@@ -1,0 +1,1158 @@
+# 🏭 EPIC: Multi-Tenant Textile Manufacturing ERP System
+## Lavoro AI Ferri - Complete Development Roadmap
+
+---
+
+## 💻 Technology Stack & Languages
+
+### **Backend**
+- **Language**: TypeScript (Node.js)
+- **Framework**: Express.js
+- **Database**: PostgreSQL with Prisma ORM
+- **Authentication**: JWT (JSON Web Tokens)
+- **Caching**: Redis
+- **API Documentation**: Swagger/OpenAPI
+
+### **Frontend** (Future Implementation)
+- **Language**: TypeScript
+- **Framework**: React.js with Vite
+- **UI Library**: Ant Design + Sass/SCSS
+- **State Management**: React Context API + localStorage
+- **Form Handling**: Ant Design Form
+- **Routing**: React Router v6
+- **API State**: React Query (optional, for caching)
+- **Icons**: Ant Design icons
+
+### **DevOps & Infrastructure**
+- **Containerization**: Docker + Docker Compose
+- **Orchestration**: Kubernetes
+- **CI/CD**: GitHub Actions
+- **Cloud**: AWS/GCP (planned)
+- **Monitoring**: Prometheus + Grafana (planned)
+
+### **Testing**
+- **Unit Testing**: Jest
+- **API Testing**: Supertest
+- **E2E Testing**: Playwright (planned)
+
+---
+
+## 📋 EPIC Overview
+
+**Epic Name**: Multi-Tenant Textile Manufacturing ERP System  
+**Duration**: 16-20 weeks  
+**Team Size**: 6-8 developers (Backend-focused currently)  
+**Priority**: P0 (Critical Business Initiative)  
+**Current Status**: Backend Phase - Foundation Complete  
+
+### **Business Objective**
+Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed for textile manufacturing, garment production, and textile trading businesses. The platform will provide end-to-end business management solutions with modern technology stack and industry-specific workflows.
+
+### **Success Metrics**
+- **User Adoption**: 100+ textile companies onboarded within 6 months
+- **Performance**: <2s page load times, 99.9% uptime
+- **User Experience**: >4.5/5 user satisfaction score
+- **Business Impact**: 30% reduction in operational overhead for clients
+
+---
+
+## 🎯 EPIC THEMES & USER STORIES
+
+### **Theme 1: Foundation & Authentication** (Weeks 1-3)
+*Multi-tenant architecture with secure user management*
+
+### **Theme 2: Company & Location Management** (Weeks 4-6)
+*Multi-company operations with location-based workflows*
+
+### **Theme 3: Core Textile Operations** (Weeks 7-10)
+*Industry-specific manufacturing and inventory management*
+
+### **Theme 4: Advanced Features & AI Integration** (Weeks 11-14)
+*Smart analytics, quality control, and business intelligence*
+
+### **Theme 5: Mobile & Integration** (Weeks 15-16)
+*Mobile app and third-party integrations*
+
+---
+
+## 📦 DEPENDENCY MANAGEMENT
+
+### **When to Run `npm install`**
+
+1. **Initial Setup (Week 1)**
+   - Backend: `npm install` after project initialization
+   - Install core dependencies: Express, TypeScript, Prisma, JWT, Redis, etc.
+
+2. **Frontend Setup (Week 2)** 
+   - Frontend: `npm install` after React project creation
+   - Install UI dependencies: Ant Design, Sass/SCSS, React Router, etc.
+
+3. **New Dependencies**
+   - Run `npm install <package-name>` when adding new features
+   - Update `package.json` and commit changes
+   - Team members run `npm install` after pulling updates
+
+4. **Production Deployment**
+   - `npm ci` for faster, reliable builds in CI/CD
+   - Docker builds include `npm install` step
+
+---
+
+## 🏗️ DETAILED DEVELOPMENT ROADMAP
+
+## **PHASE 1: FOUNDATION & AUTHENTICATION** (Weeks 1-3)
+
+### **Sprint 1.1: Backend Infrastructure Setup** (Week 1)
+
+#### **Backend Tasks**
+- [x] **Setup Node.js + Express + TypeScript project structure** ✅ **COMPLETED**
+  - [x] Initialize project with proper folder structure
+  - [x] **Run `npm install` to install all dependencies**
+  - [x] Configure TypeScript with strict mode
+  - [x] Setup ESLint, Prettier, and Husky pre-commit hooks
+  - [x] Configure environment variables management
+
+- [x] **Database Architecture & Multi-Tenant Schema Design** ✅ **COMPLETED**
+  - [x] Design PostgreSQL schema-per-tenant architecture
+  - [x] Create tenant isolation middleware
+  - [x] Setup database migrations with Prisma
+  - [x] Implement connection pooling for multiple tenants
+
+- [x] **Authentication System Backend** ✅ **COMPLETED**
+  - [x] JWT token generation and validation
+  - [x] Refresh token mechanism with Redis storage
+  - [x] Password hashing with bcrypt
+  - [x] Rate limiting for auth endpoints
+  - [x] Session management with device tracking
+
+- [x] **API Foundation** ✅ **COMPLETED**
+  - [x] RESTful API structure with versioning (/api/v1/)
+  - [x] Request/Response middleware (CORS, helmet, compression)
+  - [x] Error handling middleware with proper HTTP status codes
+  - [x] API documentation with Swagger/OpenAPI
+  - [x] Request validation with Joi schemas
+
+#### **DevOps Tasks**
+- [x] **CI/CD Pipeline Setup** ✅ **COMPLETED**
+  - [x] GitHub Actions for automated testing
+  - [x] Docker containerization for backend
+  - [x] Environment-specific deployments (dev, staging, prod)
+  - [x] Database backup and migration strategies
+
+### **Sprint 1.2: Frontend Foundation** (Week 2)
+
+#### **Frontend Tasks**
+- [x] **React + TypeScript Project Setup** ✅ **COMPLETED**
+  - [x] Initialize React project with Vite
+  - [x] **Run `npm install` to install frontend dependencies**
+  - [x] Vite configuration with hot reload
+  - [x] Sass/SCSS + Ant Design integration
+  - [x] Folder structure for scalable architecture
+  - [x] Component library setup with Storybook
+
+- [x] **State Management & Routing** 
+  - [x] React Context API for authentication state
+  - [x] localStorage for token persistence
+  - [x] React Router with protected routes
+  - [x] Route guards for authentication and authorization
+
+- [x] **Design System Implementation** ✅ **COMPLETED**
+  - [x] Color palette and typography system
+  - [x] Align tokens with User-Flow doc: Primary #7b5fc9, Secondary #a2d8e5, Success/Error/Warning; Typography: Poppins (headings), Inter (body)
+  - [x] Reusable component library (AuthCard, LinkButton, GradientButton, AuthLayout)
+  - [x] Responsive breakpoints and utilities
+  - [x] Icon system with Ant Design icons (Lucide removed)
+  - [x] Light and Dark themes (token-driven, Sass + AntD), theme switcher, respects prefers-color-scheme
+  - [x] Global CSS classes for auth form styling
+  - [x] Animated gradient buttons with shimmer effects
+
+- [x] **Authentication UI Components** ✅ **COMPLETED**
+  - [x] Login form with validation and remember me functionality
+  - [x] Google Sign-In on Login screen
+    - Button: "Continue with Google" using official branding (AntD Button with Google icon)
+    - Flow: OAuth 2.0 (Google) → receive auth code/token → backend exchanges/validates → frontend stores tokens in localStorage via AuthContext
+    - Redirects: Support redirect back to `/companies` after successful login
+    - Error handling: Toast on failure, disabled state while loading
+    - Security: Use PKCE; never store Google ID token beyond backend validation
+    - Config: `.env` keys for Google Client ID; document setup steps
+    - Analytics: Track clicks/success/failure (future)
+  - [x] Social icons on Login screen footer (Facebook, YouTube, Instagram)
+    - Icons: Use Ant Design icons
+    - Placement: Below form with a divider "Follow us"
+    - Behavior: External links open in new tab, `rel="noopener noreferrer"`
+    - Accessibility: Provide aria-labels and focus styles
+    - Theming: Icons adapt to light/dark theme and primary color on hover
+  - [x] Registration form (single-screen process)
+    - Removed multi-step wizard for faster user experience
+    - All 5 fields on single screen: First name, Last name, Email/Phone, Password, Confirm Password
+    - Single email/phone field with smart validation for both formats
+    - Terms & Conditions checkbox with link buttons
+    - Help text: "Enter your email address or phone number with country code (e.g., +1 for US, +91 for India)"
+    - Uniqueness validation across all users
+  - [x] Forgot password flow (icon-only steps)
+  - [x] Form validation with Ant Design Form
+  - [x] Animated gradient buttons with shimmer effects
+  - [x] Global AuthLayout component with logo positioning
+  - [x] Remember me functionality with localStorage integration
+
+### **Sprint 1.3: User Authentication Flow** (Week 3) ✅ **COMPLETED**
+
+#### **Backend API Integration**
+- [x] **User Registration System** ✅ **COMPLETED**
+  - [x] Backend: User creation with email/phone validation
+  - [x] Frontend: Single-screen registration form with smart validation
+  - [x] Email verification system
+  - [x] Phone number verification with OTP
+  - [x] Single email/phone field with country code support
+  - [x] Uniqueness validation across all users
+  - [x] Combined email/phone validation with regex patterns
+  - [x] Terms & Conditions acceptance
+  - [x] Password strength validation (8+ chars, uppercase, lowercase, number)
+
+- [x] **Login & Session Management** ✅ **COMPLETED**
+  - [x] Backend: Login endpoint with JWT generation
+  - [x] Frontend: Login form with remember me functionality
+  - [x] Automatic token refresh mechanism
+  - [x] Session timeout handling
+  - [x] Session storage management
+  - [x] Remember me with localStorage for email/phone persistence
+  - [x] Auto-populate login field on return visits
+
+- [x] **Password Management** ✅ **PARTIALLY COMPLETED**
+  - [x] Forgot password flow with icon-only steps
+  - [ ] Password reset with email/SMS
+  - [x] Password strength validation (Backend)
+  - [ ] Password change functionality
+
+- [x] **Authentication API Endpoints** ✅ **COMPLETED**
+  - [x] POST `/api/v1/auth/register` - User registration
+  - [x] POST `/api/v1/auth/login` - User login
+  - [x] POST `/api/v1/auth/refresh` - Token refresh
+  - [x] POST `/api/v1/auth/logout` - User logout
+  - [x] GET `/api/v1/auth/profile` - Get user profile
+  - [x] GET `/api/v1/auth/sessions` - Get user sessions
+  - [x] DELETE `/api/v1/auth/sessions/:id` - Revoke session
+
+---
+
+## **PHASE 2: COMPANY & LOCATION MANAGEMENT** (Weeks 4-6)
+
+### **Sprint 2.1: Multi-Tenant Company System** (Week 4)
+
+#### **Backend Tasks**
+- [ ] **Company Management API**
+  - Company CRUD operations with tenant isolation
+  - Company slug generation and uniqueness validation
+  - User-company relationship management
+  - Role-based permissions per company
+  - **Default Location Name** handling during company creation
+  - Location creation with custom name as head office + default
+  - Financial document location reference (invoices, bills, POs)
+
+- [ ] **Tenant Context Switching**
+  - Company selection endpoint
+  - JWT token regeneration with company context
+  - Middleware for tenant validation
+  - Cross-tenant data isolation verification
+
+#### **Frontend Tasks**
+- [ ] **Company Selection Interface**
+  - Company list API integration
+  - Header: Logo (top-left) + Create Company + User Profile (top-right)
+  - Tab system: "Owner" | "Roles" tabs
+  - Single-line list items (not cards) with company info
+  - Role badges (OWNER, ADMIN, MANAGER, EMPLOYEE)
+  - Industry type display
+  - Empty state with Ant Design Empty component
+  - Click anywhere on row → Switch context → Dashboard
+  - **Create Company**: Opens Ant Design Drawer (not separate page)
+  - Professional dashboard feel with clear hierarchy
+  - [ ] Update Companies page UI and behavior per spec (tabs, row layout, status badges, empty state)
+
+- [ ] **Company Creation Drawer**
+  - **Ant Design Drawer component** with single scrollable form
+  - **Drawer trigger**: "Create Company" button on company selection page
+  - **Drawer size**: Large (width: 720px) to accommodate form fields
+  - **Section 1: Basic Information** (name, slug, industry, description, country)
+  - **Section 2: Head Office Location** (Default Location Name, Address Line 1, Address Line 2, City, State, Pincode)
+  - **Section 3: Business Details** (established year, business type, certifications)
+  - **Section 4: Contact Information** (phone, email, website, tax ID)
+  - **Section 5: Branding** (logo upload, company colors)
+  - **Form Layout**: Single form with section headings and dividers
+  - **Action Buttons**: Cancel & Create Company at bottom of drawer
+  - Auto-generate slug from company name with uniqueness validation
+  - **Default Location Name field**: Custom name for head office location
+  - Head office automatically becomes headquarters AND default location
+  - Default location used in invoices, bills, POs, and financial documents
+  - User automatically becomes OWNER with full permissions
+  - Immediate tenant schema creation for data isolation
+  - Logo upload with drag & drop, image cropping, file validation
+  - **On completion**: Close drawer, refresh company list, auto-select new company
+
+### **Sprint 2.2: Location Management System** (Week 5)
+
+#### **Backend Tasks**
+- [ ] **Location Management API**
+  - Location CRUD with company association
+  - Headquarters designation logic
+  - **Default location management with custom naming**
+  - Address validation and geocoding
+  - **Default/Head Office changeability**: Allow changing default and head office status
+  - **Financial document integration**: Link default location to invoices, bills, POs
+  - Location hierarchy management (head office can be different from default)
+
+#### **Frontend Tasks**
+- [ ] **Location Management Interface**
+  - Location List Screen (`/locations`) with card layout
+  - Header: "Company Locations" + Add Location button
+  - Badges: "Headquarters", "Default", "Active/Inactive"
+  - Location types: Headquarters, Branch, Warehouse, Factory
+  - Bulk actions: Activate/deactivate multiple locations
+  - **Default/Head Office toggle buttons**: Allow changing default and headquarters status
+  - Location Creation/Edit Screen (`/locations/create` or `/locations/:id/edit`)
+  - **Form Fields Structure**:
+    - **Location ID**: Auto-generated from backend (disabled/read-only)
+    - **Location Name**: Custom name (required)
+    - **Location Image**: Image upload with drag & drop, cropping, file validation (optional)
+    - **Email**: Location-specific email (optional)
+    - **Phone Number**: Location contact number (optional)
+    - **Country**: Country selection dropdown (required)
+    - **Default**: Toggle switch (only one per company)
+    - **Head Office**: Toggle switch (only one per company)
+    - **Address Line 1**: Primary address (required)
+    - **Address Line 2**: Secondary address (optional)
+    - **City**: City name (required)
+    - **State**: State/Province (required)
+    - **Pincode**: Postal/ZIP code (required)
+  - **Validation Logic**: Ensure only one Default and one Head Office per company
+  - **Auto-toggle**: When setting new Default/Head Office, automatically unset previous ones
+  - Location Details Screen (`/locations/:id`) with comprehensive information
+  - Sections: Overview, Operations, Analytics, Activity, Financial Usage
+
+### **Sprint 2.3: User & Role Management** (Week 6)
+
+#### **Backend Tasks**
+- [ ] **User Management API**
+  - User invitation system
+  - Role assignment and permission management
+  - Bulk user operations
+  - User activity tracking
+
+#### **Frontend Tasks**
+- [ ] **User Management Interface**
+  - Users List Screen (`/users`) with professional table layout
+  - Header: "Team Members" + Invite User button
+  - Table: User list with avatar, name, email, role, status, last active
+  - Filters: Role, status, department, location
+  - Role management: Change user roles (OWNER → ADMIN → MANAGER → EMPLOYEE)
+  - Status control: Active/inactive user management
+  - Bulk actions: Role changes, status updates
+  - User search: Name, email, role filtering
+  - User Invitation Screen (`/users/invite`) with welcoming design
+  - Form fields: User info, role assignment, location assignment, department
+  - Role preview: Show permissions for selected role
+  - Bulk invites: CSV upload for multiple invitations
+  - Custom message: Personalized invitation text
+  - User Profile Screen (`/users/:id`) with detailed analytics
+  - Sections: Personal, Role & Permissions, Activity, Performance
+  - Role history: Track role changes over time
+  - Permission details: Granular permission view
+  - Activity timeline: Comprehensive user activity
+
+---
+
+## **PHASE 2.5: DASHBOARD & CORE UI** (Week 6.5)
+
+### **Sprint 2.5: Main Dashboard Implementation**
+
+#### **Backend Tasks**
+- [ ] **Dashboard Data APIs**
+  - KPI calculation endpoints
+  - Real-time activity feed API
+  - Company metrics aggregation
+  - Quick actions data services
+
+#### **Frontend Tasks**
+- [ ] **Main Dashboard Implementation**
+  - Main Dashboard (`/dashboard`) with executive layout
+  - Header: Logo, company switcher, search, notifications, user menu
+  - Sidebar: Navigation menu (collapsible)
+  - KPI Cards: Users, Locations, Activity, Growth metrics
+  - Real-time updates: Live activity feed
+  - Quick actions: Common tasks shortcuts
+  - Company switcher: Multi-tenant company selection
+  - Analytics Dashboard (`/analytics`) with detailed reporting
+  - User analytics: Login patterns, role distribution, activity heatmaps
+  - Location analytics: Utilization, performance, growth
+  - System analytics: Performance metrics, usage statistics
+  - Date range filters: Custom reporting periods
+  - Export options: PDF, Excel, CSV reports
+  - Drill-down: Detailed views from summary data
+
+- [ ] **Settings Screens Implementation**
+  - Account Settings (`/settings/account`) for personal management
+  - Sections: Profile, Security, Preferences, Privacy
+  - Password change with strength indicator
+  - 2FA toggle, login notifications, session timeout
+  - Company Settings (`/settings/company`) for Owner/Admin
+  - Sections: General, Locations, Users, Integrations, Billing
+  - Administrative interface with comprehensive organization
+
+- [ ] **Profile Management Suite**
+  - User Profile Page (`/profile`) with edit/view mode toggle
+  - Personal, Contact, Account information sections
+  - Avatar upload with cropping functionality
+  - Password Change (`/profile/password`) with security features
+  - Security Settings (`/profile/security`) with comprehensive options
+  - Device Management (`/profile/devices`) with tracking
+  - Activity Log (`/profile/activity`) with filtering and export
+
+---
+
+## **PHASE 3: CORE TEXTILE OPERATIONS** (Weeks 7-10)
+
+### **Sprint 3.1: Inventory Management System** (Week 7)
+
+#### **Backend Tasks**
+- [ ] **Inventory Database Design**
+  - Raw materials, WIP, finished goods schemas
+  - Stock movement tracking
+  - Location-based inventory
+  - Batch/lot tracking for textiles
+
+- [ ] **Inventory Management API**
+  - Stock CRUD operations
+  - Stock movement logging
+  - Low stock alerts
+  - Inventory valuation (FIFO, LIFO, Weighted Average)
+
+#### **Frontend Tasks**
+- [ ] **Inventory Dashboard**
+  - Stock levels overview
+  - Low stock alerts
+  - Inventory movement history
+  - Stock adjustment forms
+
+- [ ] **Material Management**
+  - Raw material catalog
+  - Supplier management
+  - Purchase order creation
+  - Goods receipt processing
+
+### **Sprint 3.2: Production Management** (Week 8)
+
+#### **Backend Tasks**
+- [ ] **Production Planning System**
+  - Production order management
+  - Bill of Materials (BOM) handling
+  - Capacity planning algorithms
+  - Production scheduling
+
+- [ ] **Manufacturing Workflow API**
+  - Work order creation and tracking
+  - Production stage management
+  - Resource allocation
+  - Production reporting
+
+#### **Frontend Tasks**
+- [ ] **Production Dashboard**
+  - Production KPIs and metrics
+  - Work order management
+  - Production scheduling interface
+  - Resource utilization charts
+
+- [ ] **Manufacturing Execution**
+  - Shop floor data entry
+  - Production progress tracking
+  - Quality checkpoints
+  - Waste tracking and reporting
+
+### **Sprint 3.3: Order Management System** (Week 9)
+
+#### **Backend Tasks**
+- [ ] **Order Processing System**
+  - Sales order management
+  - Order fulfillment workflow
+  - Delivery scheduling
+  - **Invoice generation with default location integration**
+  - **Bill generation with head office/default location details**
+  - **Purchase Order (PO) creation with location-based addressing**
+  - **Financial document location referencing system**
+
+#### **Frontend Tasks**
+- [ ] **Order Management Interface**
+  - Order creation and editing
+  - Order status tracking
+  - Customer management
+  - Delivery management
+
+### **Sprint 3.4: Quality Control System** (Week 10)
+
+#### **Backend Tasks**
+- [ ] **Quality Management API**
+  - Quality control checkpoints
+  - Defect tracking and categorization
+  - Quality metrics calculation
+  - Compliance reporting
+
+#### **Frontend Tasks**
+- [ ] **Quality Control Dashboard**
+  - Quality metrics visualization
+  - Defect tracking interface
+  - Inspection checklists
+  - Quality reports generation
+
+---
+
+## **PHASE 3.5: TEXTILE-SPECIFIC MODULES** (Week 10.5)
+
+### **Sprint 3.5: Industry-Specific Features**
+
+#### **Backend Tasks**
+- [ ] **Textile Manufacturing Modules**
+  - Fabric Production APIs (Cotton, silk, wool, synthetic fiber processing)
+  - Yarn Manufacturing (Spinning, weaving, knitting operations)
+  - Dyeing & Finishing (Color processing, fabric treatment, quality control)
+  - Pattern & Design (CAD integration, design management, sample tracking)
+
+- [ ] **Garment Manufacturing APIs**
+  - Cut & Sew Operations (Pattern cutting, assembly line management)
+  - Quality Control (Inspection workflows, defect tracking, compliance)
+  - Order Management (Bulk orders, custom manufacturing, delivery tracking)
+  - Inventory Management (Raw materials, work-in-progress, finished goods)
+
+- [ ] **Textile Trading Systems**
+  - Wholesale Operations (Bulk fabric trading, distributor management)
+  - Retail Integration (B2B and B2C sales channels)
+  - Import/Export (International trade compliance, documentation)
+  - Supply Chain (Vendor management, logistics, warehousing)
+
+#### **Frontend Tasks**
+- [ ] **Textile Manufacturing Interface**
+  - Fabric Production Dashboard with process monitoring
+  - Yarn Manufacturing workflow management
+  - Dyeing & Finishing quality control interface
+  - Pattern & Design CAD integration tools
+
+- [ ] **Garment Manufacturing UI**
+  - Cut & Sew Operations management interface
+  - Quality Control inspection workflows
+  - Bulk order management system
+  - Assembly line monitoring dashboard
+
+- [ ] **Trading Operations Interface**
+  - Wholesale trading platform
+  - B2B/B2C sales channel management
+  - Import/Export documentation system
+  - Supply chain visibility dashboard
+
+---
+
+## **PHASE 4: ADVANCED FEATURES & AI INTEGRATION** (Weeks 11-14)
+
+### **Sprint 4.1: Business Intelligence & Analytics** (Week 11)
+
+#### **Backend Tasks**
+- [ ] **Analytics Engine**
+  - Data aggregation services
+  - KPI calculation algorithms
+  - Report generation system
+  - Data export functionality
+
+#### **Frontend Tasks**
+- [ ] **Analytics Dashboard**
+  - Executive dashboard with KPIs
+  - Interactive charts and graphs
+  - Custom report builder
+  - Data visualization components
+
+### **Sprint 4.2: AI-Powered Features** (Week 12)
+
+#### **Backend Tasks**
+- [ ] **AI/ML Integration**
+  - Demand forecasting algorithms
+  - Quality prediction models
+  - Inventory optimization AI
+  - Predictive maintenance system
+
+#### **Frontend Tasks**
+- [ ] **AI Features Interface**
+  - Demand forecasting dashboard
+  - AI-powered recommendations
+  - Predictive analytics visualization
+  - Smart alerts and notifications
+
+### **Sprint 4.3: Financial Management** (Week 13)
+
+#### **Backend Tasks**
+- [ ] **Financial System**
+  - Cost accounting for textile operations
+  - Profitability analysis
+  - Budget management
+  - **Financial reporting with location-based data**
+  - **Invoice/Bill/PO location integration**
+  - **Default location address in financial documents**
+  - **Location-wise financial analytics and reporting**
+
+#### **Frontend Tasks**
+- [ ] **Financial Dashboard**
+  - Cost analysis interface
+  - Profit/loss visualization
+  - Budget tracking
+  - Financial reports
+
+### **Sprint 4.4: Compliance & Reporting** (Week 14)
+
+#### **Backend Tasks**
+- [ ] **Compliance Management**
+  - Regulatory compliance tracking
+  - Audit trail system
+  - Document management
+  - Certification tracking
+
+#### **Frontend Tasks**
+- [ ] **Compliance Interface**
+  - Compliance dashboard
+  - Document upload and management
+  - Audit trail viewer
+  - Compliance reports
+
+---
+
+## **PHASE 5: MOBILE & INTEGRATION** (Weeks 15-16)
+
+### **Sprint 5.1: Mobile Application** (Week 15)
+
+#### **Mobile Development Tasks**
+- [ ] **React Native App Development**
+  - Cross-platform mobile app
+  - Offline capability for shop floor
+  - Barcode/QR code scanning
+  - Push notifications
+
+### **Sprint 5.2: Third-Party Integrations** (Week 16)
+
+#### **Integration Tasks**
+- [ ] **ERP Integrations**
+  - SAP, Oracle integration APIs
+  - Accounting software integration
+  - E-commerce platform connections
+  - Logistics partner APIs
+
+---
+
+## **PHASE 4.5: TEXTILE INDUSTRY CHALLENGES** (Week 14.5)
+
+### **Sprint 4.5: Industry Challenge Solutions**
+
+#### **Operational Efficiency Solutions**
+- [ ] **Multi-Location Management**
+  - Factories, warehouses, retail outlets coordination
+  - Production planning with capacity planning and resource allocation
+  - Quality assurance with standardized processes
+  - Cost optimization for material waste reduction and energy efficiency
+
+#### **Business Intelligence Implementation**
+- [ ] **Real-time Analytics**
+  - Production metrics, sales performance, profitability dashboards
+  - Demand forecasting with AI-powered prediction
+  - Financial management with cost accounting and profit analysis
+  - Compliance reporting for industry regulations and export documentation
+
+#### **Stakeholder Management Systems**
+- [ ] **Supplier Integration**
+  - Vendor portals and procurement automation
+  - Customer management with order tracking and delivery management
+  - Team collaboration with role-based access and workflow management
+
+---
+
+## 🆕 NEW INNOVATIVE FEATURES
+
+### **1. Smart Textile Tracking System**
+- **RFID/NFC Integration**: Track fabric rolls and garments throughout production
+- **Blockchain Traceability**: Immutable record of textile journey from fiber to finished product
+- **Sustainability Metrics**: Carbon footprint tracking and sustainability scoring
+
+### **2. AI-Powered Quality Vision System**
+- **Computer Vision**: Automated defect detection in fabrics using camera systems
+- **Machine Learning**: Pattern recognition for quality classification
+- **Real-time Alerts**: Instant notifications for quality issues
+
+### **3. Virtual Textile Designer**
+- **3D Fabric Visualization**: Virtual fabric rendering and pattern design
+- **Color Matching AI**: Intelligent color matching and recommendation system
+- **Digital Twin**: Virtual representation of production processes
+
+### **4. Smart Factory IoT Integration**
+- **Machine Connectivity**: Real-time machine data collection
+- **Predictive Maintenance**: AI-powered equipment failure prediction
+- **Energy Optimization**: Smart energy consumption monitoring and optimization
+
+### **5. Advanced Supply Chain Intelligence**
+- **Supplier Risk Assessment**: AI-powered supplier reliability scoring
+- **Dynamic Pricing**: Real-time market price tracking and optimization
+- **Logistics Optimization**: Route optimization for deliveries
+
+### **6. Customer Experience Portal**
+- **B2B Customer Portal**: Self-service order tracking and management
+- **Custom Product Configurator**: Interactive product customization tools
+- **Virtual Showroom**: 3D product visualization for customers
+
+### **7. Sustainability & ESG Reporting**
+- **Environmental Impact Tracking**: Water usage, chemical consumption monitoring
+- **ESG Compliance Dashboard**: Environmental, Social, Governance metrics
+- **Circular Economy Features**: Waste reduction and recycling tracking
+
+### **8. Advanced Analytics & Forecasting**
+- **Market Trend Analysis**: Fashion trend prediction using social media data
+- **Seasonal Demand Forecasting**: AI-powered demand prediction
+- **Price Optimization**: Dynamic pricing based on market conditions
+
+### **9. Multi-Currency & Localization**
+- **Global Trading Support**: Multi-currency management
+- **Localization**: Multiple languages and regional requirements
+- **Compliance Ready**: Built-in support for textile industry regulations
+- **GDPR Compliance**: Secure data handling and protection
+
+### **10. Competitive Advantages Implementation**
+- **Cloud-Native Architecture**: Scalable, secure, accessible from anywhere
+- **Mobile-First Design**: Responsive design for factory floor and field operations
+- **API-First Approach**: Easy integration with existing systems and equipment
+- **Enterprise Security**: Complete data isolation, audit trails, role-based access
+
+---
+
+## 🛠️ TECHNICAL ARCHITECTURE
+
+### **Frontend Architecture**
+```
+src/
+├── components/          # Reusable UI components
+│   ├── ui/             # Basic UI components (buttons, inputs)
+│   ├── forms/          # Form components
+│   ├── charts/         # Data visualization components
+│   └── layout/         # Layout components
+├── pages/              # Page components
+│   ├── auth/           # Authentication pages
+│   ├── company/        # Company management
+│   ├── inventory/      # Inventory management
+│   ├── production/     # Production management
+│   └── analytics/      # Analytics and reporting
+├── hooks/              # Custom React hooks
+├── services/           # API service functions
+├── context/            # React Context providers (auth, company, UI)
+├── utils/              # Utility functions
+├── types/              # TypeScript type definitions
+└── assets/             # Static assets
+```
+
+### **Backend Architecture**
+```
+src/
+├── controllers/        # Route controllers
+├── middleware/         # Express middleware
+├── models/            # Database models
+├── services/          # Business logic services
+├── utils/             # Utility functions
+├── config/            # Configuration files
+├── migrations/        # Database migrations
+├── seeds/             # Database seeds
+└── tests/             # Test files
+```
+
+### **Database Schema Design**
+
+#### **Multi-Tenant Tables**
+- `tenants` - Company/tenant information
+- `users` - Global user table
+- `user_tenants` - User-tenant relationships with roles
+
+#### **Tenant-Specific Schemas**
+Each tenant gets isolated schema with:
+- `inventory_items`
+- `production_orders`
+- `quality_records`
+- `financial_transactions`
+- `locations` (with custom name, is_default, is_headquarters flags)
+- `suppliers`
+- `customers`
+- `invoices` (with location_id reference)
+- `bills` (with location_id reference)
+- `purchase_orders` (with location_id reference)
+- `financial_documents` (with default_location integration)
+
+---
+
+## 🔧 DEVELOPMENT STANDARDS
+
+### **Code Quality Standards**
+- **TypeScript**: Strict mode enabled
+- **ESLint**: Airbnb configuration
+- **Prettier**: Code formatting
+- **Husky**: Pre-commit hooks
+- **Jest/Vitest**: Unit testing (>80% coverage)
+- **Cypress**: E2E testing
+
+### **API Standards**
+- **RESTful Design**: Consistent endpoint naming
+- **OpenAPI Documentation**: Complete API documentation
+- **Error Handling**: Standardized error responses
+- **Validation**: Input validation with Joi/Zod
+- **Rate Limiting**: API rate limiting
+- **Caching**: Redis caching for performance
+
+### **Security Standards**
+- **Authentication**: JWT with refresh tokens
+- **Authorization**: Role-based access control
+- **Data Encryption**: Sensitive data encryption
+- **HTTPS**: SSL/TLS encryption
+- **OWASP**: Security best practices
+- **Audit Logging**: Complete audit trails
+
+---
+
+## 📊 PERFORMANCE REQUIREMENTS
+
+### **Frontend Performance**
+- **First Contentful Paint**: <1.5s
+- **Largest Contentful Paint**: <2.5s
+- **Cumulative Layout Shift**: <0.1
+- **First Input Delay**: <100ms
+- **Bundle Size**: <500KB (gzipped)
+
+### **Backend Performance**
+- **API Response Time**: <200ms (95th percentile)
+- **Database Query Time**: <100ms average
+- **Concurrent Users**: 1000+ simultaneous users
+- **Uptime**: 99.9% availability
+- **Scalability**: Horizontal scaling capability
+
+---
+
+## 🧪 TESTING STRATEGY
+
+### **Frontend Testing**
+- **Unit Tests**: Component testing with React Testing Library
+- **Integration Tests**: API integration testing
+- **E2E Tests**: User journey testing with Cypress
+- **Visual Tests**: Screenshot testing for UI consistency
+- **Performance Tests**: Lighthouse CI integration
+
+### **Backend Testing**
+- **Unit Tests**: Service and utility function testing
+- **Integration Tests**: API endpoint testing
+- **Database Tests**: Migration and query testing
+- **Load Tests**: Performance testing with Artillery
+- **Security Tests**: Vulnerability scanning
+
+---
+
+## 📈 MONITORING & OBSERVABILITY
+
+### **Application Monitoring**
+- **Error Tracking**: Sentry for error monitoring
+- **Performance Monitoring**: Application performance metrics
+- **User Analytics**: User behavior tracking
+- **Business Metrics**: KPI monitoring dashboards
+
+### **Infrastructure Monitoring**
+- **Server Monitoring**: CPU, memory, disk usage
+- **Database Monitoring**: Query performance, connection pools
+- **Network Monitoring**: Latency, throughput metrics
+- **Log Aggregation**: Centralized logging with ELK stack
+
+---
+
+## 🚀 DEPLOYMENT STRATEGY
+
+### **Environment Setup**
+- **Development**: Local development with Docker Compose
+- **Staging**: Staging environment for testing
+- **Production**: Production deployment with load balancing
+- **Disaster Recovery**: Backup and recovery procedures
+
+### **CI/CD Pipeline**
+```yaml
+Stages:
+1. Code Commit → GitHub
+2. Automated Tests → GitHub Actions
+3. Build & Package → Docker Images
+4. Deploy to Staging → Automated
+5. E2E Tests → Cypress
+6. Deploy to Production → Manual Approval
+7. Post-Deployment Tests → Automated
+```
+
+---
+
+## 📋 ACCEPTANCE CRITERIA
+
+### **Phase 1 Completion Criteria**
+- [ ] User registration and login working
+- [ ] Multi-tenant architecture implemented
+- [ ] Company creation and selection functional
+- [ ] Basic user management operational
+
+### **Phase 2 Completion Criteria**
+- [ ] Location management system complete
+- [ ] Role-based access control implemented
+- [ ] Company switching functional
+- [ ] User invitation system working
+
+### **Phase 3 Completion Criteria**
+- [ ] Inventory management operational
+- [ ] Production management functional
+- [ ] Order processing system complete
+- [ ] Quality control system implemented
+
+### **Phase 4 Completion Criteria**
+- [ ] Analytics dashboard functional
+- [ ] AI features implemented
+- [ ] Financial management operational
+- [ ] Compliance system complete
+
+### **Phase 5 Completion Criteria**
+- [ ] Mobile app deployed
+- [ ] Third-party integrations functional
+- [ ] Performance benchmarks met
+- [ ] Security audit passed
+
+---
+
+## 🎯 SUCCESS METRICS & KPIs
+
+### **Technical KPIs**
+- **Code Coverage**: >80%
+- **Bug Density**: <1 bug per 1000 lines of code
+- **API Response Time**: <200ms average
+- **Application Uptime**: >99.9%
+- **Security Vulnerabilities**: Zero critical vulnerabilities
+
+### **Business KPIs**
+- **User Adoption Rate**: >70% of invited users active
+- **Feature Utilization**: >60% of features used regularly
+- **Customer Satisfaction**: >4.5/5 rating
+- **Time to Value**: <2 weeks for new customers
+- **Revenue Impact**: 30% operational cost reduction for clients
+
+---
+
+## 🔄 RISK MITIGATION
+
+### **Technical Risks**
+- **Scalability Issues**: Implement horizontal scaling from day 1
+- **Data Security**: Multi-layer security with encryption
+- **Performance Bottlenecks**: Continuous performance monitoring
+- **Third-party Dependencies**: Vendor risk assessment
+
+### **Business Risks**
+- **Market Competition**: Unique textile-specific features
+- **Customer Adoption**: Comprehensive onboarding program
+- **Regulatory Changes**: Flexible compliance framework
+- **Technology Changes**: Modular architecture for adaptability
+
+---
+
+## 📚 DOCUMENTATION REQUIREMENTS
+
+### **Technical Documentation**
+- **API Documentation**: Complete OpenAPI specifications
+- **Architecture Documentation**: System design documents
+- **Database Schema**: ER diagrams and data dictionary
+- **Deployment Guide**: Step-by-step deployment instructions
+
+### **User Documentation**
+- **User Manual**: Comprehensive user guide
+- **Admin Guide**: System administration documentation
+- **Training Materials**: Video tutorials and guides
+- **FAQ**: Common questions and troubleshooting
+
+---
+
+## 🔗 API ENDPOINTS SUMMARY
+
+### **Authentication APIs**
+- `POST /api/auth/register` - User registration with email/phone validation
+- `POST /api/auth/login` - User login (NO company context in response)
+- `POST /api/auth/refresh` - Token refresh mechanism
+- `POST /api/auth/logout` - User logout with session cleanup
+- `POST /api/auth/forgot-password` - Password reset request
+- `POST /api/auth/reset-password` - Password reset confirmation
+
+### **Company Management APIs**
+- `GET /api/v1/companies` - Get user's companies with roles
+- `POST /api/v1/companies` - Create new company (user becomes OWNER)
+- `GET /api/v1/companies/:tenantId` - Get company details
+- `POST /api/v1/companies/:tenantId/switch` - Switch company context with token regeneration
+- `POST /api/v1/companies/:tenantId/invite` - Invite user to company with role assignment
+- `POST /api/v1/companies/:tenantId/accept-invitation` - Accept invitation and join company
+
+### **User Management APIs**
+- `GET /api/v1/users/profile` - Get user profile
+- `PUT /api/v1/users/profile` - Update user profile
+- `POST /api/v1/users/change-password` - Change password
+- `GET /api/v1/users/activity` - Get activity log with filtering
+- `GET /api/v1/users/devices` - Get user devices
+- `DELETE /api/v1/users/devices/:deviceId` - Revoke device
+
+### **Location Management APIs**
+- `GET /api/v1/locations` - Get company locations
+- `POST /api/v1/locations` - Create new location with custom name
+- `GET /api/v1/locations/:id` - Get location details
+- `PUT /api/v1/locations/:id` - Update location (including default/HQ status)
+- `DELETE /api/v1/locations/:id` - Delete location (except headquarters)
+- `POST /api/v1/locations/:id/set-default` - Set location as default for financial docs
+- `POST /api/v1/locations/:id/set-headquarters` - Set location as headquarters
+- `GET /api/v1/locations/default` - Get current default location for financial documents
+
+### **Textile Industry APIs**
+- `GET /api/v1/inventory` - Inventory management endpoints
+- `POST /api/v1/production/orders` - Production order management
+- `GET /api/v1/quality/metrics` - Quality control metrics
+- `POST /api/v1/textile/fabric-production` - Fabric production tracking
+- `GET /api/v1/garment/cut-sew` - Garment manufacturing operations
+- `POST /api/v1/trading/wholesale` - Wholesale trading operations
+
+---
+
+## 🎨 DESIGN SYSTEM & UI GUIDELINES
+
+### **Color Palette**
+- **Primary**: #7b5fc9 (Purple) - Main brand color for buttons, links, active states
+- **Secondary**: #a2d8e5 (Light Blue) - Accent color for badges, highlights
+- **Success**: #52c41a (Green) - Success states, active status
+- **Error**: #ff4d4f (Red) - Error states, inactive status
+- **Warning**: #faad14 (Orange) - Warning states, pending actions
+- **Background**: #f5f5f5 (Light Gray) - Page backgrounds
+- **Surface**: #ffffff (White) - Card backgrounds, modals
+
+### **Typography**
+- **Headings**: Poppins (600 weight)
+- **Body Text**: Inter (400/500 weight)
+- **Buttons**: Inter (500 weight)
+
+### **UI/UX Guidelines**
+- **Application Logo**: Always top-left corner on all authenticated screens
+- **Logo Behavior**: Clickable, redirects to dashboard when company context exists
+- **Responsive**: Mobile-first design with breakpoints at 768px, 1024px
+- **Accessibility**: WCAG 2.1 AA compliance
+
+### **Form Guidelines**
+- **< 5 fields**: Modal
+- **5-20 fields**: Drawer component
+- **> 20 fields**: Separate screen/wizard
+
+### **Action Buttons**
+- Cancel & Save always at bottom
+- Consistent placement across all forms
+- Primary actions use brand colors
+
+### **Table Actions**
+- Multiple actions in "More" menu (three dots)
+- Ant Design icons for actions
+- Consistent action patterns
+
+### **Empty States**
+- Ant Design icons for illustrations
+- Minimal text
+- Clear call-to-action buttons
+
+---
+
+## 📋 IMPLEMENTATION STATUS TRACKING
+
+### **✅ COMPLETED FEATURES**
+- [x] **Node.js + Express + TypeScript project structure** ✅
+- [x] **TypeScript configuration with strict mode** ✅
+- [x] **ESLint, Prettier, and Husky pre-commit hooks** ✅
+- [x] **Environment variables management** ✅
+- [x] **Basic Express app with middleware setup** ✅
+- [x] **Configuration management system** ✅
+- [x] **Logger utility with Winston** ✅
+- [x] **Error handling middleware** ✅
+- [x] **Project folder structure** ✅
+- [x] **PostgreSQL schema-per-tenant architecture** ✅
+- [x] **Prisma ORM setup with multi-tenant support** ✅
+- [x] **Database connection pooling for multiple tenants** ✅
+- [x] **Tenant isolation middleware** ✅
+- [x] **Database migration system** ✅
+- [x] **Global and tenant-specific table schemas** ✅
+- [x] **JWT token generation and validation system** ✅
+- [x] **Redis integration for session management** ✅
+- [x] **Password hashing with bcrypt** ✅
+- [x] **Rate limiting middleware for auth endpoints** ✅
+- [x] **Session management with device tracking** ✅
+- [x] **Authentication service with refresh tokens** ✅
+- [x] **Authentication controllers and routes** ✅
+- [x] **Multi-tenant context switching** ✅
+- [x] **RESTful API structure with versioning (/api/v1/)** ✅
+- [x] **Enhanced CORS, Helmet, and Compression middleware** ✅
+- [x] **Comprehensive error handling with proper HTTP status codes** ✅
+- [x] **Swagger/OpenAPI documentation with interactive UI** ✅
+- [x] **Request validation with Joi schemas and sanitization** ✅
+- [x] **Request logging, tracing, and monitoring middleware** ✅
+- [x] **Rate limiting with Redis-based distributed limiting** ✅
+- [x] **Security middleware with content validation** ✅
+- [x] **API versioning and client version tracking** ✅
+- [x] **GitHub Actions CI/CD pipeline with automated testing** ✅
+- [x] **Multi-stage Docker containerization with security hardening** ✅
+- [x] **Kubernetes deployment manifests for all environments** ✅
+- [x] **Database backup and restore automation with S3 integration** ✅
+- [x] **Environment-specific deployments (dev, staging, production)** ✅
+- [x] **Blue-green deployment strategy for zero-downtime updates** ✅
+- [x] **Automated database migrations and health monitoring** ✅
+- [x] **Container security scanning and vulnerability management** ✅
+- [x] **Horizontal Pod Autoscaling and resource optimization** ✅
+- [ ] User registration wizard (3 steps) with API integration
+- [ ] User login form with validation and backend integration
+- [ ] Authentication service with automatic token refresh
+- [ ] Role-based access control system (OWNER, ADMIN, MANAGER, EMPLOYEE)
+- [ ] Multi-tenant architecture with schema-per-tenant
+- [ ] Company creation wizard with complete form validation
+- [ ] Company switching with JWT token regeneration
+- [ ] User invitation system with proper role assignment
+
+### **🔄 IN PROGRESS**
+- [ ] Company list/selection screen implementation (CRITICAL)
+- [ ] Dashboard KPI cards and widgets with company context
+- [ ] Location management system
+- [ ] User profile management suite
+
+### **📋 TODO PRIORITIES**
+- [ ] Manufacturing management modules
+- [ ] Inventory management system
+- [ ] Quality control features
+- [ ] Financial management tools
+- [ ] Layout components (header, sidebar) for authenticated screens
+- [ ] Textile-specific industry modules
+- [ ] AI-powered features integration
+- [ ] Mobile application development
+- [ ] Third-party integrations
+
+---
+
+## 🎉 CONCLUSION
+
+This EPIC provides a comprehensive roadmap for building a world-class multi-tenant textile manufacturing ERP system. The phased approach ensures steady progress while maintaining quality and security standards. The innovative features will differentiate the platform in the competitive ERP market, specifically targeting the unique needs of the textile industry.
+
+The combination of modern technology stack, AI-powered features, and industry-specific workflows will create a powerful platform that transforms traditional textile businesses into modern, data-driven operations with improved efficiency, reduced costs, and enhanced competitiveness in the global market.
+
+**Total Estimated Effort**: 18-22 weeks with 6-8 person team (extended due to comprehensive feature set)  
+**Budget Estimate**: $900K - $1.4M (including team, infrastructure, and tools)  
+**ROI Timeline**: 6-12 months post-launch  
+**Market Opportunity**: $50M+ textile ERP market segment
+
+### **Key Success Factors**
+- **Industry Expertise**: Deep understanding of textile manufacturing processes
+- **User Experience**: Intuitive design tailored for textile industry workers
+- **Scalability**: Multi-tenant architecture supporting rapid growth
+- **Integration**: Seamless connectivity with existing textile industry systems
+- **Compliance**: Built-in support for textile industry regulations and standards
+
+### **Competitive Differentiation**
+- **Textile-Focused Workflows**: Industry-standard processes and terminology
+- **AI-Powered Intelligence**: Smart forecasting and quality control
+- **Multi-Location Support**: Comprehensive factory and warehouse management
+- **Real-Time Analytics**: Production metrics and business intelligence
+- **Mobile-First Design**: Shop floor and field operation optimization

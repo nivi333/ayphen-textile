@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["dist/*"],
+      "@/controllers/*": ["dist/controllers/*"],
+      "@/middleware/*": ["dist/middleware/*"],
+      "@/models/*": ["dist/models/*"],
+      "@/services/*": ["dist/services/*"],
+      "@/utils/*": ["dist/utils/*"],
+      "@/config/*": ["dist/config/*"],
+      "@/types/*": ["dist/types/*"]
+    }
+  }
+}
