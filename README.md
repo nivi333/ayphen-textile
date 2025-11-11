@@ -1,6 +1,6 @@
-# Lavoro AI Ferri - Backend
+# Lavoro AI Ferri - Textile ERP System
 
-Multi-tenant textile manufacturing ERP system backend built with Node.js, Express, and TypeScript.
+Multi-tenant textile manufacturing ERP system built with Node.js, Express, TypeScript, React, and modern web technologies.
 
 ## 🚀 Quick Start
 
