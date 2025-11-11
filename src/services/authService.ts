@@ -6,7 +6,6 @@ import { config } from '@/config/config';
 import { logger } from '@/utils/logger';
 import { redisClient } from '@/utils/redis';
 import { globalPrisma } from '@/database/connection';
-import { migrationManager } from '@/database/migrations';
 
 export interface AuthTokens {
   accessToken: string;
@@ -39,17 +38,6 @@ export interface RegisterData {
   deviceInfo?: string;
   userAgent?: string;
   ipAddress?: string;
-}
-
-export interface SessionInfo {
-  id: string;
-  userId: string;
-  tenantId?: string;
-  deviceInfo?: string;
-  ipAddress?: string;
-  userAgent?: string;
-  createdAt: Date;
-  expiresAt: Date;
 }
 
 export class AuthService {
@@ -234,172 +222,11 @@ export class AuthService {
     const refreshExpSec = Math.floor(refreshExpMs / 1000);
     await redisClient.setex(`refresh_token:${sessionId}`, refreshExpSec, refreshToken);
 
-    const sessionMeta = { userId, tenantId, deviceInfo, ipAddress, userAgent, createdAt: new Date().toISOString() };
-    await redisClient.setex(`session:${sessionId}`, refreshExpSec, JSON.stringify(sessionMeta));
-
     return {
       accessToken,
       refreshToken,
       expiresIn: this.parseExpirationTime(config.jwt.expiresIn) / 1000,
     };
-  }
-
-  /**
-   * Refresh access token using refresh token
-   */
-  static async refreshToken(refreshToken: string): Promise<AuthTokens> {
-    const decoded = this.verifyToken(refreshToken, 'refresh');
-
-    const storedToken = await redisClient.get(`refresh_token:${decoded.sessionId}`);
-    if (!storedToken || storedToken !== refreshToken) {
-      throw new Error('Invalid refresh token');
-    }
-
-    const session = await globalPrisma.session.findUnique({
-      where: { id: decoded.sessionId },
-    });
-
-    if (!session || session.refreshToken !== refreshToken) {
-      throw new Error('Session not found or invalid');
-    }
-
-    if (session.expiresAt < new Date()) {
-      await this.revokeSession(decoded.sessionId);
-      throw new Error('Session expired');
-    }
-
-    const newTokens = await this.createSession({
-      userId: decoded.userId,
-      sessionId: decoded.sessionId,
-      tenantId: decoded.tenantId,
-      deviceInfo: session.deviceInfo || undefined,
-      userAgent: session.userAgent || undefined,
-      ipAddress: session.ipAddress || undefined,
-    });
-
-    await redisClient.del(`refresh_token:${decoded.sessionId}`);
-
-    logger.info(`Token refreshed for user: ${decoded.userId}`);
-    return newTokens;
-  }
-
-  /**
-   * Switch tenant context (generate new tokens with tenant info)
-   */
-  static async switchTenant(userId: string, tenantId: string, sessionId: string): Promise<AuthTokens> {
-    const access = await migrationManager.validateTenantAccess(userId, tenantId);
-    if (!access.hasAccess) {
-      throw new Error('Access denied to tenant');
-    }
-
-    const session = await globalPrisma.session.findUnique({
-      where: { id: sessionId },
-    });
-
-    if (!session || session.userId !== userId) {
-      throw new Error('Invalid session');
-    }
-
-    const newTokens = await this.createSession({
-      userId,
-      sessionId,
-      tenantId,
-      deviceInfo: session.deviceInfo || undefined,
-      userAgent: session.userAgent || undefined,
-      ipAddress: session.ipAddress || undefined,
-    });
-
-    logger.info(`Tenant switched for user ${userId} to tenant ${tenantId}`);
-    return newTokens;
-  }
-
-  /**
-   * Logout user (revoke session)
-   */
-  static async logout(sessionId: string): Promise<void> {
-    await this.revokeSession(sessionId);
-    logger.info(`User logged out, session revoked: ${sessionId}`);
-  }
-
-  /**
-   * Revoke session
-   */
-  static async revokeSession(sessionId: string): Promise<void> {
-    await globalPrisma.session.delete({ where: { id: sessionId } });
-    await redisClient.del(`refresh_token:${sessionId}`, `session:${sessionId}`);
-  }
-
-  /**
-   * Get user sessions
-   */
-  static async getUserSessions(userId: string): Promise<SessionInfo[]> {
-    const sessions = await globalPrisma.session.findMany({
-      where: { userId },
-      orderBy: { createdAt: 'desc' },
-    });
-
-    return sessions.map(session => ({
-      id: session.id,
-      userId: session.userId,
-      tenantId: session.tenantId || undefined,
-      deviceInfo: session.deviceInfo || undefined,
-      ipAddress: session.ipAddress || undefined,
-      userAgent: session.userAgent || undefined,
-      createdAt: session.createdAt,
-      expiresAt: session.expiresAt,
-    }));
-  }
-
-  /**
-   * Revoke all user sessions except current
-   */
-  static async revokeAllUserSessions(userId: string, currentSessionId?: string): Promise<void> {
-    const whereClause: any = { userId };
-    if (currentSessionId) {
-      whereClause.id = { not: currentSessionId };
-    }
-
-    const sessions = await globalPrisma.session.findMany({
-      where: whereClause,
-      select: { id: true },
-    });
-
-    await globalPrisma.session.deleteMany({ where: whereClause });
-
-    const redisKeys = sessions.flatMap(session => [
-      `refresh_token:${session.id}`,
-      `session:${session.id}`,
-    ]);
-
-    if (redisKeys.length > 0) {
-      await redisClient.del(...redisKeys);
-    }
-
-    logger.info(`Revoked ${sessions.length} sessions for user: ${userId}`);
-  }
-
-  /**
-   * Clean up expired sessions
-   */
-  static async cleanupExpiredSessions(): Promise<void> {
-    const expiredSessions = await globalPrisma.session.findMany({
-      where: { expiresAt: { lt: new Date() } },
-      select: { id: true },
-    });
-
-    if (expiredSessions.length === 0) return;
-
-    await globalPrisma.session.deleteMany({
-      where: { expiresAt: { lt: new Date() } },
-    });
-
-    const redisKeys = expiredSessions.flatMap(session => [
-      `refresh_token:${session.id}`,
-      `session:${session.id}`,
-    ]);
-
-    await redisClient.del(...redisKeys);
-    logger.info(`Cleaned up ${expiredSessions.length} expired sessions`);
   }
 
   /**
@@ -415,16 +242,16 @@ export class AuthService {
     const unit = match[2];
 
     switch (unit) {
-      case 's': return value * 1000;
-      case 'm': return value * 60 * 1000;
-      case 'h': return value * 60 * 60 * 1000;
-      case 'd': return value * 24 * 60 * 60 * 1000;
-      default: throw new Error('Invalid time unit');
+      case 's':
+        return value * 1000;
+      case 'm':
+        return value * 60 * 1000;
+      case 'h':
+        return value * 60 * 60 * 1000;
+      case 'd':
+        return value * 24 * 60 * 60 * 1000;
+      default:
+        throw new Error('Invalid time unit');
     }
   }
 }
-
-// Schedule cleanup of expired sessions every hour
-setInterval(() => {
-  AuthService.cleanupExpiredSessions();
-}, 60 * 60 * 1000);

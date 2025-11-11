@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { AuthController } from '@/controllers/authController';
-import { redisClient } from '@/utils/redis';
-import { globalPrisma } from '@/database/connection';
-import { logger } from '@/utils/logger';
-import { config } from '@/config/config';
+import { AuthController } from '../../controllers/authController';
+import { redisClient } from '../../utils/redis';
+import { globalPrisma } from '../../database/connection';
+import { logger } from '../../utils/logger';
+import { config } from '../../config/config';
 
 const router = Router();
 

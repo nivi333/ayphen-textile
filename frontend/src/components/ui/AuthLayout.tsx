@@ -1,17 +1,22 @@
 import { ReactNode } from 'react';
 import { BrandLogo } from '../BrandLogo';
+import { AnimatedBackground } from './AnimatedBackground';
 
 interface AuthLayoutProps {
   children: ReactNode;
   backgroundGradient?: string;
   backgroundDecorations?: ReactNode;
+  animated?: boolean;
+  animationVariant?: 'login' | 'register' | 'forgot-password';
 }
 
 // Reusable auth layout component with logo and background
 export function AuthLayout({ 
   children, 
   backgroundGradient = 'linear-gradient(135deg, #faf5ff 0%, #f0f9ff 50%, #ffffff 100%)',
-  backgroundDecorations
+  backgroundDecorations,
+  animated = true,
+  animationVariant = 'login'
 }: AuthLayoutProps) {
   return (
     <div style={{
@@ -44,7 +49,13 @@ export function AuthLayout({
         overflow: 'hidden',
         zIndex: 0
       }}>
-        {backgroundDecorations}
+        {animated ? (
+          <AnimatedBackground variant={animationVariant}>
+            {backgroundDecorations}
+          </AnimatedBackground>
+        ) : (
+          backgroundDecorations
+        )}
       </div>
       
       {/* Main content container */}

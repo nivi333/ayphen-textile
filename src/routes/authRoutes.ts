@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import { AuthController } from '@/controllers/authController';
-import { tenantIsolationMiddleware } from '@/middleware/tenantIsolation';
+import { AuthController } from '../controllers/authController';
+import { tenantIsolationMiddleware } from '../middleware/tenantIsolation';
 import { 
   authRateLimit, 
   registrationRateLimit, 
   passwordResetRateLimit,
   userRateLimit 
-} from '@/middleware/rateLimiter';
+} from '../middleware/rateLimiter';
 
 const router = Router();
 

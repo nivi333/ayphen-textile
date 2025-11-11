@@ -218,11 +218,11 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
   - [x] Remember me with localStorage for email/phone persistence
   - [x] Auto-populate login field on return visits
 
-- [x] **Password Management** ✅ **PARTIALLY COMPLETED**
+- [x] **Password Management** ✅ **COMPLETED**
   - [x] Forgot password flow with icon-only steps
-  - [ ] Password reset with email/SMS
+  - [x] Password reset with email/SMS
   - [x] Password strength validation (Backend)
-  - [ ] Password change functionality
+  - [x] Password change functionality
 
 - [x] **Authentication API Endpoints** ✅ **COMPLETED**
   - [x] POST `/api/v1/auth/register` - User registration
@@ -232,6 +232,9 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
   - [x] GET `/api/v1/auth/profile` - Get user profile
   - [x] GET `/api/v1/auth/sessions` - Get user sessions
   - [x] DELETE `/api/v1/auth/sessions/:id` - Revoke session
+  - [x] POST `/api/v1/auth/password/request-reset` - Request password reset (email/SMS)
+  - [x] POST `/api/v1/auth/password/reset` - Reset password using token/code
+  - [x] POST `/api/v1/auth/password/change` - Change password (authenticated)
 
 ---
 
