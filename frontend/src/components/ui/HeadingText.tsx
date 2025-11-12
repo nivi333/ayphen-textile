@@ -5,7 +5,7 @@ interface HeadingTextProps {
   className?: string;
 }
 
-export function HeadingText({ children, className = '' }: HeadingTextProps) {
+export default function HeadingText({ children, className = '' }: HeadingTextProps) {
   return (
     <h3 className={`headingText ${className}`.trim()}>
       {children}

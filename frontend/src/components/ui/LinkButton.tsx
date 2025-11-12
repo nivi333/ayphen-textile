@@ -10,7 +10,7 @@ interface LinkButtonProps {
 }
 
 // Reusable link button component with no border styling
-export function LinkButton({ children, onClick, href, target, className }: LinkButtonProps) {
+export default function LinkButton({ children, onClick, href, target, className }: LinkButtonProps) {
   const handleClick = () => {
     if (href) {
       if (target === '_blank') {

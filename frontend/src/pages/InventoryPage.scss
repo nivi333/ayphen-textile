@@ -1,0 +1,250 @@
+.inventory-root {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 24px;
+
+  .inventory-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 16px 24px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .inventory-header-actions {
+      display: flex;
+      gap: 12px;
+    }
+  }
+
+  .inventory-content {
+    max-width: 1400px;
+    margin: 0 auto;
+
+    .ant-card {
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .ant-table {
+      .ant-table-thead > tr > th {
+        background-color: #fafafa;
+        font-weight: 600;
+        border-bottom: 2px solid #f0f0f0;
+      }
+
+      .ant-table-tbody > tr:hover > td {
+        background-color: #f0f8ff;
+      }
+
+      .ant-table-cell {
+        padding: 12px 16px;
+      }
+    }
+
+    .ant-pagination {
+      margin-top: 16px;
+      text-align: center;
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 768px) {
+    padding: 16px;
+
+    .inventory-header {
+      flex-direction: column;
+      gap: 16px;
+      text-align: center;
+
+      .inventory-header-actions {
+        width: 100%;
+
+        .ant-btn {
+          width: 100%;
+        }
+      }
+    }
+
+    .inventory-content {
+      .ant-row {
+        .ant-col {
+          margin-bottom: 16px;
+        }
+      }
+
+      .ant-table {
+        font-size: 12px;
+
+        .ant-table-cell {
+          padding: 8px 12px;
+        }
+      }
+    }
+  }
+
+  // Custom styles for inventory-specific elements
+  .inventory-filters {
+    .ant-input-affix-wrapper,
+    .ant-select-selector {
+      border-radius: 6px;
+    }
+
+    .ant-btn {
+      border-radius: 6px;
+      font-weight: 500;
+    }
+  }
+
+  .low-stock-indicator {
+    .ant-tag {
+      font-size: 11px;
+      padding: 2px 6px;
+    }
+  }
+
+  .quality-status {
+    .ant-tag {
+      font-size: 11px;
+      font-weight: 500;
+    }
+  }
+
+  // Modal styles
+  .ant-modal {
+    .ant-modal-content {
+      border-radius: 8px;
+    }
+
+    .ant-modal-header {
+      border-radius: 8px 8px 0 0;
+      border-bottom: 1px solid #f0f0f0;
+
+      .ant-modal-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+      }
+    }
+
+    .ant-modal-body {
+      padding: 24px;
+
+      .ant-form-item-label > label {
+        font-weight: 500;
+        color: #374151;
+      }
+
+      .ant-input,
+      .ant-select-selector,
+      .ant-input-number {
+        border-radius: 6px;
+      }
+
+      .ant-btn {
+        border-radius: 6px;
+        font-weight: 500;
+      }
+    }
+
+    .ant-modal-footer {
+      border-top: 1px solid #f0f0f0;
+      padding: 16px 24px;
+    }
+  }
+
+  // Alert styles
+  .ant-alert {
+    border-radius: 8px;
+
+    .ant-alert-message {
+      font-weight: 500;
+    }
+  }
+
+  // Card styles
+  .ant-card {
+    .ant-card-body {
+      .ant-statistic {
+        .ant-statistic-title {
+          color: #6b7280;
+          font-size: 14px;
+          margin-bottom: 4px;
+        }
+
+        .ant-statistic-content {
+          font-size: 24px;
+          font-weight: 600;
+          color: #1f2937;
+
+          .ant-statistic-content-prefix {
+            margin-right: 4px;
+          }
+        }
+      }
+    }
+  }
+
+  // Badge styles for low stock count
+  .ant-badge-count {
+    background-color: #dc2626;
+    font-size: 12px;
+    font-weight: 600;
+    min-width: 18px;
+    height: 18px;
+    line-height: 16px;
+  }
+
+  // Table action buttons
+  .ant-table-cell .ant-btn {
+    padding: 4px;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+
+    &:hover {
+      background-color: #f0f0f0;
+    }
+  }
+}
+
+// Dark mode support (if needed)
+@media (prefers-color-scheme: dark) {
+  .inventory-root {
+    background-color: #1f2937;
+
+    .inventory-header,
+    .ant-card,
+    .ant-modal-content {
+      background-color: #374151;
+      color: #f9fafb;
+    }
+
+    .ant-table-thead > tr > th {
+      background-color: #4b5563;
+      color: #f9fafb;
+      border-bottom-color: #6b7280;
+    }
+
+    .ant-table-tbody > tr:hover > td {
+      background-color: #4b5563;
+    }
+
+    .ant-input,
+    .ant-select-selector {
+      background-color: #4b5563;
+      border-color: #6b7280;
+      color: #f9fafb;
+
+      &::placeholder {
+        color: #9ca3af;
+      }
+    }
+
+    .ant-form-item-label > label {
+      color: #e5e7eb;
+    }
+  }
+}

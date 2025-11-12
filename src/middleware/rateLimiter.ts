@@ -22,7 +22,7 @@ export interface RateLimitInfo {
 /**
  * Create a rate limiting middleware
  */
-export function createRateLimit(options: RateLimitOptions) {
+export default function createRateLimit(options: RateLimitOptions) {
   const {
     windowMs,
     maxRequests,
@@ -118,7 +118,7 @@ function defaultKeyGenerator(req: Request): string {
 /**
  * Key generator for authenticated users
  */
-export function userKeyGenerator(req: Request): string {
+export default function userKeyGenerator(req: Request): string {
   const userId = req.userId || req.ip;
   return `rate_limit:user:${userId}`;
 }
@@ -126,7 +126,7 @@ export function userKeyGenerator(req: Request): string {
 /**
  * Key generator for authentication endpoints
  */
-export function authKeyGenerator(req: Request): string {
+export default function authKeyGenerator(req: Request): string {
   const identifier = req.body?.emailOrPhone || req.body?.email || req.ip;
   return `rate_limit:auth:${identifier}`;
 }
@@ -134,7 +134,7 @@ export function authKeyGenerator(req: Request): string {
 /**
  * Key generator for tenant-specific operations
  */
-export function tenantKeyGenerator(req: Request): string {
+export default function tenantKeyGenerator(req: Request): string {
   const tenantId = req.tenantId || 'global';
   const userId = req.userId || req.ip;
   return `rate_limit:tenant:${tenantId}:${userId}`;
@@ -265,14 +265,14 @@ const whitelistedIPs = new Set([
   // Add more IPs as needed
 ]);
 
-export function isWhitelisted(ip: string): boolean {
+export default function isWhitelisted(ip: string): boolean {
   return whitelistedIPs.has(ip);
 }
 
 /**
  * Rate limiter that respects IP whitelist
  */
-export function createWhitelistAwareRateLimit(options: RateLimitOptions) {
+export default function createWhitelistAwareRateLimit(options: RateLimitOptions) {
   const rateLimiter = createRateLimit(options);
   
   return (req: Request, res: Response, next: NextFunction): void => {
@@ -288,7 +288,7 @@ export function createWhitelistAwareRateLimit(options: RateLimitOptions) {
 /**
  * Dynamic rate limiter based on user role
  */
-export function createRoleBasedRateLimit(baseLimits: Record<string, RateLimitOptions>) {
+export default function createRoleBasedRateLimit(baseLimits: Record<string, RateLimitOptions>) {
   return (req: Request, res: Response, next: NextFunction): void => {
     const userRole = req.userRole || 'EMPLOYEE';
     const limits = baseLimits[userRole] || baseLimits['EMPLOYEE'];
@@ -301,7 +301,7 @@ export function createRoleBasedRateLimit(baseLimits: Record<string, RateLimitOpt
 /**
  * Burst rate limiter (allows short bursts but limits sustained usage)
  */
-export function createBurstRateLimit(options: {
+export default function createBurstRateLimit(options: {
   burstLimit: number;
   burstWindowMs: number;
   sustainedLimit: number;

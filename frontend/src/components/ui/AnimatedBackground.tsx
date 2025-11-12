@@ -5,7 +5,7 @@ interface AnimatedBackgroundProps {
   children?: ReactNode;
 }
 
-export function AnimatedBackground({ variant = 'login', children }: AnimatedBackgroundProps) {
+export default function AnimatedBackground({ variant = 'login', children }: AnimatedBackgroundProps) {
   const getColorScheme = () => {
     switch (variant) {
       case 'register':

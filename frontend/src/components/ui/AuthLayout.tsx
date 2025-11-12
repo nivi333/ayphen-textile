@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { BrandLogo } from '../BrandLogo';
-import { AnimatedBackground } from './AnimatedBackground';
+import AnimatedBackground from './AnimatedBackground';
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -11,7 +11,7 @@ interface AuthLayoutProps {
 }
 
 // Reusable auth layout component with logo and background
-export function AuthLayout({ 
+export default function AuthLayout({ 
   children, 
   backgroundGradient = 'linear-gradient(135deg, #faf5ff 0%, #f0f9ff 50%, #ffffff 100%)',
   backgroundDecorations,

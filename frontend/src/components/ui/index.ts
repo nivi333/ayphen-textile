@@ -1,6 +1,6 @@
 // Export all UI components for easy importing
-export { AuthCard } from './AuthCard';
-export { LinkButton } from './LinkButton';
-export { GradientButton } from './GradientButton';
-export { AuthLayout } from './AuthLayout';
-export { HeadingText } from './HeadingText';
+export { default as AuthCard } from './AuthCard';
+export { default as LinkButton } from './LinkButton';
+export { default as GradientButton } from './GradientButton';
+export { default as AuthLayout } from './AuthLayout';
+export { default as HeadingText } from './HeadingText';

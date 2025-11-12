@@ -1,12 +1,18 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '../contexts/AuthContext';
-import { ProtectedRoute, PublicRoute } from '../components/ProtectedRoute';
-import { LoginPage, RegisterPage, ForgotPasswordPage } from '../pages';
-import { CompaniesListPage } from '../pages/CompaniesListPage';
-import { GoogleAuthCallback } from '../components/auth/GoogleAuthCallback';
+import ProtectedRoute, { PublicRoute } from '../components/ProtectedRoute';
+import {
+  LoginPage,
+  RegisterPage,
+  ForgotPasswordPage,
+  DashboardPage,
+  InventoryPage,
+} from '../pages';
+import CompaniesListPage from '../pages/CompaniesListPage';
+import GoogleAuthCallback from '../components/auth/GoogleAuthCallback';
 
 // Main application router component
-export function AppRouter() {
+export default function AppRouter() {
   return (
     <BrowserRouter>
       <AuthProvider>
@@ -47,6 +53,24 @@ export function AppRouter() {
             element={
               <ProtectedRoute>
                 <CompaniesListPage />
+              </ProtectedRoute>
+            }
+          />
+          {/* Protected Routes - Company Required */}
+          <Route
+            path='/dashboard'
+            element={
+              <ProtectedRoute requireCompany={true}>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path='/inventory'
+            element={
+              <ProtectedRoute requireCompany={true}>
+                <InventoryPage />
               </ProtectedRoute>
             }
           />

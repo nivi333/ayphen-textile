@@ -23,7 +23,7 @@ function getInitialTheme(): AppTheme {
   return prefersDark ? 'dark' : 'light';
 }
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+export default function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<AppTheme>(getInitialTheme);
 
   useEffect(() => {

@@ -1,19 +1,20 @@
 import { useState, useEffect } from 'react';
 import { Button, message, Modal, Typography } from 'antd';
 import { TeamOutlined, BankOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import { useAuth } from '../contexts/AuthContext';
+import useAuth from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Company } from '../types/auth';
-import { BrandLogo } from '../components/BrandLogo';
 import { HeadingText } from '../components/ui';
 import './CompaniesListPage.scss';
+import { COMPANY_TEXT } from '../constants/company';
 
 // Companies selection page component
 import { Spin } from 'antd';
 
 import { CompanyCreationDrawer } from '../components/CompanyCreationDrawer';
+import { BrandLogo } from '@/components/BrandLogo';
 
-export function CompaniesListPage() {
+export default function CompaniesListPage() {
   const { companies, switchCompany, isLoading, logout, refreshCompanies } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -50,7 +51,7 @@ export function CompaniesListPage() {
   if (isLoading || lazyLoading) {
     return (
       <div className='companies-loading'>
-        <Spin size='large' tip='Loading companies...' />
+        <Spin size='large' tip={COMPANY_TEXT.LOADING_COMPANIES} />
       </div>
     );
   }
@@ -59,10 +60,11 @@ export function CompaniesListPage() {
     setLoading(true);
     try {
       await switchCompany(company);
-      message.success('Company switched successfully');
+      message.success(COMPANY_TEXT.COMPANY_SWITCHED_SUCCESS);
       navigate('/dashboard');
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to switch company';
+      const errorMessage =
+        error instanceof Error ? error.message : COMPANY_TEXT.SWITCH_COMPANY_ERROR;
       message.error(errorMessage);
     } finally {
       setLoading(false);
@@ -71,23 +73,23 @@ export function CompaniesListPage() {
 
   const handleLogout = () => {
     Modal.confirm({
-      title: 'Confirm Logout',
+      title: COMPANY_TEXT.LOGOUT_CONFIRM_TITLE,
       icon: <ExclamationCircleOutlined />,
-      content: 'Are you sure you want to logout? You will be redirected to the login page.',
-      okText: 'Yes, Logout',
+      content: COMPANY_TEXT.LOGOUT_CONFIRM_CONTENT,
+      okText: COMPANY_TEXT.LOGOUT_CONFIRM_OK,
       okType: 'danger',
-      cancelText: 'Cancel',
+      cancelText: COMPANY_TEXT.LOGOUT_CONFIRM_CANCEL,
       onOk() {
         return new Promise(resolve => {
           setLogoutLoading(true);
           setTimeout(() => {
             try {
               logout();
-              message.success('Logged out successfully');
+              message.success(COMPANY_TEXT.LOGGED_OUT_SUCCESS);
               navigate('/login');
               resolve(true);
             } catch (error) {
-              message.error('Failed to logout. Please try again.');
+              message.error(COMPANY_TEXT.LOGOUT_ERROR);
             } finally {
               setLogoutLoading(false);
             }
@@ -104,10 +106,11 @@ export function CompaniesListPage() {
   return (
     <div className='companies-root'>
       <div className='companies-top-bar'>
+        {/* <BrandLogo width={150} height={36} /> */}
         <BrandLogo width={150} height={36} />
         <div className='companies-top-bar-actions'>
           <Button type='primary' className='companies-add-btn' onClick={() => setDrawerOpen(true)}>
-            Add Company
+            {COMPANY_TEXT.ADD_COMPANY}
           </Button>
           <Button
             type='default'
@@ -116,13 +119,13 @@ export function CompaniesListPage() {
             onClick={handleLogout}
             disabled={logoutLoading}
           >
-            Logout
+            {COMPANY_TEXT.LOGOUT}
           </Button>
         </div>
       </div>
       <div className='companies-content'>
         <div className='companies-inner-wrapper'>
-          <HeadingText>Select Company / Role</HeadingText>
+          <HeadingText>{COMPANY_TEXT.PAGE_TITLE}</HeadingText>
           {companies && companies.length > 0 ? (
             <>
               <div className='companies-tabs'>
@@ -130,18 +133,18 @@ export function CompaniesListPage() {
                   className={`companies-tab${activeTab === 'owner' ? ' active' : ''}`}
                   onClick={() => setActiveTab('owner')}
                 >
-                  Owner
+                  {COMPANY_TEXT.OWNER_TAB}
                 </div>
                 <div
                   className={`companies-tab${activeTab === 'roles' ? ' active' : ''}`}
                   onClick={() => setActiveTab('roles')}
                 >
-                  Roles
+                  {COMPANY_TEXT.ROLES_TAB}
                 </div>
               </div>
               <div className='companies-list'>
                 {(activeTab === 'owner' ? ownerCompanies : roleCompanies).length === 0 ? (
-                  <div className='companies-empty'>No companies found</div>
+                  <div className='companies-empty'>{COMPANY_TEXT.NO_COMPANIES_FOUND}</div>
                 ) : (
                   <ul className='companies-list-ul'>
                     {(activeTab === 'owner' ? ownerCompanies : roleCompanies).map(company => (
@@ -163,7 +166,9 @@ export function CompaniesListPage() {
                               ) : (
                                 <BankOutlined className='companies-card-icon' />
                               )}
-                              <Typography.Text className="companies-card-company-name">{company.name}</Typography.Text>
+                              <Typography.Text className='companies-card-company-name'>
+                                {company.name}
+                              </Typography.Text>
                             </div>
                           </div>
                         </div>
@@ -180,7 +185,7 @@ export function CompaniesListPage() {
           ) : (
             <div className='companies-empty-state'>
               <BankOutlined className='companies-empty-icon' />
-              <div className='companies-empty-text'>No company created</div>
+              <div className='companies-empty-text'>{COMPANY_TEXT.NO_COMPANY_CREATED}</div>
             </div>
           )}
         </div>

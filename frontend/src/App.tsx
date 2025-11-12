@@ -1,5 +1,5 @@
-import { AppRouter } from './router/AppRouter';
-import { ThemeProvider } from './contexts/ThemeContext';
+import AppRouter from './router/AppRouter';
+import ThemeProvider from './contexts/ThemeContext';
 
 function App() {
   return (

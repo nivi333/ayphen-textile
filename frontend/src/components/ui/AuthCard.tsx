@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { Card } from 'antd';
-import { HeadingText } from './HeadingText';
+import HeadingText from './HeadingText';
 
 interface AuthCardProps {
   children: ReactNode;
@@ -8,7 +8,7 @@ interface AuthCardProps {
 }
 
 // Reusable auth card component with logo and title
-export function AuthCard({ children, heading }: AuthCardProps) {
+export default function AuthCard({ children, heading }: AuthCardProps) {
   return (
     <div style={{ maxWidth: '448px', margin: '0 auto' }}>
       <Card 

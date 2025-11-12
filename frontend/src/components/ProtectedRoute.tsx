@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import useAuth from '../contexts/AuthContext';
 import { Spin } from 'antd';
 
 interface ProtectedRouteProps {
@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
   requireCompany?: boolean;
 }
 
-export function ProtectedRoute({ children, requireCompany = false }: ProtectedRouteProps) {
+export default function ProtectedRoute({ children, requireCompany = false }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading, currentCompany } = useAuth();
   const location = useLocation();
 

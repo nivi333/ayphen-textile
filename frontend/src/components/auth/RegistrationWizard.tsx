@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Form, Input, Typography, message, Checkbox } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { useAuth } from '../../contexts/AuthContext';
+import useAuth from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { AuthCard, LinkButton, GradientButton } from '../ui';
 
@@ -15,7 +15,7 @@ interface RegistrationData {
   confirmPassword: string;
 }
 
-export function RegistrationWizard() {
+export default function RegistrationWizard() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();

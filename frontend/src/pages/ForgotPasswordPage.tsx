@@ -1,8 +1,8 @@
-import { ForgotPasswordForm } from '../components/auth/ForgotPasswordForm';
+import ForgotPasswordForm from '../components/auth/ForgotPasswordForm';
 import { AuthLayout } from '../components/ui';
 
 // Forgot password page component
-export function ForgotPasswordPage() {
+export default function ForgotPasswordPage() {
   return (
     <AuthLayout
       animated={true}

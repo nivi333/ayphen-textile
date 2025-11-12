@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Form, Input, Button, Typography, message, Checkbox, Divider, Space } from 'antd';
 import { GoogleOutlined, FacebookOutlined, YoutubeOutlined, InstagramOutlined } from '@ant-design/icons';
-import { useAuth } from '../../contexts/AuthContext';
+import useAuth from '../../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthCard, LinkButton, GradientButton } from '../ui';
 import { googleAuth } from '../../utils/googleAuth';
@@ -14,7 +14,7 @@ interface LoginFormData {
   rememberMe?: boolean;
 }
 
-export function LoginForm() {
+export default function LoginForm() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);

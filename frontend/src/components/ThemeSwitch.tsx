@@ -1,7 +1,7 @@
 import { Switch } from 'antd';
 import { useTheme } from '../contexts/ThemeContext';
 
-export function ThemeSwitch({ className = '' }: { className?: string }) {
+export default function ThemeSwitch({ className = '' }: { className?: string }) {
   const { theme, toggle } = useTheme();
   return (
     <div className={className}>

@@ -15,7 +15,7 @@ interface GradientButtonProps {
 }
 
 // Reusable gradient button component
-export function GradientButton({ 
+export default function GradientButton({ 
   children, 
   onClick, 
   loading = false, 

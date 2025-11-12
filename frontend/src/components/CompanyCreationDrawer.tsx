@@ -253,7 +253,7 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
                       message: 'Slug must be lowercase, alphanumeric or hyphens',
                     },
                     () => ({
-                      validator(_, value) {
+                      validator(_) {
                         if (slugChecking) return Promise.reject('Checking slug...');
                         if (!slugUnique) return Promise.reject('Slug already taken');
                         return Promise.resolve();

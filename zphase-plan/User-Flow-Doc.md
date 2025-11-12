@@ -961,7 +961,7 @@ This comprehensive documentation covers all essential screens, functionality, an
 - Activity type filtering
 - Time range filtering (24h, 7d, 30d, 90d)
 - Search functionality
-- Export functionality
+- export default functionality
 - Success/failure tracking
 
 ---

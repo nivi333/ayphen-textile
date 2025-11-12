@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Spin, Result, Button } from 'antd';
-import { useAuth } from '../../contexts/AuthContext';
+import useAuth from '../../contexts/AuthContext';
 import { googleAuth } from '../../utils/googleAuth';
 
-export function GoogleAuthCallback() {
+export default function GoogleAuthCallback() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { login } = useAuth();
