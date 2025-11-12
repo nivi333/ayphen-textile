@@ -9,9 +9,19 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: $spacing-md $spacing-lg;
+  padding: 0 32px;
+  height: 64px;
   border-bottom: 1px solid $border-color;
   background-color: $bg-primary;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  .dashboard-title {
+    h1 {
+      font-size: 20px !important;
+      margin: 0 !important;
+      line-height: 1.2;
+    }
+  }
 }
 
 .dashboard-header-actions {
@@ -49,9 +59,10 @@
 }
 
 .dashboard-subtitle {
-  font-size: 16px;
+  font-size: 13px;
   color: $secondary-text-color;
-  margin-top: $spacing-sm;
+  margin: 2px 0 0 0;
+  line-height: 1.2;
 }
 
 .dashboard-stats {

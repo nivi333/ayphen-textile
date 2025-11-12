@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '../contexts/AuthContext';
+import { HeaderProvider } from '../contexts/HeaderContext';
 import ProtectedRoute, { PublicRoute } from '../components/ProtectedRoute';
 import {
   LoginPage,
@@ -16,7 +17,8 @@ export default function AppRouter() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
+        <HeaderProvider>
+          <Routes>
           {/* Public Routes */}
           <Route
             path='/login'
@@ -78,7 +80,8 @@ export default function AppRouter() {
           {/* Default Redirects */}
           <Route path='/' element={<Navigate to='/login' replace />} />
           <Route path='*' element={<Navigate to='/login' replace />} />
-        </Routes>
+          </Routes>
+        </HeaderProvider>
       </AuthProvider>
     </BrowserRouter>
   );

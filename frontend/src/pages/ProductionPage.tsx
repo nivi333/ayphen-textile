@@ -34,7 +34,7 @@ import {
 } from '@ant-design/icons';
 import moment from 'moment';
 import useAuth from '../contexts/AuthContext';
-import { BrandLogo } from '../components/BrandLogo';
+import { MainLayout } from '../components/layout';
 import { Heading } from '../components/Heading';
 import '../constants/company';
 
@@ -440,18 +440,21 @@ const ProductionPage: React.FC = () => {
   };
 
   return (
-    <div className="production-root">
-      <div className="production-header">
-        <BrandLogo width={150} height={36} />
-        <div className="production-header-actions">
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateOrder}>
-            Create Production Order
-          </Button>
+    <MainLayout>
+      <div className="production-root">
+        <div className="production-header">
+          <div className="production-title">
+            <Heading level={1}>Production Management</Heading>
+            <p className="production-subtitle">Monitor and manage your textile production orders</p>
+          </div>
+          <div className="production-header-actions">
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateOrder}>
+              Create Production Order
+            </Button>
+          </div>
         </div>
-      </div>
 
-      <div className="production-content">
-        <Heading level={2}>Production Management</Heading>
+        <div className="production-content">
 
         {/* Summary Cards */}
         {summary && (
@@ -968,7 +971,8 @@ const ProductionPage: React.FC = () => {
           </Tabs>
         </Modal>
       )}
-    </div>
+      </div>
+    </MainLayout>
   );
 };
 

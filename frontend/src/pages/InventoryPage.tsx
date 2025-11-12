@@ -28,8 +28,8 @@ import {
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import useAuth from '../contexts/AuthContext';
-import { BrandLogo } from '../components/BrandLogo';
-import { HeadingText } from '../components/ui';
+import { MainLayout } from '../components/layout';
+import { Heading } from '../components/Heading';
 import '../constants/company';
 
 const { Option } = Select;
@@ -301,18 +301,21 @@ const InventoryPage: React.FC = () => {
   };
 
   return (
-    <div className="inventory-root">
-      <div className="inventory-header">
-        <BrandLogo width={150} height={36} />
-        <div className="inventory-header-actions">
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateItem}>
-            Add Inventory Item
-          </Button>
+    <MainLayout>
+      <div className="inventory-root">
+        <div className="inventory-header">
+          <div className="inventory-title">
+            <Heading level={1}>Inventory Management</Heading>
+            <p className="inventory-subtitle">Manage your textile inventory and stock levels</p>
+          </div>
+          <div className="inventory-header-actions">
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateItem}>
+              Add Inventory Item
+            </Button>
+          </div>
         </div>
-      </div>
 
-      <div className="inventory-content">
-        <HeadingText>Inventory Management</HeadingText>
+        <div className="inventory-content">
 
         {/* Summary Cards */}
         {summary && (
@@ -609,7 +612,8 @@ const InventoryPage: React.FC = () => {
           </Form.Item>
         </Form>
       </Modal>
-    </div>
+      </div>
+    </MainLayout>
   );
 };
 

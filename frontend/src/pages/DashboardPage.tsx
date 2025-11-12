@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Row, Col, Card, Statistic, Button, Modal, Form, Input, Select, message } from 'antd';
 import {
@@ -7,20 +7,37 @@ import {
   ShoppingCartOutlined,
   BarChartOutlined,
   PlusOutlined,
-  SettingOutlined,
 } from '@ant-design/icons';
+import { useHeader } from '../contexts/HeaderContext';
 import useAuth from '../contexts/AuthContext';
-import { BrandLogo } from '../components/BrandLogo';
 import { Heading } from '../components/Heading';
+import { MainLayout } from '../components/layout';
 import './DashboardPage.scss';
 import { COMPANY_TEXT } from '../constants/company';
 
 const DashboardPage: React.FC = () => {
-  const { currentCompany, user } = useAuth();
+  const { currentCompany } = useAuth();
+  const { setHeaderActions } = useHeader();
   const navigate = useNavigate();
   const [inviteModalVisible, setInviteModalVisible] = useState(false);
   const [inviting, setInviting] = useState(false);
   const [form] = Form.useForm();
+
+  // Set header actions when component mounts
+  useEffect(() => {
+    setHeaderActions(
+      <Button
+        type='primary'
+        icon={<PlusOutlined />}
+        onClick={() => setInviteModalVisible(true)}
+      >
+        Invite Team Member
+      </Button>
+    );
+
+    // Cleanup when component unmounts
+    return () => setHeaderActions(null);
+  }, [setHeaderActions]);
 
   const stats = [
     {
@@ -111,120 +128,100 @@ const DashboardPage: React.FC = () => {
   };
 
   return (
-    <div className='dashboard-root'>
-      <div className='dashboard-header'>
-        <BrandLogo width={150} height={36} />
-        <div className='dashboard-header-actions'>
-          <Button type='text' icon={<SettingOutlined />}>
-            Settings
-          </Button>
-          <div className='dashboard-user-info'>
-            <span className='dashboard-user-name'>
-              {user?.firstName} {user?.lastName}
-            </span>
-            <span className='dashboard-company-name'>{currentCompany?.name}</span>
+    <MainLayout>
+      <div className='dashboard-container'>
+        <div className='dashboard-content'>
+          <div className='dashboard-stats'>
+            <Row gutter={[16, 16]}>
+              {stats.map((stat, index) => (
+                <Col xs={24} sm={12} lg={6} key={index}>
+                  <Card className='dashboard-stat-card'>
+                    <Statistic
+                      title={stat.title}
+                      value={stat.value}
+                      prefix={<span style={{ color: stat.color }}>{stat.icon}</span>}
+                      valueStyle={{ color: stat.color }}
+                    />
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          </div>
+
+          <div className='dashboard-quick-actions'>
+            <Heading level={3}>Quick Actions</Heading>
+            <Row gutter={[16, 16]}>
+              {quickActions.map((action, index) => (
+                <Col xs={24} sm={12} lg={6} key={index}>
+                  <Card className='dashboard-action-card' hoverable onClick={action.action}>
+                    <div className='dashboard-action-icon' style={{ color: '#7b5fc9' }}>
+                      {action.icon}
+                    </div>
+                    <div className='dashboard-action-content'>
+                      <h4>{action.title}</h4>
+                      <p>{action.description}</p>
+                    </div>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          </div>
+
+          <div className='dashboard-recent-activity'>
+            <Heading level={3}>Recent Activity</Heading>
+            <Card className='dashboard-activity-card'>
+              <div className='dashboard-empty-state'>
+                <BankOutlined style={{ fontSize: '48px', color: '#cbd5e1' }} />
+                <p>No recent activity</p>
+                <span>Start by creating your first product or order</span>
+              </div>
+            </Card>
           </div>
         </div>
+
+        <Modal
+          title='Invite Team Member'
+          open={inviteModalVisible}
+          onCancel={() => setInviteModalVisible(false)}
+          footer={null}
+          width={400}
+        >
+          <Form form={form} layout='vertical' onFinish={handleInviteUser}>
+            <Form.Item
+              name='email'
+              label='Email Address'
+              rules={[
+                { required: true, message: 'Please enter an email address' },
+                { type: 'email', message: 'Please enter a valid email address' },
+              ]}
+            >
+              <Input placeholder='user@example.com' />
+            </Form.Item>
+
+            <Form.Item
+              name='role'
+              label='Role'
+              rules={[{ required: true, message: 'Please select a role' }]}
+            >
+              <Select placeholder='Select role'>
+                <Select.Option value='EMPLOYEE'>Employee</Select.Option>
+                <Select.Option value='MANAGER'>Manager</Select.Option>
+                <Select.Option value='ADMIN'>Admin</Select.Option>
+              </Select>
+            </Form.Item>
+
+            <Form.Item className='text-right'>
+              <Button onClick={() => setInviteModalVisible(false)} style={{ marginRight: 8 }}>
+                Cancel
+              </Button>
+              <Button type='primary' htmlType='submit' loading={inviting}>
+                Send Invitation
+              </Button>
+            </Form.Item>
+          </Form>
+        </Modal>
       </div>
-
-      <div className='dashboard-content'>
-        <div className='dashboard-welcome'>
-          <Heading level={3}>
-            {COMPANY_TEXT.WELCOME_MESSAGE.replace('{companyName}', currentCompany?.name || '')}
-          </Heading>
-          <p className='dashboard-subtitle'>{COMPANY_TEXT.SUBTITLE}</p>
-        </div>
-
-        <div className='dashboard-stats'>
-          <Row gutter={[16, 16]}>
-            {stats.map((stat, index) => (
-              <Col xs={24} sm={12} lg={6} key={index}>
-                <Card className='dashboard-stat-card'>
-                  <Statistic
-                    title={stat.title}
-                    value={stat.value}
-                    prefix={<span style={{ color: stat.color }}>{stat.icon}</span>}
-                    valueStyle={{ color: stat.color }}
-                  />
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </div>
-
-        <div className='dashboard-quick-actions'>
-          <Heading level={3}>Quick Actions</Heading>
-          <Row gutter={[16, 16]}>
-            {quickActions.map((action, index) => (
-              <Col xs={24} sm={12} lg={6} key={index}>
-                <Card className='dashboard-action-card' hoverable onClick={action.action}>
-                  <div className='dashboard-action-icon' style={{ color: '#7b5fc9' }}>
-                    {action.icon}
-                  </div>
-                  <div className='dashboard-action-content'>
-                    <h4>{action.title}</h4>
-                    <p>{action.description}</p>
-                  </div>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </div>
-
-        <div className='dashboard-recent-activity'>
-          <Heading level={3}>Recent Activity</Heading>
-          <Card className='dashboard-activity-card'>
-            <div className='dashboard-empty-state'>
-              <BankOutlined style={{ fontSize: '48px', color: '#cbd5e1' }} />
-              <p>No recent activity</p>
-              <span>Start by creating your first product or order</span>
-            </div>
-          </Card>
-        </div>
-      </div>
-
-      <Modal
-        title='Invite Team Member'
-        open={inviteModalVisible}
-        onCancel={() => setInviteModalVisible(false)}
-        footer={null}
-        width={400}
-      >
-        <Form form={form} layout='vertical' onFinish={handleInviteUser}>
-          <Form.Item
-            name='email'
-            label='Email Address'
-            rules={[
-              { required: true, message: 'Please enter an email address' },
-              { type: 'email', message: 'Please enter a valid email address' },
-            ]}
-          >
-            <Input placeholder='user@example.com' />
-          </Form.Item>
-
-          <Form.Item
-            name='role'
-            label='Role'
-            rules={[{ required: true, message: 'Please select a role' }]}
-          >
-            <Select placeholder='Select role'>
-              <Select.Option value='EMPLOYEE'>Employee</Select.Option>
-              <Select.Option value='MANAGER'>Manager</Select.Option>
-              <Select.Option value='ADMIN'>Admin</Select.Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item className='text-right'>
-            <Button onClick={() => setInviteModalVisible(false)} style={{ marginRight: 8 }}>
-              Cancel
-            </Button>
-            <Button type='primary' htmlType='submit' loading={inviting}>
-              Send Invitation
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
-    </div>
+    </MainLayout>
   );
 };
 

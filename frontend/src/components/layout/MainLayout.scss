@@ -1,0 +1,121 @@
+@import '../../index.scss';
+
+.main-layout {
+  min-height: 100vh;
+  background: $bg-primary;
+
+  // Full Width Header
+  .app-header {
+    background: #ffffff;
+    border-bottom: 1px solid $border-color;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    padding: 0;
+    height: 64px;
+    line-height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+
+    .header-content {
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+      gap: 24px;
+
+      .header-center {
+        flex: 1;
+        text-align: center;
+
+        .header-title {
+          font-size: 20px;
+          font-weight: 600;
+          color: $primary-text-color;
+          margin: 0;
+          line-height: 1.2;
+        }
+
+        .header-subtitle {
+          font-size: 13px;
+          color: $secondary-text-color;
+          margin: 2px 0 0 0;
+          line-height: 1.2;
+        }
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+    }
+  }
+
+  // Content Layout (Sidebar + Main Content)
+  .content-layout {
+    min-height: calc(100vh - 64px);
+
+    .main-content {
+      padding: 0;
+      background: $bg-primary;
+      min-height: calc(100vh - 64px);
+      overflow-x: auto;
+    }
+  }
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  height: 64px;
+  border-bottom: 1px solid $border-color;
+  background-color: $bg-primary;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  gap: 32px;
+
+  .dashboard-title {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    flex: 1;
+  }
+
+  .dashboard-header-actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    height: 100%;
+  }
+}
+
+
+// Dark theme support
+[data-theme='dark'] {
+  .main-layout {
+    background: #141414;
+
+    .main-content-layout {
+      .main-content {
+        background: #141414;
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .main-layout {
+    .main-content-layout {
+      margin-left: 0 !important;
+
+      .main-content {
+        padding: 16px;
+      }
+    }
+  }
+}
