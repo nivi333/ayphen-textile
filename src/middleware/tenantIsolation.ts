@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { config } from '../config/config';
 import { logger } from '../utils/logger';
-import { databaseManager } from '../database/connection';
+import { databaseManager, globalPrisma } from '../database/connection';
 
 // Extend Request interface to include tenant information
 declare global {
@@ -100,8 +100,16 @@ export const requireRole = (allowedRoles: string[]) => {
 async function validateTenantAccess(userId: string, tenantId: string): Promise<boolean> {
   try {
     logger.debug(`Validating tenant access: user ${userId} -> tenant ${tenantId}`);
-    // TODO: Implement actual validation using globalPrisma
-    return true;
+    const access = await globalPrisma.userTenant.findFirst({
+      where: {
+        userId,
+        tenantId,
+        isActive: true,
+        tenant: { isActive: true }
+      },
+      include: { tenant: true }
+    });
+    return !!access;
   } catch (error) {
     logger.error('Error validating tenant access:', error);
     return false;

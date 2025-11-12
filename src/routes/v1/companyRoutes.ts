@@ -9,6 +9,9 @@ const router = Router();
  * All routes require authentication (handled by tenantIsolationMiddleware in parent router)
  */
 
+// Check slug availability (authenticated users only)
+router.get('/check-slug', companyController.checkSlugAvailability.bind(companyController));
+
 // Get all companies for authenticated user
 router.get('/', companyController.getUserCompanies.bind(companyController));
 
@@ -31,6 +34,12 @@ router.put('/:tenantId',
 router.post('/:tenantId/invite', 
   requireRole(['OWNER', 'ADMIN']), 
   companyController.inviteUser.bind(companyController)
+);
+
+// Delete company (OWNER only)
+router.delete('/:tenantId',
+  requireRole(['OWNER']),
+  companyController.deleteCompany.bind(companyController)
 );
 
 export default router;

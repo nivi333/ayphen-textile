@@ -1,0 +1,123 @@
+@import '../index.scss';
+
+.company-creation-drawer {
+  .ccd-content {
+    padding: 24px 32px 0 32px;
+    font-family: $font-family-body;
+    font-size: 1rem;
+    color: $primary-text-color;
+    background: $bg-primary;
+    min-height: 100vh;
+  }
+
+  .ccd-title {
+    font-family: $font-family-heading;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $primary-text-color;
+    margin-bottom: 0;
+  }
+
+  .ccd-section {
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .ccd-section-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: $primary-text-color;
+    margin-bottom: 12px;
+    margin-top: 0;
+  }
+
+  .ccd-divider {
+    margin: 8px 0 16px 0;
+    border-color: $border-light;
+  }
+
+  .ccd-logo-section {
+    margin-bottom: 4px;
+    .ccd-section-title {
+      margin-bottom: 8px;
+    }
+    .ccd-logo-upload {
+      width: 120px;
+      margin: 0 auto 12px auto;
+      display: block;
+    }
+  }
+
+  .ant-form-item {
+    margin-bottom: 10px;
+  }
+
+  .ant-input,
+  .ant-select-selector,
+  .ant-input-textarea {
+    font-size: 14px;
+    border-radius: 6px;
+  }
+
+  .ccd-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 18px;
+    padding-bottom: 18px;
+  }
+
+  .ant-upload-drag {
+    background: $bg-secondary;
+    border: 1.5px dashed $secondary-color;
+    border-radius: $border-radius-base;
+  }
+
+  // Logo upload styles
+  .ccd-logo-upload {
+    width: 120px;
+    margin: 0;
+    display: block;
+  }
+
+  .ccd-logo-help-text {
+    text-align: start;
+    color: $tertiary-text-color;
+    font-size: 12px;
+    margin: 6px 0;
+  }
+
+  .ccd-upload-icon {
+    font-size: 32px;
+    color: $tertiary-text-color;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  // Global form input styles
+  .ccd-input,
+  .ccd-select,
+  .ccd-textarea {
+    font-size: 14px;
+  }
+
+  .ccd-input {
+    border-radius: $border-radius-base;
+  }
+
+  .ccd-select {
+    .ant-select-selector {
+      font-size: 14px;
+    }
+  }
+
+  .ccd-textarea {
+    border-radius: $border-radius-base;
+  }
+
+  .ccd-cancel-btn {
+    margin-right: $spacing-sm;
+  }
+}

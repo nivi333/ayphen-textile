@@ -9,6 +9,7 @@ type AuthAction =
   | { type: 'LOGIN_SUCCESS'; payload: { user: User; tokens: AuthTokens; companies: Company[] } }
   | { type: 'LOGOUT' }
   | { type: 'SET_CURRENT_COMPANY'; payload: Company }
+  | { type: 'REFRESH_COMPANIES'; payload: Company[] }
   | { type: 'REFRESH_TOKEN_SUCCESS'; payload: AuthTokens }
   | {
       type: 'INITIALIZE_AUTH';
@@ -63,6 +64,12 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
         currentCompany: action.payload,
       };
 
+    case 'REFRESH_COMPANIES':
+      return {
+        ...state,
+        companies: action.payload,
+      };
+
     case 'REFRESH_TOKEN_SUCCESS':
       return {
         ...state,
@@ -92,6 +99,7 @@ interface AuthContextType extends AuthState {
   logout: () => void;
   switchCompany: (company: Company) => void;
   refreshToken: () => Promise<void>;
+  refreshCompanies: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -230,6 +238,41 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  const refreshCompanies = async () => {
+    try {
+      const tokens = AuthStorage.getTokens();
+      if (!tokens?.accessToken) {
+        throw new Error('No access token available');
+      }
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/companies`,
+        {
+          headers: {
+            Authorization: `Bearer ${tokens.accessToken}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch companies');
+      }
+
+      const companiesResponse = await response.json();
+      const companies = companiesResponse.data || [];
+
+      AuthStorage.setCompanies(companies);
+
+      dispatch({
+        type: 'REFRESH_COMPANIES',
+        payload: companies,
+      });
+    } catch (error) {
+      console.error('Error refreshing companies:', error);
+      throw error;
+    }
+  };
+
   const value: AuthContextType = {
     ...state,
     login,
@@ -237,6 +280,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     logout,
     switchCompany,
     refreshToken,
+    refreshCompanies,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

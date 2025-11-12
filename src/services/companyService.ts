@@ -3,10 +3,13 @@ import { logger } from '../utils/logger';
 
 interface CreateCompanyData {
   name: string;
-  slug: string;
+  slug?: string;
   industry?: string;
   description?: string;
+  logoUrl?: string;
   country?: string;
+  defaultLocation?: string;
+  defaultLocationName?: string;
 }
 
 interface CompanyWithRole {
@@ -15,6 +18,7 @@ interface CompanyWithRole {
   slug: string;
   industry?: string;
   description?: string;
+  logoUrl?: string;
   country?: string;
   role: string;
   joinedAt: Date;
@@ -26,44 +30,81 @@ export class CompanyService {
    * Create a new company and assign the user as OWNER
    */
   async createCompany(userId: string, companyData: CreateCompanyData): Promise<any> {
-    
     try {
-      // Check if slug is already taken
-      const existingTenant = await globalPrisma.tenant.findUnique({
-        where: { slug: companyData.slug }
-      });
+      // Generate slug if not provided
+      let baseSlug = companyData.slug && companyData.slug.trim().length > 0
+        ? companyData.slug.trim().toLowerCase()
+        : companyData.name
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-');
 
-      if (existingTenant) {
-        throw new Error('Company slug already exists');
+      // Ensure uniqueness of slug
+      let uniqueSlug = baseSlug;
+      let counter = 1;
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const exists = await globalPrisma.tenant.findUnique({ where: { slug: uniqueSlug } });
+        if (!exists) break;
+        uniqueSlug = `${baseSlug}-${counter++}`;
       }
 
+      const defaultLocationName = (companyData.defaultLocation || companyData.defaultLocationName)?.trim() || 'Head Office';
+      const country = companyData.country?.trim() || 'UNKNOWN';
+
       // Create tenant and user-tenant relationship in a transaction
-      const result = await globalPrisma.$transaction(async (tx) => {
-        // Create the tenant
-        const tenant = await tx.tenant.create({
+      const tenant = await globalPrisma.$transaction(async (tx) => {
+        const createdTenant = await tx.tenant.create({
           data: {
             name: companyData.name,
-            slug: companyData.slug,
+            slug: uniqueSlug,
             industry: companyData.industry,
             description: companyData.description,
+            logoUrl: companyData.logoUrl,
             country: companyData.country,
+            defaultLocation: defaultLocationName,
           }
         });
 
-        // Create user-tenant relationship with OWNER role
         await tx.userTenant.create({
           data: {
             userId,
-            tenantId: tenant.id,
+            tenantId: createdTenant.id,
             role: 'OWNER'
           }
         });
 
-        return tenant;
+        return createdTenant;
       });
 
-      logger.info(`Company created: ${result.name} (${result.slug}) by user ${userId}`);
-      return result;
+      // Create tenant schema/tables
+      await databaseManager.createTenantSchema(tenant.id);
+
+      // Insert default Head Office location in tenant schema
+      const pool = databaseManager.getTenantPool(tenant.id);
+      const schemaName = databaseManager.getSchemaName(tenant.id);
+      await pool.query(
+        `INSERT INTO ${schemaName}.locations 
+          (tenant_id, name, email, phone, country, address_line_1, address_line_2, city, state, pincode, is_default, is_headquarters, location_type, is_active)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, TRUE, TRUE, 'HEAD_OFFICE', TRUE)`,
+        [
+          tenant.id,
+          defaultLocationName,
+          null,
+          null,
+          country,
+          '',
+          '',
+          '',
+          '',
+          ''
+        ]
+      );
+
+      logger.info(`Company created: ${tenant.name} (${tenant.slug}) by user ${userId}`);
+      return tenant;
     } catch (error) {
       logger.error('Error creating company:', error);
       throw error;
@@ -95,6 +136,7 @@ export class CompanyService {
         slug: ut.tenant.slug,
         industry: ut.tenant.industry,
         description: ut.tenant.description,
+        logoUrl: ut.tenant.logoUrl,
         country: ut.tenant.country,
         role: ut.role,
         joinedAt: ut.createdAt,
@@ -291,6 +333,50 @@ export class CompanyService {
       return updatedTenant;
     } catch (error) {
       logger.error('Error updating company:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Soft delete (deactivate) company - OWNER only
+   */
+  async deleteCompany(userId: string, tenantId: string): Promise<void> {
+    try {
+      // Verify user has OWNER permission
+      const userAccess = await globalPrisma.userTenant.findFirst({
+        where: { userId, tenantId, role: 'OWNER', isActive: true },
+      });
+      if (!userAccess) {
+        throw new Error('Insufficient permissions to delete company');
+      }
+
+      await globalPrisma.tenant.update({
+        where: { id: tenantId },
+        data: { isActive: false },
+      });
+
+      logger.info(`Company ${tenantId} deactivated by user ${userId}`);
+    } catch (error) {
+      logger.error('Error deleting company:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Check if a company slug is available
+   */
+  async checkSlugAvailability(slug: string): Promise<boolean> {
+    try {
+      const normalizedSlug = slug.toLowerCase().trim();
+      
+      // Check if slug exists in database
+      const existingCompany = await globalPrisma.tenant.findUnique({
+        where: { slug: normalizedSlug }
+      });
+
+      return !existingCompany; // Return true if slug is available (doesn't exist)
+    } catch (error) {
+      logger.error('Error checking slug availability:', error);
       throw error;
     }
   }

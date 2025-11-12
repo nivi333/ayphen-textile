@@ -11,6 +11,7 @@ export interface Company {
   name: string;
   slug: string;
   industry: string;
+  logoUrl?: string;
   role: CompanyRole;
 }
 

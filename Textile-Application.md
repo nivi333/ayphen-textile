@@ -243,25 +243,27 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
 ### **Sprint 2.1: Multi-Tenant Company System** (Week 4)
 
 #### **Backend Tasks**
-- [ ] **Company Management API**
+- [x] **Company Management API** ✅ **COMPLETED**
   - Company CRUD operations with tenant isolation
   - Company slug generation and uniqueness validation
   - User-company relationship management
   - Role-based permissions per company
-  - **Default Location Name** handling during company creation
+  - **Default Location** (text field) required in company creation
+  - This value is stored in the company (global) and also used to create the initial Head Office location (default + headquarters)
+  - The default/head office location can be edited/changed later
   - Location creation with custom name as head office + default
   - Financial document location reference (invoices, bills, POs)
 
-- [ ] **Tenant Context Switching**
+- [x] **Tenant Context Switching** ✅ **COMPLETED**
   - Company selection endpoint
   - JWT token regeneration with company context
   - Middleware for tenant validation
   - Cross-tenant data isolation verification
 
 #### **Frontend Tasks**
-- [ ] **Company Selection Interface**
+- [x] **Company Selection Interface** ✅ **COMPLETED**
   - Company list API integration
-  - Header: Logo (top-left) + Create Company + User Profile (top-right)
+  - Header: Logo (top-left) + Create Company + Logout (top-right)
   - Tab system: "Owner" | "Roles" tabs
   - Single-line list items (not cards) with company info
   - Role badges (OWNER, ADMIN, MANAGER, EMPLOYEE)
@@ -270,17 +272,16 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
   - Click anywhere on row → Switch context → Dashboard
   - **Create Company**: Opens Ant Design Drawer (not separate page)
   - Professional dashboard feel with clear hierarchy
-  - [ ] Update Companies page UI and behavior per spec (tabs, row layout, status badges, empty state)
+  - [x] Update Companies page UI and behavior per spec (tabs, row layout, status badges, empty state)
 
 - [ ] **Company Creation Drawer**
   - **Ant Design Drawer component** with single scrollable form
   - **Drawer trigger**: "Create Company" button on company selection page
   - **Drawer size**: Large (width: 720px) to accommodate form fields
-  - **Section 1: Basic Information** (name, slug, industry, description, country)
-  - **Section 2: Head Office Location** (Default Location Name, Address Line 1, Address Line 2, City, State, Pincode)
-  - **Section 3: Business Details** (established year, business type, certifications)
-  - **Section 4: Contact Information** (phone, email, website, tax ID)
-  - **Section 5: Branding** (logo upload, company colors)
+  - **Section 1: Basic Information** (logo upload with BankOutlined icon, name, slug with "lavoro.ai/" prefix, industry with 12 options, description, country without "Other" option, default location name)
+  - **Section 2: Head Office Location** (Address Line 1, Address Line 2, City, State, Pincode)
+  - **Section 3: Business Details** (established date with DatePicker, business type, certifications)
+  - **Section 4: Contact Information** (phone, email with validation, website with placeholder, tax ID)
   - **Form Layout**: Single form with section headings and dividers
   - **Action Buttons**: Cancel & Create Company at bottom of drawer
   - Auto-generate slug from company name with uniqueness validation

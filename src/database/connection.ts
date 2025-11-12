@@ -19,16 +19,25 @@ class DatabaseManager {
   private tenantPrismaClients = new Map<string, PrismaClient>();
 
   /**
+   * Compute sanitized schema name for a tenant
+   */
+  getSchemaName(tenantId: string): string {
+    const safeId = tenantId.replace(/-/g, '_');
+    return `tenant_${safeId}`;
+  }
+
+  /**
    * Get or create a connection pool for a specific tenant
    */
   getTenantPool(tenantId: string): Pool {
     if (!this.tenantPools.has(tenantId)) {
+      const schemaName = this.getSchemaName(tenantId);
       const pool = new Pool({
         connectionString: config.database.url,
         max: config.database.maxConnections,
         idleTimeoutMillis: config.database.idleTimeout,
         connectionTimeoutMillis: config.database.connectionTimeout,
-        options: `-c search_path=tenant_${tenantId},public`,
+        options: `-c search_path=${schemaName},public`,
       });
 
       pool.on('error', (err) => logger.error(`Pool error for tenant ${tenantId}:`, err));
@@ -44,9 +53,10 @@ class DatabaseManager {
    */
   getTenantPrisma(tenantId: string): PrismaClient {
     if (!this.tenantPrismaClients.has(tenantId)) {
+      const schemaName = this.getSchemaName(tenantId);
       const prismaClient = new PrismaClient({
         datasources: {
-          db: { url: `${config.database.url}?schema=tenant_${tenantId}` },
+          db: { url: `${config.database.url}?schema=${schemaName}` },
         },
         log: config.env === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
       });
@@ -66,7 +76,8 @@ class DatabaseManager {
     const client = await pool.connect();
 
     try {
-      await client.query(`CREATE SCHEMA IF NOT EXISTS tenant_${tenantId}`);
+      const schemaName = this.getSchemaName(tenantId);
+      await client.query(`CREATE SCHEMA IF NOT EXISTS ${schemaName}`);
       await this.createTenantTables(client, tenantId);
       logger.info(`Created schema and tables for tenant: ${tenantId}`);
     } catch (error) {
@@ -81,7 +92,7 @@ class DatabaseManager {
    * Create all tenant-specific tables
    */
   private async createTenantTables(client: any, tenantId: string): Promise<void> {
-    const schemaName = `tenant_${tenantId}`;
+    const schemaName = this.getSchemaName(tenantId);
 
     // Locations table
     await client.query(`
@@ -189,6 +200,72 @@ class DatabaseManager {
       )
     `);
 
+    // Sales invoices table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS ${schemaName}.invoices (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        tenant_id UUID NOT NULL,
+        location_id UUID NOT NULL,
+        invoice_number VARCHAR(100) NOT NULL,
+        customer_id UUID,
+        issue_date DATE NOT NULL DEFAULT CURRENT_DATE,
+        due_date DATE,
+        subtotal DECIMAL(15,4) DEFAULT 0,
+        tax_total DECIMAL(15,4) DEFAULT 0,
+        total DECIMAL(15,4) DEFAULT 0,
+        currency VARCHAR(10) DEFAULT 'USD',
+        status VARCHAR(50) DEFAULT 'DRAFT',
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW(),
+        UNIQUE(tenant_id, invoice_number)
+      )
+    `);
+
+    // Purchase orders table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS ${schemaName}.purchase_orders (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        tenant_id UUID NOT NULL,
+        location_id UUID NOT NULL,
+        po_number VARCHAR(100) NOT NULL,
+        supplier_id UUID,
+        order_date DATE NOT NULL DEFAULT CURRENT_DATE,
+        expected_date DATE,
+        subtotal DECIMAL(15,4) DEFAULT 0,
+        tax_total DECIMAL(15,4) DEFAULT 0,
+        total DECIMAL(15,4) DEFAULT 0,
+        currency VARCHAR(10) DEFAULT 'USD',
+        status VARCHAR(50) DEFAULT 'DRAFT',
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW(),
+        UNIQUE(tenant_id, po_number)
+      )
+    `);
+
+    // Bills (AP invoices) table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS ${schemaName}.bills (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        tenant_id UUID NOT NULL,
+        location_id UUID NOT NULL,
+        bill_number VARCHAR(100) NOT NULL,
+        supplier_id UUID,
+        bill_date DATE NOT NULL DEFAULT CURRENT_DATE,
+        due_date DATE,
+        subtotal DECIMAL(15,4) DEFAULT 0,
+        tax_total DECIMAL(15,4) DEFAULT 0,
+        total DECIMAL(15,4) DEFAULT 0,
+        currency VARCHAR(10) DEFAULT 'USD',
+        status VARCHAR(50) DEFAULT 'DRAFT',
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW(),
+        UNIQUE(tenant_id, bill_number)
+      )
+    `);
+
     // Suppliers table
     await client.query(`
       CREATE TABLE IF NOT EXISTS ${schemaName}.suppliers (
@@ -251,6 +328,9 @@ class DatabaseManager {
       `CREATE INDEX IF NOT EXISTS idx_${schemaName}_financial_tenant ON ${schemaName}.financial_transactions(tenant_id)`,
       `CREATE INDEX IF NOT EXISTS idx_${schemaName}_suppliers_tenant ON ${schemaName}.suppliers(tenant_id)`,
       `CREATE INDEX IF NOT EXISTS idx_${schemaName}_customers_tenant ON ${schemaName}.customers(tenant_id)`,
+      `CREATE INDEX IF NOT EXISTS idx_${schemaName}_invoices_tenant_location ON ${schemaName}.invoices(tenant_id, location_id)`,
+      `CREATE INDEX IF NOT EXISTS idx_${schemaName}_purchase_orders_tenant_location ON ${schemaName}.purchase_orders(tenant_id, location_id)`,
+      `CREATE INDEX IF NOT EXISTS idx_${schemaName}_bills_tenant_location ON ${schemaName}.bills(tenant_id, location_id)`
     ];
 
     for (const indexQuery of indexes) {
