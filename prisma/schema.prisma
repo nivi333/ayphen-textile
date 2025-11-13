@@ -147,7 +147,7 @@ enum QualityStatus {
 // ============================================================================
 // TENANT-SPECIFIC TABLES (Schema per tenant approach)
 // Note: These will be created dynamically for each tenant
-// This is just the template structure - commented out for now to fix Prisma generation
+// This is just the template structure - actual tables created via migrations
 // ============================================================================
 
 // Template for tenant-specific location table
@@ -172,7 +172,112 @@ model TenantLocation {
   createdAt     DateTime    @default(now()) @map("created_at")
   updatedAt     DateTime    @updatedAt @map("updated_at")
 
+  // Relationships
+  inventoryItems   TenantInventoryItem[]
+  stockMovementsFrom TenantStockMovement[] @relation("StockMovementFromLocation")
+  stockMovementsTo   TenantStockMovement[] @relation("StockMovementToLocation")
+
   @@map("tenant_locations")
+}
+
+// Template for tenant-specific suppliers
+model TenantSupplier {
+  id           String   @id @default(uuid())
+  tenantId     String   @map("tenant_id")
+  name         String
+  contactPerson String? @map("contact_person")
+  email        String?
+  phone        String?
+  address      String?
+  city         String?
+  state        String?
+  country      String?
+  pincode      String?
+  taxId        String?  @map("tax_id")
+  paymentTerms String?  @map("payment_terms")
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  inventoryItems TenantInventoryItem[]
+
+  @@map("tenant_suppliers")
+}
+
+// Template for tenant-specific inventory items
+model TenantInventoryItem {
+  id              String   @id @default(uuid())
+  tenantId        String   @map("tenant_id")
+  locationId      String   @map("location_id")
+  name            String   @map("name")
+  sku             String   @map("sku")
+  description     String?  @map("description")
+  category        InventoryCategory @map("category")
+  subCategory     String?  @map("sub_category")
+  fiberType       String?  @map("fiber_type")
+  yarnCount       String?  @map("yarn_count")
+  gsm             Decimal? @map("gsm")
+  fabricType      String?  @map("fabric_type")
+  color           String?  @map("color")
+  width           Decimal? @map("width")
+  weight          Decimal? @map("weight")
+  uom             String   @default("METER") @map("uom")
+  currentStock    Decimal  @default(0) @map("current_stock")
+  reservedStock   Decimal  @default(0) @map("reserved_stock")
+  availableStock  Decimal  @default(0) @map("available_stock")
+  minStockLevel   Decimal  @default(0) @map("min_stock_level")
+  maxStockLevel   Decimal? @map("max_stock_level")
+  reorderPoint    Decimal  @default(0) @map("reorder_point")
+  unitCost        Decimal  @map("unit_cost")
+  averageCost     Decimal  @default(0) @map("average_cost")
+  lastPurchasePrice Decimal? @map("last_purchase_price")
+  lastPurchaseDate  DateTime? @map("last_purchase_date")
+  primarySupplierId String? @map("primary_supplier_id")
+  supplierSku     String?  @map("supplier_sku")
+  batchNumber     String?  @map("batch_number")
+  lotNumber       String?  @map("lot_number")
+  expiryDate      DateTime? @map("expiry_date")
+  qualityStatus   QualityStatus @default(PENDING) @map("quality_status")
+  isActive        Boolean  @default(true) @map("is_active")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  location        TenantLocation @relation(fields: [locationId], references: [id])
+  primarySupplier TenantSupplier? @relation(fields: [primarySupplierId], references: [id])
+  stockMovements  TenantStockMovement[]
+
+  @@unique([tenantId, sku])
+  @@map("tenant_inventory_items")
+}
+
+// Template for tenant-specific stock movements
+model TenantStockMovement {
+  id            String   @id @default(uuid())
+  tenantId      String   @map("tenant_id")
+  itemId        String   @map("item_id")
+  fromLocationId String? @map("from_location_id")
+  toLocationId  String? @map("to_location_id")
+  movementType  StockMovementType @map("movement_type")
+  quantity      Decimal
+  unitCost      Decimal? @map("unit_cost")
+  referenceType String?  @map("reference_type")
+  referenceId   String?  @map("reference_id")
+  batchNumber   String?  @map("batch_number")
+  lotNumber     String?  @map("lot_number")
+  notes         String?
+  performedBy   String   @map("performed_by")
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  item          TenantInventoryItem @relation(fields: [itemId], references: [id])
+  fromLocation  TenantLocation? @relation("StockMovementFromLocation", fields: [fromLocationId], references: [id])
+  toLocation    TenantLocation? @relation("StockMovementToLocation", fields: [toLocationId], references: [id])
+
+  @@map("tenant_stock_movements")
 }
 
 // Template for tenant-specific production orders

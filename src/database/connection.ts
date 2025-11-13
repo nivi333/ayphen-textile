@@ -54,15 +54,18 @@ class DatabaseManager {
   getTenantPrisma(tenantId: string): PrismaClient {
     if (!this.tenantPrismaClients.has(tenantId)) {
       const schemaName = this.getSchemaName(tenantId);
+      // Create a connection URL that includes the schema search_path
+      const tenantUrl = `${config.database.url}?options=-c%20search_path%3D${schemaName}%2Cpublic`;
+
       const prismaClient = new PrismaClient({
         datasources: {
-          db: { url: `${config.database.url}?schema=${schemaName}` },
+          db: { url: tenantUrl },
         },
         log: config.env === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
       });
 
       this.tenantPrismaClients.set(tenantId, prismaClient);
-      logger.info(`Created Prisma client for tenant: ${tenantId}`);
+      logger.info(`Created Prisma client for tenant: ${tenantId} with schema: ${schemaName}`);
     }
 
     return this.tenantPrismaClients.get(tenantId)!;
@@ -94,16 +97,16 @@ class DatabaseManager {
   private async createTenantTables(client: any, tenantId: string): Promise<void> {
     const schemaName = this.getSchemaName(tenantId);
 
-    // Locations table
+    // Locations table (matches TenantLocation Prisma model)
     await client.query(`
-      CREATE TABLE IF NOT EXISTS ${schemaName}.locations (
+      CREATE TABLE IF NOT EXISTS ${schemaName}.tenant_locations (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         tenant_id UUID NOT NULL,
         name VARCHAR(255) NOT NULL,
         email VARCHAR(255),
         phone VARCHAR(50),
         country VARCHAR(100) NOT NULL,
-        address_line_1 TEXT NOT NULL,
+        address_line_1 TEXT,
         address_line_2 TEXT,
         city VARCHAR(100) NOT NULL,
         state VARCHAR(100) NOT NULL,
@@ -118,9 +121,9 @@ class DatabaseManager {
       )
     `);
 
-    // Inventory items table
+    // Inventory items table (matches TenantInventoryItem Prisma model)
     await client.query(`
-      CREATE TABLE IF NOT EXISTS ${schemaName}.inventory_items (
+      CREATE TABLE IF NOT EXISTS ${schemaName}.tenant_inventory_items (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         tenant_id UUID NOT NULL,
         location_id UUID NOT NULL,
@@ -128,11 +131,31 @@ class DatabaseManager {
         sku VARCHAR(100) NOT NULL,
         description TEXT,
         category VARCHAR(100),
-        unit VARCHAR(50),
-        quantity DECIMAL(15,4) DEFAULT 0,
-        min_stock DECIMAL(15,4) DEFAULT 0,
-        max_stock DECIMAL(15,4),
-        unit_price DECIMAL(15,4),
+        sub_category VARCHAR(100),
+        fiber_type VARCHAR(100),
+        yarn_count VARCHAR(50),
+        gsm DECIMAL(10,2),
+        fabric_type VARCHAR(100),
+        color VARCHAR(100),
+        width DECIMAL(15,4),
+        weight DECIMAL(15,4),
+        uom VARCHAR(20) DEFAULT 'METER',
+        current_stock DECIMAL(15,4) DEFAULT 0,
+        reserved_stock DECIMAL(15,4) DEFAULT 0,
+        available_stock DECIMAL(15,4) DEFAULT 0,
+        min_stock_level DECIMAL(15,4) DEFAULT 0,
+        max_stock_level DECIMAL(15,4),
+        reorder_point DECIMAL(15,4) DEFAULT 0,
+        unit_cost DECIMAL(15,4),
+        average_cost DECIMAL(15,4) DEFAULT 0,
+        last_purchase_price DECIMAL(15,4),
+        last_purchase_date TIMESTAMP,
+        primary_supplier_id UUID,
+        supplier_sku VARCHAR(100),
+        batch_number VARCHAR(100),
+        lot_number VARCHAR(100),
+        expiry_date TIMESTAMP,
+        quality_status VARCHAR(20) DEFAULT 'PENDING',
         is_active BOOLEAN DEFAULT TRUE,
         created_at TIMESTAMP DEFAULT NOW(),
         updated_at TIMESTAMP DEFAULT NOW(),
@@ -140,9 +163,9 @@ class DatabaseManager {
       )
     `);
 
-    // Production orders table
+    // Production orders table (matches TenantProductionOrder Prisma model)
     await client.query(`
-      CREATE TABLE IF NOT EXISTS ${schemaName}.production_orders (
+      CREATE TABLE IF NOT EXISTS ${schemaName}.tenant_production_orders (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         tenant_id UUID NOT NULL,
         location_id UUID NOT NULL,
@@ -178,8 +201,6 @@ class DatabaseManager {
         approved_by UUID,
         approved_at TIMESTAMP,
         notes TEXT,
-        created_by UUID,
-        updated_by UUID,
         is_active BOOLEAN DEFAULT TRUE,
         created_at TIMESTAMP DEFAULT NOW(),
         updated_at TIMESTAMP DEFAULT NOW(),
@@ -187,9 +208,9 @@ class DatabaseManager {
       )
     `);
 
-    // Work orders table
+    // Work orders table (matches TenantWorkOrder Prisma model)
     await client.query(`
-      CREATE TABLE IF NOT EXISTS ${schemaName}.work_orders (
+      CREATE TABLE IF NOT EXISTS ${schemaName}.tenant_work_orders (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         tenant_id UUID NOT NULL,
         production_order_id UUID NOT NULL,
@@ -211,8 +232,6 @@ class DatabaseManager {
         priority VARCHAR(20) DEFAULT 'MEDIUM',
         quality_check_required BOOLEAN DEFAULT FALSE,
         notes TEXT,
-        created_by UUID,
-        updated_by UUID,
         is_active BOOLEAN DEFAULT TRUE,
         created_at TIMESTAMP DEFAULT NOW(),
         updated_at TIMESTAMP DEFAULT NOW(),
@@ -324,9 +343,32 @@ class DatabaseManager {
       )
     `);
 
-    // Suppliers table
+    // Stock movements table (matches TenantStockMovement Prisma model)
     await client.query(`
-      CREATE TABLE IF NOT EXISTS ${schemaName}.suppliers (
+      CREATE TABLE IF NOT EXISTS ${schemaName}.tenant_stock_movements (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        tenant_id UUID NOT NULL,
+        item_id UUID NOT NULL,
+        from_location_id UUID,
+        to_location_id UUID,
+        movement_type VARCHAR(50) NOT NULL,
+        quantity DECIMAL(15,4) NOT NULL,
+        unit_cost DECIMAL(15,4),
+        reference_type VARCHAR(50),
+        reference_id UUID,
+        batch_number VARCHAR(100),
+        lot_number VARCHAR(100),
+        notes TEXT,
+        performed_by UUID NOT NULL,
+        is_active BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+
+    // Suppliers table (matches TenantSupplier Prisma model)
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS ${schemaName}.tenant_suppliers (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         tenant_id UUID NOT NULL,
         name VARCHAR(255) NOT NULL,
@@ -378,14 +420,15 @@ class DatabaseManager {
    */
   private async createTenantIndexes(client: any, schemaName: string): Promise<void> {
     const indexes = [
-      `CREATE INDEX IF NOT EXISTS idx_${schemaName}_locations_tenant ON ${schemaName}.locations(tenant_id)`,
-      `CREATE INDEX IF NOT EXISTS idx_${schemaName}_inventory_tenant_location ON ${schemaName}.inventory_items(tenant_id, location_id)`,
-      `CREATE INDEX IF NOT EXISTS idx_${schemaName}_inventory_sku ON ${schemaName}.inventory_items(sku)`,
-      `CREATE INDEX IF NOT EXISTS idx_${schemaName}_production_tenant_location ON ${schemaName}.production_orders(tenant_id, location_id)`,
-      `CREATE INDEX IF NOT EXISTS idx_${schemaName}_work_orders_tenant_production ON ${schemaName}.work_orders(tenant_id, production_order_id)`,
+      `CREATE INDEX IF NOT EXISTS idx_${schemaName}_locations_tenant ON ${schemaName}.tenant_locations(tenant_id)`,
+      `CREATE INDEX IF NOT EXISTS idx_${schemaName}_inventory_tenant_location ON ${schemaName}.tenant_inventory_items(tenant_id, location_id)`,
+      `CREATE INDEX IF NOT EXISTS idx_${schemaName}_inventory_sku ON ${schemaName}.tenant_inventory_items(sku)`,
+      `CREATE INDEX IF NOT EXISTS idx_${schemaName}_production_tenant_location ON ${schemaName}.tenant_production_orders(tenant_id, location_id)`,
+      `CREATE INDEX IF NOT EXISTS idx_${schemaName}_work_orders_tenant_production ON ${schemaName}.tenant_work_orders(tenant_id, production_order_id)`,
+      `CREATE INDEX IF NOT EXISTS idx_${schemaName}_stock_movements_tenant_item ON ${schemaName}.tenant_stock_movements(tenant_id, item_id)`,
       `CREATE INDEX IF NOT EXISTS idx_${schemaName}_quality_tenant_location ON ${schemaName}.quality_records(tenant_id, location_id)`,
       `CREATE INDEX IF NOT EXISTS idx_${schemaName}_financial_tenant ON ${schemaName}.financial_transactions(tenant_id)`,
-      `CREATE INDEX IF NOT EXISTS idx_${schemaName}_suppliers_tenant ON ${schemaName}.suppliers(tenant_id)`,
+      `CREATE INDEX IF NOT EXISTS idx_${schemaName}_suppliers_tenant ON ${schemaName}.tenant_suppliers(tenant_id)`,
       `CREATE INDEX IF NOT EXISTS idx_${schemaName}_customers_tenant ON ${schemaName}.customers(tenant_id)`,
       `CREATE INDEX IF NOT EXISTS idx_${schemaName}_invoices_tenant_location ON ${schemaName}.invoices(tenant_id, location_id)`,
       `CREATE INDEX IF NOT EXISTS idx_${schemaName}_purchase_orders_tenant_location ON ${schemaName}.purchase_orders(tenant_id, location_id)`,

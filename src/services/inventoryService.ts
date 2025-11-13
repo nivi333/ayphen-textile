@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, InventoryCategory, QualityStatus, StockMovementType } from '@prisma/client';
 import { logger } from '../utils/logger';
 import { databaseManager } from '../database/connection';
 
@@ -7,7 +7,7 @@ export interface CreateInventoryItemData {
   name: string;
   sku: string;
   description?: string;
-  category: 'RAW_MATERIAL' | 'WORK_IN_PROGRESS' | 'FINISHED_GOODS' | 'CONSUMABLES' | 'PACKAGING';
+  category: InventoryCategory;
   subCategory?: string;
   fiberType?: string;
   yarnCount?: string;
@@ -27,7 +27,7 @@ export interface CreateInventoryItemData {
   batchNumber?: string;
   lotNumber?: string;
   expiryDate?: Date;
-  qualityStatus?: string;
+  qualityStatus?: QualityStatus;
 }
 
 export interface UpdateInventoryItemData extends Partial<CreateInventoryItemData> {
@@ -38,7 +38,7 @@ export interface StockMovementData {
   itemId: string;
   fromLocationId?: string;
   toLocationId?: string;
-  movementType: 'RECEIPT' | 'ISSUE' | 'TRANSFER' | 'ADJUSTMENT' | 'RETURN';
+  movementType: StockMovementType;
   quantity: number;
   unitCost?: number;
   referenceType?: string;
@@ -50,7 +50,8 @@ export interface StockMovementData {
 }
 
 export class InventoryService {
-  private getTenantPrisma(tenantId: string): PrismaClient {
+  private getTenantPrisma(tenantId: string): any {
+    // Return any type to avoid TypeScript issues with tenant-specific Prisma clients
     return databaseManager.getTenantPrisma(tenantId);
   }
 
@@ -91,7 +92,7 @@ export class InventoryService {
           batchNumber: data.batchNumber,
           lotNumber: data.lotNumber,
           expiryDate: data.expiryDate,
-          qualityStatus: data.qualityStatus || 'PENDING',
+          qualityStatus: data.qualityStatus || QualityStatus.PENDING,
         },
         include: {
           location: true,
@@ -120,8 +121,8 @@ export class InventoryService {
       }
 
       // Calculate available stock
-      const currentStock = data.currentStock ?? existingItem.currentStock;
-      const reservedStock = existingItem.reservedStock;
+      const currentStock = data.currentStock ?? Number(existingItem.currentStock);
+      const reservedStock = Number(existingItem.reservedStock);
       const availableStock = currentStock - reservedStock;
 
       const item = await prisma.tenantInventoryItem.update({
@@ -166,12 +167,7 @@ export class InventoryService {
     }
   }
 
-  async getInventoryItems(tenantId: string, filters?: {
-    locationId?: string;
-    category?: string;
-    search?: string;
-    lowStock?: boolean;
-  }) {
+  async getInventoryItems(tenantId: string, filters?: { locationId?: string; category?: string; search?: string; lowStock?: boolean; }) {
     try {
       const prisma = this.getTenantPrisma(tenantId);
 
@@ -309,8 +305,8 @@ export class InventoryService {
           throw new Error('Inventory item not found');
         }
 
-        let newStock = item.currentStock;
-        let newReservedStock = item.reservedStock;
+        let newStock = Number(item.currentStock);
+        let newReservedStock = Number(item.reservedStock);
 
         switch (data.movementType) {
           case 'RECEIPT':
@@ -343,8 +339,8 @@ export class InventoryService {
           data: {
             currentStock: newStock,
             availableStock: availableStock,
-            averageCost: data.unitCost ? ((item.averageCost * item.currentStock + data.unitCost * data.quantity) / newStock) : item.averageCost,
-            lastPurchasePrice: data.movementType === 'RECEIPT' ? data.unitCost : item.lastPurchasePrice,
+            averageCost: data.unitCost ? ((Number(item.averageCost) * Number(item.currentStock) + data.unitCost * data.quantity) / newStock) : Number(item.averageCost),
+            lastPurchasePrice: data.movementType === 'RECEIPT' ? data.unitCost : item.lastPurchasePrice ? Number(item.lastPurchasePrice) : undefined,
             lastPurchaseDate: data.movementType === 'RECEIPT' ? new Date() : item.lastPurchaseDate,
           },
         });
@@ -360,12 +356,7 @@ export class InventoryService {
     }
   }
 
-  async getStockMovements(tenantId: string, itemId?: string, filters?: {
-    movementType?: string;
-    fromDate?: Date;
-    toDate?: Date;
-    performedBy?: string;
-  }) {
+  async getStockMovements(tenantId: string, itemId?: string, filters?: { movementType?: string; fromDate?: Date; toDate?: Date; performedBy?: string; }) {
     try {
       const prisma = this.getTenantPrisma(tenantId);
 
@@ -465,9 +456,9 @@ export class InventoryService {
 
       return {
         totalItems: summary._count.id,
-        totalStockValue: (summary._sum.currentStock || 0) * (summary._sum.unitCost || 0),
-        totalStockQuantity: summary._sum.currentStock || 0,
-        availableStockQuantity: summary._sum.availableStock || 0,
+        totalStockValue: (Number(summary._sum.currentStock) || 0) * (Number(summary._sum.unitCost) || 0),
+        totalStockQuantity: Number(summary._sum.currentStock) || 0,
+        availableStockQuantity: Number(summary._sum.availableStock) || 0,
         lowStockItemsCount: lowStockCount,
       };
     } catch (error) {

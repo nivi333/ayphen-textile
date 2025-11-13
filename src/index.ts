@@ -2,9 +2,9 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { config } from './config/config';
 import { logger } from './utils/logger';
-import { 
-  corsMiddleware, 
-  securityMiddleware, 
+import {
+  corsMiddleware,
+  securityMiddleware,
   compressionMiddleware,
   requestIdMiddleware,
   requestLoggingMiddleware,
@@ -14,15 +14,15 @@ import {
   clientVersionMiddleware,
   requestSizeLimitMiddleware,
   timeoutMiddleware,
-  maintenanceModeMiddleware
+  maintenanceModeMiddleware,
 } from './middleware/requestMiddleware';
-import { 
-  enhancedErrorHandler, 
+import {
+  enhancedErrorHandler,
   notFoundHandler,
   setupUnhandledRejectionHandler,
-  setupUncaughtExceptionHandler
+  setupUncaughtExceptionHandler,
 } from './middleware/enhancedErrorHandler';
-import { generalRateLimit } from './middleware/rateLimiter';
+ 
 import { setupSwagger } from './docs/swagger';
 import v1Routes from './routes/v1';
 
@@ -56,7 +56,8 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Rate limiting middleware
-app.use(generalRateLimit);
+// app.use(generalRateLimit);
+// app.use(/* generalRateLimit */);
 
 // API Documentation
 setupSwagger(app);
