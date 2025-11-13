@@ -1,6 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Row, Col, Card, Statistic, Button, Modal, Form, Input, Select, message } from 'antd';
+import {
+  Row,
+  Col,
+  Card,
+  Statistic,
+  Button,
+  Modal,
+  Form,
+  Input,
+  Select,
+  Typography,
+  message,
+} from 'antd';
 import {
   BankOutlined,
   TeamOutlined,
@@ -12,6 +24,7 @@ import { useHeader } from '../contexts/HeaderContext';
 import useAuth from '../contexts/AuthContext';
 import { Heading } from '../components/Heading';
 import { MainLayout } from '../components/layout';
+import { GradientButton } from '../components/ui';
 import './DashboardPage.scss';
 import { COMPANY_TEXT } from '../constants/company';
 
@@ -26,13 +39,9 @@ const DashboardPage: React.FC = () => {
   // Set header actions when component mounts
   useEffect(() => {
     setHeaderActions(
-      <Button
-        type='primary'
-        icon={<PlusOutlined />}
-        onClick={() => setInviteModalVisible(true)}
-      >
+      <GradientButton size='small' onClick={() => setInviteModalVisible(true)}>
         Invite Team Member
-      </Button>
+      </GradientButton>
     );
 
     // Cleanup when component unmounts
@@ -172,8 +181,12 @@ const DashboardPage: React.FC = () => {
             <Card className='dashboard-activity-card'>
               <div className='dashboard-empty-state'>
                 <BankOutlined style={{ fontSize: '48px', color: '#cbd5e1' }} />
-                <p>No recent activity</p>
-                <span>Start by creating your first product or order</span>
+                <Typography.Text>
+                  <p>No recent activity</p>
+                </Typography.Text>
+                <Typography.Text>
+                  <span>Start by creating your first product or order</span>
+                </Typography.Text>
               </div>
             </Card>
           </div>
@@ -214,9 +227,9 @@ const DashboardPage: React.FC = () => {
               <Button onClick={() => setInviteModalVisible(false)} style={{ marginRight: 8 }}>
                 Cancel
               </Button>
-              <Button type='primary' htmlType='submit' loading={inviting}>
+              <GradientButton size='small' htmlType='submit' loading={inviting}>
                 Send Invitation
-              </Button>
+              </GradientButton>
             </Form.Item>
           </Form>
         </Modal>

@@ -23,6 +23,7 @@ import {
   LOCATION_DRAWER_CONFIG,
 } from '../../constants/location';
 import { locationService, Location, CreateLocationRequest } from '../../services/locationService';
+import { GradientButton } from '../ui';
 import './LocationDrawer.scss';
 
 const { Title, Text } = Typography;
@@ -208,11 +209,13 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
         <div className='drawer-footer'>
           <Space>
             <Button onClick={handleCancel} disabled={loading}>
-              Cancel
+              <Typography.Text>Cancel</Typography.Text>
             </Button>
-            <Button type='primary' onClick={handleSubmit(onSubmit)} loading={loading}>
-              {editingLocation ? 'Update Location' : 'Create Location'}
-            </Button>
+            <GradientButton size='small' onClick={handleSubmit(onSubmit)} loading={loading}>
+              <Typography.Text>
+                {editingLocation ? 'Update Location' : 'Create Location'}
+              </Typography.Text>
+            </GradientButton>
           </Space>
         </div>
       }

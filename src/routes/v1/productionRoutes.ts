@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { productionController } from '../../controllers/productionController';
-import { authenticateToken } from '../../middleware/auth';
+import { tenantIsolationMiddleware } from '../../middleware/tenantIsolation';
 
 const router = Router();
 
 // Apply authentication middleware to all production routes
-router.use(authenticateToken);
+router.use(tenantIsolationMiddleware);
 
 // Production Orders CRUD
 router.post('/orders', productionController.createProductionOrder.bind(productionController));

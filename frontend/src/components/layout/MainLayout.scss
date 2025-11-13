@@ -58,7 +58,7 @@
     min-height: calc(100vh - 64px);
 
     .main-content {
-      padding: 0;
+      padding: 15px;
       background: $bg-primary;
       min-height: calc(100vh - 64px);
       overflow-x: auto;
@@ -92,7 +92,6 @@
     height: 100%;
   }
 }
-
 
 // Dark theme support
 [data-theme='dark'] {

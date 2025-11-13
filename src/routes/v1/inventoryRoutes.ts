@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { inventoryController } from '../../controllers/inventoryController';
-import { authenticateToken } from '../../middleware/auth';
+import { tenantIsolationMiddleware } from '../../middleware/tenantIsolation';
 
 const router = Router();
 
 // Apply authentication middleware to all inventory routes
-router.use(authenticateToken);
+router.use(tenantIsolationMiddleware);
 
 // Inventory Items CRUD
 router.post('/items', inventoryController.createInventoryItem.bind(inventoryController));

@@ -1,18 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Button, message, Modal, Typography } from 'antd';
-import { TeamOutlined, BankOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import useAuth from '../contexts/AuthContext';
+import { Button, Typography, message, Modal, Spin } from 'antd';
+import { ExclamationCircleOutlined, BankOutlined, TeamOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { Company } from '../types/auth';
-import { HeadingText } from '../components/ui';
+import useAuth from '../contexts/AuthContext';
+import { CompanyCreationDrawer } from '../components/CompanyCreationDrawer';
+import HeadingText from '../components/ui/HeadingText';
+import { GradientButton } from '../components/ui';
+import { BrandLogo } from '../components/BrandLogo';
 import './CompaniesListPage.scss';
 import { COMPANY_TEXT } from '../constants/company';
-
-// Companies selection page component
-import { Spin } from 'antd';
-
-import { CompanyCreationDrawer } from '../components/CompanyCreationDrawer';
-import { BrandLogo } from '@/components/BrandLogo';
+import { Company } from '../types/auth';
 
 export default function CompaniesListPage() {
   const { companies, switchCompany, isLoading, logout, refreshCompanies } = useAuth();
@@ -109,15 +106,20 @@ export default function CompaniesListPage() {
         {/* <BrandLogo width={150} height={36} /> */}
         <BrandLogo width={150} height={36} />
         <div className='companies-top-bar-actions'>
-          <Button type='primary' className='companies-add-btn' onClick={() => setDrawerOpen(true)}>
+          <GradientButton
+            type='primary'
+            className='companies-add-btn'
+            onClick={() => setDrawerOpen(true)}
+          >
             {COMPANY_TEXT.ADD_COMPANY}
-          </Button>
+          </GradientButton>
           <Button
             type='default'
             danger
             loading={logoutLoading}
             onClick={handleLogout}
             disabled={logoutLoading}
+            style={{ height: '40px' }}
           >
             {COMPANY_TEXT.LOGOUT}
           </Button>

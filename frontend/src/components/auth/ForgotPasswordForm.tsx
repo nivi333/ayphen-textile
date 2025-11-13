@@ -300,9 +300,9 @@ export default function ForgotPasswordForm() {
             title='Password Reset Successful!'
             subTitle='Your password has been reset successfully. You will be redirected to the login page shortly.'
             extra={
-              <Button type='primary' onClick={() => navigate('/login')}>
+              <GradientButton size='small' onClick={() => navigate('/login')}>
                 Go to Login
-              </Button>
+              </GradientButton>
             }
           />
         );

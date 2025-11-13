@@ -14,6 +14,7 @@ import {
   Modal,
   Form,
   InputNumber,
+  Typography,
   message,
   Badge,
 } from 'antd';
@@ -310,7 +311,7 @@ const InventoryPage: React.FC = () => {
           </div>
           <div className="inventory-header-actions">
             <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateItem}>
-              Add Inventory Item
+              <Typography.Text>Add Inventory Item</Typography.Text>
             </Button>
           </div>
         </div>
@@ -604,10 +605,10 @@ const InventoryPage: React.FC = () => {
 
           <Form.Item style={{ textAlign: 'right', marginBottom: 0 }}>
             <Button onClick={handleModalCancel} style={{ marginRight: 8 }}>
-              Cancel
+              <Typography.Text>Cancel</Typography.Text>
             </Button>
             <Button type="primary" htmlType="submit">
-              {editingItem ? 'Update Item' : 'Create Item'}
+              <Typography.Text>{editingItem ? 'Update Item' : 'Create Item'}</Typography.Text>
             </Button>
           </Form.Item>
         </Form>

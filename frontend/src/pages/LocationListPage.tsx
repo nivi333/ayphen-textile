@@ -1,20 +1,6 @@
 import { useState, useEffect } from 'react';
+import { Table, Button, Tag, Space, Avatar, Dropdown, Modal, message, Empty, Spin } from 'antd';
 import {
-  Layout,
-  Table,
-  Button,
-  Tag,
-  Space,
-  Avatar,
-  Dropdown,
-  Modal,
-  message,
-  Typography,
-  Empty,
-  Spin,
-} from 'antd';
-import {
-  PlusOutlined,
   EditOutlined,
   DeleteOutlined,
   EnvironmentOutlined,
@@ -22,7 +8,11 @@ import {
   CrownOutlined,
 } from '@ant-design/icons';
 import useAuth from '../contexts/AuthContext';
+import { useHeader } from '../contexts/HeaderContext';
 import { locationService, Location } from '../services/locationService';
+import { MainLayout } from '../components/layout';
+import { Heading } from '../components/Heading';
+import { GradientButton } from '../components/ui';
 import {
   LOCATION_TYPE_LABELS,
   LOCATION_TYPE_COLORS,
@@ -33,19 +23,28 @@ import {
   LOCATION_ERROR_MESSAGES,
 } from '../constants/location';
 import LocationDrawer from '../components/location/LocationDrawer';
-import { BrandLogo } from '../components/BrandLogo';
 import './LocationListPage.scss';
-
-const { Header, Content } = Layout;
-const { Title } = Typography;
 
 export default function LocationListPage() {
   const { currentCompany } = useAuth();
+  const { setHeaderActions } = useHeader();
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [editingLocation, setEditingLocation] = useState<Location | null>(null);
   const [tableLoading, setTableLoading] = useState(false);
+
+  // Set header actions when component mounts
+  useEffect(() => {
+    setHeaderActions(
+      <GradientButton onClick={handleAddLocation} size='small' className='add-location-btn'>
+        Add Location
+      </GradientButton>
+    );
+
+    // Cleanup when component unmounts
+    return () => setHeaderActions(null);
+  }, [setHeaderActions]);
 
   useEffect(() => {
     if (currentCompany) {
@@ -186,8 +185,8 @@ export default function LocationListPage() {
             {record.name.charAt(0)}
           </Avatar>
           <div>
-            <div className="location-name">{record.name}</div>
-            <div className="location-address">
+            <div className='location-name'>{record.name}</div>
+            <div className='location-address'>
               {record.addressLine1}, {record.city}, {record.state}
             </div>
           </div>
@@ -208,7 +207,7 @@ export default function LocationListPage() {
       title: 'Contact',
       key: 'contact',
       render: (record: Location) => (
-        <div className="location-contact">
+        <div className='location-contact'>
           {record.email && <div>{record.email}</div>}
           {record.phone && <div>{record.phone}</div>}
         </div>
@@ -218,17 +217,17 @@ export default function LocationListPage() {
       title: 'Status',
       key: 'status',
       render: (record: Location) => (
-        <Space direction="vertical" size="small">
+        <Space direction='vertical' size='small'>
           <Tag color={LOCATION_STATUS_COLORS[record.isActive ? 'ACTIVE' : 'INACTIVE']}>
             {record.isActive ? 'Active' : 'Inactive'}
           </Tag>
           {record.isDefault && (
-            <Tag color="#7b5fc9" icon={<EnvironmentOutlined />}>
+            <Tag color='#7b5fc9' icon={<EnvironmentOutlined />}>
               Default
             </Tag>
           )}
           {record.isHeadquarters && (
-            <Tag color="#faad14" icon={<CrownOutlined />}>
+            <Tag color='#faad14' icon={<CrownOutlined />}>
               Headquarters
             </Tag>
           )}
@@ -243,9 +242,9 @@ export default function LocationListPage() {
         <Dropdown
           menu={{ items: getActionMenuItems(record) }}
           trigger={['click']}
-          placement="bottomRight"
+          placement='bottomRight'
         >
-          <Button type="text" icon={<MoreOutlined />} />
+          <Button type='text' icon={<MoreOutlined />} />
         </Dropdown>
       ),
     },
@@ -253,86 +252,53 @@ export default function LocationListPage() {
 
   if (!currentCompany) {
     return (
-      <Layout className="location-list-page">
-        <Header className="page-header">
-          <BrandLogo />
-        </Header>
-        <Content className="page-content">
-          <div className="no-company-message">
-            Please select a company to manage locations.
-          </div>
-        </Content>
-      </Layout>
+      <MainLayout>
+        <div className='no-company-message'>Please select a company to manage locations.</div>
+      </MainLayout>
     );
   }
 
   return (
-    <Layout className="location-list-page">
-      <Header className="page-header">
-        <div className="header-left">
-          <BrandLogo />
+    <MainLayout>
+      <div className='page-container'>
+        <div className='page-header-section'>
+          <Heading level={2} className='page-title'>
+            Company Locations
+          </Heading>
         </div>
-        <div className="header-right">
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={handleAddLocation}
-            className="add-location-btn"
-          >
-            Add Location
-          </Button>
-        </div>
-      </Header>
 
-      <Content className="page-content">
-        <div className="page-container">
-          <div className="page-header-section">
-            <Title level={2} className="page-title">
-              Company Locations
-            </Title>
-            <div className="page-subtitle">
-              Manage your company locations, branches, warehouses, and factories
+        <div className='table-container'>
+          {loading ? (
+            <div className='loading-container'>
+              <Spin size='large' />
             </div>
-          </div>
-
-          <div className="table-container">
-            {loading ? (
-              <div className="loading-container">
-                <Spin size="large" />
-              </div>
-            ) : locations.length === 0 ? (
-              <Empty
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description={LOCATION_EMPTY_STATE.DESCRIPTION}
-              >
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  onClick={handleAddLocation}
-                >
-                  {LOCATION_EMPTY_STATE.BUTTON_TEXT}
-                </Button>
-              </Empty>
-            ) : (
-              <Table
-                columns={columns}
-                dataSource={locations}
-                rowKey="id"
-                loading={tableLoading}
-                pagination={{
-                  pageSize: LOCATION_TABLE_CONFIG.PAGE_SIZE,
-                  showSizeChanger: LOCATION_TABLE_CONFIG.SHOW_SIZE_CHANGER,
-                  showQuickJumper: LOCATION_TABLE_CONFIG.SHOW_QUICK_JUMPER,
-                  showTotal: (total, range) =>
-                    `${range[0]}-${range[1]} of ${total} locations`,
-                }}
-                scroll={{ x: LOCATION_TABLE_CONFIG.SCROLL_X }}
-                className="locations-table"
-              />
-            )}
-          </div>
+          ) : locations.length === 0 ? (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={LOCATION_EMPTY_STATE.DESCRIPTION}
+            >
+              <GradientButton size='small' onClick={handleAddLocation}>
+                {LOCATION_EMPTY_STATE.BUTTON_TEXT}
+              </GradientButton>
+            </Empty>
+          ) : (
+            <Table
+              columns={columns}
+              dataSource={locations}
+              rowKey='id'
+              loading={tableLoading}
+              pagination={{
+                pageSize: LOCATION_TABLE_CONFIG.PAGE_SIZE,
+                showSizeChanger: LOCATION_TABLE_CONFIG.SHOW_SIZE_CHANGER,
+                showQuickJumper: LOCATION_TABLE_CONFIG.SHOW_QUICK_JUMPER,
+                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} locations`,
+              }}
+              scroll={{ x: LOCATION_TABLE_CONFIG.SCROLL_X }}
+              className='locations-table'
+            />
+          )}
         </div>
-      </Content>
+      </div>
 
       <LocationDrawer
         visible={drawerVisible}
@@ -341,6 +307,6 @@ export default function LocationListPage() {
         editingLocation={editingLocation}
         locations={locations}
       />
-    </Layout>
+    </MainLayout>
   );
 }

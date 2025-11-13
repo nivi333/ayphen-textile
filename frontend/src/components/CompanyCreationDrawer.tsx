@@ -16,6 +16,7 @@ import { BankOutlined } from '@ant-design/icons';
 import ImgCrop from 'antd-img-crop';
 import { companyService, CreateCompanyRequest } from '../services/companyService';
 import { EmailPhoneInput } from './ui/EmailPhoneInput';
+import { GradientButton } from './ui';
 import './CompanyCreationDrawer.scss';
 
 const { Option } = Select;
@@ -515,9 +516,9 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
             <Button onClick={onClose} className='ccd-cancel-btn'>
               Cancel
             </Button>
-            <Button type='primary' htmlType='submit' loading={uploading}>
+            <GradientButton size='small' htmlType='submit' loading={uploading}>
               Create Company
-            </Button>
+            </GradientButton>
           </div>
         </Form>
       </div>
