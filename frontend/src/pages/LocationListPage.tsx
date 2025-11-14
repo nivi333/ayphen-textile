@@ -1,5 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
-import { Table, Button, Tag, Space, Avatar, Dropdown, Modal, message, Empty, Spin } from 'antd';
+import {
+  Table,
+  Button,
+  Tag,
+  Space,
+  Avatar,
+  Dropdown,
+  Modal,
+  message,
+  Empty,
+  Spin,
+  Checkbox,
+} from 'antd';
 import {
   EditOutlined,
   DeleteOutlined,
@@ -153,14 +165,14 @@ export default function LocationListPage() {
     {
       key: 'default',
       icon: <EnvironmentOutlined />,
-      label: location.isDefault ? 'Remove as Default' : 'Set as Default',
+      label: 'Set as Default',
       onClick: () => handleSetDefault(location),
       disabled: location.isDefault,
     },
     {
       key: 'headquarters',
       icon: <CrownOutlined />,
-      label: location.isHeadquarters ? 'Remove as Headquarters' : 'Set as Headquarters',
+      label: 'Set as Headquarters',
       onClick: () => handleSetHeadquarters(location),
       disabled: location.isHeadquarters,
     },
@@ -221,24 +233,27 @@ export default function LocationListPage() {
       ),
     },
     {
+      title: 'Default',
+      key: 'isDefault',
+      width: 100,
+      render: (record: Location) => <Checkbox checked={record.isDefault} disabled />,
+    },
+    {
+      title: 'Headquarters',
+      key: 'isHeadquarters',
+      width: 120,
+      render: (record: Location) => <Checkbox checked={record.isHeadquarters} disabled />,
+    },
+    {
       title: 'Status',
       key: 'status',
+      width: 100,
       render: (record: Location) => (
-        <Space direction='vertical' size='small'>
-          <Tag color={LOCATION_STATUS_COLORS[record.isActive ? 'ACTIVE' : 'INACTIVE']}>
-            {record.isActive ? 'Active' : 'Inactive'}
-          </Tag>
-          {record.isDefault && (
-            <Tag color='#7b5fc9' icon={<EnvironmentOutlined />}>
-              Default
-            </Tag>
-          )}
-          {record.isHeadquarters && (
-            <Tag color='#faad14' icon={<CrownOutlined />}>
-              Headquarters
-            </Tag>
-          )}
-        </Space>
+        <Tag
+          color={record.isActive ? LOCATION_STATUS_COLORS.ACTIVE : LOCATION_STATUS_COLORS.INACTIVE}
+        >
+          {record.isActive ? 'Active' : 'Inactive'}
+        </Tag>
       ),
     },
     {

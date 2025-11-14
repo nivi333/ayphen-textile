@@ -110,7 +110,7 @@
 
             > td {
               border-bottom: 1px solid $border-light;
-              padding: $spacing-lg $spacing-md;
+              padding: 10px;
             }
           }
 
@@ -139,20 +139,6 @@
               &:last-child {
                 margin-bottom: 0;
               }
-            }
-          }
-
-          .ant-tag {
-            border-radius: $border-radius-base;
-            font-size: $font-size-xs;
-            font-weight: 500;
-            border: none;
-            padding: 2px $spacing-md;
-            margin: 2px 0;
-
-            .anticon {
-              font-size: 10px;
-              margin-right: 4px;
             }
           }
         }

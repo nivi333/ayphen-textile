@@ -190,7 +190,7 @@ export default function Sidebar() {
             placement='bottomLeft'
           >
             <div className='sidebar-header'>
-              <Avatar size={32} style={{ backgroundColor: '#7b5fc9' }} src={currentCompany.logoUrl}>
+              <Avatar size={32} style={{ border: '1px solid #b3b3b3', padding: '2px' }} src={currentCompany.logoUrl}>
                 {currentCompany.name.charAt(0)}
               </Avatar>
               <div className='company-details'>

@@ -17,6 +17,7 @@ const createLocationSchema = Joi.object({
   locationType: Joi.string().valid('HEADQUARTERS', 'BRANCH', 'WAREHOUSE', 'FACTORY').optional(),
   isDefault: Joi.boolean().optional(),
   isHeadquarters: Joi.boolean().optional(),
+  isActive: Joi.boolean().optional(),
 });
 
 const updateLocationSchema = Joi.object({
@@ -32,6 +33,7 @@ const updateLocationSchema = Joi.object({
   locationType: Joi.string().valid('HEADQUARTERS', 'BRANCH', 'WAREHOUSE', 'FACTORY').optional(),
   isDefault: Joi.boolean().optional(),
   isHeadquarters: Joi.boolean().optional(),
+  isActive: Joi.boolean().optional(),
 });
 
 // Helper function to validate request

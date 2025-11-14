@@ -8,6 +8,8 @@
     color: $primary-text-color;
     background: $bg-primary;
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
 
   .ccd-title {
@@ -29,6 +31,38 @@
     color: $primary-text-color;
     margin-bottom: 12px;
     margin-top: 0;
+  }
+
+  .ccd-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+
+    .ccd-section-title {
+      margin-bottom: 0;
+    }
+
+    .active-toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .active-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: $primary-text-color;
+      }
+
+      .active-toggle-item {
+        margin-bottom: 0 !important;
+
+        .ant-form-item-control-input-content {
+          display: flex;
+          align-items: center;
+        }
+      }
+    }
   }
 
   .ccd-divider {
@@ -65,6 +99,12 @@
     gap: 8px;
     margin-top: 18px;
     padding-bottom: 18px;
+    border-top: 1px solid $border-light;
+    position: sticky;
+    bottom: 0;
+    background: $bg-primary;
+    padding-top: 16px;
+    margin-top: auto;
   }
 
   .ant-upload-drag {
@@ -167,5 +207,18 @@
 
   .ccd-cancel-btn {
     margin-right: $spacing-sm;
+  }
+
+  .ccd-form {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex: 1;
+  }
+
+  .ccd-form-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 16px;
   }
 }

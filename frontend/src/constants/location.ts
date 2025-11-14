@@ -27,7 +27,7 @@ export const LOCATION_STATUS = {
 } as const;
 
 export const LOCATION_STATUS_COLORS = {
-  ACTIVE: '#52c41a',
+  ACTIVE: '#54b225ff',
   INACTIVE: '#ff4d4f',
 } as const;
 

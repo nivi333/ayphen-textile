@@ -6,7 +6,6 @@ import {
   Switch,
   Button,
   Space,
-  Alert,
   Upload,
   Avatar,
   message,
@@ -15,7 +14,7 @@ import {
   Col,
   Divider,
 } from 'antd';
-import { EnvironmentOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { EnvironmentOutlined } from '@ant-design/icons';
 import { LOCATION_TYPE_LABELS, LOCATION_TYPE_COLORS } from '../../constants/location';
 import { locationService, Location, CreateLocationRequest } from '../../services/locationService';
 import { GradientButton } from '../ui';
@@ -40,9 +39,6 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
   const [imageUrl, setImageUrl] = useState<string>('');
   const [form] = Form.useForm();
 
-  const watchedIsDefault = Form.useWatch('isDefault', form);
-  const watchedIsHeadquarters = Form.useWatch('isHeadquarters', form);
-
   useEffect(() => {
     if (editingLocation) {
       form.setFieldsValue({
@@ -58,12 +54,14 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
         locationType: editingLocation.locationType,
         isDefault: editingLocation.isDefault,
         isHeadquarters: editingLocation.isHeadquarters,
+        isActive: editingLocation.isActive,
       });
       if (editingLocation.imageUrl) {
         setImageUrl(editingLocation.imageUrl);
       }
     } else {
       form.resetFields();
+      form.setFieldsValue({ isActive: true }); // Default to active for new locations
       setImageUrl('');
     }
   }, [editingLocation, form]);
@@ -114,6 +112,9 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
       const locationData: CreateLocationRequest = {
         ...values,
         imageUrl: imageUrl || undefined,
+        email: values.email || undefined,
+        phone: values.phone || undefined,
+        addressLine2: values.addressLine2 || undefined,
       };
 
       if (editingLocation) {
@@ -149,16 +150,25 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
         </div>
       }
       placement='right'
-      width={720}
+      width={680}
       open={visible}
       onClose={handleCancel}
       className='location-drawer'
       footer={null}
     >
-      <Form form={form} layout='vertical' onFinish={onFinish}>
-        {/* Section 1: Basic Information */}
+      <Form form={form} layout='vertical' onFinish={onFinish} className='ccd-form'>
+        <div className='ccd-form-content'>
+          {/* Section 1: Basic Information */}
         <div className='ccd-section'>
-          <div className='ccd-section-title'>Basic Information</div>
+          <div className='ccd-section-header'>
+            <div className='ccd-section-title'>Basic Information</div>
+            <div className='active-toggle-row'>
+              <span className='active-label'>Active</span>
+              <Form.Item name='isActive' valuePropName='checked' className='active-toggle-item'>
+                <Switch />
+              </Form.Item>
+            </div>
+          </div>
           <Col span={24}>
             <Upload
               name='avatar'
@@ -252,9 +262,79 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
               <Form.Item
                 label='Country'
                 name='country'
-                rules={[{ required: true, message: 'Please enter country' }]}
+                rules={[{ required: true, message: 'Please select country' }]}
               >
-                <Input autoComplete='off' placeholder='Enter country' className='ccd-input' />
+                <Select showSearch placeholder='Select country' className='ccd-select'>
+                  <Select.Option value='Afghanistan'>Afghanistan</Select.Option>
+                  <Select.Option value='Albania'>Albania</Select.Option>
+                  <Select.Option value='Algeria'>Algeria</Select.Option>
+                  <Select.Option value='Argentina'>Argentina</Select.Option>
+                  <Select.Option value='Australia'>Australia</Select.Option>
+                  <Select.Option value='Austria'>Austria</Select.Option>
+                  <Select.Option value='Bangladesh'>Bangladesh</Select.Option>
+                  <Select.Option value='Belgium'>Belgium</Select.Option>
+                  <Select.Option value='Brazil'>Brazil</Select.Option>
+                  <Select.Option value='Bulgaria'>Bulgaria</Select.Option>
+                  <Select.Option value='Canada'>Canada</Select.Option>
+                  <Select.Option value='Chile'>Chile</Select.Option>
+                  <Select.Option value='China'>China</Select.Option>
+                  <Select.Option value='Colombia'>Colombia</Select.Option>
+                  <Select.Option value='Croatia'>Croatia</Select.Option>
+                  <Select.Option value='Czech Republic'>Czech Republic</Select.Option>
+                  <Select.Option value='Denmark'>Denmark</Select.Option>
+                  <Select.Option value='Egypt'>Egypt</Select.Option>
+                  <Select.Option value='Finland'>Finland</Select.Option>
+                  <Select.Option value='France'>France</Select.Option>
+                  <Select.Option value='Germany'>Germany</Select.Option>
+                  <Select.Option value='Greece'>Greece</Select.Option>
+                  <Select.Option value='Hungary'>Hungary</Select.Option>
+                  <Select.Option value='Iceland'>Iceland</Select.Option>
+                  <Select.Option value='India'>India</Select.Option>
+                  <Select.Option value='Indonesia'>Indonesia</Select.Option>
+                  <Select.Option value='Iran'>Iran</Select.Option>
+                  <Select.Option value='Iraq'>Iraq</Select.Option>
+                  <Select.Option value='Ireland'>Ireland</Select.Option>
+                  <Select.Option value='Israel'>Israel</Select.Option>
+                  <Select.Option value='Italy'>Italy</Select.Option>
+                  <Select.Option value='Japan'>Japan</Select.Option>
+                  <Select.Option value='Jordan'>Jordan</Select.Option>
+                  <Select.Option value='Kenya'>Kenya</Select.Option>
+                  <Select.Option value='South Korea'>South Korea</Select.Option>
+                  <Select.Option value='Kuwait'>Kuwait</Select.Option>
+                  <Select.Option value='Lebanon'>Lebanon</Select.Option>
+                  <Select.Option value='Libya'>Libya</Select.Option>
+                  <Select.Option value='Malaysia'>Malaysia</Select.Option>
+                  <Select.Option value='Mexico'>Mexico</Select.Option>
+                  <Select.Option value='Morocco'>Morocco</Select.Option>
+                  <Select.Option value='Netherlands'>Netherlands</Select.Option>
+                  <Select.Option value='New Zealand'>New Zealand</Select.Option>
+                  <Select.Option value='Norway'>Norway</Select.Option>
+                  <Select.Option value='Pakistan'>Pakistan</Select.Option>
+                  <Select.Option value='Peru'>Peru</Select.Option>
+                  <Select.Option value='Philippines'>Philippines</Select.Option>
+                  <Select.Option value='Poland'>Poland</Select.Option>
+                  <Select.Option value='Portugal'>Portugal</Select.Option>
+                  <Select.Option value='Qatar'>Qatar</Select.Option>
+                  <Select.Option value='Romania'>Romania</Select.Option>
+                  <Select.Option value='Russia'>Russia</Select.Option>
+                  <Select.Option value='Saudi Arabia'>Saudi Arabia</Select.Option>
+                  <Select.Option value='Singapore'>Singapore</Select.Option>
+                  <Select.Option value='South Africa'>South Africa</Select.Option>
+                  <Select.Option value='Spain'>Spain</Select.Option>
+                  <Select.Option value='Sweden'>Sweden</Select.Option>
+                  <Select.Option value='Switzerland'>Switzerland</Select.Option>
+                  <Select.Option value='Syria'>Syria</Select.Option>
+                  <Select.Option value='Thailand'>Thailand</Select.Option>
+                  <Select.Option value='Tunisia'>Tunisia</Select.Option>
+                  <Select.Option value='Turkey'>Turkey</Select.Option>
+                  <Select.Option value='Ukraine'>Ukraine</Select.Option>
+                  <Select.Option value='United Arab Emirates'>United Arab Emirates</Select.Option>
+                  <Select.Option value='United Kingdom'>United Kingdom</Select.Option>
+                  <Select.Option value='United States'>United States</Select.Option>
+                  <Select.Option value='Venezuela'>Venezuela</Select.Option>
+                  <Select.Option value='Vietnam'>Vietnam</Select.Option>
+                  <Select.Option value='Yemen'>Yemen</Select.Option>
+                </Select>
               </Form.Item>
             </Col>
           </Row>
@@ -342,37 +422,28 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
         {/* Section 3: Location Settings */}
         <div className='ccd-section'>
           <div className='ccd-section-title'>Location Settings</div>
-          <Form.Item label='Default Location' name='isDefault' valuePropName='checked'>
-            <div className='switch-field'>
-              <Switch />
-              <div className='switch-label'></div>
-            </div>
-          </Form.Item>
-
-          <Form.Item label='Headquarters' name='isHeadquarters' valuePropName='checked'>
-            <div className='switch-field'>
-              <Switch />
-              <div className='switch-label'></div>
-            </div>
-          </Form.Item>
-
-          {(watchedIsDefault || watchedIsHeadquarters) && (
-            <Alert
-              message='Special Location'
-              description={
-                watchedIsHeadquarters
-                  ? 'This location will be marked as the company headquarters.'
-                  : 'This location will be used as the default for company operations.'
-              }
-              type='info'
-              showIcon
-              icon={<InfoCircleOutlined />}
-              className='info-alert'
-            />
-          )}
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label='Default Location' name='isDefault' valuePropName='checked'>
+                <div className='switch-field'>
+                  <Switch />
+                  <div className='switch-label'></div>
+                </div>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label='Headquarters' name='isHeadquarters' valuePropName='checked'>
+                <div className='switch-field'>
+                  <Switch />
+                  <div className='switch-label'></div>
+                </div>
+              </Form.Item>
+            </Col>
+          </Row>
         </div>
 
         {/* Action Buttons */}
+        </div>
         <div className='ccd-actions'>
           <Button onClick={handleCancel} className='ccd-cancel-btn'>
             Cancel

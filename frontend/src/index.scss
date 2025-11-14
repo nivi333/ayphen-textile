@@ -658,3 +658,8 @@ button {
     z-index: -1;
   }
 }
+
+// Global Ant Design overrides
+.ant-select-selection-item {
+  display: flex !important;
+}

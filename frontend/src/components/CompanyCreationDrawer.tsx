@@ -12,6 +12,7 @@ import {
   Col,
   DatePicker,
   Space,
+  Switch,
 } from 'antd';
 import { BankOutlined, DeleteOutlined } from '@ant-design/icons';
 import ImgCrop from 'antd-img-crop';
@@ -166,6 +167,7 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
         establishedDate: values.establishedDate?.format('YYYY-MM-DD'),
         businessType: values.businessType,
         contactInfo: values.contactInfo,
+        isActive: values.isActive,
         // Optional fields - only include if they have values
         ...(values.description && { description: values.description }),
         ...(logoUrl && { logoUrl }),
@@ -204,11 +206,21 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
           form={form}
           layout='vertical'
           onFinish={handleFinish}
-          initialValues={{ slugAuto: true }}
+          initialValues={{ slugAuto: true, isActive: true }}
+          className='ccd-form'
         >
-          {/* Section 1: Basic Information */}
+          <div className='ccd-form-content'>
+            {/* Section 1: Basic Information */}
           <div className='ccd-section'>
-            <div className='ccd-section-title'>Basic Information</div>
+            <div className='ccd-section-header'>
+              <div className='ccd-section-title'>Basic Information</div>
+              <div className='active-toggle-row'>
+                <span className='active-label'>Active</span>
+                <Form.Item name='isActive' valuePropName='checked' className='active-toggle-item'>
+                  <Switch />
+                </Form.Item>
+              </div>
+            </div>
             <Col span={24}>
               <ImgCrop rotate aspect={1}>
                 <Upload
@@ -535,6 +547,7 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
           </div>
 
           {/* Action Buttons */}
+          </div>
           <div className='ccd-actions'>
             <Button onClick={onClose} className='ccd-cancel-btn'>
               Cancel
