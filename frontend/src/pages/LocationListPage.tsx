@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Table, Button, Tag, Space, Avatar, Dropdown, Modal, message, Empty, Spin } from 'antd';
 import {
   EditOutlined,
@@ -33,6 +33,7 @@ export default function LocationListPage() {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [editingLocation, setEditingLocation] = useState<Location | null>(null);
   const [tableLoading, setTableLoading] = useState(false);
+  const fetchInProgressRef = useRef(false);
 
   // Set header actions when component mounts
   useEffect(() => {
@@ -53,7 +54,12 @@ export default function LocationListPage() {
   }, [currentCompany]);
 
   const fetchLocations = async () => {
+    if (fetchInProgressRef.current) {
+      return; // Prevent duplicate calls
+    }
+
     try {
+      fetchInProgressRef.current = true;
       setLoading(true);
       const data = await locationService.getLocations();
       setLocations(data);
@@ -62,6 +68,7 @@ export default function LocationListPage() {
       message.error(LOCATION_ERROR_MESSAGES.FETCH_ERROR);
     } finally {
       setLoading(false);
+      fetchInProgressRef.current = false;
     }
   };
 

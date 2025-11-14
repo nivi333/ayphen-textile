@@ -60,14 +60,12 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
   // Auto-generate slug from name
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value;
-    if (!form.getFieldValue('slug') || form.getFieldValue('slugAuto')) {
-      const slug = name
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-      form.setFieldsValue({ slug, slugAuto: true });
-      checkSlugUnique(slug);
-    }
+    const slug = name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    form.setFieldsValue({ slug, slugAuto: true });
+    checkSlugUnique(slug);
   };
 
   // Slug uniqueness validation
@@ -159,21 +157,22 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
         name: values.name,
         slug: values.slug,
         industry: values.industry,
-        description: values.description,
-        logoUrl: logoUrl,
         country: values.country,
         locationName: values.locationName,
         address1: values.address1,
-        address2: values.address2,
         city: values.city,
         state: values.state,
         pincode: values.pincode,
         establishedDate: values.establishedDate?.format('YYYY-MM-DD'),
         businessType: values.businessType,
-        certifications: values.certifications,
         contactInfo: values.contactInfo,
-        website: values.website,
-        taxId: values.taxId,
+        // Optional fields - only include if they have values
+        ...(values.description && { description: values.description }),
+        ...(logoUrl && { logoUrl }),
+        ...(values.address2 && { address2: values.address2 }),
+        ...(values.certifications && { certifications: values.certifications }),
+        ...(values.website && { website: values.website }),
+        ...(values.taxId && { taxId: values.taxId }),
       };
 
       await companyService.createCompany(companyData);

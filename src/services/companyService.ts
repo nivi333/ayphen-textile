@@ -10,6 +10,17 @@ interface CreateCompanyData {
   country?: string;
   defaultLocation?: string;
   defaultLocationName?: string;
+  address1?: string;
+  address2?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  establishedDate?: string;
+  businessType?: string;
+  certifications?: string;
+  contactInfo?: string;
+  website?: string;
+  taxId?: string;
 }
 
 interface CompanyWithRole {
@@ -53,6 +64,15 @@ export class CompanyService {
 
       const defaultLocationName = (companyData.defaultLocation || companyData.defaultLocationName)?.trim() || 'Head Office';
       const country = companyData.country?.trim() || 'UNKNOWN';
+      const addressLine1 = companyData.address1?.trim() || '';
+      const addressLine2 = companyData.address2?.trim() || '';
+      const city = companyData.city?.trim() || '';
+      const state = companyData.state?.trim() || '';
+      const pincode = companyData.pincode?.trim() || '';
+
+      const contactInfo = companyData.contactInfo?.trim();
+      const contactEmail = contactInfo && contactInfo.includes('@') ? contactInfo : null;
+      const contactPhone = contactInfo && !contactInfo.includes('@') ? contactInfo : null;
 
       // Create tenant and user-tenant relationship in a transaction
       const tenant = await globalPrisma.$transaction(async (tx) => {
@@ -65,6 +85,11 @@ export class CompanyService {
             logoUrl: companyData.logoUrl,
             country: companyData.country,
             defaultLocation: defaultLocationName,
+            establishedDate: companyData.establishedDate ? new Date(companyData.establishedDate) : null,
+            businessType: companyData.businessType,
+            certifications: companyData.certifications,
+            website: companyData.website,
+            taxId: companyData.taxId,
           }
         });
 
@@ -86,20 +111,20 @@ export class CompanyService {
       const pool = databaseManager.getTenantPool(tenant.id);
       const schemaName = databaseManager.getSchemaName(tenant.id);
       await pool.query(
-        `INSERT INTO ${schemaName}.locations 
+        `INSERT INTO ${schemaName}.tenant_locations 
           (tenant_id, name, email, phone, country, address_line_1, address_line_2, city, state, pincode, is_default, is_headquarters, location_type, is_active)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, TRUE, TRUE, 'HEAD_OFFICE', TRUE)`,
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, TRUE, TRUE, 'HEAD_OFFICE', TRUE)` ,
         [
           tenant.id,
           defaultLocationName,
-          null,
-          null,
+          contactEmail,
+          contactPhone,
           country,
-          '',
-          '',
-          '',
-          '',
-          ''
+          addressLine1,
+          addressLine2,
+          city,
+          state,
+          pincode
         ]
       );
 

@@ -19,7 +19,7 @@ const createCompanySchema = Joi.object({
   country: Joi.string().max(100).optional(),
   locationName: Joi.string().min(1).max(255).required(),
   address1: Joi.string().min(1).max(255).required(),
-  address2: Joi.string().max(255).optional(),
+  address2: Joi.string().max(255).allow('').optional(),
   city: Joi.string().min(1).max(100).required(),
   state: Joi.string().min(1).max(100).required(),
   pincode: Joi.string().min(1).max(20).required(),
@@ -68,7 +68,12 @@ export class CompanyController {
       }
 
       const userId = req.userId!;
-      const company = await companyService.createCompany(userId, value);
+      const { locationName, ...companyPayload } = value;
+
+      const company = await companyService.createCompany(userId, {
+        ...companyPayload,
+        defaultLocationName: locationName,
+      });
 
       res.status(201).json({
         success: true,

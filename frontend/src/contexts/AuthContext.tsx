@@ -224,9 +224,53 @@ export function AuthProvider({ children }: AuthProviderProps) {
     dispatch({ type: 'LOGOUT' });
   };
 
-  const switchCompany = (company: Company) => {
-    AuthStorage.setCurrentCompany(company);
-    dispatch({ type: 'SET_CURRENT_COMPANY', payload: company });
+  const switchCompany = async (company: Company) => {
+    try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+
+      const tokens = AuthStorage.getTokens();
+      if (!tokens?.accessToken) {
+        throw new Error('No access token available');
+      }
+
+      // Call switch company API to get new tokens with tenantId
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/companies/${company.id}/switch`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${tokens.accessToken}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to switch company');
+      }
+
+      const data = await response.json();
+      const newTokens = data.data.tokens;
+
+      // Update localStorage with new tokens
+      AuthStorage.setTokens(newTokens);
+      AuthStorage.setCurrentCompany(company);
+
+      dispatch({
+        type: 'SET_CURRENT_COMPANY',
+        payload: company,
+      });
+
+      dispatch({
+        type: 'REFRESH_TOKEN_SUCCESS',
+        payload: newTokens,
+      });
+    } catch (error: any) {
+      console.error('Error switching company:', error);
+      throw error;
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
   };
 
   const refreshToken = async () => {

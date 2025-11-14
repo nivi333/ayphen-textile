@@ -6,48 +6,20 @@ import {
   Switch,
   Button,
   Space,
-  Typography,
   Alert,
   Upload,
   Avatar,
   message,
+  Form,
+  Row,
+  Col,
+  Divider,
 } from 'antd';
-import { EnvironmentOutlined, UploadOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import {
-  LOCATION_TYPE_LABELS,
-  LOCATION_TYPE_COLORS,
-  LOCATION_VALIDATION_MESSAGES,
-  LOCATION_DRAWER_CONFIG,
-} from '../../constants/location';
+import { EnvironmentOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { LOCATION_TYPE_LABELS, LOCATION_TYPE_COLORS } from '../../constants/location';
 import { locationService, Location, CreateLocationRequest } from '../../services/locationService';
 import { GradientButton } from '../ui';
 import './LocationDrawer.scss';
-
-const { Title, Text } = Typography;
-
-// Form validation schema
-const locationSchema = z.object({
-  name: z
-    .string()
-    .min(2, LOCATION_VALIDATION_MESSAGES.NAME_MIN_LENGTH)
-    .max(100, LOCATION_VALIDATION_MESSAGES.NAME_MAX_LENGTH),
-  email: z.string().email(LOCATION_VALIDATION_MESSAGES.EMAIL_INVALID).optional().or(z.literal('')),
-  phone: z.string().optional(),
-  country: z.string().min(1, LOCATION_VALIDATION_MESSAGES.COUNTRY_REQUIRED),
-  addressLine1: z.string().min(1, LOCATION_VALIDATION_MESSAGES.ADDRESS_LINE_1_REQUIRED),
-  addressLine2: z.string().optional(),
-  city: z.string().min(1, LOCATION_VALIDATION_MESSAGES.CITY_REQUIRED),
-  state: z.string().min(1, LOCATION_VALIDATION_MESSAGES.STATE_REQUIRED),
-  pincode: z.string().min(1, LOCATION_VALIDATION_MESSAGES.PINCODE_REQUIRED),
-  locationType: z.enum(['HEADQUARTERS', 'BRANCH', 'WAREHOUSE', 'FACTORY']),
-  isDefault: z.boolean(),
-  isHeadquarters: z.boolean(),
-});
-
-type LocationFormData = z.infer<typeof locationSchema>;
 
 interface LocationDrawerProps {
   visible: boolean;
@@ -66,37 +38,14 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string>('');
+  const [form] = Form.useForm();
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    watch,
-    formState: { errors, isDirty },
-  } = useForm<LocationFormData>({
-    resolver: zodResolver(locationSchema),
-    defaultValues: {
-      name: '',
-      email: '',
-      phone: '',
-      country: '',
-      addressLine1: '',
-      addressLine2: '',
-      city: '',
-      state: '',
-      pincode: '',
-      locationType: 'BRANCH',
-      isDefault: false,
-      isHeadquarters: false,
-    },
-  });
-
-  const watchedIsDefault = watch('isDefault');
-  const watchedIsHeadquarters = watch('isHeadquarters');
+  const watchedIsDefault = Form.useWatch('isDefault', form);
+  const watchedIsHeadquarters = Form.useWatch('isHeadquarters', form);
 
   useEffect(() => {
     if (editingLocation) {
-      reset({
+      form.setFieldsValue({
         name: editingLocation.name,
         email: editingLocation.email || '',
         phone: editingLocation.phone || '',
@@ -114,10 +63,10 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
         setImageUrl(editingLocation.imageUrl);
       }
     } else {
-      reset();
+      form.resetFields();
       setImageUrl('');
     }
-  }, [editingLocation, reset]);
+  }, [editingLocation, form]);
 
   const beforeUpload = (file: File) => {
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
@@ -141,29 +90,29 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
     return false; // Prevent automatic upload
   };
 
-  const onSubmit = async (data: LocationFormData) => {
+  const onFinish = async (values: any) => {
     try {
       setLoading(true);
 
       // Validate business logic
-      if (data.isDefault && !editingLocation) {
+      if (values.isDefault && !editingLocation) {
         const existingDefault = locations.find(loc => loc.isDefault);
         if (existingDefault) {
-          message.error(LOCATION_VALIDATION_MESSAGES.ONLY_ONE_DEFAULT);
+          message.error('Only one default location is allowed per company');
           return;
         }
       }
 
-      if (data.isHeadquarters && !editingLocation) {
+      if (values.isHeadquarters && !editingLocation) {
         const existingHeadquarters = locations.find(loc => loc.isHeadquarters);
         if (existingHeadquarters) {
-          message.error(LOCATION_VALIDATION_MESSAGES.ONLY_ONE_HEADQUARTERS);
+          message.error('Only one headquarters location is allowed per company');
           return;
         }
       }
 
       const locationData: CreateLocationRequest = {
-        ...data,
+        ...values,
         imageUrl: imageUrl || undefined,
       };
 
@@ -186,7 +135,7 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
   };
 
   const handleCancel = () => {
-    if (isDirty) {
+    if (form.isFieldsTouched()) {
       // You could add a confirmation dialog here if needed
     }
     onClose();
@@ -196,136 +145,93 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
     <Drawer
       title={
         <div className='drawer-title'>
-          <EnvironmentOutlined />
           <span>{editingLocation ? 'Edit Location' : 'Add New Location'}</span>
         </div>
       }
-      placement={LOCATION_DRAWER_CONFIG.PLACEMENT}
-      width={LOCATION_DRAWER_CONFIG.WIDTH}
+      placement='right'
+      width={720}
       open={visible}
       onClose={handleCancel}
       className='location-drawer'
-      footer={
-        <div className='drawer-footer'>
-          <Space>
-            <Button onClick={handleCancel} disabled={loading}>
-              <Typography.Text>Cancel</Typography.Text>
-            </Button>
-            <GradientButton size='small' onClick={handleSubmit(onSubmit)} loading={loading}>
-              <Typography.Text>
-                {editingLocation ? 'Update Location' : 'Create Location'}
-              </Typography.Text>
-            </GradientButton>
-          </Space>
-        </div>
-      }
+      footer={null}
     >
-      <form className='location-form'>
-        <div className='form-section'>
-          <Title level={5} className='section-title'>
-            Basic Information
-          </Title>
-
-          <div className='form-row'>
-            <div className='form-field'>
-              <label className='field-label'>Location Image</label>
-              <Upload
-                name='avatar'
-                listType='picture-card'
-                className='avatar-uploader'
-                showUploadList={false}
-                beforeUpload={beforeUpload}
-              >
-                {imageUrl ? (
-                  <Avatar size={80} src={imageUrl} />
-                ) : (
-                  <div className='upload-placeholder'>
-                    <UploadOutlined />
-                    <div style={{ marginTop: 8 }}>Upload</div>
-                  </div>
-                )}
-              </Upload>
-              <Text type='secondary' className='field-help'>
-                Upload location image (JPG/PNG, max 2MB)
-              </Text>
+      <Form form={form} layout='vertical' onFinish={onFinish}>
+        {/* Section 1: Basic Information */}
+        <div className='ccd-section'>
+          <div className='ccd-section-title'>Basic Information</div>
+          <Col span={24}>
+            <Upload
+              name='avatar'
+              listType='picture-circle'
+              className='ccd-logo-upload'
+              showUploadList={false}
+              beforeUpload={beforeUpload}
+            >
+              {imageUrl ? (
+                <Avatar size={120} src={imageUrl} />
+              ) : (
+                <span className='ccd-upload-icon'>
+                  <EnvironmentOutlined />
+                </span>
+              )}
+            </Upload>
+            <div className='ccd-logo-help-text'>
+              Upload Location Image (JPG/PNG, max 2MB)
+              <br />
+              Drag & drop or click to upload
             </div>
-
-            <div className='form-field'>
-              <label className='field-label required'>Location Name</label>
-              <Controller
+          </Col>
+          <Row gutter={12}>
+            <Col span={12}>
+              <Form.Item
+                label='Location Name'
                 name='name'
-                control={control}
-                render={({ field }: any) => (
-                  <Input
-                    {...field}
-                    placeholder='Enter location name'
-                    status={errors.name ? 'error' : ''}
-                  />
-                )}
-              />
-              {errors.name && (
-                <Text type='danger' className='field-error'>
-                  {errors.name.message}
-                </Text>
-              )}
-            </div>
-          </div>
-
-          <div className='form-row'>
-            <div className='form-field'>
-              <label className='field-label'>Email Address</label>
-              <Controller
+                rules={[{ required: true, message: 'Please enter location name' }]}
+              >
+                <Input
+                  maxLength={100}
+                  autoComplete='off'
+                  placeholder='Enter location name'
+                  className='ccd-input'
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label='Email Address'
                 name='email'
-                control={control}
-                render={({ field }: any) => (
-                  <Input
-                    {...field}
-                    placeholder='location@company.com'
-                    status={errors.email ? 'error' : ''}
-                  />
-                )}
-              />
-              {errors.email && (
-                <Text type='danger' className='field-error'>
-                  {errors.email.message}
-                </Text>
-              )}
-            </div>
-
-            <div className='form-field'>
-              <label className='field-label'>Phone Number</label>
-              <Controller
-                name='phone'
-                control={control}
-                render={({ field }: any) => (
-                  <Input
-                    {...field}
-                    placeholder='+1 234 567 8900'
-                    status={errors.phone ? 'error' : ''}
-                  />
-                )}
-              />
-              {errors.phone && (
-                <Text type='danger' className='field-error'>
-                  {errors.phone.message}
-                </Text>
-              )}
-            </div>
-
-            <div className='form-field'>
-              <label className='field-label required'>Location Type</label>
-              <Controller
+                rules={[
+                  {
+                    type: 'email',
+                    message: 'Please enter a valid email address',
+                  },
+                ]}
+              >
+                <Input
+                  autoComplete='off'
+                  placeholder='location@company.com'
+                  className='ccd-input'
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={12}>
+            <Col span={12}>
+              <Form.Item label='Phone Number' name='phone'>
+                <Input autoComplete='off' placeholder='+1 234 567 8900' className='ccd-input' />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label='Location Type'
                 name='locationType'
-                control={control}
-                render={({ field }: any) => (
-                  <Select
-                    {...field}
-                    placeholder='Select location type'
-                    status={errors.locationType ? 'error' : ''}
-                    options={
-                      Object.entries(LOCATION_TYPE_LABELS).map(([key, label]) => ({
-                        value: key,
-                        label: (
+                rules={[{ required: true, message: 'Please select location type' }]}
+              >
+                <Select placeholder='Select location type' className='ccd-select'>
+                  {Object.entries(LOCATION_TYPE_LABELS).map(
+                    ([key, label]) =>
+                      key !== 'HEADQUARTERS' && (
+                        <Select.Option key={key} value={key}>
                           <Space>
                             <div
                               className='type-indicator'
@@ -336,172 +242,119 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
                             />
                             {label}
                           </Space>
-                        ),
-                      })) as any
-                    }
-                  />
-                )}
-              />
-              {errors.locationType && (
-                <Text type='danger' className='field-error'>
-                  {errors.locationType.message}
-                </Text>
-              )}
-            </div>
-
-            <div className='form-field'>
-              <label className='field-label required'>Country</label>
-              <Controller
+                        </Select.Option>
+                      )
+                  )}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label='Country'
                 name='country'
-                control={control}
-                render={({ field }: any) => (
-                  <Input
-                    {...field}
-                    placeholder='Enter country'
-                    status={errors.country ? 'error' : ''}
-                  />
-                )}
-              />
-              {errors.country && (
-                <Text type='danger' className='field-error'>
-                  {errors.country.message}
-                </Text>
-              )}
-            </div>
-
-            <div className='form-field'>
-              <label className='field-label required'>Address Line 1</label>
-              <Controller
-                name='addressLine1'
-                control={control}
-                render={({ field }: any) => (
-                  <Input
-                    {...field}
-                    placeholder='Street address'
-                    status={errors.addressLine1 ? 'error' : ''}
-                  />
-                )}
-              />
-              {errors.addressLine1 && (
-                <Text type='danger' className='field-error'>
-                  {errors.addressLine1.message}
-                </Text>
-              )}
-            </div>
-
-            <div className='form-field'>
-              <label className='field-label'>Address Line 2</label>
-              <Controller
-                name='addressLine2'
-                control={control}
-                render={({ field }: any) => (
-                  <Input {...field} placeholder='Apartment, suite, unit, building, floor, etc.' />
-                )}
-              />
-            </div>
-          </div>
+                rules={[{ required: true, message: 'Please enter country' }]}
+              >
+                <Input autoComplete='off' placeholder='Enter country' className='ccd-input' />
+              </Form.Item>
+            </Col>
+          </Row>
         </div>
 
-        <div className='form-section'>
-          <Title level={5} className='section-title'>
-            Address Information
-          </Title>
+        <Divider className='ccd-divider' />
 
-          <div className='form-row'>
-            <div className='form-field'>
-              <label className='field-label required'>City</label>
-              <Controller
-                name='city'
-                control={control}
-                render={({ field }: any) => (
-                  <Input {...field} placeholder='Enter city' status={errors.city ? 'error' : ''} />
-                )}
-              />
-              {errors.city && (
-                <Text type='danger' className='field-error'>
-                  {errors.city.message}
-                </Text>
-              )}
-            </div>
-
-            <div className='form-field'>
-              <label className='field-label required'>State/Province</label>
-              <Controller
-                name='state'
-                control={control}
-                render={({ field }: any) => (
-                  <Input
-                    {...field}
-                    placeholder='Enter state'
-                    status={errors.state ? 'error' : ''}
-                  />
-                )}
-              />
-              {errors.state && (
-                <Text type='danger' className='field-error'>
-                  {errors.state.message}
-                </Text>
-              )}
-            </div>
-          </div>
-
-          <div className='form-field'>
-            <label className='field-label required'>Postal/ZIP Code</label>
-            <Controller
-              name='pincode'
-              control={control}
-              render={({ field }: any) => (
+        {/* Section 2: Address Information */}
+        <div className='ccd-section'>
+          <div className='ccd-section-title'>Address Information</div>
+          <Row gutter={12}>
+            <Col span={12}>
+              <Form.Item
+                label='Address Line 1'
+                name='addressLine1'
+                rules={[{ required: true, message: 'Please enter address' }]}
+              >
                 <Input
-                  {...field}
-                  placeholder='Enter postal code'
-                  status={errors.pincode ? 'error' : ''}
+                  maxLength={255}
+                  autoComplete='off'
+                  placeholder='Street address'
+                  className='ccd-input'
                 />
-              )}
-            />
-            {errors.pincode && (
-              <Text type='danger' className='field-error'>
-                {errors.pincode.message}
-              </Text>
-            )}
-          </div>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label='Address Line 2' name='addressLine2'>
+                <Input
+                  maxLength={255}
+                  autoComplete='off'
+                  placeholder='Apartment, suite, unit, building, floor, etc.'
+                  className='ccd-input'
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={12}>
+            <Col span={12}>
+              <Form.Item
+                label='City'
+                name='city'
+                rules={[{ required: true, message: 'Please enter city' }]}
+              >
+                <Input
+                  maxLength={100}
+                  autoComplete='off'
+                  placeholder='Enter city'
+                  className='ccd-input'
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label='State/Province'
+                name='state'
+                rules={[{ required: true, message: 'Please enter state' }]}
+              >
+                <Input
+                  maxLength={100}
+                  autoComplete='off'
+                  placeholder='Enter state'
+                  className='ccd-input'
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label='Postal/ZIP Code'
+                name='pincode'
+                rules={[{ required: true, message: 'Please enter postal code' }]}
+              >
+                <Input
+                  maxLength={20}
+                  autoComplete='off'
+                  placeholder='Enter postal code'
+                  className='ccd-input'
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+        </div>
 
-          <div className='form-field'>
-            <Controller
-              name='isDefault'
-              control={control}
-              render={({ field }: any) => (
-                <div className='switch-field'>
-                  <Switch {...field} checked={field.value} />
-                  <div className='switch-label'>
-                    <Text strong>Default Location</Text>
-                    <Text type='secondary' className='switch-description'>
-                      This location will be used as the default for company operations, invoices,
-                      and financial documents.
-                    </Text>
-                  </div>
-                </div>
-              )}
-            />
-          </div>
+        <Divider className='ccd-divider' />
 
-          <div className='form-field'>
-            <Controller
-              name='isHeadquarters'
-              control={control}
-              render={({ field }: any) => (
-                <div className='switch-field'>
-                  <Switch {...field} checked={field.value} />
-                  <div className='switch-label'>
-                    <Text strong>Headquarters</Text>
-                    <Text type='secondary' className='switch-description'>
-                      This location will be designated as the company headquarters. Only one
-                      headquarters can be set per company.
-                    </Text>
-                  </div>
-                </div>
-              )}
-            />
-          </div>
+        {/* Section 3: Location Settings */}
+        <div className='ccd-section'>
+          <div className='ccd-section-title'>Location Settings</div>
+          <Form.Item label='Default Location' name='isDefault' valuePropName='checked'>
+            <div className='switch-field'>
+              <Switch />
+              <div className='switch-label'></div>
+            </div>
+          </Form.Item>
+
+          <Form.Item label='Headquarters' name='isHeadquarters' valuePropName='checked'>
+            <div className='switch-field'>
+              <Switch />
+              <div className='switch-label'></div>
+            </div>
+          </Form.Item>
 
           {(watchedIsDefault || watchedIsHeadquarters) && (
             <Alert
@@ -518,7 +371,17 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
             />
           )}
         </div>
-      </form>
+
+        {/* Action Buttons */}
+        <div className='ccd-actions'>
+          <Button onClick={handleCancel} className='ccd-cancel-btn'>
+            Cancel
+          </Button>
+          <GradientButton size='small' htmlType='submit' loading={loading}>
+            {editingLocation ? 'Update Location' : 'Create Location'}
+          </GradientButton>
+        </div>
+      </Form>
     </Drawer>
   );
 };

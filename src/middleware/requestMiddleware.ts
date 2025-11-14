@@ -143,6 +143,15 @@ export const requestLoggingMiddleware = (req: Request, res: Response, next: Next
  */
 export const contentTypeMiddleware = (req: Request, res: Response, next: NextFunction): Response | void => {
   if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
+    // Only require Content-Type for requests that actually have a body
+    const contentLength = parseInt(req.headers['content-length'] || '0');
+    const transferEncoding = req.headers['transfer-encoding'];
+
+    // If there's no body (content-length is 0 or undefined, and no transfer-encoding)
+    if (contentLength === 0 && !transferEncoding) {
+      return next();
+    }
+
     const contentType = req.get('Content-Type');
     if (!contentType || !contentType.includes('application/json')) {
       return res.status(400).json({

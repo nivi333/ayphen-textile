@@ -96,7 +96,8 @@ export class AuthController {
       });
     } catch (error: any) {
       logger.error('Login error:', error);
-      const status = error.message?.includes('Invalid credentials') ? 401 : 500;
+      const status = error.message?.includes('Invalid credentials') ? 401 :
+                    error.message?.includes('User not registered') ? 404 : 500;
       res.status(status).json({
         success: false,
         message: error.message || 'Login failed',

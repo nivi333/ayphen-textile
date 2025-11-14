@@ -1,3 +1,5 @@
+import { AuthStorage } from '../utils/storage';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 export interface Location {
@@ -43,10 +45,14 @@ export interface UpdateLocationRequest extends Partial<CreateLocationRequest> {
 
 class LocationService {
   private getAuthHeaders() {
-    const token = localStorage.getItem('access_token');
+    const tokens = AuthStorage.getTokens();
+    if (!tokens?.accessToken) {
+      throw new Error('No access token available');
+    }
+
     return {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
+      Authorization: `Bearer ${tokens.accessToken}`,
     };
   }
 
@@ -61,7 +67,7 @@ class LocationService {
       }
 
       const data = await response.json();
-      return data.locations || [];
+      return data.data || [];
     } catch (error) {
       console.error('Error fetching locations:', error);
       throw error;
@@ -79,7 +85,7 @@ class LocationService {
       }
 
       const data = await response.json();
-      return data.location;
+      return data.data;
     } catch (error) {
       console.error('Error fetching location:', error);
       throw error;
@@ -100,7 +106,7 @@ class LocationService {
       }
 
       const data = await response.json();
-      return data.location;
+      return data.data;
     } catch (error) {
       console.error('Error creating location:', error);
       throw error;
@@ -121,7 +127,7 @@ class LocationService {
       }
 
       const data = await response.json();
-      return data.location;
+      return data.data;
     } catch (error) {
       console.error('Error updating location:', error);
       throw error;
@@ -158,7 +164,7 @@ class LocationService {
       }
 
       const data = await response.json();
-      return data.location;
+      return data.data;
     } catch (error) {
       console.error('Error setting default location:', error);
       throw error;
@@ -178,7 +184,7 @@ class LocationService {
       }
 
       const data = await response.json();
-      return data.location;
+      return data.data;
     } catch (error) {
       console.error('Error setting headquarters:', error);
       throw error;
