@@ -13,6 +13,8 @@ export interface Company {
   industry: string;
   logoUrl?: string;
   role: CompanyRole;
+  country?: string;
+  description?: string;
 }
 
 export interface AuthTokens {

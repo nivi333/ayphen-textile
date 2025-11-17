@@ -21,6 +21,7 @@ interface CreateCompanyData {
   contactInfo?: string;
   website?: string;
   taxId?: string;
+  isActive?: boolean;
 }
 
 interface CompanyWithRole {
@@ -90,6 +91,7 @@ export class CompanyService {
             certifications: companyData.certifications,
             website: companyData.website,
             taxId: companyData.taxId,
+            isActive: companyData.isActive !== undefined ? companyData.isActive : true,
           }
         });
 

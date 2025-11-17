@@ -29,6 +29,7 @@ const createCompanySchema = Joi.object({
   contactInfo: Joi.string().min(1).max(100).required(),
   website: Joi.string().max(255).optional(),
   taxId: Joi.string().max(50).optional(),
+  isActive: Joi.boolean().optional().default(true),
 });
 
 const updateCompanySchema = Joi.object({
@@ -43,6 +44,7 @@ const updateCompanySchema = Joi.object({
   logoUrl: Joi.string().max(3000000).optional(), // Allow up to ~3MB for base64 encoded 2MB images
   country: Joi.string().max(100).optional(),
   defaultLocation: Joi.string().min(1).max(255).optional(),
+  isActive: Joi.boolean().optional(),
 });
 
 const inviteUserSchema = Joi.object({

@@ -8,7 +8,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${DB_NAME:-lavoro_dev}
-      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_USER: ${DB_USER:-nivetharamdev}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
@@ -19,7 +19,7 @@ services:
     networks:
       - lavoro-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-lavoro_dev}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-nivetharamdev} -d ${DB_NAME:-lavoro_dev}"]
       interval: 10s
       timeout: 5s
       retries: 5

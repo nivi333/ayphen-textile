@@ -10,7 +10,7 @@ import {
   InventoryPage,
   LocationListPage,
 } from '../pages';
-import CompaniesListPage from '../pages/CompaniesListPage';
+import CompanyDetailPage from '../pages/CompanyDetailPage';
 import GoogleAuthCallback from '../components/auth/GoogleAuthCallback';
 
 // Main application router component
@@ -52,10 +52,10 @@ export default function AppRouter() {
 
           {/* Protected Routes - No Company Required */}
           <Route
-            path='/companies'
+            path='/companies/:tenantId'
             element={
-              <ProtectedRoute>
-                <CompaniesListPage />
+              <ProtectedRoute requireCompany={true}>
+                <CompanyDetailPage />
               </ProtectedRoute>
             }
           />

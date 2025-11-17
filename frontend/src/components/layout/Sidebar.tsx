@@ -25,7 +25,7 @@ const { Sider } = Layout;
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { currentCompany, user, logout } = useAuth();
+  const { currentCompany, logout } = useAuth();
   const [companyDropdownOpen, setCompanyDropdownOpen] = useState(false);
 
   // Navigation menu items
@@ -124,7 +124,7 @@ export default function Sidebar() {
       key: 'company-settings',
       icon: <SettingOutlined />,
       label: 'Company Details',
-      onClick: () => navigate('/companies'),
+      onClick: () => currentCompany && navigate(`/companies/${currentCompany.id}`),
     },
     {
       key: 'location',
@@ -213,18 +213,6 @@ export default function Sidebar() {
           inlineIndent={20}
         />
 
-        {/* Footer */}
-        {user && (
-          <div className='sidebar-footer'>
-            <Avatar size={32} icon={<UserOutlined />} />
-            <div className='user-info'>
-              <div className='user-name'>
-                {user.firstName} {user.lastName}
-              </div>
-              <div className='user-email'>{user.email}</div>
-            </div>
-          </div>
-        )}
       </div>
     </Sider>
   );

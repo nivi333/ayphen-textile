@@ -1,9 +1,10 @@
 import { ReactNode, useState } from 'react';
-import { Layout, Button } from 'antd';
+import { Layout, Button, Avatar } from 'antd';
 import Sidebar from './Sidebar';
 import { BrandLogo } from '../BrandLogo';
 import { useHeader } from '../../contexts/HeaderContext';
 import useAuth from '../../contexts/AuthContext';
+import { UserOutlined } from '@ant-design/icons';
 import './MainLayout.scss';
 
 const { Header, Content } = Layout;
@@ -14,7 +15,7 @@ interface MainLayoutProps {
 
 function MainLayoutContent({ children }: MainLayoutProps) {
   const { headerActions } = useHeader();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const [logoutLoading, setLogoutLoading] = useState(false);
 
   const handleLogout = async () => {
@@ -43,6 +44,20 @@ function MainLayoutContent({ children }: MainLayoutProps) {
             >
               Logout
             </Button>
+            {user && (
+              <div className='header-user'>
+                <Avatar size={36} icon={<UserOutlined />}>
+                  {`${user.firstName?.charAt(0) ?? ''}${user.lastName?.charAt(0) ?? ''}`.trim() ||
+                    undefined}
+                </Avatar>
+                <div className='header-user-info'>
+                  <span className='header-user-name'>
+                    {user.firstName} {user.lastName}
+                  </span>
+                  <span className='header-user-email'>{user.email}</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </Header>

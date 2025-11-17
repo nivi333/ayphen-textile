@@ -13,9 +13,10 @@ import {
   DatePicker,
   Space,
   Switch,
+  Modal,
 } from 'antd';
 import { BankOutlined, DeleteOutlined } from '@ant-design/icons';
-import ImgCrop from 'antd-img-crop';
+import Cropper from 'react-easy-crop';
 import { companyService, CreateCompanyRequest } from '../services/companyService';
 import { EmailPhoneInput } from './ui/EmailPhoneInput';
 import { GradientButton } from './ui';
@@ -40,12 +41,137 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
   const [slugChecking, setSlugChecking] = useState(false);
   const [slugUnique, setSlugUnique] = useState(true);
 
+  // Image cropping states
+  const [cropModalVisible, setCropModalVisible] = useState(false);
+  const [imageSrc, setImageSrc] = useState<string>('');
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
+
   const resetFormState = useCallback(() => {
     form.resetFields();
     setLogoFile(null);
     setSlugChecking(false);
     setSlugUnique(true);
+    setCropModalVisible(false);
+    setImageSrc('');
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
+    setCroppedAreaPixels(null);
   }, [form]);
+
+  // Image cropping functions
+  const createImage = (url: string): Promise<HTMLImageElement> =>
+    new Promise((resolve, reject) => {
+      const image = new Image();
+      image.addEventListener('load', () => resolve(image));
+      image.addEventListener('error', (error) => reject(error));
+      image.setAttribute('crossOrigin', 'anonymous');
+      image.src = url;
+    });
+
+  const getRadianAngle = (degreeValue: number) => {
+    return (degreeValue * Math.PI) / 180;
+  };
+
+  const rotateSize = (width: number, height: number, rotation: number): { width: number; height: number } => {
+    const rotRad = getRadianAngle(rotation);
+
+    return {
+      width:
+        Math.abs(Math.cos(rotRad) * width) + Math.abs(Math.sin(rotRad) * height),
+      height:
+        Math.abs(Math.sin(rotRad) * width) + Math.abs(Math.cos(rotRad) * height),
+    };
+  };
+
+  const getCroppedImg = async (
+    imageSrc: string,
+    pixelCrop: { x: number; y: number; width: number; height: number },
+    rotation = 0,
+    flip = { horizontal: false, vertical: false }
+  ): Promise<string | null> => {
+    const image = await createImage(imageSrc);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) {
+      return null;
+    }
+
+    const rotRad = getRadianAngle(rotation);
+
+    // calculate bounding box of the rotated image
+    const { width: bBoxWidth, height: bBoxHeight } = rotateSize(
+      image.width,
+      image.height,
+      rotation
+    );
+
+    // set canvas size to match the bounding box
+    canvas.width = bBoxWidth;
+    canvas.height = bBoxHeight;
+
+    // translate canvas context to a central location to allow rotating and flipping around the center
+    ctx.translate(bBoxWidth / 2, bBoxHeight / 2);
+    ctx.rotate(rotRad);
+    ctx.scale(flip.horizontal ? -1 : 1, flip.vertical ? -1 : 1);
+    ctx.translate(-image.width / 2, -image.height / 2);
+
+    // draw rotated image
+    ctx.drawImage(image, 0, 0);
+
+    // croppedAreaPixels values are bounding box relative
+    // extract the cropped image using these values
+    const data = ctx.getImageData(
+      pixelCrop.x,
+      pixelCrop.y,
+      pixelCrop.width,
+      pixelCrop.height
+    );
+
+    // set canvas width to final desired crop size - this will clear existing context
+    canvas.width = pixelCrop.width;
+    canvas.height = pixelCrop.height;
+
+    // paste generated rotated image at the top left corner
+    ctx.putImageData(data, 0, 0);
+
+    // As Base64 string
+    return canvas.toDataURL('image/jpeg');
+  };
+
+  const onCropComplete = useCallback((_croppedArea: { x: number; y: number; width: number; height: number }, croppedAreaPixels: { x: number; y: number; width: number; height: number }) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
+
+  const handleCropConfirm = async () => {
+    try {
+      if (!croppedAreaPixels) {
+        message.error('Please complete the image cropping first.');
+        return;
+      }
+
+      const croppedImage = await getCroppedImg(
+        imageSrc,
+        croppedAreaPixels,
+        0,
+        { horizontal: false, vertical: false }
+      );
+      if (croppedImage) {
+        setLogoFile({
+          url: croppedImage,
+          name: 'cropped-logo.jpg',
+          status: 'done',
+          uid: Date.now().toString(),
+        });
+      }
+      setCropModalVisible(false);
+    } catch (error) {
+      console.error('Error cropping image:', error);
+      message.error('Failed to crop image. Please try again.');
+    }
+  };
 
   const handleRemoveLogo = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -114,17 +240,13 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
     }
 
     if (file.status === 'done' || file.status === 'uploading' || !file.status) {
-      // Create preview URL for the uploaded file
+      // Create preview URL for the uploaded file and open crop modal
       const fileObj = file.originFileObj || file;
       if (fileObj) {
         const reader = new FileReader();
         reader.onload = () => {
-          setLogoFile({
-            ...file,
-            originFileObj: fileObj, // Ensure we preserve the original file object
-            url: reader.result,
-            status: 'done',
-          });
+          setImageSrc(reader.result as string);
+          setCropModalVisible(true);
         };
         reader.onerror = () => {
           message.error('Failed to read image file!');
@@ -142,16 +264,8 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
   const handleFinish = async (values: any) => {
     setUploading(true);
     try {
-      // Convert logo file to base64 if uploaded
-      let logoUrl: string | undefined;
-      if (logoFile && logoFile.originFileObj) {
-        logoUrl = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(logoFile.originFileObj);
-        });
-      }
+      // Use the cropped logo URL directly
+      const logoUrl = logoFile?.url;
 
       // Prepare the data for API call
       const companyData: CreateCompanyRequest = {
@@ -222,36 +336,34 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
               </div>
             </div>
             <Col span={24}>
-              <ImgCrop rotate aspect={1}>
-                <Upload
-                  name='logo'
-                  accept='image/*'
-                  listType='picture-circle'
-                  beforeUpload={() => false}
-                  showUploadList={false}
-                  onChange={handleLogoChange}
-                  maxCount={1}
-                  className='ccd-logo-upload'
-                >
-                  {logoFile && logoFile.url ? (
-                    <div className='ccd-logo-preview'>
-                      <img src={logoFile.url} alt='Company Logo' />
-                      <button
-                        type='button'
-                        className='ccd-logo-delete-btn'
-                        onClick={handleRemoveLogo}
-                        aria-label='Remove company logo'
-                      >
-                        <DeleteOutlined />
-                      </button>
-                    </div>
-                  ) : (
-                    <span className='ccd-upload-icon'>
-                      <BankOutlined />
-                    </span>
-                  )}
-                </Upload>
-              </ImgCrop>
+              <Upload
+                name='logo'
+                accept='image/*'
+                listType='picture-circle'
+                beforeUpload={() => false}
+                showUploadList={false}
+                onChange={handleLogoChange}
+                maxCount={1}
+                className='ccd-logo-upload'
+              >
+                {logoFile && logoFile.url ? (
+                  <div className='ccd-logo-preview'>
+                    <img src={logoFile.url} alt='Company Logo' />
+                    <button
+                      type='button'
+                      className='ccd-logo-delete-btn'
+                      onClick={handleRemoveLogo}
+                      aria-label='Remove company logo'
+                    >
+                      <DeleteOutlined />
+                    </button>
+                  </div>
+                ) : (
+                  <span className='ccd-upload-icon'>
+                    <BankOutlined />
+                  </span>
+                )}
+              </Upload>
               <div className='ccd-logo-help-text'>
                 Upload Logo (PNG/JPG, max 2MB)
                 <br />
@@ -558,6 +670,48 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
           </div>
         </Form>
       </div>
+
+      {/* Image Cropping Modal */}
+      <Modal
+        title="Crop Company Logo"
+        open={cropModalVisible}
+        onCancel={() => setCropModalVisible(false)}
+        onOk={handleCropConfirm}
+        okText="Crop & Save"
+        cancelText="Cancel"
+        width={600}
+        centered
+      >
+        <div style={{ position: 'relative', height: '400px', width: '100%' }}>
+          <Cropper
+            image={imageSrc}
+            crop={crop}
+            zoom={zoom}
+            aspect={1}
+            onCropChange={setCrop}
+            onZoomChange={setZoom}
+            onCropComplete={onCropComplete}
+          />
+        </div>
+        <div style={{ marginTop: '16px', textAlign: 'center' }}>
+          <div style={{ marginBottom: '8px' }}>
+            <label style={{ marginRight: '8px' }}>Zoom:</label>
+            <input
+              type="range"
+              min="1"
+              max="3"
+              step="0.1"
+              value={zoom}
+              onChange={(e) => setZoom(Number(e.target.value))}
+              style={{ width: '200px' }}
+            />
+            <span style={{ marginLeft: '8px' }}>{zoom.toFixed(1)}x</span>
+          </div>
+          <div style={{ color: '#666', fontSize: '14px' }}>
+            Drag to reposition • Scroll or use slider to zoom
+          </div>
+        </div>
+      </Modal>
     </Drawer>
   );
 };

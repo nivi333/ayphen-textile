@@ -49,6 +49,41 @@
         display: flex;
         align-items: center;
         gap: 16px;
+
+        .header-user {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 6px 14px;
+          background: rgba(123, 95, 201, 0.08);
+          border: 1px solid rgba(123, 95, 201, 0.18);
+          border-radius: 999px;
+          line-height: 1.2;
+
+          .ant-avatar {
+            background: $primary-color;
+            color: #fff;
+            font-weight: 600;
+          }
+
+          .header-user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+
+            .header-user-name {
+              font-size: 0.9rem;
+              font-weight: 600;
+              color: $primary-text-color;
+            }
+
+            .header-user-email {
+              font-size: 0.75rem;
+              color: $secondary-text-color;
+              letter-spacing: 0.01em;
+            }
+          }
+        }
       }
     }
   }

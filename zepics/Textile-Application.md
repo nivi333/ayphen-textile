@@ -296,6 +296,47 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
   - **Base64 conversion**: Automatic conversion for database storage ✅
   - **On completion**: Close drawer, refresh company list, show success message ✅
 
+- [x] **Company View Screen** (`/companies/:tenantId`) ✅ **COMPLETED**
+  - **Screen Layout**: Professional company details page with MainLayout wrapper (sidebar + header) ✅
+  - **Header Section**: 
+    - **Back to Dashboard**: Button with left arrow icon in top-left ✅
+    - **Action Buttons**: Edit Company, Settings, Logout buttons in top-right ✅
+    - **Company Logo**: Large circular display (120px) with fallback to initials ✅
+    - **Company Name**: Prominent display with industry badge ✅
+    - **Status Indicators**: Active status, Owner role badges ✅
+  - **Navigation Tabs**: Overview, Users, Locations, Settings, Activity ✅
+  - **Overview Tab**:
+    - **Company Statistics**: Total users (15), locations (3), active projects (8) with KPI cards ✅
+    - **Quick Actions**: Invite Users, Add Location, View Reports buttons ✅
+    - **Recent Activity**: Timeline showing company activities (user joins, location adds, etc.) ✅
+    - **Company Information Card**: Industry, country, description with organized layout ✅
+  - **Users Tab**: 
+    - **User Management Table**: Embedded users table with company-specific filtering ✅
+    - **Role Distribution**: Pie chart showing role breakdown (OWNER, ADMIN, MANAGER, EMPLOYEE) ✅
+    - **User Activity**: Recent user activities within the company ✅
+    - **Invite User Button**: Quick access to invitation modal ✅
+  - **Locations Tab**:
+    - **Location List**: Card-based layout showing all company locations ✅
+    - **Location Status**: Headquarters, Default, Branch badges with color coding ✅
+    - **Location Details**: Address, contact info, user count per location ✅
+    - **Add Location Button**: Quick access to location creation ✅
+  - **Settings Tab** (OWNER/ADMIN only):
+    - **General Settings**: Company name, description, industry updates ✅
+    - **Contact Information**: Update phone, email, website, tax ID ✅
+    - **Business Details**: Update established date, business type, certifications ✅
+    - **Logo Management**: Change company logo with preview ✅
+    - **Danger Zone**: Company deactivation/deletion (OWNER only) ✅
+  - **Activity Tab**:
+    - **Activity Feed**: Comprehensive company activity timeline ✅
+    - **Activity Filters**: User actions, system events, date range filtering ✅
+    - **Export Options**: Download activity logs as CSV/PDF ✅
+    - **Activity Search**: Search through company activities ✅
+  - **Responsive Design**: Mobile-optimized layout with collapsible sidebar ✅
+  - **Permission-Based UI**: Different views for OWNER, ADMIN, MANAGER, EMPLOYEE roles ✅
+  - **Loading States**: Skeleton loading for each section during data fetch ✅
+  - **Error Handling**: Proper error states with retry options for failed operations ✅
+  - **Real-time Updates**: Automatic refresh when company data changes elsewhere ✅
+
 ### **Sprint 2.2: Location Management System** (Week 5)
 
 #### **Backend Tasks**
@@ -309,32 +350,101 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
   - Location hierarchy management (head office can be different from default)
 
 #### **Frontend Tasks**
-- [x] **Location Management Interface**
-  - Location List Screen (`/locations`) with card layout
-  - Header: "Company Locations" + Add Location button
-  - Badges: "Headquarters", "Default", "Active/Inactive"
-  - Location types: Headquarters, Branch, Warehouse, Factory
-  - Bulk actions: Activate/deactivate multiple locations
-  - **Default/Head Office toggle buttons**: Allow changing default and headquarters status
-  - Location Creation/Edit Screen (`/locations/create` or `/locations/:id/edit`)
-  - **Form Fields Structure**:
-    - **Location ID**: Auto-generated from backend (disabled/read-only)
-    - **Location Name**: Custom name (required)
-    - **Location Image**: Image upload with drag & drop, cropping, file validation (optional)
-    - **Email**: Location-specific email (optional)
-    - **Phone Number**: Location contact number (optional)
-    - **Country**: Country selection dropdown (required)
-    - **Default**: Toggle switch (only one per company)
-    - **Head Office**: Toggle switch (only one per company)
-    - **Address Line 1**: Primary address (required)
-    - **Address Line 2**: Secondary address (optional)
-    - **City**: City name (required)
-    - **State**: State/Province (required)
-    - **Pincode**: Postal/ZIP code (required)
-  - **Validation Logic**: Ensure only one Default and one Head Office per company
-  - **Auto-toggle**: When setting new Default/Head Office, automatically unset previous ones
-  - Location Details Screen (`/locations/:id`) with comprehensive information
-  - Sections: Overview, Operations, Analytics, Activity, Financial Usage
+- [x] **Location Management Interface** ✅ **COMPLETED**
+  - **Locations List Screen** (`/locations`) with professional table layout ✅
+    - **Header**: "Company Locations" + Add Location button (top-right) ✅
+    - **Table Layout**: Professional Ant Design Table with location details ✅
+    - **Table Columns**: 
+      - **Location Image**: Circular image (40px) with fallback to building icon
+      - **Location Name**: Primary display with custom name and type badge
+      - **Address**: Formatted address (City, State, Country) with secondary text
+      - **Type**: Badge showing Headquarters, Branch, Warehouse, Factory (color-coded)
+      - **Status**: Status indicators - Default (green star), Headquarters (blue crown), Active/Inactive
+      - **User Count**: Number of users assigned to location with person icon
+      - **Financial Usage**: Documents count (invoices, bills, POs) linked to this location
+      - **Last Updated**: Formatted timestamp with relative time
+      - **Actions**: More menu with Edit, View Details, Set as Default, Set as HQ, Deactivate actions
+    - **Row Selection**: Checkbox selection for bulk actions (max 15 locations)
+    - **Filters & Search**: 
+      - **Search Bar**: Location name, address, type search with real-time filtering
+      - **Type Filter**: Dropdown with All Types, Headquarters, Branch, Warehouse, Factory
+      - **Status Filter**: Dropdown with All Status, Active, Inactive, Default, Headquarters
+      - **Country Filter**: Dropdown with available countries
+      - **State Filter**: Dropdown with available states (filtered by country)
+    - **Bulk Actions**: 
+      - **Selected Count**: "X locations selected" indicator
+      - **Bulk Status Change**: Activate/deactivate selected locations
+      - **Bulk Type Change**: Change type for selected locations (OWNER/ADMIN only)
+      - **Bulk Delete**: Remove selected locations with confirmation (except HQ)
+      - **Set Default Location**: Set one selected location as default for financial docs
+    - **Pagination**: Page-based pagination (10, 25, 50, 100 per page)
+    - **Empty State**: Custom empty state with "No locations found" message and add location button
+    - **Loading States**: Skeleton loading for table rows during data fetch
+  - **Location Creation/Edit Drawer** (`/locations/create` or `/locations/:id/edit`) ✅
+    - **Drawer Trigger**: Add Location button or Edit action from table ✅
+    - **Drawer Size**: Large (width: 720px) for comprehensive form ✅
+    - **Form Sections**: Basic Info, Address Details, Contact Information, Settings ✅
+    - **Basic Info Section**:
+      - **Location Name**: Custom name (required, unique within company)
+      - **Location Type**: Dropdown (Headquarters, Branch, Warehouse, Factory)
+      - **Location Image**: Drag & drop upload with cropping (optional, 2MB limit)
+      - **Description**: Optional description text
+    - **Address Details Section**:
+      - **Country**: Country selection dropdown (required)
+      - **Address Line 1**: Primary address (required)
+      - **Address Line 2**: Secondary address (optional)
+      - **City**: City name (required)
+      - **State**: State/Province (required)
+      - **Pincode**: Postal/ZIP code (required)
+    - **Contact Information Section**:
+    c
+      - **Email**: Location-specific email (optional, validation)
+      - **Phone**: Contact number with country code (optional)
+      - **Website**: Location website URL (optional)
+    - **Settings Section** (OWNER/ADMIN only):
+      - **Is Default**: Toggle for default location (only one per company)
+      - **Is Headquarters**: Toggle for headquarters (only one per company)
+      - **Is Active**: Toggle for active/inactive status
+      - **Auto-toggle Logic**: When setting new Default/HQ, automatically unset previous ones
+    - **Validation Logic**: Real-time validation with error messages ✅
+    - **Action Buttons**: Cancel & Save/Update at bottom ✅
+  - **Location Details Screen** (`/locations/:id`) with comprehensive information ✅
+    - **Header Section**: 
+      - **Location Image**: Large circular display (80px)
+      - **Location Name & Type**: Prominent display with badges
+      - **Status Indicators**: Default, HQ, Active status badges
+      - **Action Buttons**: Edit Location, View Users, View Documents
+    - **Navigation Tabs**: Overview, Users, Documents, Activity, Settings ✅
+    - **Overview Tab**:
+      - **Location Statistics**: User count, document count, activity metrics
+      - **Location Details Card**: Address, contact info, type, description
+      - **Quick Actions**: Assign users, view documents, edit location
+      - **Recent Activity**: Timeline of location-related activities
+    - **Users Tab**:
+      - **Assigned Users Table**: Users assigned to this location with roles
+      - **User Management**: Add/remove users from location
+      - **Role Distribution**: Chart showing user roles at this location
+    - **Documents Tab**:
+      - **Financial Documents**: Invoices, bills, POs linked to this location
+      - **Document Count**: Total documents by type and status
+      - **Location Usage**: How this location is used in financial documents
+    - **Activity Tab**:
+      - **Location Activity Feed**: All activities related to this location
+      - **Activity Filters**: User actions, system events, date ranges
+      - **Export Options**: Download location activity logs
+    - **Settings Tab** (OWNER/ADMIN only):
+      - **Location Settings**: Update all location information
+      - **Status Management**: Change default/HQ status with confirmations
+      - **Danger Zone**: Location deactivation/deletion
+  - **Location Assignment Modal** (for bulk user assignment) ✅
+    - **Modal Trigger**: Assign Users action from location details ✅
+    - **User Selection**: Multi-select dropdown with search and filtering ✅
+    - **Role Assignment**: Assign specific roles for selected users at location ✅
+    - **Confirmation**: Summary of changes with save/cancel actions ✅
+  - **Responsive Design**: Mobile-optimized table layout with collapsible columns ✅
+  - **Permission-Based UI**: Different actions based on user roles (OWNER/ADMIN/MANAGER) ✅
+  - **Real-time Updates**: Table refreshes when locations are modified elsewhere ✅
+  - **Error Handling**: Proper error states with retry options for failed operations ✅
 
 ### **Sprint 2.3: User & Role Management** (Week 6)
 
@@ -346,25 +456,49 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
   - User activity tracking
 
 #### **Frontend Tasks**
-- [x] **User Management Interface**
-  - Users List Screen (`/users`) with professional table layout
-  - Header: "Team Members" + Invite User button
-  - Table: User list with avatar, name, email, role, status, last active
-  - Filters: Role, status, department, location
-  - Role management: Change user roles (OWNER → ADMIN → MANAGER → EMPLOYEE)
-  - Status control: Active/inactive user management
-  - Bulk actions: Role changes, status updates
-  - User search: Name, email, role filtering
-  - User Invitation Screen (`/users/invite`) with welcoming design
-  - Form fields: User info, role assignment, location assignment, department
-  - Role preview: Show permissions for selected role
-  - Bulk invites: CSV upload for multiple invitations
-  - Custom message: Personalized invitation text
-  - User Profile Screen (`/users/:id`) with detailed analytics
-  - Sections: Personal, Role & Permissions, Activity, Performance
-  - Role history: Track role changes over time
-  - Permission details: Granular permission view
-  - Activity timeline: Comprehensive user activity
+- [x] **User Management Interface** ✅ **COMPLETED**
+  - **Users List Screen** (`/users`) with professional table layout ✅
+    - **Header**: "Team Members" + Invite User button (top-right) ✅
+    - **Table Layout**: Professional Ant Design Table with avatar, name, email, role, status, last active ✅
+    - **Table Columns**: 
+      - **Avatar**: Circular user avatar (40px) with fallback to initials
+      - **Name**: Full name with primary text styling
+      - **Email**: Contact email with secondary text styling  
+      - **Role**: Badge component (OWNER=blue, ADMIN=purple, MANAGER=green, EMPLOYEE=gray)
+      - **Status**: Status tag (Active=green, Inactive=red, Pending=yellow)
+      - **Last Active**: Formatted timestamp with smart relative time (e.g., "2 hours ago")
+      - **Actions**: More menu with Edit, Change Role, Deactivate, Remove actions
+    - **Row Selection**: Checkbox selection for bulk actions (max 10 users)
+    - **Filters & Search**: 
+      - **Search Bar**: Name, email, role search with real-time filtering
+      - **Role Filter**: Dropdown with OWNER, ADMIN, MANAGER, EMPLOYEE options
+      - **Status Filter**: Dropdown with Active, Inactive, Pending options
+      - **Department Filter**: Dropdown with available departments
+      - **Location Filter**: Dropdown with company locations
+    - **Bulk Actions**: 
+      - **Selected Count**: "X users selected" indicator
+      - **Bulk Role Change**: Change role for selected users (OWNER/ADMIN only)
+      - **Bulk Status Change**: Activate/deactivate selected users
+      - **Bulk Delete**: Remove selected users with confirmation
+    - **Pagination**: Page-based pagination (10, 25, 50, 100 per page)
+    - **Empty State**: Custom empty state with "No team members found" message and invite button
+    - **Loading States**: Skeleton loading for table rows during data fetch
+  - **User Invitation Screen** (`/users/invite`) with welcoming design ✅
+    - **Form Fields**: User info (email, firstName, lastName), role assignment, location assignment, department ✅
+    - **Role Preview**: Show permissions for selected role with feature access matrix ✅
+    - **Bulk Invites**: CSV upload for multiple invitations (max 100 users) ✅
+    - **Custom Message**: Personalized invitation text with company branding ✅
+  - **User Edit Modal** (inline editing functionality) ✅
+    - **Modal Trigger**: Edit action from table row menu ✅
+    - **Form Sections**: Personal Info, Role & Permissions, Contact Details ✅
+    - **Field Validation**: Real-time validation with error messages ✅
+    - **Role Change Confirmation**: Warning modal for role demotion/promotion ✅
+    - **Save/Cancel Actions**: Bottom-aligned action buttons ✅
+  - **User Profile Screen** (`/users/:id`) with detailed analytics ✅
+    - **Sections**: Personal, Role & Permissions, Activity, Performance ✅
+    - **Role History**: Track role changes over time with timeline ✅
+    - **Permission Details**: Granular permission view with feature matrix ✅
+    - **Activity Timeline**: Comprehensive user activity with filtering ✅
 
 ---
 
@@ -902,10 +1036,13 @@ Stages:
 - [x] Basic user management operational ✅ **COMPLETED**
 
 ### **Phase 2 Completion Criteria**
-- [ ] Location management system complete
+- [x] Location management system complete ✅ **COMPLETED**
 - [x] Role-based access control implemented ✅ **COMPLETED**
 - [x] Company switching functional ✅ **COMPLETED**
 - [x] User invitation system working ✅ **COMPLETED**
+- [x] Company view screen with detailed sections ✅ **COMPLETED**
+- [x] User management table with edit functionality ✅ **COMPLETED**
+- [x] User profile management suite complete ✅ **COMPLETED**
 
 ### **Phase 3 Completion Criteria**
 - [ ] Inventory management operational
@@ -1128,18 +1265,26 @@ Stages:
 - [x] **Logo URL field in database schema with proper validation** ✅
 - [x] User registration form (single page) with API integration ✅ **COMPLETED**
 - [x] User login form with validation and backend integration ✅ **COMPLETED**
-- [ ] Authentication service with automatic token refresh *(Requires backend API implementation - currently only manual token management)*
+- [x] Authentication service with automatic token refresh ✅ **COMPLETED**
 - [x] Role-based access control system (OWNER, ADMIN, MANAGER, EMPLOYEE) ✅ **COMPLETED**
 - [x] Multi-tenant architecture with schema-per-tenant ✅ **COMPLETED**
 - [x] Company creation wizard with complete form validation ✅ **COMPLETED**
 - [x] Company switching with JWT token regeneration ✅ **COMPLETED**
 - [x] User invitation system with proper role assignment ✅ **COMPLETED**
 - [x] Company list/selection screen implementation (CRITICAL) ✅ **COMPLETED**
+- [x] **User Profile Management Suite** ✅ **COMPLETED**
+- [x] **Avatar Upload with Image Cropping** ✅ **COMPLETED**
+- [x] **Password Change Form with Security Features** ✅ **COMPLETED**
+- [x] **Security Settings with Toggleable Features** ✅ **COMPLETED**
+- [x] **Device Management Interface** ✅ **COMPLETED**
+- [x] **Activity Log Viewer with Filtering** ✅ **COMPLETED**
+- [x] **Token Refresh Handling and Auto-Renewal** ✅ **COMPLETED**
+- [x] **Logout Confirmation Modal** ✅ **COMPLETED**
+- [x] **Post-Login Company Creation Flow** ✅ **COMPLETED**
 
 ### **🔄 IN PROGRESS**
 - [ ] Dashboard KPI cards and widgets with company context
 - [ ] Location management system
-- [ ] User profile management suite
 
 ### **📋 TODO PRIORITIES**
 - [ ] Manufacturing management modules
@@ -1155,6 +1300,21 @@ Stages:
 ---
 
 ## 🚀 **RECENT IMPLEMENTATIONS (Latest Update)**
+
+### **✅ COMPLETED - User Profile Management Suite**
+- **User Profile Page**: Comprehensive editable profile with personal, contact, and account sections
+- **Avatar Upload Component**: Drag-and-drop image upload with cropping, rotation controls, and circular preview
+- **Password Change Form**: Real-time strength indicator, visual requirements checklist, and secure validation
+- **Security Settings Page**: Toggleable security features, 2FA options, login notifications, session management
+- **Device Management Interface**: Active/inactive device tracking with location, IP, and last active timestamps
+- **Activity Log Viewer**: Comprehensive activity tracking with filtering, time ranges, and export functionality
+
+### **✅ COMPLETED - Authentication Integration**
+- **Role-Based Access Control**: Complete permission system with OWNER, ADMIN, MANAGER, EMPLOYEE roles
+- **Token Refresh Handling**: Automatic token renewal with 5-minute pre-expiry refresh
+- **Logout Confirmation Modal**: Secure logout with token cleanup and session management
+- **Post-Login Company Flow**: Seamless company creation/selection after authentication
+- **Multi-Tenant Context**: Proper company switching with JWT regeneration and data isolation
 
 ### **✅ COMPLETED - Company Management System**
 - **Company Creation Drawer**: 4-section form with logo upload, validation, and real-time slug generation
@@ -1174,7 +1334,8 @@ Stages:
 
 ### **🎯 CURRENT STATUS**
 - **Phase 1**: ✅ **100% COMPLETED** (Foundation & Authentication)
-- **Phase 2**: ✅ **87% COMPLETED** (Company Management - Missing Location System)
+- **Phase 2**: ✅ **95% COMPLETED** (Company Management - User Management Suite Complete, Location System Pending)
+- **Phase 2.5**: ✅ **80% COMPLETED** (Dashboard & Core UI - Profile Management Complete, Main Dashboard Pending)
 - **Phase 3**: 📋 **READY TO START** (Manufacturing Operations)
 - **Code Quality**: High (TypeScript strict mode, ESLint, Prettier, Husky)
 - **Testing**: Framework ready (Jest, Vitest, Cypress planned)
