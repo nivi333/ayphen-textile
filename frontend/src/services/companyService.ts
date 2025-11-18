@@ -21,6 +21,7 @@ export interface CreateCompanyRequest {
   contactInfo: string;
   website?: string;
   taxId?: string;
+  isActive?: boolean;
 }
 
 export interface CompanyResponse {
@@ -29,9 +30,49 @@ export interface CompanyResponse {
   slug: string;
   industry?: string;
   description?: string;
-  country: string;
+  logoUrl?: string;
+  country?: string;
+  defaultLocation?: string;
+  address1?: string;
+  address2?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  establishedDate?: string;
+  businessType?: string;
+  certifications?: string;
+  contactInfo?: string;
+  website?: string;
+  taxId?: string;
+  isActive?: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface CompanyDetails extends CompanyResponse {
+  userRole?: string;
+}
+
+export interface UpdateCompanyRequest {
+  name?: string;
+  slug?: string;
+  industry?: string;
+  description?: string;
+  logoUrl?: string;
+  country?: string;
+  defaultLocation?: string;
+  address1?: string;
+  address2?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  establishedDate?: string;
+  businessType?: string;
+  certifications?: string;
+  contactInfo?: string;
+  website?: string;
+  taxId?: string;
+  isActive?: boolean;
 }
 
 class CompanyService {
@@ -40,10 +81,10 @@ class CompanyService {
     if (!tokens) {
       throw new Error('No authentication tokens found');
     }
-    
+
     return {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${tokens.accessToken}`
+      Authorization: `Bearer ${tokens.accessToken}`,
     };
   }
 
@@ -52,7 +93,7 @@ class CompanyService {
       const response = await fetch(`${API_BASE_URL}/companies`, {
         method: 'POST',
         headers: this.getAuthHeaders(),
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
 
       const result = await response.json();
@@ -70,10 +111,13 @@ class CompanyService {
 
   async checkSlugAvailability(slug: string): Promise<boolean> {
     try {
-      const response = await fetch(`${API_BASE_URL}/companies/check-slug?slug=${encodeURIComponent(slug)}`, {
-        method: 'GET',
-        headers: this.getAuthHeaders()
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/companies/check-slug?slug=${encodeURIComponent(slug)}`,
+        {
+          method: 'GET',
+          headers: this.getAuthHeaders(),
+        }
+      );
 
       if (!response.ok) {
         // If API fails, fall back to client-side validation
@@ -89,6 +133,47 @@ class CompanyService {
       // Fallback to client-side validation
       const reservedSlugs = ['admin', 'api', 'www', 'app', 'dashboard', 'login', 'register'];
       return !reservedSlugs.includes(slug.toLowerCase());
+    }
+  }
+
+  async updateCompany(tenantId: string, data: UpdateCompanyRequest): Promise<CompanyDetails> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/companies/${tenantId}`, {
+        method: 'PUT',
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to update company');
+      }
+
+      return result.data;
+    } catch (error) {
+      console.error('Error updating company:', error);
+      throw error;
+    }
+  }
+
+  async getCompany(tenantId: string): Promise<CompanyDetails> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/companies/${tenantId}`, {
+        method: 'GET',
+        headers: this.getAuthHeaders(),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to fetch company');
+      }
+
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching company:', error);
+      throw error;
     }
   }
 }

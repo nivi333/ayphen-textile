@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import {
   Avatar,
@@ -25,6 +25,8 @@ import {
 import { useNavigate, useParams } from 'react-router-dom';
 import useAuth from '../contexts/AuthContext';
 import { MainLayout } from '../components/layout';
+import { CompanyCreationDrawer } from '../components/CompanyCreationDrawer';
+import { companyService, CompanyDetails } from '../services/companyService';
 import './CompanyDetailPage.scss';
 
 const { Title, Text } = Typography;
@@ -89,13 +91,22 @@ const getDisplayValue = (value?: ReactNode) => {
 
 export default function CompanyDetailPage() {
   const { tenantId } = useParams<{ tenantId: string }>();
-  const { currentCompany, companies } = useAuth();
+  const { currentCompany, companies, refreshCompanies } = useAuth();
   const navigate = useNavigate();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editingCompany, setEditingCompany] = useState<CompanyDetails | null>(null);
+  const [loadingCompany, setLoadingCompany] = useState(false);
 
   // Find the company details
-  const company = currentCompany && currentCompany.id === tenantId ? currentCompany : 
-                  companies?.find(c => c.id === tenantId);
-  const extendedCompany = (company || {}) as ExtendedCompany;
+  const company = useMemo(() => {
+    if (!tenantId) return undefined;
+    if (currentCompany && currentCompany.id === tenantId) {
+      return currentCompany;
+    }
+    return companies?.find(c => c.id === tenantId);
+  }, [tenantId, currentCompany, companies]);
+
+  const extendedCompany = useMemo(() => (company || {}) as ExtendedCompany, [company]);
 
   useEffect(() => {
     if (!company) {
@@ -108,8 +119,31 @@ export default function CompanyDetailPage() {
     navigate('/dashboard');
   };
 
-  const handleEditCompany = () => {
-    message.info('Edit company functionality coming soon');
+  const handleEditCompany = async () => {
+    if (!tenantId) return;
+    try {
+      setLoadingCompany(true);
+      const details = await companyService.getCompany(tenantId);
+      setEditingCompany(details);
+      setDrawerOpen(true);
+    } catch (error: unknown) {
+      const errMsg =
+        error instanceof Error ? error.message : 'Failed to load company details for editing';
+      message.error(errMsg);
+    } finally {
+      setLoadingCompany(false);
+    }
+  };
+
+  const handleDrawerClose = () => {
+    setDrawerOpen(false);
+    setEditingCompany(null);
+  };
+
+  const handleCompanyUpdated = async (updated: CompanyDetails) => {
+    message.success('Company details updated');
+    setEditingCompany(updated);
+    await refreshCompanies();
   };
 
   if (!company) {
@@ -237,7 +271,13 @@ export default function CompanyDetailPage() {
             <Button icon={<ArrowLeftOutlined />} onClick={handleBack} className='ghost-button'>
               Back to Dashboard
             </Button>
-            <Button type='primary' icon={<EditOutlined />} onClick={handleEditCompany}>
+            <Button
+              type='primary'
+              icon={<EditOutlined />}
+              onClick={handleEditCompany}
+              loading={loadingCompany}
+              disabled={loadingCompany}
+            >
               Edit
             </Button>
           </Space>
@@ -311,6 +351,14 @@ export default function CompanyDetailPage() {
           </div>
         </Card>
       </div>
+      <CompanyCreationDrawer
+        open={drawerOpen}
+        onClose={handleDrawerClose}
+        mode='edit'
+        companyId={tenantId}
+        initialData={editingCompany ?? undefined}
+        onCompanyUpdated={handleCompanyUpdated}
+      />
     </MainLayout>
   );
 }

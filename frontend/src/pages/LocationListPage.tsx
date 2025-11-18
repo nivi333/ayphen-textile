@@ -17,7 +17,6 @@ import {
   DeleteOutlined,
   EnvironmentOutlined,
   MoreOutlined,
-  CrownOutlined,
 } from '@ant-design/icons';
 import useAuth from '../contexts/AuthContext';
 import { useHeader } from '../contexts/HeaderContext';
@@ -117,34 +116,6 @@ export default function LocationListPage() {
     });
   };
 
-  const handleSetDefault = async (location: Location) => {
-    try {
-      setTableLoading(true);
-      await locationService.setDefaultLocation(location.id);
-      message.success(LOCATION_SUCCESS_MESSAGES.SET_DEFAULT);
-      fetchLocations();
-    } catch (error) {
-      console.error('Error setting default location:', error);
-      message.error(LOCATION_ERROR_MESSAGES.SET_DEFAULT_ERROR);
-    } finally {
-      setTableLoading(false);
-    }
-  };
-
-  const handleSetHeadquarters = async (location: Location) => {
-    try {
-      setTableLoading(true);
-      await locationService.setHeadquarters(location.id);
-      message.success(LOCATION_SUCCESS_MESSAGES.SET_HEADQUARTERS);
-      fetchLocations();
-    } catch (error) {
-      console.error('Error setting headquarters:', error);
-      message.error(LOCATION_ERROR_MESSAGES.SET_HEADQUARTERS_ERROR);
-    } finally {
-      setTableLoading(false);
-    }
-  };
-
   const handleDrawerClose = () => {
     setDrawerVisible(false);
     setEditingLocation(null);
@@ -161,20 +132,6 @@ export default function LocationListPage() {
       icon: <EditOutlined />,
       label: 'Edit',
       onClick: () => handleEditLocation(location),
-    },
-    {
-      key: 'default',
-      icon: <EnvironmentOutlined />,
-      label: 'Set as Default',
-      onClick: () => handleSetDefault(location),
-      disabled: location.isDefault,
-    },
-    {
-      key: 'headquarters',
-      icon: <CrownOutlined />,
-      label: 'Set as Headquarters',
-      onClick: () => handleSetHeadquarters(location),
-      disabled: location.isHeadquarters,
     },
     {
       type: 'divider' as const,

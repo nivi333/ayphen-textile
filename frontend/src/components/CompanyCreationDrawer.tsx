@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Drawer,
   Form,
@@ -13,165 +13,67 @@ import {
   DatePicker,
   Space,
   Switch,
-  Modal,
 } from 'antd';
 import { BankOutlined, DeleteOutlined } from '@ant-design/icons';
-import Cropper from 'react-easy-crop';
-import { companyService, CreateCompanyRequest } from '../services/companyService';
+import dayjs from 'dayjs';
+import {
+  companyService,
+  CreateCompanyRequest,
+  CompanyDetails,
+  UpdateCompanyRequest,
+} from '../services/companyService';
 import { EmailPhoneInput } from './ui/EmailPhoneInput';
 import { GradientButton } from './ui';
 import './CompanyCreationDrawer.scss';
 
 const { Option } = Select;
 
+type CompanyFormInitialData = Partial<CreateCompanyRequest & CompanyDetails> & {
+  id?: string;
+  locationName?: string;
+  contactInfo?: string;
+  address1?: string;
+  address2?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+};
+
 interface CompanyCreationDrawerProps {
   open: boolean;
   onClose: () => void;
-  onCompanyCreated: () => void;
+  onCompanyCreated?: () => void;
+  onCompanyUpdated?: (company: CompanyDetails) => void;
+  mode?: 'create' | 'edit';
+  companyId?: string;
+  initialData?: CompanyFormInitialData;
 }
 
 export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
   open,
   onClose,
   onCompanyCreated,
+  onCompanyUpdated,
+  mode = 'create',
+  companyId,
+  initialData,
 }) => {
   const [form] = Form.useForm();
   const [logoFile, setLogoFile] = useState<any>(null);
   const [uploading, setUploading] = useState(false);
   const [slugChecking, setSlugChecking] = useState(false);
   const [slugUnique, setSlugUnique] = useState(true);
+  const [originalSlug, setOriginalSlug] = useState<string | null>(null);
 
-  // Image cropping states
-  const [cropModalVisible, setCropModalVisible] = useState(false);
-  const [imageSrc, setImageSrc] = useState<string>('');
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
+  const isEditing = mode === 'edit' && !!companyId;
 
   const resetFormState = useCallback(() => {
     form.resetFields();
     setLogoFile(null);
     setSlugChecking(false);
     setSlugUnique(true);
-    setCropModalVisible(false);
-    setImageSrc('');
-    setCrop({ x: 0, y: 0 });
-    setZoom(1);
-    setCroppedAreaPixels(null);
+    setOriginalSlug(null);
   }, [form]);
-
-  // Image cropping functions
-  const createImage = (url: string): Promise<HTMLImageElement> =>
-    new Promise((resolve, reject) => {
-      const image = new Image();
-      image.addEventListener('load', () => resolve(image));
-      image.addEventListener('error', (error) => reject(error));
-      image.setAttribute('crossOrigin', 'anonymous');
-      image.src = url;
-    });
-
-  const getRadianAngle = (degreeValue: number) => {
-    return (degreeValue * Math.PI) / 180;
-  };
-
-  const rotateSize = (width: number, height: number, rotation: number): { width: number; height: number } => {
-    const rotRad = getRadianAngle(rotation);
-
-    return {
-      width:
-        Math.abs(Math.cos(rotRad) * width) + Math.abs(Math.sin(rotRad) * height),
-      height:
-        Math.abs(Math.sin(rotRad) * width) + Math.abs(Math.cos(rotRad) * height),
-    };
-  };
-
-  const getCroppedImg = async (
-    imageSrc: string,
-    pixelCrop: { x: number; y: number; width: number; height: number },
-    rotation = 0,
-    flip = { horizontal: false, vertical: false }
-  ): Promise<string | null> => {
-    const image = await createImage(imageSrc);
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-
-    if (!ctx) {
-      return null;
-    }
-
-    const rotRad = getRadianAngle(rotation);
-
-    // calculate bounding box of the rotated image
-    const { width: bBoxWidth, height: bBoxHeight } = rotateSize(
-      image.width,
-      image.height,
-      rotation
-    );
-
-    // set canvas size to match the bounding box
-    canvas.width = bBoxWidth;
-    canvas.height = bBoxHeight;
-
-    // translate canvas context to a central location to allow rotating and flipping around the center
-    ctx.translate(bBoxWidth / 2, bBoxHeight / 2);
-    ctx.rotate(rotRad);
-    ctx.scale(flip.horizontal ? -1 : 1, flip.vertical ? -1 : 1);
-    ctx.translate(-image.width / 2, -image.height / 2);
-
-    // draw rotated image
-    ctx.drawImage(image, 0, 0);
-
-    // croppedAreaPixels values are bounding box relative
-    // extract the cropped image using these values
-    const data = ctx.getImageData(
-      pixelCrop.x,
-      pixelCrop.y,
-      pixelCrop.width,
-      pixelCrop.height
-    );
-
-    // set canvas width to final desired crop size - this will clear existing context
-    canvas.width = pixelCrop.width;
-    canvas.height = pixelCrop.height;
-
-    // paste generated rotated image at the top left corner
-    ctx.putImageData(data, 0, 0);
-
-    // As Base64 string
-    return canvas.toDataURL('image/jpeg');
-  };
-
-  const onCropComplete = useCallback((_croppedArea: { x: number; y: number; width: number; height: number }, croppedAreaPixels: { x: number; y: number; width: number; height: number }) => {
-    setCroppedAreaPixels(croppedAreaPixels);
-  }, []);
-
-  const handleCropConfirm = async () => {
-    try {
-      if (!croppedAreaPixels) {
-        message.error('Please complete the image cropping first.');
-        return;
-      }
-
-      const croppedImage = await getCroppedImg(
-        imageSrc,
-        croppedAreaPixels,
-        0,
-        { horizontal: false, vertical: false }
-      );
-      if (croppedImage) {
-        setLogoFile({
-          url: croppedImage,
-          name: 'cropped-logo.jpg',
-          status: 'done',
-          uid: Date.now().toString(),
-        });
-      }
-      setCropModalVisible(false);
-    } catch (error) {
-      console.error('Error cropping image:', error);
-      message.error('Failed to crop image. Please try again.');
-    }
-  };
 
   const handleRemoveLogo = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -199,6 +101,12 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
   const checkSlugUnique = async (slug: string) => {
     if (!slug) {
       setSlugUnique(true);
+      return;
+    }
+
+    if (isEditing && slug === originalSlug) {
+      setSlugUnique(true);
+      setSlugChecking(false);
       return;
     }
 
@@ -240,13 +148,17 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
     }
 
     if (file.status === 'done' || file.status === 'uploading' || !file.status) {
-      // Create preview URL for the uploaded file and open crop modal
+      // Create preview URL for the uploaded file
       const fileObj = file.originFileObj || file;
       if (fileObj) {
         const reader = new FileReader();
         reader.onload = () => {
-          setImageSrc(reader.result as string);
-          setCropModalVisible(true);
+          setLogoFile({
+            url: reader.result as string,
+            name: fileObj.name,
+            status: 'done',
+            uid: file.uid || Date.now().toString(),
+          });
         };
         reader.onerror = () => {
           message.error('Failed to read image file!');
@@ -268,34 +180,64 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
       const logoUrl = logoFile?.url;
 
       // Prepare the data for API call
-      const companyData: CreateCompanyRequest = {
-        name: values.name,
-        slug: values.slug,
-        industry: values.industry,
-        country: values.country,
-        locationName: values.locationName,
-        address1: values.address1,
-        city: values.city,
-        state: values.state,
-        pincode: values.pincode,
-        establishedDate: values.establishedDate?.format('YYYY-MM-DD'),
-        businessType: values.businessType,
-        contactInfo: values.contactInfo,
-        isActive: values.isActive,
-        // Optional fields - only include if they have values
-        ...(values.description && { description: values.description }),
-        ...(logoUrl && { logoUrl }),
-        ...(values.address2 && { address2: values.address2 }),
-        ...(values.certifications && { certifications: values.certifications }),
-        ...(values.website && { website: values.website }),
-        ...(values.taxId && { taxId: values.taxId }),
-      };
+      if (isEditing && companyId) {
+        const updatePayload: UpdateCompanyRequest = {
+          name: values.name,
+          slug: values.slug,
+          industry: values.industry,
+          description: values.description,
+          ...(logoUrl ? { logoUrl } : {}),
+          country: values.country,
+          defaultLocation: values.locationName,
+          address1: values.address1,
+          address2: values.address2,
+          city: values.city,
+          state: values.state,
+          pincode: values.pincode,
+          establishedDate: values.establishedDate?.format('YYYY-MM-DD'),
+          businessType: values.businessType,
+          certifications: values.certifications,
+          contactInfo: values.contactInfo,
+          website: values.website,
+          taxId: values.taxId,
+          isActive: values.isActive,
+        };
 
-      await companyService.createCompany(companyData);
+        const updatedCompany = await companyService.updateCompany(companyId, updatePayload);
 
-      message.success('Company created successfully!');
-      handleDrawerClose();
-      onCompanyCreated();
+        message.success('Company updated successfully!');
+        onCompanyUpdated?.(updatedCompany);
+        handleDrawerClose();
+      } else {
+        const companyData: CreateCompanyRequest = {
+          name: values.name,
+          slug: values.slug,
+          industry: values.industry,
+          country: values.country,
+          locationName: values.locationName,
+          address1: values.address1,
+          city: values.city,
+          state: values.state,
+          pincode: values.pincode,
+          establishedDate: values.establishedDate?.format('YYYY-MM-DD'),
+          businessType: values.businessType,
+          contactInfo: values.contactInfo,
+          isActive: values.isActive,
+          // Optional fields - only include if they have values
+          ...(values.description && { description: values.description }),
+          ...(logoUrl && { logoUrl }),
+          ...(values.address2 && { address2: values.address2 }),
+          ...(values.certifications && { certifications: values.certifications }),
+          ...(values.website && { website: values.website }),
+          ...(values.taxId && { taxId: values.taxId }),
+        };
+
+        await companyService.createCompany(companyData);
+
+        message.success('Company created successfully!');
+        handleDrawerClose();
+        onCompanyCreated?.();
+      }
       form.resetFields();
       setLogoFile(null);
     } catch (error: any) {
@@ -305,9 +247,65 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
     }
   };
 
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    if (isEditing && initialData) {
+      const formHasChanges = form.isFieldsTouched();
+      const establishedDateValue = initialData.establishedDate
+        ? dayjs(initialData.establishedDate)
+        : undefined;
+
+      if (!formHasChanges) {
+        form.setFieldsValue({
+          name: initialData.name,
+          slug: initialData.slug,
+          industry: initialData.industry,
+          description: initialData.description,
+          country: initialData.country,
+          locationName: initialData.locationName ?? initialData.defaultLocation,
+          address1: initialData.address1,
+          address2: initialData.address2,
+          city: initialData.city,
+          state: initialData.state,
+          pincode: initialData.pincode,
+          establishedDate: establishedDateValue,
+          businessType: initialData.businessType,
+          certifications: initialData.certifications,
+          contactInfo: initialData.contactInfo,
+          website: initialData.website,
+          taxId: initialData.taxId,
+          isActive: initialData.isActive ?? true,
+        });
+      }
+
+      setSlugUnique(true);
+      setSlugChecking(false);
+      setOriginalSlug(initialData.slug ?? null);
+
+      if (initialData.logoUrl) {
+        setLogoFile({
+          url: initialData.logoUrl,
+          name: 'company-logo',
+          status: 'done',
+          uid: 'existing-logo',
+        });
+      } else {
+        setLogoFile(null);
+      }
+    } else if (!isEditing) {
+      form.setFieldsValue({ isActive: true, slugAuto: true });
+    }
+  }, [open, isEditing, initialData, form]);
+
+  const drawerTitle = isEditing ? 'Edit Company' : 'Create Company';
+  const submitLabel = isEditing ? 'Save Changes' : 'Create Company';
+
   return (
     <Drawer
-      title={<span className='ccd-title'>Create Company</span>}
+      title={<span className='ccd-title'>{drawerTitle}</span>}
       width={720}
       onClose={handleDrawerClose}
       open={open}
@@ -500,9 +498,9 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
 
           <Divider className='ccd-divider' />
 
-          {/* Section 2: Head Office Location */}
+          {/* Section 2: Address */}
           <div className='ccd-section'>
-            <div className='ccd-section-title'>Head Office Location</div>
+            <div className='ccd-section-title'>Address</div>
             <Row gutter={12}>
               <Col span={12}>
                 <Form.Item
@@ -665,53 +663,12 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
               Cancel
             </Button>
             <GradientButton size='small' htmlType='submit' loading={uploading}>
-              Create Company
+              {submitLabel}
             </GradientButton>
           </div>
         </Form>
       </div>
 
-      {/* Image Cropping Modal */}
-      <Modal
-        title="Crop Company Logo"
-        open={cropModalVisible}
-        onCancel={() => setCropModalVisible(false)}
-        onOk={handleCropConfirm}
-        okText="Crop & Save"
-        cancelText="Cancel"
-        width={600}
-        centered
-      >
-        <div style={{ position: 'relative', height: '400px', width: '100%' }}>
-          <Cropper
-            image={imageSrc}
-            crop={crop}
-            zoom={zoom}
-            aspect={1}
-            onCropChange={setCrop}
-            onZoomChange={setZoom}
-            onCropComplete={onCropComplete}
-          />
-        </div>
-        <div style={{ marginTop: '16px', textAlign: 'center' }}>
-          <div style={{ marginBottom: '8px' }}>
-            <label style={{ marginRight: '8px' }}>Zoom:</label>
-            <input
-              type="range"
-              min="1"
-              max="3"
-              step="0.1"
-              value={zoom}
-              onChange={(e) => setZoom(Number(e.target.value))}
-              style={{ width: '200px' }}
-            />
-            <span style={{ marginLeft: '8px' }}>{zoom.toFixed(1)}x</span>
-          </div>
-          <div style={{ color: '#666', fontSize: '14px' }}>
-            Drag to reposition • Scroll or use slider to zoom
-          </div>
-        </div>
-      </Modal>
     </Drawer>
   );
 };

@@ -150,46 +150,6 @@ class LocationService {
       throw error;
     }
   }
-
-  async setDefaultLocation(id: string): Promise<Location> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/locations/${id}/set-default`, {
-        method: 'POST',
-        headers: this.getAuthHeaders(),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to set default location: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      return data.data;
-    } catch (error) {
-      console.error('Error setting default location:', error);
-      throw error;
-    }
-  }
-
-  async setHeadquarters(id: string): Promise<Location> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/locations/${id}/set-headquarters`, {
-        method: 'POST',
-        headers: this.getAuthHeaders(),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to set headquarters: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      return data.data;
-    } catch (error) {
-      console.error('Error setting headquarters:', error);
-      throw error;
-    }
-  }
 }
 
 export const locationService = new LocationService();

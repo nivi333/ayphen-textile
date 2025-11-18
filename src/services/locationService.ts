@@ -134,6 +134,35 @@ export class LocationService {
 
       const result = await pool.query(query, values);
 
+      // Handle exclusive flags: only one default and one headquarters per company
+      if (locationData.isDefault) {
+        // Unset default flag on all other locations
+        await pool.query(
+          `UPDATE ${schemaName}.tenant_locations 
+           SET is_default = false, updated_at = NOW() 
+           WHERE tenant_id = $1 AND id != $2 AND is_active = true`,
+          [userTenant.tenantId, result.rows[0].id]
+        );
+      }
+
+      if (locationData.isHeadquarters) {
+        // Unset headquarters flag on all other locations
+        await pool.query(
+          `UPDATE ${schemaName}.tenant_locations 
+           SET is_headquarters = false, updated_at = NOW() 
+           WHERE tenant_id = $1 AND id != $2 AND is_active = true`,
+          [userTenant.tenantId, result.rows[0].id]
+        );
+      }
+
+      // If this location is set as default, update the tenant's default location
+      if (locationData.isDefault) {
+        await globalPrisma.tenant.update({
+          where: { id: userTenant.tenantId },
+          data: { defaultLocation: locationData.name }
+        });
+      }
+
       logger.info(`Location created: ${locationData.name} for tenant ${userTenant.tenantId}`);
       return result.rows[0];
     } catch (error) {
@@ -202,8 +231,59 @@ export class LocationService {
         throw new Error('Location not found or access denied');
       }
 
+      const updatedLocation = result.rows[0];
+
+      // Handle exclusive flags: only one default and one headquarters per company
+      if (updateData.isDefault === true) {
+        // Unset default flag on all other locations
+        await pool.query(
+          `UPDATE ${schemaName}.tenant_locations 
+           SET is_default = false, updated_at = NOW() 
+           WHERE tenant_id = $1 AND id != $2 AND is_active = true`,
+          [userTenant.tenantId, locationId]
+        );
+      }
+
+      if (updateData.isHeadquarters === true) {
+        // Unset headquarters flag on all other locations
+        await pool.query(
+          `UPDATE ${schemaName}.tenant_locations 
+           SET is_headquarters = false, updated_at = NOW() 
+           WHERE tenant_id = $1 AND id != $2 AND is_active = true`,
+          [userTenant.tenantId, locationId]
+        );
+      }
+
+      // Handle default location changes
+      if (updateData.isDefault !== undefined) {
+        if (updateData.isDefault) {
+          // Setting this location as default - update tenant
+          await globalPrisma.tenant.update({
+            where: { id: userTenant.tenantId },
+            data: { defaultLocation: updatedLocation.name }
+          });
+        } else {
+          // Unsetting this location as default - check if there are other default locations
+          const defaultCheckQuery = `
+            SELECT COUNT(*) as default_count 
+            FROM ${schemaName}.tenant_locations 
+            WHERE is_default = true AND is_active = true AND id != $1
+          `;
+          const defaultCheckResult = await pool.query(defaultCheckQuery, [locationId]);
+          const defaultCount = parseInt(defaultCheckResult.rows[0].default_count);
+
+          // If no other default locations, clear the tenant's default location
+          if (defaultCount === 0) {
+            await globalPrisma.tenant.update({
+              where: { id: userTenant.tenantId },
+              data: { defaultLocation: null }
+            });
+          }
+        }
+      }
+
       logger.info(`Location updated: ${locationId} for tenant ${userTenant.tenantId}`);
-      return result.rows[0];
+      return updatedLocation;
     } catch (error) {
       logger.error('Error updating location:', error);
       throw error;
@@ -227,10 +307,19 @@ export class LocationService {
         throw new Error('User not associated with any active company');
       }
 
-      // Soft delete location in tenant schema
+      // Get tenant pool and schema
       const pool = databaseManager.getTenantPool(userTenant.tenantId);
       const schemaName = databaseManager.getSchemaName(userTenant.tenantId);
 
+      // Check if this location was the default location before deleting
+      const defaultCheckQuery = `
+        SELECT is_default FROM ${schemaName}.tenant_locations 
+        WHERE id = $1 AND is_active = true
+      `;
+      const defaultCheckResult = await pool.query(defaultCheckQuery, [locationId]);
+      const wasDefault = defaultCheckResult.rows[0]?.is_default;
+
+      // Soft delete location in tenant schema
       const query = `
         UPDATE ${schemaName}.tenant_locations
         SET is_active = false, updated_at = NOW()
@@ -241,6 +330,26 @@ export class LocationService {
 
       if (result.rowCount === 0) {
         throw new Error('Location not found or access denied');
+      }
+
+      // If this was the default location, handle tenant default location update
+      if (wasDefault) {
+        // Check if there are other default locations
+        const remainingDefaultQuery = `
+          SELECT COUNT(*) as default_count 
+          FROM ${schemaName}.tenant_locations 
+          WHERE is_default = true AND is_active = true
+        `;
+        const remainingDefaultResult = await pool.query(remainingDefaultQuery);
+        const remainingDefaultCount = parseInt(remainingDefaultResult.rows[0].default_count);
+
+        if (remainingDefaultCount === 0) {
+          // No more default locations, clear tenant default location
+          await globalPrisma.tenant.update({
+            where: { id: userTenant.tenantId },
+            data: { defaultLocation: null }
+          });
+        }
       }
 
       logger.info(`Location deleted: ${locationId} for tenant ${userTenant.tenantId}`);

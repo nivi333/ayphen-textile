@@ -42,11 +42,17 @@ model Tenant {
   logoUrl     String?  @map("logo_url")
   country     String?
   defaultLocation String? @map("default_location")
+  addressLine1 String?  @map("address_line_1")
+  addressLine2 String?  @map("address_line_2")
+  city        String?
+  state       String?
+  pincode     String?
   establishedDate DateTime? @map("established_date")
   businessType String? @map("business_type")
   certifications String? @map("certifications")
   website     String?
   taxId       String?  @map("tax_id")
+  contactInfo String? @map("contact_info")
   isActive    Boolean  @default(true) @map("is_active")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
@@ -163,12 +169,12 @@ model TenantLocation {
   name          String
   email         String?
   phone         String?
-  country       String
-  addressLine1  String      @map("address_line_1")
+  country       String?
+  addressLine1  String?     @map("address_line_1")
   addressLine2  String?     @map("address_line_2")
-  city          String
-  state         String
-  pincode       String
+  city          String?
+  state         String?
+  pincode       String?
   isDefault     Boolean     @default(false) @map("is_default")
   isHeadquarters Boolean    @default(false) @map("is_headquarters")
   locationType  LocationType @default(BRANCH) @map("location_type")

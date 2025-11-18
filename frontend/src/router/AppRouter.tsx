@@ -6,6 +6,7 @@ import {
   LoginPage,
   RegisterPage,
   ForgotPasswordPage,
+  CompaniesListPage,
   DashboardPage,
   InventoryPage,
   LocationListPage,
@@ -51,6 +52,14 @@ export default function AppRouter() {
           <Route path='/auth/google/callback' element={<GoogleAuthCallback />} />
 
           {/* Protected Routes - No Company Required */}
+          <Route
+            path='/companies'
+            element={
+              <ProtectedRoute>
+                <CompaniesListPage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path='/companies/:tenantId'
             element={

@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { Prisma } from '@prisma/client';
 import { companyService } from '../services/companyService';
 import { AuthService } from '../services/authService';
 import { v4 as uuidv4 } from 'uuid';
@@ -44,6 +45,17 @@ const updateCompanySchema = Joi.object({
   logoUrl: Joi.string().max(3000000).optional(), // Allow up to ~3MB for base64 encoded 2MB images
   country: Joi.string().max(100).optional(),
   defaultLocation: Joi.string().min(1).max(255).optional(),
+  address1: Joi.string().min(1).max(255).optional(),
+  address2: Joi.string().max(255).allow('').optional(),
+  city: Joi.string().min(1).max(100).optional(),
+  state: Joi.string().min(1).max(100).optional(),
+  pincode: Joi.string().min(1).max(20).optional(),
+  establishedDate: Joi.date().optional(),
+  businessType: Joi.string().max(100).optional(),
+  certifications: Joi.string().max(500).optional(),
+  contactInfo: Joi.string().min(1).max(100).optional(),
+  website: Joi.string().max(255).optional(),
+  taxId: Joi.string().max(50).optional(),
   isActive: Joi.boolean().optional(),
 });
 
@@ -84,9 +96,24 @@ export class CompanyController {
       });
     } catch (error: any) {
       logger.error('Error creating company:', error);
+
+      const prismaSessionError =
+        error instanceof Prisma.PrismaClientKnownRequestError ||
+        error instanceof Prisma.PrismaClientUnknownRequestError ||
+        error instanceof Prisma.PrismaClientInitializationError ||
+        (typeof error?.message === 'string' && error.message.includes('Invalid `connection_1.globalPrisma'));
+
+      if (prismaSessionError) {
+        res.status(401).json({
+          success: false,
+          message: 'Session timeout. Try login again!',
+        });
+        return;
+      }
+
       res.status(400).json({
         success: false,
-        message: error.message || 'Failed to create company',
+        message: error?.message || 'Failed to create company',
       });
     }
   }
