@@ -84,15 +84,28 @@ export class CompanyController {
       const userId = req.userId!;
       const { locationName, ...companyPayload } = value;
 
-      const company = await companyService.createCompany(userId, {
+      // Map frontend field names to backend expected names
+      const mappedPayload = {
         ...companyPayload,
+        addressLine1: companyPayload.address1,
+        addressLine2: companyPayload.address2,
+      };
+      // Remove the original field names
+      delete mappedPayload.address1;
+      delete mappedPayload.address2;
+
+      const company = await companyService.createCompany(userId, {
+        ...mappedPayload,
         defaultLocationName: locationName,
       });
 
       res.status(201).json({
         success: true,
         message: 'Company created successfully',
-        data: company,
+        data: {
+          ...company,
+          logoUrl: company.logoUrl ? `${company.logoUrl.substring(0, 50)}...` : null,
+        },
       });
     } catch (error: any) {
       logger.error('Error creating company:', error);
@@ -101,7 +114,8 @@ export class CompanyController {
         error instanceof Prisma.PrismaClientKnownRequestError ||
         error instanceof Prisma.PrismaClientUnknownRequestError ||
         error instanceof Prisma.PrismaClientInitializationError ||
-        (typeof error?.message === 'string' && error.message.includes('Invalid `connection_1.globalPrisma'));
+        (typeof error?.message === 'string' &&
+          error.message.includes('Invalid `connection_1.globalPrisma'));
 
       if (prismaSessionError) {
         res.status(401).json({
