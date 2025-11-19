@@ -145,7 +145,7 @@ export default function LocationListPage() {
       key: 'location',
       render: (record: Location) => (
         <Space>
-          <Avatar size={70} src={record.imageUrl} icon={<EnvironmentOutlined />}>
+          <Avatar src={record.imageUrl} icon={<EnvironmentOutlined />}>
             {record.name.charAt(0)}
           </Avatar>
           <div>

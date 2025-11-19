@@ -43,6 +43,7 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
     if (editingLocation) {
       form.setFieldsValue({
         name: editingLocation.name,
+        locationId: editingLocation.locationId,
         email: editingLocation.email || '',
         phone: editingLocation.phone || '',
         country: editingLocation.country,
@@ -109,8 +110,10 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
         }
       }
 
+      const { locationId, ...restValues } = values;
+
       const locationData: CreateLocationRequest = {
-        ...values,
+        ...restValues,
         imageUrl: imageUrl || undefined,
         email: values.email || undefined,
         phone: values.phone || undefined,
@@ -178,7 +181,7 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
                 beforeUpload={beforeUpload}
               >
                 {imageUrl ? (
-                  <Avatar size={120} src={imageUrl} />
+                  <Avatar src={imageUrl} className='location-avatar' />
                 ) : (
                   <span className='ccd-upload-icon'>
                     <EnvironmentOutlined />
@@ -193,6 +196,16 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
             </Col>
             <Row gutter={12}>
               <Col span={12}>
+                <Form.Item label='Location ID' name='locationId'>
+                  <Input
+                    disabled
+                    autoComplete='off'
+                    placeholder='Auto generated'
+                    className='ccd-input'
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
                 <Form.Item
                   label='Location Name'
                   name='name'
@@ -206,6 +219,8 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
                   />
                 </Form.Item>
               </Col>
+            </Row>
+            <Row gutter={12}>
               <Col span={12}>
                 <Form.Item
                   label='Email Address'
@@ -224,8 +239,6 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
                   />
                 </Form.Item>
               </Col>
-            </Row>
-            <Row gutter={12}>
               <Col span={12}>
                 <Form.Item label='Phone Number' name='phone'>
                   <Input autoComplete='off' placeholder='+1 234 567 8900' className='ccd-input' />

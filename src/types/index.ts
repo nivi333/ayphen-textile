@@ -41,7 +41,9 @@ export interface CreateLocationData {
   country?: string;
   pincode?: string;
   locationType?: 'BRANCH' | 'WAREHOUSE' | 'FACTORY' | 'STORE';
+  isDefault?: boolean;
   isHeadquarters?: boolean;
+  imageUrl?: string;
 }
 
 export interface UpdateLocationData {
@@ -55,6 +57,8 @@ export interface UpdateLocationData {
   country?: string;
   pincode?: string;
   locationType?: 'BRANCH' | 'WAREHOUSE' | 'FACTORY' | 'STORE';
+  isDefault?: boolean;
   isHeadquarters?: boolean;
   isActive?: boolean;
+  imageUrl?: string;
 }

@@ -40,7 +40,9 @@ export const createLocationSchema = Joi.object({
   country: Joi.string().max(100).optional(),
   pincode: Joi.string().max(20).optional(),
   locationType: Joi.string().valid('BRANCH', 'WAREHOUSE', 'FACTORY', 'STORE').default('BRANCH'),
+  isDefault: Joi.boolean().optional(),
   isHeadquarters: Joi.boolean().default(false),
+  imageUrl: Joi.string().optional(),
 });
 
 export const updateLocationSchema = Joi.object({
@@ -54,8 +56,10 @@ export const updateLocationSchema = Joi.object({
   country: Joi.string().max(100).optional(),
   pincode: Joi.string().max(20).optional(),
   locationType: Joi.string().valid('BRANCH', 'WAREHOUSE', 'FACTORY', 'STORE').optional(),
+  isDefault: Joi.boolean().optional(),
   isHeadquarters: Joi.boolean().optional(),
   isActive: Joi.boolean().optional(),
+  imageUrl: Joi.string().optional(),
 });
 
 export class LocationService {
@@ -101,6 +105,7 @@ export class LocationService {
           state: data.state,
           country: data.country,
           pincode: data.pincode,
+          image_url: data.imageUrl,
           location_type: data.locationType || 'BRANCH',
           is_headquarters: data.isHeadquarters || false,
           is_default: isDefault,
@@ -134,6 +139,7 @@ export class LocationService {
         state: newLocation.state,
         country: newLocation.country,
         pincode: newLocation.pincode,
+        imageUrl: newLocation.image_url ?? undefined,
         isDefault: newLocation.is_default,
         isHeadquarters: newLocation.is_headquarters,
         locationType: newLocation.location_type,
@@ -167,6 +173,7 @@ export class LocationService {
           state: true,
           country: true,
           pincode: true,
+          image_url: true,
           is_default: true,
           is_headquarters: true,
           location_type: true,
@@ -189,6 +196,7 @@ export class LocationService {
         state: location.state,
         country: location.country,
         pincode: location.pincode,
+        imageUrl: location.image_url ?? undefined,
         isDefault: location.is_default,
         isHeadquarters: location.is_headquarters,
         locationType: location.location_type,
@@ -296,6 +304,17 @@ export class LocationService {
         });
       }
 
+      // If updating to default, ensure no other default exists
+      if (data.isDefault && !existingLocation.is_default) {
+        await this.prisma.company_locations.updateMany({
+          where: {
+            company_id: companyId,
+            is_default: true,
+          },
+          data: { is_default: false },
+        });
+      }
+
       const updatedLocation = await this.prisma.company_locations.update({
         where: { id: locationId },
         data: {
@@ -309,8 +328,10 @@ export class LocationService {
           ...(data.country !== undefined && { country: data.country }),
           ...(data.pincode !== undefined && { pincode: data.pincode }),
           ...(data.locationType && { location_type: data.locationType }),
+          ...(data.isDefault !== undefined && { is_default: data.isDefault }),
           ...(data.isHeadquarters !== undefined && { is_headquarters: data.isHeadquarters }),
           ...(data.isActive !== undefined && { is_active: data.isActive }),
+          ...(data.imageUrl !== undefined && { image_url: data.imageUrl }),
         },
         select: {
           id: true,
@@ -346,6 +367,7 @@ export class LocationService {
         state: updatedLocation.state,
         country: updatedLocation.country,
         pincode: updatedLocation.pincode,
+        imageUrl: updatedLocation.image_url ?? undefined,
         isDefault: updatedLocation.is_default,
         isHeadquarters: updatedLocation.is_headquarters,
         locationType: updatedLocation.location_type,

@@ -58,6 +58,7 @@ model company_locations {
   email           String?
   phone           String?
   pincode         String?
+  image_url       String?
   companies       companies    @relation(fields: [company_id], references: [id], onDelete: Cascade)
 }
 

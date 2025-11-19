@@ -76,8 +76,7 @@ $dark-info-color: #3b82f6;
 // ============================================================================
 
 $font-family-heading: 'Poppins', 'Inter', system-ui, sans-serif;
-$font-family-body:
-  'Inter',
+$font-family-body: 'Inter',
   -apple-system,
   BlinkMacSystemFont,
   'Segoe UI',
@@ -102,14 +101,11 @@ $spacing-xl: 32px;
 $spacing-2xl: 48px;
 
 $shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-$shadow-md:
-  0 4px 6px -1px rgba(0, 0, 0, 0.1),
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
   0 2px 4px -1px rgba(0, 0, 0, 0.06);
-$shadow-lg:
-  0 10px 15px -3px rgba(0, 0, 0, 0.1),
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
   0 4px 6px -2px rgba(0, 0, 0, 0.05);
-$shadow-xl:
-  0 20px 25px -5px rgba(0, 0, 0, 0.1),
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
   0 10px 10px -5px rgba(0, 0, 0, 0.04);
 
 .no-border-link:hover,
@@ -285,7 +281,7 @@ $shadow-xl:
     }
   }
 
-  .ant-form-item-label > label {
+  .ant-form-item-label>label {
     color: $dark-text-secondary !important;
   }
 
@@ -442,23 +438,23 @@ button {
   text-align: center;
 }
 
-.space-y-1 > * + * {
+.space-y-1>*+* {
   margin-top: $spacing-xs;
 }
 
-.space-y-2 > * + * {
+.space-y-2>*+* {
   margin-top: $spacing-sm;
 }
 
-.space-y-4 > * + * {
+.space-y-4>*+* {
   margin-top: $spacing-md;
 }
 
-.space-y-6 > * + * {
+.space-y-6>*+* {
   margin-top: $spacing-lg;
 }
 
-.space-x-4 > * + * {
+.space-x-4>*+* {
   margin-left: $spacing-md;
 }
 
@@ -589,11 +585,9 @@ button {
     }
 
     &.to-blue-900 {
-      background: linear-gradient(
-        to bottom right,
-        $dark-bg-secondary,
-        darken($secondary-color, 20%)
-      );
+      background: linear-gradient(to bottom right,
+          $dark-bg-secondary,
+          darken($secondary-color, 20%));
     }
 
     &.to-orange-900 {
@@ -665,15 +659,15 @@ button {
 }
 
 // Avatar styles for company and location screens
-.ant-avatar > img {
+.ant-avatar>img {
   display: block;
-  width: 70px;
-  height: 70px;
+  width: 100%;
+
   object-fit: cover;
 }
 
 .ant-avatar.ant-avatar-circle {
-  width: 70px;
-  height: 70px;
-  font-size: 18px;
+  width: 45px;
+  height: 45px;
+  font-size: 22px;
 }
