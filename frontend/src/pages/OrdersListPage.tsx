@@ -275,7 +275,7 @@ export default function OrdersListPage() {
             <Table
               columns={columns}
               dataSource={orders}
-              rowKey='id'
+              rowKey={(record) => record.id || record.orderId}
               loading={tableLoading}
               pagination={{ pageSize: 10, showSizeChanger: true }}
               className='orders-table'

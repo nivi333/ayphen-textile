@@ -10,7 +10,7 @@
 - **Framework**: Express.js
 - **Database**: PostgreSQL with Prisma ORM
 - **Authentication**: JWT (JSON Web Tokens)
-- **Caching**: Redis
+- **Caching**: Redis (Docker containerized)
 - **API Documentation**: Swagger/OpenAPI
 
 ### **Frontend**

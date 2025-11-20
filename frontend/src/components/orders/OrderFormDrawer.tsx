@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Drawer, Form, Input, DatePicker, Select, Button, Space, Divider, InputNumber, message } from 'antd';
+import { Drawer, Form, Input, DatePicker, Select, Button, Divider, InputNumber, message, Row, Col } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
 import dayjs, { Dayjs } from 'dayjs';
 import { GradientButton } from '../ui';
 import { locationService, Location } from '../../services/locationService';
@@ -7,6 +8,24 @@ import { orderService, CreateOrderRequest, OrderDetail, OrderItemInput } from '.
 import './OrderFormDrawer.scss';
 
 const { Option } = Select;
+
+// UOM (Unit of Measure) options for textile manufacturing
+// Common units used in textile industry for measuring quantities
+const UOM_OPTIONS = [
+  { value: 'PCS', label: 'PCS - Pieces' },
+  { value: 'MTR', label: 'MTR - Meters' },
+  { value: 'YDS', label: 'YDS - Yards' },
+  { value: 'KG', label: 'KG - Kilograms' },
+  { value: 'LBS', label: 'LBS - Pounds' },
+  { value: 'ROLL', label: 'ROLL - Rolls' },
+  { value: 'BOX', label: 'BOX - Boxes' },
+  { value: 'CTN', label: 'CTN - Cartons' },
+  { value: 'DOZ', label: 'DOZ - Dozens' },
+  { value: 'SET', label: 'SET - Sets' },
+  { value: 'BALE', label: 'BALE - Bales' },
+  { value: 'CONE', label: 'CONE - Cones' },
+  { value: 'SPOOL', label: 'SPOOL - Spools' },
+];
 
 interface OrderFormDrawerProps {
   visible: boolean;
@@ -182,7 +201,6 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
       className='order-form-drawer'
       styles={{ body: { padding: 0 } }}
       footer={null}
-      destroyOnClose
     >
       <div className='order-drawer-content'>
         <Form<OrderFormValues>
@@ -195,55 +213,59 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
             {/* Order Info */}
             <div className='order-section'>
               <div className='order-section-title'>Order Info</div>
-              <Space size='middle' style={{ width: '100%' }} direction='vertical'>
-                <Form.Item
-                  label='Customer Name'
-                  name='customerName'
-                  rules={[{ required: true, message: 'Please enter customer name' }]}
-                >
-                  <Input maxLength={255} placeholder='Enter customer name' />
-                </Form.Item>
-
-                <Form.Item label='Customer Code' name='customerCode'>
-                  <Input maxLength={100} placeholder='Optional customer code' />
-                </Form.Item>
-
-                <Space size='middle' style={{ width: '100%' }}>
+              <Row gutter={[5, 10]}>
+                <Col span={12}>
+                  <Form.Item
+                    label='Customer Name'
+                    name='customerName'
+                    rules={[{ required: true, message: 'Please enter customer name' }]}
+                  >
+                    <Input maxLength={255} placeholder='Enter customer name' />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label='Customer Code' name='customerCode'>
+                    <Input maxLength={100} placeholder='Optional customer code' />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
                   <Form.Item
                     label='Order Date'
                     name='orderDate'
                     rules={[{ required: true, message: 'Please select order date' }]}
-                    style={{ flex: 1 }}
                   >
                     <DatePicker style={{ width: '100%' }} />
                   </Form.Item>
-
-                  <Form.Item label='Currency' name='currency' style={{ width: 160 }}>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label='Currency' name='currency'>
                     <Input maxLength={10} placeholder='INR' />
                   </Form.Item>
-                </Space>
-
-                <Form.Item label='Notes' name='notes'>
-                  <Input.TextArea rows={2} maxLength={1000} placeholder='Optional notes' />
-                </Form.Item>
-
-                <Form.Item label='Location' name='locationId'>
-                  <Select
-                    allowClear
-                    placeholder='Select shipping location'
-                    showSearch
-                    optionFilterProp='children'
-                  >
-                    {locations.map(loc => (
-                      <Option key={loc.id} value={loc.id}>
-                        {loc.name}
-                        {loc.isHeadquarters ? ' • HQ' : ''}
-                        {loc.isDefault ? ' • Default' : ''}
-                      </Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </Space>
+                </Col>
+                <Col span={24}>
+                  <Form.Item label='Notes' name='notes'>
+                    <Input.TextArea rows={2} maxLength={1000} placeholder='Optional notes' />
+                  </Form.Item>
+                </Col>
+                <Col span={24}>
+                  <Form.Item label='Location' name='locationId'>
+                    <Select
+                      allowClear
+                      placeholder='Select shipping location'
+                      showSearch
+                      optionFilterProp='children'
+                    >
+                      {locations.map(loc => (
+                        <Option key={loc.id} value={loc.id}>
+                          {loc.name}
+                          {loc.isHeadquarters ? ' • HQ' : ''}
+                          {loc.isDefault ? ' • Default' : ''}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+              </Row>
             </div>
 
             <Divider className='order-divider' />
@@ -268,74 +290,90 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
                 {(fields, { add, remove }, { errors }) => (
                   <>
                     {fields.map((field, index) => (
-                      <div key={field.key} className='order-item-row'>
-                        <Space align='start' style={{ width: '100%' }}>
+                      <Row key={field.key} gutter={[5, 10]} className='order-item-row' align='top'>
+                        <Col span={4}>
                           <Form.Item
                             {...field}
                             label={index === 0 ? 'Item Code' : ''}
                             name={[field.name, 'itemCode']}
                             fieldKey={[field.fieldKey!, 'itemCode']}
-                            rules={[{ required: true, message: 'Item code is required' }]}
-                            style={{ flex: 2 }}
+                            rules={[{ required: true, message: 'Required' }]}
                           >
                             <Input maxLength={255} placeholder='Item code' />
                           </Form.Item>
-
+                        </Col>
+                        <Col span={6}>
                           <Form.Item
                             {...field}
                             label={index === 0 ? 'Description' : ''}
                             name={[field.name, 'description']}
                             fieldKey={[field.fieldKey!, 'description']}
-                            style={{ flex: 3 }}
                           >
                             <Input maxLength={500} placeholder='Description (optional)' />
                           </Form.Item>
-
+                        </Col>
+                        <Col span={3}>
                           <Form.Item
                             {...field}
                             label={index === 0 ? 'Qty' : ''}
                             name={[field.name, 'quantity']}
                             fieldKey={[field.fieldKey!, 'quantity']}
-                            rules={[{ required: true, message: 'Quantity required' }]}
-                            style={{ width: 100 }}
+                            rules={[{ required: true, message: 'Required' }]}
                           >
-                            <InputNumber min={0.001} step={1} style={{ width: '100%' }} />
+                            <InputNumber min={0.001} step={1} style={{ width: '100%' }} placeholder='1' />
                           </Form.Item>
-
+                        </Col>
+                        <Col span={4}>
                           <Form.Item
                             {...field}
                             label={index === 0 ? 'UOM' : ''}
                             name={[field.name, 'unitOfMeasure']}
                             fieldKey={[field.fieldKey!, 'unitOfMeasure']}
-                            rules={[{ required: true, message: 'UOM required' }]}
-                            style={{ width: 120 }}
+                            rules={[{ required: true, message: 'Required' }]}
                           >
-                            <Input maxLength={50} placeholder='PCS' />
+                            <Select placeholder='Select UOM' showSearch>
+                              {UOM_OPTIONS.map(uom => (
+                                <Option key={uom.value} value={uom.value}>
+                                  {uom.label}
+                                </Option>
+                              ))}
+                            </Select>
                           </Form.Item>
-
+                        </Col>
+                        <Col span={5}>
                           <Form.Item
                             {...field}
                             label={index === 0 ? 'Unit Price' : ''}
                             name={[field.name, 'unitPrice']}
                             fieldKey={[field.fieldKey!, 'unitPrice']}
-                            rules={[{ required: true, message: 'Unit price required' }]}
-                            style={{ width: 140 }}
+                            rules={[{ required: true, message: 'Required' }]}
                           >
-                            <InputNumber min={0} step={1} style={{ width: '100%' }} />
+                            <InputNumber
+                              min={0}
+                              step={0.01}
+                              precision={2}
+                              style={{ width: '100%' }}
+                              placeholder='0.00'
+                              formatter={(value) => {
+                                if (!value) return '';
+                                return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                              }}
+                              parser={(value) => value!.replace(/\$\s?|(,*)/g, '') as any}
+                            />
                           </Form.Item>
-
+                        </Col>
+                        <Col span={2}>
                           {fields.length > 1 && (
                             <Button
-                              type='link'
+                              type='text'
                               danger
+                              icon={<DeleteOutlined />}
                               onClick={() => remove(field.name)}
-                              style={{ marginTop: index === 0 ? 29 : 5 }}
-                            >
-                              Remove
-                            </Button>
+                              style={{ marginTop: index === 0 ? 30 : 6 }}
+                            />
                           )}
-                        </Space>
-                      </div>
+                        </Col>
+                      </Row>
                     ))}
 
                     <Form.ErrorList errors={errors} />
@@ -353,37 +391,38 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
             {/* Delivery Details */}
             <div className='order-section'>
               <div className='order-section-title'>Delivery Details</div>
-              <Space size='middle' style={{ width: '100%' }} direction='vertical'>
-                <Space size='middle' style={{ width: '100%' }}>
-                  <Form.Item label='Delivery Date' name='deliveryDate' style={{ flex: 1 }}>
-                    <DatePicker style={{ width: '100%' }} />
+              <Row gutter={[5, 10]}>
+                <Col span={12}>
+                  <Form.Item label='Delivery Date' name='deliveryDate'>
+                    <DatePicker style={{ width: '100%' }} placeholder='Select date' />
                   </Form.Item>
-                </Space>
-
-                <Space size='middle' style={{ width: '100%' }}>
-                  <Form.Item label='Shipping Carrier' name='shippingCarrier' style={{ flex: 1 }}>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label='Shipping Method' name='shippingMethod'>
+                    <Input maxLength={255} placeholder='e.g., Air, Sea, Road' />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label='Shipping Carrier' name='shippingCarrier'>
                     <Input maxLength={255} placeholder='e.g., FedEx, DHL' />
                   </Form.Item>
-
-                  <Form.Item label='Tracking Number' name='trackingNumber' style={{ flex: 1 }}>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label='Tracking Number' name='trackingNumber'>
                     <Input maxLength={255} placeholder='Tracking number' />
                   </Form.Item>
-                </Space>
-
-                <Form.Item label='Shipping Method' name='shippingMethod'>
-                  <Input maxLength={255} placeholder='e.g., Air, Sea, Road' />
-                </Form.Item>
-
-                <Space size='middle' style={{ width: '100%' }}>
-                  <Form.Item label='Delivery Window Start' name='deliveryWindowStart' style={{ flex: 1 }}>
-                    <DatePicker style={{ width: '100%' }} showTime />
+                </Col>
+                <Col span={12}>
+                  <Form.Item label='Delivery Window Start' name='deliveryWindowStart'>
+                    <DatePicker style={{ width: '100%' }} showTime placeholder='Start date & time' />
                   </Form.Item>
-
-                  <Form.Item label='Delivery Window End' name='deliveryWindowEnd' style={{ flex: 1 }}>
-                    <DatePicker style={{ width: '100%' }} showTime />
+                </Col>
+                <Col span={12}>
+                  <Form.Item label='Delivery Window End' name='deliveryWindowEnd'>
+                    <DatePicker style={{ width: '100%' }} showTime placeholder='End date & time' />
                   </Form.Item>
-                </Space>
-              </Space>
+                </Col>
+              </Row>
             </div>
           </div>
 

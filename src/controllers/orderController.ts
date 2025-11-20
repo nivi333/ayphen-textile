@@ -22,7 +22,7 @@ const createOrderSchema = Joi.object({
       Joi.object({
         lineNumber: Joi.number().integer().min(1).optional(),
         itemCode: Joi.string().min(1).max(255).required(),
-        description: Joi.string().max(500).optional(),
+        description: Joi.string().max(500).allow('', null).optional(),
         quantity: Joi.number().greater(0).required(),
         unitOfMeasure: Joi.string().min(1).max(50).required(),
         unitPrice: Joi.number().min(0).required(),
@@ -50,7 +50,7 @@ const updateOrderSchema = Joi.object({
       Joi.object({
         lineNumber: Joi.number().integer().min(1).optional(),
         itemCode: Joi.string().min(1).max(255).required(),
-        description: Joi.string().max(500).optional(),
+        description: Joi.string().max(500).allow('', null).optional(),
         quantity: Joi.number().greater(0).required(),
         unitOfMeasure: Joi.string().min(1).max(50).required(),
         unitPrice: Joi.number().min(0).required(),

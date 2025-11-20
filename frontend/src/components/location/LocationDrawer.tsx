@@ -139,9 +139,8 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
   };
 
   const handleCancel = () => {
-    if (form.isFieldsTouched()) {
-      // You could add a confirmation dialog here if needed
-    }
+    form.resetFields();
+    setImageUrl('');
     onClose();
   };
 
