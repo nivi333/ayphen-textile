@@ -208,11 +208,14 @@ export default function OrdersListPage() {
       dataIndex: 'totalAmount',
       key: 'totalAmount',
       align: 'right' as const,
-      render: (value: number, record: OrderSummary) => (
-        <span>
-          {record.currency} {value.toFixed(2)}
-        </span>
-      ),
+      render: (value: number, record: OrderSummary) => {
+        const amount = typeof value === 'number' ? value : parseFloat(value || '0');
+        return (
+          <span>
+            {record.currency} {amount.toFixed(2)}
+          </span>
+        );
+      },
     },
     {
       title: 'Actions',
