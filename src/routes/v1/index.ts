@@ -3,6 +3,8 @@ import authRoutes from './authRoutes';
 import healthRoutes from './healthRoutes';
 import companyRoutes from './companyRoutes';
 import locationRoutes from './locationRoutes';
+import orderRoutes from './orderRoutes';
+import financialDocumentRoutes from './financialDocumentRoutes';
 // import inventoryRoutes from './inventoryRoutes';
 // import productionRoutes from './productionRoutes';
 import { tenantIsolationMiddleware } from '../../middleware/tenantIsolation';
@@ -23,6 +25,7 @@ router.get('/', (req, res) => {
       // Future endpoints will be added here
       companies: '/companies',
       locations: '/locations',
+      orders: '/orders',
       inventory: '/inventory',
       production: '/production',
       quality: '/quality (coming soon)',
@@ -44,6 +47,8 @@ router.use(userRateLimit);
 // Protected routes
 router.use('/companies', companyRoutes);
 router.use('/locations', locationRoutes);
+router.use('/orders', orderRoutes);
+router.use('/financial-documents', financialDocumentRoutes);
 // router.use('/inventory', inventoryRoutes);
 // router.use('/production', productionRoutes);
 // router.use('/quality', qualityRoutes);

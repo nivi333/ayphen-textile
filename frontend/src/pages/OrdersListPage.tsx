@@ -1,0 +1,296 @@
+import { useEffect, useRef, useState } from 'react';
+import { Table, Tag, Space, Button, Dropdown, Empty, Spin, message } from 'antd';
+import { MoreOutlined, EditOutlined } from '@ant-design/icons';
+import useAuth from '../contexts/AuthContext';
+import { useHeader } from '../contexts/HeaderContext';
+import { MainLayout } from '../components/layout';
+import { Heading } from '../components/Heading';
+import { GradientButton } from '../components/ui';
+import { locationService, Location } from '../services/locationService';
+import { orderService, OrderSummary, OrderStatus } from '../services/orderService';
+import { OrderFormDrawer } from '../components/orders/OrderFormDrawer';
+import './OrdersListPage.scss';
+
+const STATUS_COLORS: Record<OrderStatus, string> = {
+  DRAFT: 'default',
+  CONFIRMED: 'processing',
+  IN_PRODUCTION: 'gold',
+  READY_TO_SHIP: 'cyan',
+  SHIPPED: 'blue',
+  DELIVERED: 'green',
+  CANCELLED: 'red',
+};
+
+const NEXT_STATUS_MAP: Record<OrderStatus, OrderStatus[]> = {
+  DRAFT: ['CONFIRMED', 'CANCELLED'],
+  CONFIRMED: ['IN_PRODUCTION', 'CANCELLED'],
+  IN_PRODUCTION: ['READY_TO_SHIP', 'CANCELLED'],
+  READY_TO_SHIP: ['SHIPPED'],
+  SHIPPED: ['DELIVERED'],
+  DELIVERED: [],
+  CANCELLED: [],
+};
+
+function getStatusLabel(status: OrderStatus): string {
+  switch (status) {
+    case 'DRAFT':
+      return 'Draft';
+    case 'CONFIRMED':
+      return 'Confirmed';
+    case 'IN_PRODUCTION':
+      return 'In Production';
+    case 'READY_TO_SHIP':
+      return 'Ready to Ship';
+    case 'SHIPPED':
+      return 'Shipped';
+    case 'DELIVERED':
+      return 'Delivered';
+    case 'CANCELLED':
+      return 'Cancelled';
+    default:
+      return status;
+  }
+}
+
+export default function OrdersListPage() {
+  const { currentCompany } = useAuth();
+  const { setHeaderActions } = useHeader();
+  const [orders, setOrders] = useState<OrderSummary[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [tableLoading, setTableLoading] = useState(false);
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
+  const fetchInProgressRef = useRef(false);
+
+  useEffect(() => {
+    setHeaderActions(
+      <GradientButton onClick={handleCreateOrder} size='small' className='orders-create-btn'>
+        Create Order
+      </GradientButton>,
+    );
+
+    return () => setHeaderActions(null);
+  }, [setHeaderActions]);
+
+  useEffect(() => {
+    if (currentCompany) {
+      fetchData();
+    }
+  }, [currentCompany]);
+
+  const fetchData = async () => {
+    if (fetchInProgressRef.current) return;
+
+    try {
+      fetchInProgressRef.current = true;
+      setLoading(true);
+      const [ordersData, locationsData] = await Promise.all([
+        orderService.getOrders(),
+        locationService.getLocations(),
+      ]);
+      setOrders(ordersData);
+      setLocations(locationsData);
+    } catch (error: any) {
+      console.error('Error fetching orders:', error);
+      message.error(error.message || 'Failed to fetch orders');
+    } finally {
+      setLoading(false);
+      fetchInProgressRef.current = false;
+    }
+  };
+
+  const refreshOrders = async () => {
+    try {
+      setTableLoading(true);
+      const ordersData = await orderService.getOrders();
+      setOrders(ordersData);
+    } catch (error: any) {
+      console.error('Error refreshing orders:', error);
+      message.error(error.message || 'Failed to refresh orders');
+    } finally {
+      setTableLoading(false);
+    }
+  };
+
+  const handleCreateOrder = () => {
+    setEditingOrderId(null);
+    setDrawerVisible(true);
+  };
+
+  const handleEditOrder = (order: OrderSummary) => {
+    setEditingOrderId(order.orderId);
+    setDrawerVisible(true);
+  };
+
+  const handleDrawerClose = () => {
+    setDrawerVisible(false);
+    setEditingOrderId(null);
+  };
+
+  const handleOrderSaved = () => {
+    refreshOrders();
+  };
+
+  const handleChangeStatus = async (order: OrderSummary, nextStatus: OrderStatus) => {
+    try {
+      setTableLoading(true);
+      await orderService.updateOrderStatus(order.orderId, nextStatus);
+      message.success(`Order status updated to ${getStatusLabel(nextStatus)}`);
+      refreshOrders();
+    } catch (error: any) {
+      console.error('Error updating order status:', error);
+      message.error(error.message || 'Failed to update order status');
+    } finally {
+      setTableLoading(false);
+    }
+  };
+
+  const getLocationName = (locationId?: string) => {
+    if (!locationId) return '—';
+    const loc = locations.find(l => l.id === locationId);
+    if (!loc) return '—';
+    let label = loc.name;
+    if (loc.isHeadquarters) label += ' • HQ';
+    if (loc.isDefault) label += ' • Default';
+    return label;
+  };
+
+  const getStatusMenuItems = (order: OrderSummary) => {
+    const allowedNext = NEXT_STATUS_MAP[order.status] || [];
+
+    return allowedNext.map(status => ({
+      key: status,
+      label: getStatusLabel(status),
+      onClick: () => handleChangeStatus(order, status),
+    }));
+  };
+
+  const columns = [
+    {
+      title: 'Order ID',
+      dataIndex: 'orderId',
+      key: 'orderId',
+    },
+    {
+      title: 'Customer',
+      dataIndex: 'customerName',
+      key: 'customerName',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status: OrderStatus) => (
+        <Tag color={STATUS_COLORS[status]}>{getStatusLabel(status)}</Tag>
+      ),
+    },
+    {
+      title: 'Order Date',
+      dataIndex: 'orderDate',
+      key: 'orderDate',
+      render: (value: string) => new Date(value).toLocaleDateString(),
+    },
+    {
+      title: 'Delivery Date',
+      dataIndex: 'deliveryDate',
+      key: 'deliveryDate',
+      render: (value?: string) => (value ? new Date(value).toLocaleDateString() : '—'),
+    },
+    {
+      title: 'Location',
+      dataIndex: 'locationId',
+      key: 'locationId',
+      render: (value?: string) => getLocationName(value),
+    },
+    {
+      title: 'Total Amount',
+      dataIndex: 'totalAmount',
+      key: 'totalAmount',
+      align: 'right' as const,
+      render: (value: number, record: OrderSummary) => (
+        <span>
+          {record.currency} {value.toFixed(2)}
+        </span>
+      ),
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      width: 160,
+      render: (_: any, record: OrderSummary) => {
+        const statusItems = getStatusMenuItems(record);
+        const menuItems = [
+          {
+            key: 'edit',
+            icon: <EditOutlined />,
+            label: 'Edit',
+            onClick: () => handleEditOrder(record),
+          },
+          ...(statusItems.length
+            ? ([{ type: 'divider' as const }] as any[]).concat(statusItems as any)
+            : []),
+        ];
+
+        return (
+          <Space>
+            <Dropdown menu={{ items: menuItems }} trigger={['click']} placement='bottomRight'>
+              <Button type='text' icon={<MoreOutlined />} />
+            </Dropdown>
+          </Space>
+        );
+      },
+    },
+  ];
+
+  if (!currentCompany) {
+    return (
+      <MainLayout>
+        <div className='no-company-message'>Please select a company to manage orders.</div>
+      </MainLayout>
+    );
+  }
+
+  return (
+    <MainLayout>
+      <div className='page-container'>
+        <div className='page-header-section'>
+          <Heading level={2} className='page-title'>
+            Orders
+          </Heading>
+        </div>
+
+        <div className='table-container'>
+          {loading ? (
+            <div className='loading-container'>
+              <Spin size='large' />
+            </div>
+          ) : orders.length === 0 ? (
+            <Empty description='No orders found'>
+              <GradientButton size='small' onClick={handleCreateOrder}>
+                Create First Order
+              </GradientButton>
+            </Empty>
+          ) : (
+            <Table
+              columns={columns}
+              dataSource={orders}
+              rowKey='id'
+              loading={tableLoading}
+              pagination={{ pageSize: 10, showSizeChanger: true }}
+              className='orders-table'
+            />
+          )}
+        </div>
+      </div>
+
+      <OrderFormDrawer
+        visible={drawerVisible}
+        onClose={handleDrawerClose}
+        onSaved={handleOrderSaved}
+        mode={editingOrderId ? 'edit' : 'create'}
+        editingOrderId={editingOrderId}
+      />
+    </MainLayout>
+  );
+}

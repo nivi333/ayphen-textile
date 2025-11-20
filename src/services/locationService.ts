@@ -367,7 +367,7 @@ export class LocationService {
         state: updatedLocation.state,
         country: updatedLocation.country,
         pincode: updatedLocation.pincode,
-        imageUrl: updatedLocation.image_url ?? undefined,
+        imageUrl: (updatedLocation as any).image_url ?? undefined,
         isDefault: updatedLocation.is_default,
         isHeadquarters: updatedLocation.is_headquarters,
         locationType: updatedLocation.location_type,

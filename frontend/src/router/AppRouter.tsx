@@ -8,8 +8,8 @@ import {
   ForgotPasswordPage,
   CompaniesListPage,
   DashboardPage,
-  InventoryPage,
   LocationListPage,
+  OrdersListPage,
 } from '../pages';
 import CompanyDetailPage from '../pages/CompanyDetailPage';
 import GoogleAuthCallback from '../components/auth/GoogleAuthCallback';
@@ -21,84 +21,84 @@ export default function AppRouter() {
       <AuthProvider>
         <HeaderProvider>
           <Routes>
-          {/* Public Routes */}
-          <Route
-            path='/login'
-            element={
-              <PublicRoute>
-                <LoginPage />
-              </PublicRoute>
-            }
-          />
+            {/* Public Routes */}
+            <Route
+              path='/login'
+              element={
+                <PublicRoute>
+                  <LoginPage />
+                </PublicRoute>
+              }
+            />
 
-          <Route
-            path='/register'
-            element={
-              <PublicRoute>
-                <RegisterPage />
-              </PublicRoute>
-            }
-          />
+            <Route
+              path='/register'
+              element={
+                <PublicRoute>
+                  <RegisterPage />
+                </PublicRoute>
+              }
+            />
 
-          <Route
-            path='/forgot-password'
-            element={
-              <PublicRoute>
-                <ForgotPasswordPage />
-              </PublicRoute>
-            }
-          />
+            <Route
+              path='/forgot-password'
+              element={
+                <PublicRoute>
+                  <ForgotPasswordPage />
+                </PublicRoute>
+              }
+            />
 
-          <Route path='/auth/google/callback' element={<GoogleAuthCallback />} />
+            <Route path='/auth/google/callback' element={<GoogleAuthCallback />} />
 
-          {/* Protected Routes - No Company Required */}
-          <Route
-            path='/companies'
-            element={
-              <ProtectedRoute>
-                <CompaniesListPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path='/companies/:tenantId'
-            element={
-              <ProtectedRoute requireCompany={true}>
-                <CompanyDetailPage />
-              </ProtectedRoute>
-            }
-          />
-          {/* Protected Routes - Company Required */}
-          <Route
-            path='/dashboard'
-            element={
-              <ProtectedRoute requireCompany={true}>
-                <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
+            {/* Protected Routes - No Company Required */}
+            <Route
+              path='/companies'
+              element={
+                <ProtectedRoute>
+                  <CompaniesListPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path='/companies/:tenantId'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <CompanyDetailPage />
+                </ProtectedRoute>
+              }
+            />
+            {/* Protected Routes - Company Required */}
+            <Route
+              path='/dashboard'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <DashboardPage />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path='/inventory'
-            element={
-              <ProtectedRoute requireCompany={true}>
-                <InventoryPage />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path='/locations'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <LocationListPage />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path='/locations'
-            element={
-              <ProtectedRoute requireCompany={true}>
-                <LocationListPage />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path='/orders'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <OrdersListPage />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Default Redirects */}
-          <Route path='/' element={<Navigate to='/login' replace />} />
-          <Route path='*' element={<Navigate to='/login' replace />} />
+            {/* Default Redirects */}
+            <Route path='/' element={<Navigate to='/login' replace />} />
+            <Route path='*' element={<Navigate to='/login' replace />} />
           </Routes>
         </HeaderProvider>
       </AuthProvider>

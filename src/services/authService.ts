@@ -199,13 +199,14 @@ export class AuthService {
     userId: string;
     sessionId: string;
     tenantId?: string;
+    role?: string;
     deviceInfo?: string;
     userAgent?: string;
     ipAddress?: string;
   }): Promise<AuthTokens> {
-    const { userId, sessionId, tenantId, deviceInfo, userAgent, ipAddress } = sessionData;
+    const { userId, sessionId, tenantId, role, deviceInfo, userAgent, ipAddress } = sessionData;
 
-    const tokenPayload = { userId, sessionId, tenantId };
+    const tokenPayload = { userId, sessionId, tenantId, role };
     const accessToken = this.generateAccessToken(tokenPayload);
     const refreshToken = this.generateRefreshToken(tokenPayload);
 

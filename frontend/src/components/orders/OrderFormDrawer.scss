@@ -1,0 +1,49 @@
+.order-form-drawer {
+  .order-drawer-title {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .order-drawer-content {
+    padding: 16px 24px 80px;
+  }
+
+  .order-form-content {
+    max-height: calc(100vh - 160px);
+    overflow-y: auto;
+    padding-right: 8px;
+  }
+
+  .order-section {
+    margin-bottom: 16px;
+  }
+
+  .order-section-title {
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .order-divider {
+    margin: 16px 0;
+  }
+
+  .order-item-row {
+    margin-bottom: 8px;
+  }
+
+  .order-actions {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0 4px;
+    background: #fff;
+    border-top: 1px solid #f0f0f0;
+    margin-top: 16px;
+  }
+
+  .order-cancel-btn {
+    margin-right: 8px;
+  }
+}

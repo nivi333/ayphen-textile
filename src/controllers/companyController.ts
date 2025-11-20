@@ -26,11 +26,11 @@ const createCompanySchema = Joi.object({
   taxId: Joi.string().max(50).optional(),
   email: Joi.string().email().optional(),
   phone: Joi.string().max(20).optional(),
-  addressLine1: Joi.string().max(255).optional(),
+  addressLine1: Joi.string().max(255).required(),
   address1: Joi.string().max(255).optional(),
   addressLine2: Joi.string().max(255).allow('').optional(),
-  city: Joi.string().max(100).optional(),
-  state: Joi.string().max(100).optional(),
+  city: Joi.string().max(100).required(),
+  state: Joi.string().max(100).required(),
   pincode: Joi.string().max(20).optional(),
   certifications: Joi.array().items(Joi.string()).optional(),
   isActive: Joi.boolean().optional().default(true), // Always true for new companies
@@ -190,12 +190,13 @@ export class CompanyController {
 
       const result = await companyService.switchCompany(userId, tenantId);
 
-      // Regenerate tokens with tenant context
+      // Regenerate tokens with tenant context and role
       const sessionId = uuidv4();
       const tokens = await AuthService.createSession({
         userId,
         sessionId,
         tenantId,
+        role: result.role,
         userAgent: req.headers['user-agent'] as string,
         ipAddress: req.ip,
       });
