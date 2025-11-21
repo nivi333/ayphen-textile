@@ -1,7 +1,5 @@
 import {
   DashboardOutlined,
-  ShopOutlined,
-  EnvironmentOutlined,
   ShoppingCartOutlined,
   SafetyOutlined,
   DollarOutlined,
@@ -11,6 +9,10 @@ import {
   SkinOutlined,
   AppstoreOutlined,
   FormatPainterOutlined,
+  InboxOutlined,
+  ToolOutlined,
+  TeamOutlined,
+  BarChartOutlined,
 } from '@ant-design/icons';
 
 export type IndustryType = 
@@ -40,22 +42,34 @@ export const CORE_MODULES: MenuItem[] = [
     path: '/dashboard',
   },
   {
-    key: 'companies',
-    label: 'Companies',
-    icon: ShopOutlined,
-    path: '/companies',
+    key: 'products',
+    label: 'Products',
+    icon: InboxOutlined,
+    path: '/products',
   },
   {
-    key: 'locations',
-    label: 'Locations',
-    icon: EnvironmentOutlined,
-    path: '/locations',
+    key: 'inventory',
+    label: 'Inventory',
+    icon: AppstoreOutlined,
+    path: '/dashboard', // Placeholder - will be /inventory when implemented
   },
   {
     key: 'orders',
     label: 'Orders',
     icon: ShoppingCartOutlined,
     path: '/orders',
+  },
+  {
+    key: 'customers',
+    label: 'Customers',
+    icon: TeamOutlined,
+    path: '/dashboard', // Placeholder - will be /customers when implemented
+  },
+  {
+    key: 'machinery',
+    label: 'Machinery',
+    icon: ToolOutlined,
+    path: '/dashboard', // Placeholder - will be /machinery when implemented
   },
   {
     key: 'quality',
@@ -93,7 +107,13 @@ export const CORE_MODULES: MenuItem[] = [
     key: 'reports',
     label: 'Reports',
     icon: FileTextOutlined,
-    path: '/reports',
+    path: '/dashboard', // Placeholder - will be /reports when implemented
+  },
+  {
+    key: 'analytics',
+    label: 'Analytics',
+    icon: BarChartOutlined,
+    path: '/dashboard', // Placeholder - will be /analytics when implemented
   },
 ];
 
@@ -185,7 +205,12 @@ export const getNavigationByIndustry = (industry: IndustryType): MenuItem[] => {
   };
 
   // Combine core modules with industry-specific modules
-  return [...CORE_MODULES, ...industryModules[industry]];
+  // Insert industry modules before Finance
+  const financeIndex = CORE_MODULES.findIndex(m => m.key === 'finance');
+  const beforeFinance = CORE_MODULES.slice(0, financeIndex);
+  const afterFinance = CORE_MODULES.slice(financeIndex);
+  
+  return [...beforeFinance, ...industryModules[industry], ...afterFinance];
 };
 
 /**

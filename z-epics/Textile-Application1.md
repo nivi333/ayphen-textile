@@ -44,6 +44,8 @@
 - Logo always top-left
 - Buttons: medium/small only
 - Forms: 5-20 fields = drawer, <5 = modal, >20 = page
+- **MainLayout Requirement**: ALL post-company-selection screens MUST be wrapped in `MainLayout` component to display sidebar and header. This is mandatory for consistent navigation experience.
+- **Sidebar Configuration**: All screens (implemented and future placeholders) must be added to sidebar navigation in `navigationConfig.ts`. Non-implemented screens should route to `/dashboard` temporarily.
 ---
 
 ## 📋 EPIC Overview

@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '../contexts/AuthContext';
 import { HeaderProvider } from '../contexts/HeaderContext';
 import ProtectedRoute, { PublicRoute } from '../components/ProtectedRoute';
+import MainLayout from '../components/layout/MainLayout';
 import {
   LoginPage,
   RegisterPage,
@@ -115,7 +116,9 @@ export default function AppRouter() {
               path='/quality/checkpoints'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <QualityCheckpointsListPage />
+                  <MainLayout>
+                    <QualityCheckpointsListPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -124,7 +127,9 @@ export default function AppRouter() {
               path='/quality/defects'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <QualityDefectsListPage />
+                  <MainLayout>
+                    <QualityDefectsListPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -133,7 +138,9 @@ export default function AppRouter() {
               path='/quality/compliance'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <ComplianceReportsListPage />
+                  <MainLayout>
+                    <ComplianceReportsListPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
