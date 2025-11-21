@@ -64,6 +64,10 @@
       .page-header-section {
         padding: $spacing-xl $spacing-xl $spacing-lg;
         border-bottom: 1px solid $border-light;
+        display: flex;
+        align-items: center;
+        align-content: center;
+        justify-content: space-between;
 
         .page-title {
           color: $text-primary;
@@ -92,7 +96,7 @@
         }
 
         .locations-table {
-          .ant-table-thead > tr > th {
+          .ant-table-thead>tr>th {
             background: $bg-primary;
             border-bottom: 2px solid $border-light;
             color: $text-primary;
@@ -103,12 +107,12 @@
             letter-spacing: 0.5px;
           }
 
-          .ant-table-tbody > tr {
-            &:hover > td {
+          .ant-table-tbody>tr {
+            &:hover>td {
               background: $bg-primary;
             }
 
-            > td {
+            >td {
               border-bottom: 1px solid $border-light;
               padding: 10px;
             }
@@ -196,12 +200,12 @@
           padding: $spacing-lg;
 
           .locations-table {
-            .ant-table-thead > tr > th {
+            .ant-table-thead>tr>th {
               font-size: $font-size-xs;
               padding: $spacing-md $spacing-sm;
             }
 
-            .ant-table-tbody > tr > td {
+            .ant-table-tbody>tr>td {
               padding: $spacing-md $spacing-sm;
             }
 
@@ -264,17 +268,17 @@
 
       .table-container {
         .locations-table {
-          .ant-table-thead > tr > th {
+          .ant-table-thead>tr>th {
             background: $dark-bg-primary;
             border-bottom-color: $dark-border;
           }
 
-          .ant-table-tbody > tr {
-            &:hover > td {
+          .ant-table-tbody>tr {
+            &:hover>td {
               background: $dark-bg-primary;
             }
 
-            > td {
+            >td {
               border-bottom-color: $dark-border;
             }
           }

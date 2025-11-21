@@ -91,23 +91,42 @@ export default function Sidebar() {
   };
 
   const getSelectedKeys = () => {
-    return [location.pathname];
+    const path = location.pathname;
+    
+    // Find the exact matching menu item
+    for (const item of menuItems) {
+      // Check if it's a direct match
+      if (item.key === path) {
+        return [path];
+      }
+      
+      // Check children for match
+      if (item.children) {
+        for (const child of item.children) {
+          if (child.key === path) {
+            return [path];
+          }
+        }
+      }
+    }
+    
+    // Default to dashboard if no match
+    return ['/dashboard'];
   };
 
   const getOpenKeys = () => {
     const path = location.pathname;
-    if (path.includes('/production') || path.includes('/quality')) {
-      return ['manufacturing'];
+    
+    // Open Quality Control submenu if on quality pages
+    if (path.includes('/quality')) {
+      return ['/quality'];
     }
-    if (path.includes('/inventory') || path.includes('/procurement') || path.includes('/products')) {
-      return ['inventory'];
+    
+    // Open Textile Operations submenu if on textile pages
+    if (path.includes('/textile')) {
+      return ['/textile'];
     }
-    if (path.includes('/orders') || path.includes('/customers')) {
-      return ['sales'];
-    }
-    if (path.includes('/accounting') || path.includes('/reports')) {
-      return ['finance'];
-    }
+    
     return [];
   };
 
