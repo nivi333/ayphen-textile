@@ -51,7 +51,7 @@ export const CORE_MODULES: MenuItem[] = [
     key: 'inventory',
     label: 'Inventory',
     icon: AppstoreOutlined,
-    path: '/dashboard', // Placeholder - will be /inventory when implemented
+    path: '/inventory', // Placeholder - routes to dashboard via click handler
   },
   {
     key: 'orders',
@@ -63,13 +63,13 @@ export const CORE_MODULES: MenuItem[] = [
     key: 'customers',
     label: 'Customers',
     icon: TeamOutlined,
-    path: '/dashboard', // Placeholder - will be /customers when implemented
+    path: '/customers', // Placeholder - routes to dashboard via click handler
   },
   {
     key: 'machinery',
     label: 'Machinery',
     icon: ToolOutlined,
-    path: '/dashboard', // Placeholder - will be /machinery when implemented
+    path: '/machinery', // Placeholder - routes to dashboard via click handler
   },
   {
     key: 'quality',
@@ -107,13 +107,13 @@ export const CORE_MODULES: MenuItem[] = [
     key: 'reports',
     label: 'Reports',
     icon: FileTextOutlined,
-    path: '/dashboard', // Placeholder - will be /reports when implemented
+    path: '/reports', // Placeholder - routes to dashboard via click handler
   },
   {
     key: 'analytics',
     label: 'Analytics',
     icon: BarChartOutlined,
-    path: '/dashboard', // Placeholder - will be /analytics when implemented
+    path: '/analytics', // Placeholder - routes to dashboard via click handler
   },
 ];
 

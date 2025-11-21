@@ -1,3 +1,5 @@
+import { AuthStorage } from '../utils/storage';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';
 
 interface CreateCheckpointData {
@@ -44,10 +46,13 @@ interface CreateComplianceReportData {
 }
 
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('accessToken');
+  const tokens = AuthStorage.getTokens();
+  if (!tokens?.accessToken) {
+    throw new Error('No access token available');
+  }
   return {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
+    'Authorization': `Bearer ${tokens.accessToken}`,
   };
 };
 
