@@ -1,0 +1,76 @@
+.products-table {
+  .ant-table-tbody > tr > td {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .product-image-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .product-thumbnail {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+
+  .product-placeholder {
+    width: 48px;
+    height: 48px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 18px;
+  }
+
+  .product-name {
+    font-weight: 500;
+    color: #1a1a1a;
+  }
+
+  .product-sku {
+    font-size: 12px;
+    color: #8c8c8c;
+    margin-top: 2px;
+  }
+
+  .stock-quantity {
+    font-weight: 500;
+    color: #1a1a1a;
+  }
+
+  .stock-status-tag {
+    margin-top: 4px;
+    font-size: 11px;
+  }
+
+  .selling-price {
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  .markup-percent {
+    font-size: 12px;
+    color: #52c41a;
+    margin-top: 2px;
+  }
+}
+
+.products-create-btn {
+  margin-left: 8px;
+}
+
+.filters-section {
+  margin-bottom: 16px;
+}
+
+.no-company-message {
+  padding: 24px;
+}

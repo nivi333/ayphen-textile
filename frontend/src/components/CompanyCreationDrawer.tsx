@@ -443,18 +443,16 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
                   rules={[{ required: true, message: 'Please select industry' }]}
                 >
                   <Select placeholder='Select industry' className='ccd-select'>
-                    <Option value='Textile & Fabrics'>Textile & Fabrics</Option>
-                    <Option value='Garments & Apparel'>Garments & Apparel</Option>
-                    <Option value='Fashion & Clothing'>Fashion & Clothing</Option>
+                    <Option value='Textile Manufacturing'>Textile Manufacturing</Option>
+                    <Option value='Garment Production'>Garment Production</Option>
+                    <Option value='Knitting & Weaving'>Knitting & Weaving</Option>
+                    <Option value='Fabric Processing'>Fabric Processing</Option>
+                    <Option value='Apparel Design'>Apparel Design</Option>
+                    <Option value='Fashion Retail'>Fashion Retail</Option>
+                    <Option value='Yarn Production'>Yarn Production</Option>
+                    <Option value='Dyeing & Finishing'>Dyeing & Finishing</Option>
                     <Option value='Home Textiles'>Home Textiles</Option>
                     <Option value='Technical Textiles'>Technical Textiles</Option>
-                    <Option value='Yarn & Fiber'>Yarn & Fiber</Option>
-                    <Option value='Denim & Jeans'>Denim & Jeans</Option>
-                    <Option value='Sportswear & Activewear'>Sportswear & Activewear</Option>
-                    <Option value='Lingerie & Undergarments'>Lingerie & Undergarments</Option>
-                    <Option value='Leather & Accessories'>Leather & Accessories</Option>
-                    <Option value='Manufacturing & Production'>Manufacturing & Production</Option>
-                    <Option value='Trading & Export'>Trading & Export</Option>
                   </Select>
                 </Form.Item>
               </Col>

@@ -10,6 +10,7 @@ import {
   DashboardPage,
   LocationListPage,
   OrdersListPage,
+  ProductsListPage,
 } from '../pages';
 import CompanyDetailPage from '../pages/CompanyDetailPage';
 import GoogleAuthCallback from '../components/auth/GoogleAuthCallback';
@@ -92,6 +93,15 @@ export default function AppRouter() {
               element={
                 <ProtectedRoute requireCompany={true}>
                   <OrdersListPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/products'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <ProductsListPage />
                 </ProtectedRoute>
               }
             />

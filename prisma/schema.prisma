@@ -42,6 +42,8 @@ model companies {
   quality_defects   quality_defects[]
   quality_metrics   quality_metrics[]
   compliance_reports compliance_reports[]
+  products          products[]
+  product_categories product_categories[]
 }
 
 model company_locations {
@@ -365,4 +367,97 @@ enum ComplianceStatus {
   NON_COMPLIANT
   PENDING_REVIEW
   EXPIRED
+}
+
+// Product Management System Tables
+
+model product_categories {
+  id          String    @id @default(uuid())
+  category_id String
+  company_id  String
+  name        String
+  description String?
+  parent_id   String?
+  is_active   Boolean   @default(true)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime
+
+  company  companies @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  products products[]
+
+  @@unique([company_id, category_id])
+  @@index([company_id])
+  @@index([parent_id])
+}
+
+model products {
+  id              String         @id @default(uuid())
+  product_id      String
+  product_code    String
+  company_id      String
+  category_id     String?
+  sku             String
+  name            String
+  description     String?
+  material        String?
+  color           String?
+  size            String?
+  weight          Decimal?       @db.Decimal(10, 3)
+  unit_of_measure String         @default("PCS")
+  cost_price      Decimal        @db.Decimal(12, 2)
+  selling_price   Decimal        @db.Decimal(12, 2)
+  markup_percent  Decimal?       @db.Decimal(5, 2)
+  stock_quantity  Int            @default(0)
+  reorder_level   Int?
+  barcode         String?
+  image_url       String?
+  specifications  Json?
+  is_active       Boolean        @default(true)
+  created_at      DateTime       @default(now())
+  updated_at      DateTime
+
+  company         companies           @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  category        product_categories? @relation(fields: [category_id], references: [id], onDelete: SetNull)
+  stock_adjustments stock_adjustments[]
+
+  @@unique([company_id, product_id])
+  @@unique([company_id, product_code])
+  @@unique([company_id, sku])
+  @@index([company_id])
+  @@index([category_id])
+  @@index([sku])
+  @@index([product_code])
+}
+
+model stock_adjustments {
+  id              String              @id @default(uuid())
+  adjustment_id   String
+  product_id      String
+  company_id      String
+  adjustment_type StockAdjustmentType
+  quantity        Decimal             @db.Decimal(12, 3)
+  previous_stock  Decimal             @db.Decimal(12, 3)
+  new_stock       Decimal             @db.Decimal(12, 3)
+  reason          String?
+  notes           String?
+  adjusted_by     String
+  created_at      DateTime            @default(now())
+
+  product products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@unique([company_id, adjustment_id])
+  @@index([product_id])
+  @@index([company_id])
+  @@index([created_at])
+}
+
+enum StockAdjustmentType {
+  ADD
+  REMOVE
+  SET
+  SALE
+  PURCHASE
+  RETURN
+  DAMAGE
+  TRANSFER
 }

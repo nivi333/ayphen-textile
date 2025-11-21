@@ -58,8 +58,13 @@ export default function Sidebar() {
       label: 'Inventory',
       children: [
         {
-          key: '/inventory',
+          key: '/products',
           icon: <AppstoreOutlined />,
+          label: 'Products',
+        },
+        {
+          key: '/inventory',
+          icon: <InboxOutlined />,
           label: 'Stock Management',
         },
         {
@@ -165,7 +170,7 @@ export default function Sidebar() {
     if (path.includes('/production') || path.includes('/quality')) {
       return ['manufacturing'];
     }
-    if (path.includes('/inventory') || path.includes('/procurement')) {
+    if (path.includes('/inventory') || path.includes('/procurement') || path.includes('/products')) {
       return ['inventory'];
     }
     if (path.includes('/orders') || path.includes('/customers')) {

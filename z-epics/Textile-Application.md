@@ -665,6 +665,59 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
 - [x] Prisma schema bidirectional relations
 - [x] Database migrations applied successfully
 
+### **Sprint 3.3.5: Product Management System** (Week 9.5)
+
+#### **Backend Tasks**
+- [ ] **Product Database Design**
+  - Products table with multi-tenant isolation (company_id)
+  - Product categories and subcategories
+  - Product variants (size, color, material)
+  - Stock tracking with location-based inventory
+  - Pricing management (cost, selling price, markup)
+  - Product images and specifications
+  - SKU/barcode management
+
+- [ ] **Product Management API**
+  - POST `/api/v1/products` - Create product
+  - GET `/api/v1/products` - List products with filters
+  - GET `/api/v1/products/:id` - Get product details
+  - PUT `/api/v1/products/:id` - Update product
+  - DELETE `/api/v1/products/:id` - Delete product
+  - POST `/api/v1/products/:id/stock-adjustment` - Adjust stock levels
+  - GET `/api/v1/products/categories` - Get product categories
+  - Role-based access control (OWNER/ADMIN/MANAGER)
+
+#### **Frontend Tasks**
+- [ ] **ProductsListPage** (`frontend/src/pages/ProductsListPage.tsx`)
+  - Professional AntD Table with product listing
+  - Columns: Image, Product Name, SKU, Category, Stock, Price, Status, Actions
+  - Search and filters (category, status, stock level)
+  - Bulk actions (activate/deactivate, delete)
+  - Pagination with configurable page sizes
+  - Empty state with "Add Product" call-to-action
+  - Stock level indicators (low stock warnings)
+  - Quick view modal for product details
+
+- [ ] **ProductFormDrawer** (`frontend/src/components/products/ProductFormDrawer.tsx`)
+  - Large drawer (720px) for create/edit product
+  - Section 1: Basic Information (name, SKU, category, description)
+  - Section 2: Pricing (cost price, selling price, markup %)
+  - Section 3: Inventory (stock quantity, unit of measure, reorder level)
+  - Section 4: Specifications (material, color, size, weight)
+  - Section 5: Images (product image upload with preview)
+  - Real-time validation with error messages
+  - Auto-generate SKU option
+  - Cancel & Save buttons at bottom
+
+- [ ] **StockAdjustmentModal** (`frontend/src/components/products/StockAdjustmentModal.tsx`)
+  - Modal for quick stock adjustments
+  - Current stock display
+  - Adjustment type (Add/Remove/Set)
+  - Quantity input with validation
+  - Reason/notes field
+  - Location selection (if multi-location)
+  - Confirmation with new stock level preview
+
 ### **Sprint 3.4: Quality Control System** (Week 10)
 
 #### **Backend Tasks**

@@ -1,10 +1,10 @@
 import { ReactNode, useState } from 'react';
-import { Layout, Button, Avatar } from 'antd';
+import { Layout, Button } from 'antd';
 import Sidebar from './Sidebar';
 import { BrandLogo } from '../BrandLogo';
 import { useHeader } from '../../contexts/HeaderContext';
 import useAuth from '../../contexts/AuthContext';
-import { UserOutlined } from '@ant-design/icons';
+import { UserAvatar } from '../ui';
 import './MainLayout.scss';
 
 const { Header, Content } = Layout;
@@ -46,10 +46,11 @@ function MainLayoutContent({ children }: MainLayoutProps) {
             </Button>
             {user && (
               <div className='header-user'>
-                <Avatar size={36} icon={<UserOutlined />}>
-                  {`${user.firstName?.charAt(0) ?? ''}${user.lastName?.charAt(0) ?? ''}`.trim() ||
-                    undefined}
-                </Avatar>
+                <UserAvatar 
+                  firstName={user.firstName}
+                  lastName={user.lastName}
+                  size={36}
+                />
                 <div className='header-user-info'>
                   <span className='header-user-name'>
                     {user.firstName} {user.lastName}
