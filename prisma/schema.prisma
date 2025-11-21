@@ -48,6 +48,9 @@ model companies {
   yarn_manufacturing yarn_manufacturing[]
   dyeing_finishing  dyeing_finishing[]
   garment_manufacturing garment_manufacturing[]
+  quality_inspections quality_inspections[]
+  inspection_templates inspection_templates[]
+  inspection_metrics inspection_metrics[]
   design_patterns   design_patterns[]
 }
 
@@ -109,18 +112,21 @@ model user_companies {
 }
 
 model users {
-  id             String           @id
-  first_name     String
-  last_name      String
-  email          String?          @unique
-  phone          String?          @unique
-  password       String
-  avatar_url     String?
-  is_active      Boolean          @default(true)
-  created_at     DateTime         @default(now())
-  updated_at     DateTime
-  sessions       sessions[]
-  user_companies user_companies[]
+  id                      String           @id
+  first_name              String
+  last_name               String
+  email                   String?          @unique
+  phone                   String?          @unique
+  password                String
+  avatar_url              String?
+  is_active               Boolean          @default(true)
+  created_at              DateTime         @default(now())
+  updated_at              DateTime
+  sessions                sessions[]
+  user_companies          user_companies[]
+  inspections             quality_inspections[] @relation("InspectionInspector")
+  templates_created       inspection_templates[] @relation("TemplateCreator")
+  defect_comments         defect_comments[] @relation("DefectCommentUser")
 }
 
 enum LocationType {
@@ -288,6 +294,7 @@ model quality_defects {
 
   company    companies           @relation(fields: [company_id], references: [id], onDelete: Cascade)
   checkpoint quality_checkpoints @relation(fields: [checkpoint_id], references: [id])
+  comments   defect_comments[]
 
   @@index([company_id])
   @@index([defect_category])
@@ -721,4 +728,154 @@ enum IndustryType {
   PHARMACEUTICAL
   ELECTRONICS
   GENERAL
+}
+
+// New Quality Control Enums
+enum InspectionType {
+  INCOMING_MATERIAL
+  IN_PROCESS
+  FINAL_PRODUCT
+  RANDOM_CHECK
+}
+
+enum InspectionStatus {
+  PENDING
+  IN_PROGRESS
+  PASSED
+  FAILED
+  CONDITIONAL
+}
+
+enum DefectStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+  CLOSED
+}
+
+enum EvaluationType {
+  PASS_FAIL
+  RATING
+  MEASUREMENT
+}
+
+// New Quality Control Models
+model quality_inspections {
+  id                String            @id @default(uuid())
+  company_id        String
+  inspection_number String
+  inspection_type   InspectionType
+  reference_type    String            // PRODUCT, ORDER, BATCH
+  reference_id      String
+  location_id       String?
+  inspector_id      String
+  template_id       String?
+  scheduled_date    DateTime
+  started_at        DateTime?
+  completed_at      DateTime?
+  status            InspectionStatus  @default(PENDING)
+  overall_result    String?           // PASS, FAIL, CONDITIONAL
+  quality_score     Float?
+  inspector_notes   String?
+  recommendations   String?
+  created_at        DateTime          @default(now())
+  updated_at        DateTime          @updatedAt
+  
+  companies         companies         @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  inspector         users             @relation("InspectionInspector", fields: [inspector_id], references: [id])
+  template          inspection_templates? @relation(fields: [template_id], references: [id])
+  checkpoints       inspection_checkpoints[]
+  
+  @@unique([company_id, inspection_number])
+  @@index([company_id, status])
+  @@index([inspector_id])
+  @@index([reference_type, reference_id])
+}
+
+model inspection_templates {
+  id              String            @id @default(uuid())
+  company_id      String
+  name            String
+  description     String?
+  category        String            // INCOMING, IN_PROCESS, FINAL, RANDOM, CUSTOM
+  applicable_to   String[]          // PRODUCTS, ORDERS, BATCHES
+  passing_score   Float             @default(70)
+  is_active       Boolean           @default(true)
+  created_by      String
+  created_at      DateTime          @default(now())
+  updated_at      DateTime          @updatedAt
+  
+  companies       companies         @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  creator         users             @relation("TemplateCreator", fields: [created_by], references: [id])
+  checkpoints     template_checkpoints[]
+  inspections     quality_inspections[]
+  
+  @@index([company_id, is_active])
+}
+
+model template_checkpoints {
+  id              String            @id @default(uuid())
+  template_id     String
+  name            String
+  description     String?
+  evaluation_type EvaluationType
+  is_required     Boolean           @default(true)
+  order_index     Int
+  created_at      DateTime          @default(now())
+  
+  template        inspection_templates @relation(fields: [template_id], references: [id], onDelete: Cascade)
+  
+  @@index([template_id, order_index])
+}
+
+model inspection_checkpoints {
+  id              String            @id @default(uuid())
+  inspection_id   String
+  name            String
+  description     String?
+  evaluation_type EvaluationType
+  result          String?           // PASS, FAIL, or rating value
+  notes           String?
+  photos          String[]
+  order_index     Int
+  created_at      DateTime          @default(now())
+  
+  inspection      quality_inspections @relation(fields: [inspection_id], references: [id], onDelete: Cascade)
+  
+  @@index([inspection_id, order_index])
+}
+
+model defect_comments {
+  id              String            @id @default(uuid())
+  defect_id       String
+  user_id         String
+  comment         String
+  attachments     String[]
+  created_at      DateTime          @default(now())
+  
+  defect          quality_defects   @relation(fields: [defect_id], references: [id])
+  user            users             @relation("DefectCommentUser", fields: [user_id], references: [id])
+  
+  @@index([defect_id, created_at])
+}
+
+model inspection_metrics {
+  id                  String      @id @default(uuid())
+  company_id          String
+  period_start        DateTime
+  period_end          DateTime
+  total_inspections   Int         @default(0)
+  passed_inspections  Int         @default(0)
+  failed_inspections  Int         @default(0)
+  pass_rate           Float       @default(0)
+  total_defects       Int         @default(0)
+  critical_defects    Int         @default(0)
+  avg_inspection_time Float?
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  
+  companies           companies   @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  
+  @@unique([company_id, period_start, period_end])
+  @@index([company_id, period_start])
 }

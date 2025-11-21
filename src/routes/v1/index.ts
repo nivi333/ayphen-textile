@@ -6,6 +6,7 @@ import locationRoutes from './locationRoutes';
 import orderRoutes from './orderRoutes';
 import financialDocumentRoutes from './financialDocumentRoutes';
 import qualityRoutes from './qualityRoutes';
+import inspectionRoutes from './inspectionRoutes';
 import productRoutes from './productRoutes';
 import textileRoutes from './textileRoutes';
 import userRoutes from '../userRoutes';
@@ -32,6 +33,7 @@ router.get('/', (req, res) => {
       orders: '/orders',
       financialDocuments: '/financial-documents',
       quality: '/quality',
+      inspections: '/inspections',
       products: '/products',
       textile: '/textile',
       users: '/users',
@@ -58,6 +60,7 @@ router.use('/locations', locationRoutes);
 router.use('/orders', orderRoutes);
 router.use('/financial-documents', financialDocumentRoutes);
 router.use('/quality', qualityRoutes);
+router.use('/inspections', inspectionRoutes);
 router.use('/products', productRoutes);
 router.use('/textile', textileRoutes);
 router.use('/users', userRoutes);

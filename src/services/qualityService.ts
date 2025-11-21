@@ -1,4 +1,4 @@
-import { PrismaClient, CheckpointType, QCStatus, DefectCategory, DefectSeverity, ResolutionStatus, ComplianceType, ComplianceStatus } from '@prisma/client';
+import { PrismaClient, CheckpointType, QCStatus, DefectCategory, DefectSeverity, ResolutionStatus, ComplianceType, ComplianceStatus, InspectionType, InspectionStatus, DefectStatus, EvaluationType } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
 const globalPrisma = new PrismaClient();
