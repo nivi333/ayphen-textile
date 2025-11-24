@@ -70,6 +70,12 @@ export const CORE_MODULES: MenuItem[] = [
     path: '/customers', // Placeholder - routes to dashboard via click handler
   },
   {
+    key: 'users',
+    label: 'Users',
+    icon: TeamOutlined,
+    path: '/users',
+  },
+  {
     key: 'machinery',
     label: 'Machinery',
     icon: ToolOutlined,

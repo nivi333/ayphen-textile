@@ -92,7 +92,7 @@ export const config: Config = {
   jwt: {
     secret: process.env.JWT_SECRET || 'fallback-secret-key',
     refreshSecret: process.env.JWT_REFRESH_SECRET || 'fallback-refresh-secret',
-    expiresIn: process.env.JWT_EXPIRES_IN || '24h',
+    expiresIn: process.env.JWT_EXPIRES_IN || '3d',
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
   },
   api: {

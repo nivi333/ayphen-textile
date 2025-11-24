@@ -194,6 +194,47 @@ class CompanyService {
       return null; // Return null on error to avoid breaking UI
     }
   }
+
+  async inviteUser(companyId: string, inviteData: {
+    emailOrPhone: string;
+    role: 'ADMIN' | 'MANAGER' | 'EMPLOYEE';
+    companyId: string;
+    locationId?: string;
+  }): Promise<any> {
+    try {
+      const payload = {
+        emailOrPhone: inviteData.emailOrPhone,
+        role: inviteData.role,
+        companyId: inviteData.companyId,
+        locationId: inviteData.locationId,
+      };
+
+      console.log('=== COMPANY SERVICE INVITE DEBUG ===');
+      console.log('companyId parameter:', companyId);
+      console.log('inviteData parameter:', inviteData);
+      console.log('final payload:', payload);
+      console.log('API URL:', `${API_BASE_URL}/companies/${companyId}/invite`);
+
+      const response = await fetch(`${API_BASE_URL}/companies/${companyId}/invite`, {
+        method: 'POST',
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+      console.log('API response:', result);
+
+      if (!response.ok) {
+        console.error('API error response:', result);
+        throw new Error(result.message || 'Failed to invite user');
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Error inviting user:', error);
+      throw error;
+    }
+  }
 }
 
 export const companyService = new CompanyService();

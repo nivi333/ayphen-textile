@@ -552,7 +552,9 @@ class CompanyService {
 
       // CRITICAL: Validate companyId (tenantId) exists and is valid UUID
       if (!companyId || typeof companyId !== 'string' || companyId.trim().length === 0) {
-        throw new Error('Missing required field: companyId (tenantId) is required for company selection');
+        throw new Error(
+          'Missing required field: companyId (tenantId) is required for company selection'
+        );
       }
 
       if (!uuidRegex.test(companyId)) {
@@ -693,12 +695,13 @@ class CompanyService {
     }
   }
 
-  // Invite user to company (OWNER/ADMIN only)
+  // Invite user to company (OWNER/ADMIN only) - Creates invitation, not direct membership
   async inviteUser(
     userId: string,
     companyId: string,
-    email: string,
-    role: 'OWNER' | 'ADMIN' | 'MANAGER' | 'EMPLOYEE'
+    emailOrPhone: string,
+    role: 'ADMIN' | 'MANAGER' | 'EMPLOYEE',
+    locationId?: string
   ) {
     try {
       // Check permissions
@@ -715,16 +718,30 @@ class CompanyService {
         throw new Error('Access denied. Only OWNER or ADMIN can invite users.');
       }
 
-      // Find user by email
-      const userToInvite = await globalPrisma.users.findUnique({
-        where: { email },
+      // Find user by email or phone
+      const userToInvite = await globalPrisma.users.findFirst({
+        where: {
+          OR: [{ email: emailOrPhone }, { phone: emailOrPhone }],
+        },
       });
 
       if (!userToInvite) {
-        throw new Error('Invited user does not exist in the system');
+        throw new Error('User does not exist in the system');
       }
 
-      // Check if user is already in company
+      // Check if user already has a pending invitation
+      const existingInvitation = await globalPrisma.$queryRaw`
+        SELECT * FROM user_invitations 
+        WHERE user_id = ${userToInvite.id} 
+        AND company_id = ${companyId} 
+        AND status = 'PENDING'
+      `;
+
+      if (Array.isArray(existingInvitation) && existingInvitation.length > 0) {
+        throw new Error('User already has a pending invitation to this company');
+      }
+
+      // Check if user is already a member of this company
       const existingUserCompany = await globalPrisma.user_companies.findFirst({
         where: {
           user_id: userToInvite.id,
@@ -736,39 +753,24 @@ class CompanyService {
         throw new Error('User is already a member of this company');
       }
 
-      // Create user-company relationship
-      const newUserCompany = await globalPrisma.user_companies.create({
-        data: {
-          id: uuidv4(),
-          user_id: userToInvite.id,
-          company_id: companyId,
-          role,
-          updated_at: new Date(),
-        },
-        include: {
-          users: {
-            select: {
-              id: true,
-              first_name: true,
-              last_name: true,
-              email: true,
-              phone: true,
-            },
-          },
-        },
-      });
+      // Create invitation (not direct membership)
+      const invitation = await globalPrisma.$executeRaw`
+        INSERT INTO user_invitations (id, user_id, company_id, invited_by, role, location_id, status, created_at, updated_at)
+        VALUES (${uuidv4()}, ${userToInvite.id}, ${companyId}, ${userId}, ${role}, ${locationId || null}, 'PENDING', NOW(), NOW())
+      `;
 
       return {
-        id: newUserCompany.id,
-        userId: newUserCompany.user_id,
-        companyId: newUserCompany.company_id,
-        role: newUserCompany.role,
+        id: uuidv4(),
+        userId: userToInvite.id,
+        companyId: companyId,
+        role: role,
+        status: 'PENDING',
         user: {
-          id: newUserCompany.users.id,
-          firstName: newUserCompany.users.first_name,
-          lastName: newUserCompany.users.last_name,
-          email: newUserCompany.users.email,
-          phone: newUserCompany.users.phone,
+          id: userToInvite.id,
+          firstName: userToInvite.first_name,
+          lastName: userToInvite.last_name,
+          email: userToInvite.email,
+          phone: userToInvite.phone,
         },
       };
     } catch (error) {

@@ -5,13 +5,7 @@ import {
   Col,
   Card,
   Statistic,
-  Button,
-  Modal,
-  Form,
-  Input,
-  Select,
   Typography,
-  message,
 } from 'antd';
 import {
   BankOutlined,
@@ -25,6 +19,7 @@ import useAuth from '../contexts/AuthContext';
 import { Heading } from '../components/Heading';
 import { MainLayout } from '../components/layout';
 import { GradientButton } from '../components/ui';
+import UserInviteModal from '../components/users/UserInviteModal';
 import './DashboardPage.scss';
 import { COMPANY_TEXT } from '../constants/company';
 
@@ -32,14 +27,12 @@ const DashboardPage: React.FC = () => {
   const { currentCompany } = useAuth();
   const { setHeaderActions } = useHeader();
   const navigate = useNavigate();
-  const [inviteModalVisible, setInviteModalVisible] = useState(false);
-  const [inviting, setInviting] = useState(false);
-  const [form] = Form.useForm();
+  const [inviteDrawerVisible, setInviteDrawerVisible] = useState(false);
 
   // Set header actions when component mounts
   useEffect(() => {
     setHeaderActions(
-      <GradientButton size='small' onClick={() => setInviteModalVisible(true)}>
+      <GradientButton size='small' onClick={() => setInviteDrawerVisible(true)}>
         Invite Team Member
       </GradientButton>
     );
@@ -92,7 +85,7 @@ const DashboardPage: React.FC = () => {
       title: COMPANY_TEXT.INVITE_TEAM,
       icon: <TeamOutlined />,
       description: COMPANY_TEXT.INVITE_TEAM_DESC,
-      action: () => setInviteModalVisible(true),
+      action: () => setInviteDrawerVisible(true),
     },
     {
       title: COMPANY_TEXT.VIEW_REPORTS,
@@ -102,38 +95,9 @@ const DashboardPage: React.FC = () => {
     },
   ];
 
-  const handleInviteUser = async (values: any) => {
-    if (!currentCompany) return;
-
-    setInviting(true);
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/companies/${currentCompany.id}/invite`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          },
-          body: JSON.stringify({
-            email: values.email,
-            role: values.role,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to send invitation');
-      }
-
-      message.success('Invitation sent successfully!');
-      setInviteModalVisible(false);
-      form.resetFields();
-    } catch (error: any) {
-      message.error(error.message || 'Failed to send invitation');
-    } finally {
-      setInviting(false);
-    }
+  const handleInviteSuccess = () => {
+    // Refresh any data if needed
+    console.log('User invited successfully from dashboard');
   };
 
   return (
@@ -192,47 +156,11 @@ const DashboardPage: React.FC = () => {
           </div>
         </div>
 
-        <Modal
-          title='Invite Team Member'
-          open={inviteModalVisible}
-          onCancel={() => setInviteModalVisible(false)}
-          footer={null}
-          width={400}
-        >
-          <Form form={form} layout='vertical' onFinish={handleInviteUser}>
-            <Form.Item
-              name='email'
-              label='Email Address'
-              rules={[
-                { required: true, message: 'Please enter an email address' },
-                { type: 'email', message: 'Please enter a valid email address' },
-              ]}
-            >
-              <Input placeholder='user@example.com' />
-            </Form.Item>
-
-            <Form.Item
-              name='role'
-              label='Role'
-              rules={[{ required: true, message: 'Please select a role' }]}
-            >
-              <Select placeholder='Select role'>
-                <Select.Option value='EMPLOYEE'>Employee</Select.Option>
-                <Select.Option value='MANAGER'>Manager</Select.Option>
-                <Select.Option value='ADMIN'>Admin</Select.Option>
-              </Select>
-            </Form.Item>
-
-            <Form.Item className='text-right'>
-              <Button onClick={() => setInviteModalVisible(false)} style={{ marginRight: 8 }}>
-                Cancel
-              </Button>
-              <GradientButton size='small' htmlType='submit' loading={inviting}>
-                Send Invitation
-              </GradientButton>
-            </Form.Item>
-          </Form>
-        </Modal>
+        <UserInviteModal
+          visible={inviteDrawerVisible}
+          onClose={() => setInviteDrawerVisible(false)}
+          onSuccess={handleInviteSuccess}
+        />
       </div>
     </MainLayout>
   );

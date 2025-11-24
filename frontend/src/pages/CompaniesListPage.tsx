@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Button, Typography, message, Modal, Spin } from 'antd';
+import { Button, Typography, message, Modal, Spin, Badge } from 'antd';
 import { ExclamationCircleOutlined, BankOutlined, TeamOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../contexts/AuthContext';
@@ -44,6 +44,22 @@ export default function CompaniesListPage() {
   // Filter companies by role
   const ownerCompanies = companies?.filter(c => c.role === 'OWNER') || [];
   const roleCompanies = companies?.filter(c => c.role !== 'OWNER') || [];
+
+  // Role color mapping for ribbons
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case 'OWNER':
+        return '#1890ff'; // Blue
+      case 'ADMIN':
+        return '#722ed1'; // Purple
+      case 'MANAGER':
+        return '#52c41a'; // Green
+      case 'EMPLOYEE':
+        return '#fa8c16'; // Orange
+      default:
+        return '#d9d9d9'; // Gray
+    }
+  };
 
   if (isLoading || lazyLoading) {
     return (
@@ -176,6 +192,15 @@ export default function CompaniesListPage() {
                         </div>
                         <div className='companies-card-icon-industry'>
                           <span className='companies-card-industry'>{company.industry}</span>
+                          <Badge
+                            color={getRoleColor(company.role)}
+                            text={company.role}
+                            style={{
+                              margin: '0 8px',
+                              fontSize: '11px',
+                              fontWeight: 500,
+                            }}
+                          />
                           <TeamOutlined className='companies-card-team' />
                         </div>
                       </li>

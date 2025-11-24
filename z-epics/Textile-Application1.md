@@ -2099,3 +2099,43 @@ The combination of modern technology stack, AI-powered features, and industry-sp
 - **Multi-Location Support**: Comprehensive factory and warehouse management
 - **Real-Time Analytics**: Production metrics and business intelligence
 - **Mobile-First Design**: Shop floor and field operation optimization
+
+---
+
+## Recent Fixes & Improvements
+
+### **User Invite System Fix** ✅ *Nov 24, 2024*
+**Issue**: Company invite API was returning 401 Unauthorized error because companyId was not being properly sent from frontend.
+
+**Root Cause**: 
+- Frontend was using `userService.inviteUser()` which called `/api/v1/users/invite` 
+- Should use company-specific endpoint `/api/v1/companies/:companyId/invite`
+- Missing companyId in the request payload
+
+**Solution Implemented**:
+1. **Frontend Changes**:
+   - Added `inviteUser()` method to `companyService.ts`
+   - Updated `UserInviteDrawer.tsx` to use `companyService.inviteUser()` instead of `userService.inviteUser()`
+   - Added `currentCompany` from `useAuth()` context
+   - Include `companyId` in request payload: `{ email, role, companyId }`
+
+2. **Backend Changes**:
+   - Fixed route definition from `/invite` to `/:tenantId/invite` in `companyRoutes.ts`
+   - Updated controller to use `req.params.tenantId` instead of `req.tenantId` from JWT
+   - Added `companyId` to validation schema (optional)
+   - Added logging for debugging invite requests
+
+3. **API Flow**:
+   - User must be in company context (switched to company)
+   - Frontend sends: `POST /api/v1/companies/{companyId}/invite`
+   - Payload: `{ email: "user@example.com", role: "MANAGER", companyId: "company-uuid" }`
+   - Backend validates user has OWNER/ADMIN role for the company
+   - Creates user-company relationship with specified role
+
+**Testing**: ✅ Verified with API tests - invite now works correctly with proper company context and companyId logging.
+
+**Files Modified**:
+- `frontend/src/services/companyService.ts` - Added inviteUser method
+- `frontend/src/components/users/UserInviteDrawer.tsx` - Updated to use company service
+- `src/routes/v1/companyRoutes.ts` - Fixed route pattern
+- `src/controllers/companyController.ts` - Updated validation and logging

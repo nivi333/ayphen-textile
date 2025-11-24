@@ -63,8 +63,10 @@ const updateCompanySchema = Joi.object({
 });
 
 const inviteUserSchema = Joi.object({
-  email: Joi.string().email().required(),
+  emailOrPhone: Joi.string().required(),
   role: Joi.string().valid('ADMIN', 'MANAGER', 'EMPLOYEE').required(),
+  companyId: Joi.string().optional(),
+  locationId: Joi.string().optional(),
 });
 
 export class CompanyController {
@@ -285,9 +287,19 @@ export class CompanyController {
 
       const userId = req.userId!;
       const { tenantId } = req.params; // Get tenantId from route parameter
-      const { email, role } = value;
+      const { emailOrPhone, role, companyId, locationId } = value;
 
-      const invitation = await companyService.inviteUser(userId, tenantId, email, role);
+      // Log for debugging
+      logger.info('Invite user request:', {
+        userId,
+        tenantId,
+        companyId: companyId || 'not provided',
+        emailOrPhone,
+        role,
+        locationId,
+      });
+
+      const invitation = await companyService.inviteUser(userId, tenantId, emailOrPhone, role, locationId);
 
       res.status(201).json({
         success: true,
@@ -310,6 +322,7 @@ export class CompanyController {
       });
     }
   }
+
 
   /**
    * Check if company slug is available

@@ -26,8 +26,18 @@ export default function Sidebar() {
     const industry = (currentCompany?.industry as IndustryType) || 'Textile Manufacturing';
     const navigationItems = getNavigationByIndustry(industry);
 
+    // Filter navigation items based on user role
+    const userRole = currentCompany?.role;
+    const filteredItems = navigationItems.filter((item) => {
+      // Users menu is only visible to OWNER, ADMIN, and MANAGER
+      if (item.key === 'users') {
+        return userRole && ['OWNER', 'ADMIN', 'MANAGER'].includes(userRole);
+      }
+      return true; // Show all other items
+    });
+
     // Convert navigation config to Ant Design Menu format
-    return navigationItems.map((item) => ({
+    return filteredItems.map((item) => ({
       key: item.path,
       icon: <item.icon />,
       label: item.label,
@@ -37,7 +47,7 @@ export default function Sidebar() {
         label: child.label,
       })),
     }));
-  }, [currentCompany?.industry]);
+  }, [currentCompany?.industry, currentCompany?.role]);
 
   const handleLogout = () => {
     logout();

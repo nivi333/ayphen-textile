@@ -14,7 +14,6 @@ import {
 } from 'antd';
 import type { MenuProps, TableColumnsType } from 'antd';
 import {
-  UserAddOutlined,
   SearchOutlined,
   MoreOutlined,
   EditOutlined,
@@ -24,16 +23,23 @@ import {
   CheckCircleOutlined,
   FolderOpenOutlined,
 } from '@ant-design/icons';
+import useAuth from '../contexts/AuthContext';
+import { useHeader } from '../contexts/HeaderContext';
+import { MainLayout } from '../components/layout';
+import { Heading } from '../components/Heading';
+import { GradientButton } from '../components/ui';
 import { userService, User, UserFilters } from '../services/userService';
-import UserInviteDrawer from '../components/users/UserInviteDrawer';
+import UserInviteModal from '../components/users/UserInviteModal';
 import UserEditModal from '../components/users/UserEditModal';
 import './UsersListPage.scss';
 
 const { Option } = Select;
 
 const UsersListPage: React.FC = () => {
+  const { currentCompany } = useAuth();
+  const { setHeaderActions } = useHeader();
   const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [tableLoading, setTableLoading] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [inviteDrawerVisible, setInviteDrawerVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -52,7 +58,7 @@ const UsersListPage: React.FC = () => {
   });
 
   const fetchUsers = useCallback(async () => {
-    setLoading(true);
+    setTableLoading(true);
     try {
       const result = await userService.getCompanyUsers(filters);
       setUsers(result.users);
@@ -64,13 +70,25 @@ const UsersListPage: React.FC = () => {
     } catch (error: any) {
       message.error(error.message || 'Failed to fetch users');
     } finally {
-      setLoading(false);
+      setTableLoading(false);
     }
   }, [filters]);
 
   useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+    setHeaderActions(
+      <GradientButton onClick={() => setInviteDrawerVisible(true)} size='small'>
+        Invite User
+      </GradientButton>,
+    );
+
+    return () => setHeaderActions(null);
+  }, [setHeaderActions]);
+
+  useEffect(() => {
+    if (currentCompany) {
+      fetchUsers();
+    }
+  }, [fetchUsers, currentCompany]);
 
   const handleTableChange = (newPagination: any) => {
     setFilters({
@@ -399,126 +417,128 @@ const UsersListPage: React.FC = () => {
     },
   };
 
+  if (!currentCompany) {
+    return (
+      <MainLayout>
+        <div className='no-company-message'>Please select a company to manage users.</div>
+      </MainLayout>
+    );
+  }
+
   return (
-    <div className="users-list-page">
-      <div className="page-header">
-        <div className="header-left">
-          <h1>Team Members</h1>
-          <p className="subtitle">{pagination.total} members</p>
+    <MainLayout>
+      <div className='page-container'>
+        <div className='page-header-section'>
+          <Heading level={2} className='page-title'>
+            Team Members
+          </Heading>
         </div>
-        <div className="header-right">
-          <Button
-            type="primary"
-            icon={<UserAddOutlined />}
-            onClick={() => setInviteDrawerVisible(true)}
-          >
-            Invite User
-          </Button>
-        </div>
-      </div>
 
-      <div className="filters-section">
-        <Space size="middle" wrap>
-          <Input
-            placeholder="Search by name, email, or role"
-            prefix={<SearchOutlined />}
-            style={{ width: 300 }}
-            allowClear
-            onChange={(e) => handleSearch(e.target.value)}
-          />
-          <Select
-            placeholder="Filter by role"
-            style={{ width: 150 }}
-            allowClear
-            onChange={handleRoleFilter}
-          >
-            <Option value="OWNER">Owner</Option>
-            <Option value="ADMIN">Admin</Option>
-            <Option value="MANAGER">Manager</Option>
-            <Option value="EMPLOYEE">Employee</Option>
-          </Select>
-          <Select
-            placeholder="Filter by status"
-            style={{ width: 150 }}
-            allowClear
-            onChange={handleStatusFilter}
-          >
-            <Option value="active">Active</Option>
-            <Option value="inactive">Inactive</Option>
-          </Select>
-        </Space>
-      </div>
-
-      {selectedRowKeys.length > 0 && (
-        <div className="bulk-actions">
-          <Space>
-            <span className="selected-count">
-              {selectedRowKeys.length} users selected
-            </span>
-            <Button size="small" onClick={handleBulkRoleChange}>
-              Change Role
-            </Button>
-            <Button size="small" onClick={() => handleBulkStatusChange(true)}>
-              Activate
-            </Button>
-            <Button size="small" onClick={() => handleBulkStatusChange(false)}>
-              Deactivate
-            </Button>
-            <Button size="small" danger onClick={handleBulkDelete}>
-              Remove
-            </Button>
-            <Button size="small" type="text" onClick={() => setSelectedRowKeys([])}>
-              Clear Selection
-            </Button>
+        <div className='filters-section'>
+          <Space size='middle'>
+            <Input
+              placeholder='Search by name, email, or role'
+              prefix={<SearchOutlined />}
+              style={{ width: 300 }}
+              allowClear
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+            <Select
+              placeholder='Filter by role'
+              style={{ width: 150 }}
+              allowClear
+              onChange={handleRoleFilter}
+            >
+              <Option value='OWNER'>Owner</Option>
+              <Option value='ADMIN'>Admin</Option>
+              <Option value='MANAGER'>Manager</Option>
+              <Option value='EMPLOYEE'>Employee</Option>
+            </Select>
+            <Select
+              placeholder='Filter by status'
+              style={{ width: 150 }}
+              allowClear
+              onChange={handleStatusFilter}
+            >
+              <Option value='active'>Active</Option>
+              <Option value='inactive'>Inactive</Option>
+            </Select>
           </Space>
         </div>
-      )}
 
-      <Table
-        columns={columns}
-        dataSource={users}
-        rowKey="id"
-        loading={loading}
-        pagination={pagination}
-        onChange={handleTableChange}
-        rowSelection={rowSelection}
-        locale={{
-          emptyText: (
-            <Empty
-              image={<FolderOpenOutlined style={{ fontSize: 48, color: '#d9d9d9' }} />}
-              description="No team members found"
-            >
-              <Button type="primary" onClick={() => setInviteDrawerVisible(true)}>
-                Invite Your First User
+        {selectedRowKeys.length > 0 && (
+          <div className='bulk-actions'>
+            <Space>
+              <span className='selected-count'>
+                {selectedRowKeys.length} users selected
+              </span>
+              <Button size='small' onClick={handleBulkRoleChange}>
+                Change Role
               </Button>
-            </Empty>
-          ),
-        }}
-      />
+              <Button size='small' onClick={() => handleBulkStatusChange(true)}>
+                Activate
+              </Button>
+              <Button size='small' onClick={() => handleBulkStatusChange(false)}>
+                Deactivate
+              </Button>
+              <Button size='small' danger onClick={handleBulkDelete}>
+                Remove
+              </Button>
+              <Button size='small' type='text' onClick={() => setSelectedRowKeys([])}>
+                Clear Selection
+              </Button>
+            </Space>
+          </div>
+        )}
 
-      <UserInviteDrawer
-        visible={inviteDrawerVisible}
-        onClose={() => setInviteDrawerVisible(false)}
-        onSuccess={() => {
-          setInviteDrawerVisible(false);
-          fetchUsers();
-        }}
-      />
+        <div className='table-container'>
+          <Table
+            columns={columns}
+            dataSource={users}
+            rowKey='id'
+            loading={tableLoading}
+            pagination={pagination}
+            onChange={handleTableChange}
+            rowSelection={rowSelection}
+            locale={{
+              emptyText: (
+                <Empty
+                  image={<FolderOpenOutlined style={{ fontSize: 48, color: '#d9d9d9' }} />}
+                  description='No team members found'
+                >
+                  <GradientButton onClick={() => setInviteDrawerVisible(true)} size='small'>
+                    Invite Your First User
+                  </GradientButton>
+                </Empty>
+              ),
+            }}
+          />
+        </div>
 
-      <UserEditModal
-        visible={editModalVisible}
-        user={selectedUser}
-        onClose={() => {
-          setEditModalVisible(false);
-          setSelectedUser(null);
-        }}
-        onSuccess={() => {
-          setEditModalVisible(false);
-          setSelectedUser(null);
-          fetchUsers();
-        }}
-      />
-    </div>
+        <UserInviteModal
+          visible={inviteDrawerVisible}
+          onClose={() => setInviteDrawerVisible(false)}
+          onSuccess={() => {
+            setInviteDrawerVisible(false);
+            fetchUsers();
+          }}
+        />
+
+        <UserEditModal
+          visible={editModalVisible}
+          user={selectedUser}
+          onClose={() => {
+            setEditModalVisible(false);
+            setSelectedUser(null);
+          }}
+          onSuccess={() => {
+            setEditModalVisible(false);
+            setSelectedUser(null);
+            fetchUsers();
+          }}
+        />
+      </div>
+    </MainLayout>
   );
 };
 
