@@ -90,6 +90,12 @@ router.get(
   (req, res) => qualityController.getComplianceReports(req, res)
 );
 
+router.put(
+  '/compliance/:id',
+  requireRole(['OWNER', 'ADMIN']),
+  (req, res) => qualityController.updateComplianceReport(req, res)
+);
+
 router.delete(
   '/compliance/:id',
   requireRole(['OWNER', 'ADMIN']),

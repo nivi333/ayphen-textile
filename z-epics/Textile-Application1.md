@@ -36,6 +36,8 @@
 - **E2E Testing**: Playwright (planned)
 
 ## Project Development Standards
+
+### **UI/UX Standards**
 - Reuse existing components  
 - Follow theme variables (primary: #7b5fc9, accent: #a2d8e5)
 - SCSS only, no inline styles
@@ -46,6 +48,23 @@
 - Forms: 5-20 fields = drawer, <5 = modal, >20 = page
 - **MainLayout Requirement**: ALL post-company-selection screens MUST be wrapped in `MainLayout` component to display sidebar and header. This is mandatory for consistent navigation experience.
 - **Sidebar Configuration**: All screens (implemented and future placeholders) must be added to sidebar navigation in `navigationConfig.ts`. Non-implemented screens should route to `/dashboard` temporarily.
+
+### **Multi-Tenant Security & Data Isolation (CRITICAL)**
+- **MANDATORY**: Every API endpoint and service method MUST filter data by `company_id` (tenantId)
+- **Backend Services**: All `get*`, `create*`, `update*`, `delete*` methods MUST accept `companyId` as first parameter
+- **Controllers**: All protected routes MUST use `req.tenantId` from JWT token for company context
+- **Database Queries**: ALL queries MUST include `where: { company_id: companyId }` filter
+- **Role-Based Access**: Combine company filtering with role checks using `requireRole(['OWNER', 'ADMIN', 'MANAGER'])` middleware
+- **Frontend**: All API calls post-company-selection MUST include company context from auth token
+- **No Cross-Tenant Data Leaks**: Users can ONLY see/modify data from companies they have access to
+- **ID Generation**: Use globally unique IDs (to satisfy DB constraints) but always filter by company when querying
+- **Audit Trail**: Log all company-scoped operations with userId, tenantId, and action for security auditing
+
+### **API Design Patterns**
+- **Company Context**: Use current company from JWT (`req.tenantId`) instead of requiring it in URL params
+- **Invite Flow**: POST `/api/v1/companies/invite` uses logged-in user's current company automatically
+- **Error Messages**: Provide specific, actionable error messages (e.g., "Invited user does not exist in the system" not "Invalid token")
+- **Validation**: Check company context before role permissions in middleware chain
 ---
 
 ## 📋 EPIC Overview
@@ -796,28 +815,7 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
   - Template methods: createTemplate, getTemplates, getTemplateById, deleteTemplate ✅
   - Checkpoint methods: updateCheckpoint ✅
   - Metrics methods: getMetrics ✅
-
-- [ ] **QualityDashboardPage** (`frontend/src/pages/QualityDashboardPage.tsx`) (Optional - Can be implemented later)
-  - **Header**: "Quality Control" + "New Inspection" button (top-right)
-  - **KPI Cards Row**:
-    - Total Inspections (this month)
-    - Pass Rate % (with trend indicator)
-    - Active Defects (critical/high priority count)
-    - Average Inspection Time
-  - **Quality Metrics Chart**:
-    - Line chart showing pass/fail rate over time
-    - Bar chart for defect categories
-    - Pie chart for inspection status distribution
-  - **Recent Inspections Table**:
-    - Columns: ID, Product/Order, Inspector, Date, Status, Result, Actions
-    - Quick filters: Status (All, Passed, Failed, Pending)
-    - Date range filter
-    - Search by product/order/inspector
-  - **Active Defects Widget**:
-    - List of open defects with severity badges
-    - Quick action to view/resolve defects
-  - **Responsive Design**: Mobile-optimized layout
-  - **Real-time Updates**: Auto-refresh when inspections are completed
+ 
 
 - [ ] **InspectionsListPage** (`frontend/src/pages/InspectionsListPage.tsx`)
   - **Header**: "Quality Inspections" + "New Inspection" button

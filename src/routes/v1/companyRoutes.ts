@@ -33,8 +33,9 @@ router.put('/:tenantId',
   companyController.updateCompany.bind(companyController)
 );
 
-// Invite user to company (OWNER/ADMIN only)
-router.post('/:tenantId/invite', 
+// Invite user to current company (OWNER/ADMIN only)
+// Uses tenantId from JWT token automatically
+router.post('/invite', 
   requireRole(['OWNER', 'ADMIN']), 
   companyController.inviteUser.bind(companyController)
 );

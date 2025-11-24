@@ -83,11 +83,25 @@ export const requireTenantContext = (
 
 /**
  * Middleware to check user role within tenant
+ * Requires that user has switched to a company context (tenantId in JWT)
  */
 export const requireRole = (allowedRoles: string[]) => {
   return (req: Request, res: Response, next: NextFunction): void => {
+    // First check if user has a tenant context
+    if (!req.tenantId) {
+      res.status(400).json({ 
+        success: false, 
+        message: 'Company context required. Please switch to a company first.' 
+      });
+      return;
+    }
+    
+    // Then check if user has the required role
     if (!req.userRole || !allowedRoles.includes(req.userRole)) {
-      res.status(403).json({ success: false, message: 'Insufficient permissions' });
+      res.status(403).json({ 
+        success: false, 
+        message: `Insufficient permissions. Required role: ${allowedRoles.join(' or ')}` 
+      });
       return;
     }
     next();

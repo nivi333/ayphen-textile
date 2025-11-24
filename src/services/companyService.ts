@@ -720,7 +720,7 @@ class CompanyService {
       });
 
       if (!userToInvite) {
-        throw new Error('User with this email does not exist');
+        throw new Error('Invited user does not exist in the system');
       }
 
       // Check if user is already in company

@@ -449,6 +449,39 @@ export class QualityController {
     }
   }
 
+  // Update Compliance Report
+  async updateComplianceReport(req: Request, res: Response): Promise<void> {
+    try {
+      const { error, value } = updateComplianceReportSchema.validate(req.body);
+      if (error) {
+        res.status(400).json({
+          success: false,
+          message: 'Validation error',
+          errors: error.details.map(d => d.message),
+        });
+        return;
+      }
+
+      const tenantId = req.tenantId!;
+      const { id } = req.params;
+
+      const report = await qualityService.updateComplianceReport(tenantId, id, value);
+
+      res.json({
+        success: true,
+        message: 'Compliance report updated successfully',
+        data: report,
+      });
+    } catch (error: any) {
+      logger.error('Error updating compliance report:', error);
+      const statusCode = error.message === 'Report not found' ? 404 : 500;
+      res.status(statusCode).json({
+        success: false,
+        message: error.message || 'Failed to update compliance report',
+      });
+    }
+  }
+
   // Delete Compliance Report
   async deleteComplianceReport(req: Request, res: Response): Promise<void> {
     try {

@@ -269,7 +269,8 @@ export class CompanyController {
 
   /**
    * Invite user to company
-   * POST /api/v1/companies/:tenantId/invite
+   * POST /api/v1/companies/invite
+   * Uses current company from JWT token (req.tenantId)
    */
   async inviteUser(req: Request, res: Response): Promise<void> {
     try {
@@ -284,24 +285,24 @@ export class CompanyController {
       }
 
       const userId = req.userId!;
-      const { tenantId } = req.params;
+      const tenantId = req.tenantId!; // Get current company from JWT token
       const { email, role } = value;
 
       const invitation = await companyService.inviteUser(userId, tenantId, email, role);
 
       res.status(201).json({
         success: true,
-        message: 'User invited successfully',
+        message: 'User invited successfully to your company',
         data: invitation,
       });
     } catch (error: any) {
       logger.error('Error inviting user:', error);
       const statusCode =
-        error.message === 'Insufficient permissions to invite users'
+        error.message === 'Access denied. Only OWNER or ADMIN can invite users.'
           ? 403
-          : error.message === 'User not found'
+          : error.message === 'Invited user does not exist in the system'
             ? 404
-            : error.message === 'User is already part of this company'
+            : error.message === 'User is already a member of this company'
               ? 409
               : 500;
       res.status(statusCode).json({

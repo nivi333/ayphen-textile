@@ -23,18 +23,32 @@ const QualityCheckpointFormDrawer: React.FC<QualityCheckpointFormDrawerProps> = 
   const [loading, setLoading] = React.useState(false);
 
   useEffect(() => {
-    if (visible && checkpoint) {
-      form.setFieldsValue({
-        checkpointName: checkpoint.checkpointName,
-        checkpointType: checkpoint.checkpointType,
-        inspectorName: checkpoint.inspectorName,
-        inspectionDate: checkpoint.inspectionDate ? dayjs(checkpoint.inspectionDate) : null,
-        status: checkpoint.status,
-        overallScore: checkpoint.overallScore,
-        notes: checkpoint.notes,
-      });
-    } else if (visible) {
-      form.resetFields();
+    if (visible) {
+      if (checkpoint) {
+        // Editing existing checkpoint
+        form.setFieldsValue({
+          checkpointName: checkpoint.checkpointName,
+          checkpointType: checkpoint.checkpointType,
+          inspectorName: checkpoint.inspectorName,
+          inspectionDate: checkpoint.inspectionDate ? dayjs(checkpoint.inspectionDate) : null,
+          status: checkpoint.status,
+          overallScore: checkpoint.overallScore,
+          notes: checkpoint.notes,
+        });
+      } else {
+        // Creating new checkpoint - completely reset form
+        form.resetFields();
+        // Explicitly clear all fields to prevent stale data
+        form.setFieldsValue({
+          checkpointName: undefined,
+          checkpointType: undefined,
+          inspectorName: undefined,
+          inspectionDate: undefined,
+          status: undefined,
+          overallScore: undefined,
+          notes: undefined,
+        });
+      }
     }
   }, [visible, checkpoint, form]);
 

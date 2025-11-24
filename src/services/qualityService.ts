@@ -46,6 +46,18 @@ interface CreateComplianceReportData {
   documentUrl?: string;
 }
 
+interface UpdateComplianceReportData {
+  reportType?: ComplianceType;
+  reportDate?: Date;
+  auditorName?: string;
+  certification?: string;
+  validityPeriod?: string;
+  status?: ComplianceStatus;
+  findings?: string;
+  recommendations?: string;
+  documentUrl?: string;
+}
+
 export class QualityService {
   private prisma: PrismaClient;
 
@@ -53,10 +65,11 @@ export class QualityService {
     this.prisma = client;
   }
 
-  // Generate checkpoint ID (QC001, QC002, etc.)
+  // Generate checkpoint ID (QC001, QC002, etc.) - GLOBALLY UNIQUE but company-scoped
   private async generateCheckpointId(companyId: string): Promise<string> {
+    // Find the last checkpoint GLOBALLY to ensure unique IDs across all companies
+    // This prevents duplicate checkpoint_id violations in the database
     const lastCheckpoint = await this.prisma.quality_checkpoints.findFirst({
-      where: { company_id: companyId },
       orderBy: { created_at: 'desc' },
       select: { checkpoint_id: true },
     });
@@ -70,10 +83,10 @@ export class QualityService {
     return `QC${nextNumber.toString().padStart(3, '0')}`;
   }
 
-  // Generate defect ID (DEF001, DEF002, etc.)
+  // Generate defect ID (DEF001, DEF002, etc.) - GLOBALLY UNIQUE
   private async generateDefectId(companyId: string): Promise<string> {
+    // Find the last defect globally since defect_id has @unique constraint
     const lastDefect = await this.prisma.quality_defects.findFirst({
-      where: { company_id: companyId },
       orderBy: { created_at: 'desc' },
       select: { defect_id: true },
     });
@@ -87,10 +100,10 @@ export class QualityService {
     return `DEF${nextNumber.toString().padStart(3, '0')}`;
   }
 
-  // Generate metric ID (QM001, QM002, etc.)
+  // Generate metric ID (QM001, QM002, etc.) - GLOBALLY UNIQUE
   private async generateMetricId(companyId: string): Promise<string> {
+    // Find the last metric globally since metric_id has @unique constraint
     const lastMetric = await this.prisma.quality_metrics.findFirst({
-      where: { company_id: companyId },
       orderBy: { created_at: 'desc' },
       select: { metric_id: true },
     });
@@ -104,10 +117,10 @@ export class QualityService {
     return `QM${nextNumber.toString().padStart(3, '0')}`;
   }
 
-  // Generate compliance report ID (CR001, CR002, etc.)
+  // Generate compliance report ID (CR001, CR002, etc.) - GLOBALLY UNIQUE
   private async generateReportId(companyId: string): Promise<string> {
+    // Find the last report globally since report_id has @unique constraint
     const lastReport = await this.prisma.compliance_reports.findFirst({
-      where: { company_id: companyId },
       orderBy: { created_at: 'desc' },
       select: { report_id: true },
     });
@@ -162,7 +175,7 @@ export class QualityService {
     };
   }
 
-  // Get Checkpoints
+  // Get Checkpoints - FILTERED BY COMPANY for multi-tenant isolation
   async getCheckpoints(companyId: string, filters?: {
     checkpointType?: CheckpointType;
     status?: QCStatus;
@@ -579,6 +592,46 @@ export class QualityService {
         company_id: companyId,
       },
     });
+  }
+
+  // Update Compliance Report
+  async updateComplianceReport(companyId: string, reportId: string, data: UpdateComplianceReportData) {
+    const now = new Date();
+
+    const report = await this.prisma.compliance_reports.update({
+      where: {
+        id: reportId,
+        company_id: companyId,
+      },
+      data: {
+        report_type: data.reportType,
+        report_date: data.reportDate,
+        auditor_name: data.auditorName,
+        certification: data.certification ?? null,
+        validity_period: data.validityPeriod ?? null,
+        status: data.status,
+        findings: data.findings ?? null,
+        recommendations: data.recommendations ?? null,
+        document_url: data.documentUrl ?? null,
+        updated_at: now,
+      },
+    });
+
+    return {
+      id: report.id,
+      reportId: report.report_id,
+      reportType: report.report_type,
+      reportDate: report.report_date,
+      auditorName: report.auditor_name,
+      certification: report.certification ?? undefined,
+      validityPeriod: report.validity_period ?? undefined,
+      status: report.status,
+      findings: report.findings ?? undefined,
+      recommendations: report.recommendations ?? undefined,
+      documentUrl: report.document_url ?? undefined,
+      createdAt: report.created_at,
+      updatedAt: report.updated_at,
+    };
   }
 
   // Delete Compliance Report

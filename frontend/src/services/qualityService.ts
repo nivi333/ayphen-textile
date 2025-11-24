@@ -275,6 +275,22 @@ class QualityService {
     return result.data;
   }
 
+  async updateComplianceReport(id: string, data: Partial<CreateComplianceReportData>) {
+    const response = await fetch(`${API_BASE_URL}/quality/compliance/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to update compliance report');
+    }
+
+    const result = await response.json();
+    return result.data;
+  }
+
   async deleteComplianceReport(id: string) {
     const response = await fetch(`${API_BASE_URL}/quality/compliance/${id}`, {
       method: 'DELETE',

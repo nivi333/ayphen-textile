@@ -70,8 +70,8 @@ const ComplianceReportFormDrawer: React.FC<ComplianceReportFormDrawerProps> = ({
       };
 
       if (isEditing) {
-        // Note: Update endpoint not implemented in service yet
-        message.warning('Update functionality not yet implemented');
+        await qualityService.updateComplianceReport(report.id, data);
+        message.success('Compliance report updated successfully');
       } else {
         await qualityService.createComplianceReport(data);
         message.success('Compliance report created successfully');
@@ -135,125 +135,97 @@ const ComplianceReportFormDrawer: React.FC<ComplianceReportFormDrawerProps> = ({
         </div>
       }
     >
-      <Form
-        form={form}
-        layout="vertical"
-        className="compliance-report-form"
-      >
+      <Form form={form} layout='vertical' className='compliance-report-form'>
         {/* Section 1: Report Information */}
-        <div className="form-section">
-          <h3 className="section-title">Report Information</h3>
-
+        <div className='form-section'>
           <Form.Item
-            name="reportType"
-            label="Report Type"
+            name='reportType'
+            label='Report Type'
             rules={[{ required: true, message: 'Please select report type' }]}
           >
-            <Select placeholder="Select report type">
-              <Select.Option value="ISO_9001">ISO 9001 - Quality Management</Select.Option>
-              <Select.Option value="ISO_14001">ISO 14001 - Environmental Management</Select.Option>
-              <Select.Option value="OEKO_TEX">OEKO-TEX - Textile Safety</Select.Option>
-              <Select.Option value="GOTS">GOTS - Organic Textile Standard</Select.Option>
-              <Select.Option value="WRAP">WRAP - Worldwide Responsible Accredited Production</Select.Option>
-              <Select.Option value="SA8000">SA8000 - Social Accountability</Select.Option>
-              <Select.Option value="BSCI">BSCI - Business Social Compliance Initiative</Select.Option>
-              <Select.Option value="SEDEX">SEDEX - Supplier Ethical Data Exchange</Select.Option>
+            <Select placeholder='Select report type'>
+              <Select.Option value='ISO_9001'>ISO 9001 - Quality Management</Select.Option>
+              <Select.Option value='ISO_14001'>ISO 14001 - Environmental Management</Select.Option>
+              <Select.Option value='OEKO_TEX'>OEKO-TEX - Textile Safety</Select.Option>
+              <Select.Option value='GOTS'>GOTS - Organic Textile Standard</Select.Option>
+              <Select.Option value='WRAP'>
+                WRAP - Worldwide Responsible Accredited Production
+              </Select.Option>
+              <Select.Option value='SA8000'>SA8000 - Social Accountability</Select.Option>
+              <Select.Option value='BSCI'>
+                BSCI - Business Social Compliance Initiative
+              </Select.Option>
+              <Select.Option value='SEDEX'>SEDEX - Supplier Ethical Data Exchange</Select.Option>
             </Select>
           </Form.Item>
 
           <Form.Item
-            name="reportDate"
-            label="Report Date"
+            name='reportDate'
+            label='Report Date'
             rules={[{ required: true, message: 'Please select report date' }]}
           >
-            <DatePicker style={{ width: '100%' }} format="DD MMM YYYY" />
+            <DatePicker style={{ width: '100%' }} format='DD MMM YYYY' />
           </Form.Item>
 
           <Form.Item
-            name="auditorName"
-            label="Auditor Name"
+            name='auditorName'
+            label='Auditor Name'
             rules={[{ required: true, message: 'Please enter auditor name' }]}
           >
-            <Input placeholder="Enter auditor or auditing company name" />
+            <Input placeholder='Enter auditor or auditing company name' />
           </Form.Item>
         </div>
 
         {/* Section 2: Certification Details */}
-        <div className="form-section">
-          <h3 className="section-title">Certification Details</h3>
+        <div className='form-section'>
+          <Form.Item name='certification' label='Certification Number'>
+            <Input placeholder='Enter certification number (if applicable)' />
+          </Form.Item>
 
-          <Form.Item
-            name="certification"
-            label="Certification Number"
-          >
-            <Input placeholder="Enter certification number (if applicable)" />
+          <Form.Item name='validityPeriod' label='Validity Period'>
+            <Input placeholder='e.g., 1 year, 3 years, 2024-2027' />
           </Form.Item>
 
           <Form.Item
-            name="validityPeriod"
-            label="Validity Period"
-          >
-            <Input placeholder="e.g., 1 year, 3 years, 2024-2027" />
-          </Form.Item>
-
-          <Form.Item
-            name="status"
-            label="Compliance Status"
+            name='status'
+            label='Compliance Status'
             rules={[{ required: true, message: 'Please select status' }]}
           >
-            <Select placeholder="Select compliance status">
-              <Select.Option value="COMPLIANT">Compliant</Select.Option>
-              <Select.Option value="NON_COMPLIANT">Non-Compliant</Select.Option>
-              <Select.Option value="PENDING_REVIEW">Pending Review</Select.Option>
-              <Select.Option value="EXPIRED">Expired</Select.Option>
+            <Select placeholder='Select compliance status'>
+              <Select.Option value='COMPLIANT'>Compliant</Select.Option>
+              <Select.Option value='NON_COMPLIANT'>Non-Compliant</Select.Option>
+              <Select.Option value='PENDING_REVIEW'>Pending Review</Select.Option>
+              <Select.Option value='EXPIRED'>Expired</Select.Option>
             </Select>
           </Form.Item>
         </div>
 
         {/* Section 3: Findings & Recommendations */}
-        <div className="form-section">
-          <h3 className="section-title">Findings & Recommendations</h3>
-
-          <Form.Item
-            name="findings"
-            label="Audit Findings"
-          >
+        <div className='form-section'>
+          <Form.Item name='findings' label='Audit Findings'>
             <TextArea
               rows={4}
-              placeholder="Enter key findings from the audit..."
+              placeholder='Enter key findings from the audit...'
               maxLength={1000}
               showCount
             />
           </Form.Item>
 
-          <Form.Item
-            name="recommendations"
-            label="Recommendations"
-          >
+          <Form.Item name='recommendations' label='Recommendations'>
             <TextArea
               rows={4}
-              placeholder="Enter recommendations for improvement..."
+              placeholder='Enter recommendations for improvement...'
               maxLength={1000}
               showCount
             />
           </Form.Item>
 
-          <Form.Item
-            label="Upload Document"
-          >
-            <Upload
-              beforeUpload={beforeUpload}
-              maxCount={1}
-              accept=".pdf"
-            >
-              <Button icon={<UploadOutlined />}>
-                Upload Report Document (PDF, max 5MB)
-              </Button>
+          <Form.Item label='Upload Document'>
+            <Upload beforeUpload={beforeUpload} maxCount={1} accept='.pdf'>
+              <Button icon={<UploadOutlined />}>Upload Report Document (PDF, max 5MB)</Button>
             </Upload>
             {documentUrl && (
-              <div style={{ marginTop: 8, color: '#52c41a' }}>
-                ✓ Document uploaded successfully
-              </div>
+              <div style={{ marginTop: 8, color: '#52c41a' }}>✓ Document uploaded successfully</div>
             )}
           </Form.Item>
         </div>
