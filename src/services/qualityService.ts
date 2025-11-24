@@ -175,60 +175,73 @@ export class QualityService {
     };
   }
 
-  // Get Checkpoints - FILTERED BY COMPANY for multi-tenant isolation
+  /* 
+   * Get Checkpoints - FILTERED BY COMPANY for multi-tenant isolation
+   * FIX: Returns empty array if table doesn't exist (new company scenario)
+   * This prevents 500 errors when quality tables haven't been migrated yet
+   */
   async getCheckpoints(companyId: string, filters?: {
     checkpointType?: CheckpointType;
     status?: QCStatus;
     startDate?: Date;
     endDate?: Date;
   }) {
-    const where: any = { company_id: companyId };
+    try {
+      const where: any = { company_id: companyId };
 
-    if (filters?.checkpointType) {
-      where.checkpoint_type = filters.checkpointType;
-    }
-
-    if (filters?.status) {
-      where.status = filters.status;
-    }
-
-    if (filters?.startDate || filters?.endDate) {
-      where.inspection_date = {};
-      if (filters.startDate) {
-        where.inspection_date.gte = filters.startDate;
+      if (filters?.checkpointType) {
+        where.checkpoint_type = filters.checkpointType;
       }
-      if (filters.endDate) {
-        where.inspection_date.lte = filters.endDate;
+
+      if (filters?.status) {
+        where.status = filters.status;
       }
+
+      if (filters?.startDate || filters?.endDate) {
+        where.inspection_date = {};
+        if (filters.startDate) {
+          where.inspection_date.gte = filters.startDate;
+        }
+        if (filters.endDate) {
+          where.inspection_date.lte = filters.endDate;
+        }
+      }
+
+      const checkpoints = await this.prisma.quality_checkpoints.findMany({
+        where,
+        orderBy: { created_at: 'desc' },
+        include: {
+          defects: true,
+          metrics: true,
+        },
+      });
+
+      return checkpoints.map(cp => ({
+        id: cp.id,
+        checkpointId: cp.checkpoint_id,
+        companyId: cp.company_id,
+        checkpointType: cp.checkpoint_type,
+        checkpointName: cp.checkpoint_name,
+        inspectorName: cp.inspector_name,
+        inspectionDate: cp.inspection_date,
+        status: cp.status,
+        overallScore: cp.overall_score ?? undefined,
+        notes: cp.notes ?? undefined,
+        locationId: cp.location_id ?? undefined,
+        orderId: cp.order_id ?? undefined,
+        defectCount: cp.defects.length,
+        metricCount: cp.metrics.length,
+        createdAt: cp.created_at,
+        updatedAt: cp.updated_at,
+      }));
+    } catch (error: any) {
+      // If table doesn't exist, return empty array instead of throwing error
+      if (error.code === 'P2021' || error.message?.includes('does not exist')) {
+        console.warn(`Quality checkpoints table not found for company ${companyId}. Returning empty array.`);
+        return [];
+      }
+      throw error;
     }
-
-    const checkpoints = await this.prisma.quality_checkpoints.findMany({
-      where,
-      orderBy: { created_at: 'desc' },
-      include: {
-        defects: true,
-        metrics: true,
-      },
-    });
-
-    return checkpoints.map(cp => ({
-      id: cp.id,
-      checkpointId: cp.checkpoint_id,
-      companyId: cp.company_id,
-      checkpointType: cp.checkpoint_type,
-      checkpointName: cp.checkpoint_name,
-      inspectorName: cp.inspector_name,
-      inspectionDate: cp.inspection_date,
-      status: cp.status,
-      overallScore: cp.overall_score ?? undefined,
-      notes: cp.notes ?? undefined,
-      locationId: cp.location_id ?? undefined,
-      orderId: cp.order_id ?? undefined,
-      defectCount: cp.defects.length,
-      metricCount: cp.metrics.length,
-      createdAt: cp.created_at,
-      updatedAt: cp.updated_at,
-    }));
   }
 
   // Get Checkpoint by ID
@@ -346,56 +359,69 @@ export class QualityService {
     };
   }
 
-  // Get Defects
+  /* 
+   * Get Defects - FILTERED BY COMPANY for multi-tenant isolation
+   * FIX: Returns empty array if table doesn't exist (new company scenario)
+   * This prevents 500 errors when quality tables haven't been migrated yet
+   */
   async getDefects(companyId: string, filters?: {
     defectCategory?: DefectCategory;
     severity?: DefectSeverity;
     resolutionStatus?: ResolutionStatus;
   }) {
-    const where: any = { company_id: companyId };
+    try {
+      const where: any = { company_id: companyId };
 
-    if (filters?.defectCategory) {
-      where.defect_category = filters.defectCategory;
-    }
+      if (filters?.defectCategory) {
+        where.defect_category = filters.defectCategory;
+      }
 
-    if (filters?.severity) {
-      where.severity = filters.severity;
-    }
+      if (filters?.severity) {
+        where.severity = filters.severity;
+      }
 
-    if (filters?.resolutionStatus) {
-      where.resolution_status = filters.resolutionStatus;
-    }
+      if (filters?.resolutionStatus) {
+        where.resolution_status = filters.resolutionStatus;
+      }
 
-    const defects = await this.prisma.quality_defects.findMany({
-      where,
-      orderBy: { created_at: 'desc' },
-      include: {
-        checkpoint: {
-          select: {
-            checkpoint_id: true,
-            checkpoint_name: true,
+      const defects = await this.prisma.quality_defects.findMany({
+        where,
+        orderBy: { created_at: 'desc' },
+        include: {
+          checkpoint: {
+            select: {
+              checkpoint_id: true,
+              checkpoint_name: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    return defects.map(d => ({
-      id: d.id,
-      defectId: d.defect_id,
-      checkpointId: d.checkpoint.checkpoint_id,
-      checkpointName: d.checkpoint.checkpoint_name,
-      defectCategory: d.defect_category,
-      defectType: d.defect_type,
-      severity: d.severity,
-      quantity: d.quantity,
-      description: d.description ?? undefined,
-      imageUrl: d.image_url ?? undefined,
-      resolutionStatus: d.resolution_status,
-      resolvedBy: d.resolved_by ?? undefined,
-      resolvedAt: d.resolved_at ?? undefined,
-      createdAt: d.created_at,
-      updatedAt: d.updated_at,
-    }));
+      return defects.map(d => ({
+        id: d.id,
+        defectId: d.defect_id,
+        checkpointId: d.checkpoint.checkpoint_id,
+        checkpointName: d.checkpoint.checkpoint_name,
+        defectCategory: d.defect_category,
+        defectType: d.defect_type,
+        severity: d.severity,
+        quantity: d.quantity,
+        description: d.description ?? undefined,
+        imageUrl: d.image_url ?? undefined,
+        resolutionStatus: d.resolution_status,
+        resolvedBy: d.resolved_by ?? undefined,
+        resolvedAt: d.resolved_at ?? undefined,
+        createdAt: d.created_at,
+        updatedAt: d.updated_at,
+      }));
+    } catch (error: any) {
+      // If table doesn't exist, return empty array instead of throwing error
+      if (error.code === 'P2021' || error.message?.includes('does not exist')) {
+        console.warn(`Quality defects table not found for company ${companyId}. Returning empty array.`);
+        return [];
+      }
+      throw error;
+    }
   }
 
   // Resolve Defect
@@ -530,38 +556,51 @@ export class QualityService {
     };
   }
 
-  // Get Compliance Reports
+  /* 
+   * Get Compliance Reports - FILTERED BY COMPANY for multi-tenant isolation
+   * FIX: Returns empty array if table doesn't exist (new company scenario)
+   * This prevents 500 errors when quality tables haven't been migrated yet
+   */
   async getComplianceReports(companyId: string, filters?: {
     reportType?: ComplianceType;
     status?: ComplianceStatus;
   }) {
-    const where: any = { company_id: companyId };
+    try {
+      const where: any = { company_id: companyId };
 
-    if (filters?.reportType) {
-      where.report_type = filters.reportType;
+      if (filters?.reportType) {
+        where.report_type = filters.reportType;
+      }
+
+      if (filters?.status) {
+        where.status = filters.status;
+      }
+
+      const reports = await this.prisma.compliance_reports.findMany({
+        where,
+        orderBy: { report_date: 'desc' },
+      });
+
+      return reports.map(r => ({
+        id: r.id,
+        reportId: r.report_id,
+        reportType: r.report_type,
+        reportDate: r.report_date,
+        auditorName: r.auditor_name,
+        certification: r.certification ?? undefined,
+        validityPeriod: r.validity_period ?? undefined,
+        status: r.status,
+        createdAt: r.created_at,
+        updatedAt: r.updated_at,
+      }));
+    } catch (error: any) {
+      // If table doesn't exist, return empty array instead of throwing error
+      if (error.code === 'P2021' || error.message?.includes('does not exist')) {
+        console.warn(`Compliance reports table not found for company ${companyId}. Returning empty array.`);
+        return [];
+      }
+      throw error;
     }
-
-    if (filters?.status) {
-      where.status = filters.status;
-    }
-
-    const reports = await this.prisma.compliance_reports.findMany({
-      where,
-      orderBy: { report_date: 'desc' },
-    });
-
-    return reports.map(r => ({
-      id: r.id,
-      reportId: r.report_id,
-      reportType: r.report_type,
-      reportDate: r.report_date,
-      auditorName: r.auditor_name,
-      certification: r.certification ?? undefined,
-      validityPeriod: r.validity_period ?? undefined,
-      status: r.status,
-      createdAt: r.created_at,
-      updatedAt: r.updated_at,
-    }));
   }
 
   // Delete Checkpoint

@@ -22,8 +22,8 @@ export default function Sidebar() {
 
   // Get navigation menu items based on company industry
   const menuItems = useMemo(() => {
-    // Default to TEXTILE if no company or industry
-    const industry = (currentCompany?.industry as IndustryType) || 'TEXTILE';
+    // Default to Textile Manufacturing if no company or industry
+    const industry = (currentCompany?.industry as IndustryType) || 'Textile Manufacturing';
     const navigationItems = getNavigationByIndustry(industry);
 
     // Convert navigation config to Ant Design Menu format

@@ -16,12 +16,16 @@ import {
 } from '@ant-design/icons';
 
 export type IndustryType = 
-  | 'TEXTILE' 
-  | 'FOOD_BEVERAGE' 
-  | 'AUTOMOTIVE' 
-  | 'PHARMACEUTICAL' 
-  | 'ELECTRONICS' 
-  | 'GENERAL';
+  | 'Textile Manufacturing'
+  | 'Garment Production'
+  | 'Knitting & Weaving'
+  | 'Fabric Processing'
+  | 'Apparel Design'
+  | 'Fashion Retail'
+  | 'Yarn Production'
+  | 'Dyeing & Finishing'
+  | 'Home Textiles'
+  | 'Technical Textiles';
 
 export interface MenuItem {
   key: string;
@@ -195,14 +199,22 @@ export const ELECTRONICS_MODULES: MenuItem[] = [
  * @returns Array of menu items to display
  */
 export const getNavigationByIndustry = (industry: IndustryType): MenuItem[] => {
+  // All textile industries use the same TEXTILE_MODULES
   const industryModules: Record<IndustryType, MenuItem[]> = {
-    TEXTILE: TEXTILE_MODULES,
-    FOOD_BEVERAGE: FOOD_BEVERAGE_MODULES,
-    AUTOMOTIVE: AUTOMOTIVE_MODULES,
-    PHARMACEUTICAL: PHARMACEUTICAL_MODULES,
-    ELECTRONICS: ELECTRONICS_MODULES,
-    GENERAL: [], // No industry-specific modules for general
+    'Textile Manufacturing': TEXTILE_MODULES,
+    'Garment Production': TEXTILE_MODULES,
+    'Knitting & Weaving': TEXTILE_MODULES,
+    'Fabric Processing': TEXTILE_MODULES,
+    'Apparel Design': TEXTILE_MODULES,
+    'Fashion Retail': TEXTILE_MODULES,
+    'Yarn Production': TEXTILE_MODULES,
+    'Dyeing & Finishing': TEXTILE_MODULES,
+    'Home Textiles': TEXTILE_MODULES,
+    'Technical Textiles': TEXTILE_MODULES,
   };
+
+  // Get industry-specific modules, default to TEXTILE if not found
+  const specificModules = industryModules[industry] || TEXTILE_MODULES;
 
   // Combine core modules with industry-specific modules
   // Insert industry modules before Finance
@@ -210,17 +222,21 @@ export const getNavigationByIndustry = (industry: IndustryType): MenuItem[] => {
   const beforeFinance = CORE_MODULES.slice(0, financeIndex);
   const afterFinance = CORE_MODULES.slice(financeIndex);
   
-  return [...beforeFinance, ...industryModules[industry], ...afterFinance];
+  return [...beforeFinance, ...specificModules, ...afterFinance];
 };
 
 /**
  * Get all available industries for company creation
  */
 export const AVAILABLE_INDUSTRIES = [
-  { value: 'TEXTILE', label: 'Textile & Apparel' },
-  { value: 'FOOD_BEVERAGE', label: 'Food & Beverage' },
-  { value: 'AUTOMOTIVE', label: 'Automotive' },
-  { value: 'PHARMACEUTICAL', label: 'Pharmaceutical' },
-  { value: 'ELECTRONICS', label: 'Electronics' },
-  { value: 'GENERAL', label: 'General Manufacturing' },
+  { value: 'Textile Manufacturing', label: 'Textile Manufacturing' },
+  { value: 'Garment Production', label: 'Garment Production' },
+  { value: 'Knitting & Weaving', label: 'Knitting & Weaving' },
+  { value: 'Fabric Processing', label: 'Fabric Processing' },
+  { value: 'Apparel Design', label: 'Apparel Design' },
+  { value: 'Fashion Retail', label: 'Fashion Retail' },
+  { value: 'Yarn Production', label: 'Yarn Production' },
+  { value: 'Dyeing & Finishing', label: 'Dyeing & Finishing' },
+  { value: 'Home Textiles', label: 'Home Textiles' },
+  { value: 'Technical Textiles', label: 'Technical Textiles' },
 ] as const;

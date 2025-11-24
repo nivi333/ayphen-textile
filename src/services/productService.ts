@@ -264,75 +264,94 @@ export class ProductService {
 
   /**
    * Get products list with filters
+   * FIX: Returns empty array if table doesn't exist (new company scenario)
+   * This prevents 500 errors when product tables haven't been migrated yet
    */
   async getProducts(companyId: string, filters: ListProductFilters = {}) {
     if (!companyId || !companyId.trim()) {
       throw new Error('Missing required field: companyId');
     }
 
-    const {
-      categoryId,
-      search,
-      isActive,
-      lowStock,
-      minPrice,
-      maxPrice,
-      page = 1,
-      limit = 50,
-    } = filters;
+    try {
+      const {
+        categoryId,
+        search,
+        isActive,
+        lowStock,
+        minPrice,
+        maxPrice,
+        page = 1,
+        limit = 50,
+      } = filters;
 
-    const where: any = { company_id: companyId };
+      const where: any = { company_id: companyId };
 
-    if (categoryId) {
-      where.category_id = categoryId;
-    }
+      if (categoryId) {
+        where.category_id = categoryId;
+      }
 
-    if (search) {
-      where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { sku: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
-      ];
-    }
+      if (search) {
+        where.OR = [
+          { name: { contains: search, mode: 'insensitive' } },
+          { sku: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } },
+        ];
+      }
 
-    if (isActive !== undefined) {
-      where.is_active = isActive;
-    }
+      if (isActive !== undefined) {
+        where.is_active = isActive;
+      }
 
-    if (lowStock) {
-      where.stock_quantity = { lte: where.reorder_level || 10 };
-    }
+      if (lowStock) {
+        where.stock_quantity = { lte: where.reorder_level || 10 };
+      }
 
-    if (minPrice !== undefined || maxPrice !== undefined) {
-      where.selling_price = {};
-      if (minPrice !== undefined) where.selling_price.gte = minPrice;
-      if (maxPrice !== undefined) where.selling_price.lte = maxPrice;
-    }
+      if (minPrice !== undefined || maxPrice !== undefined) {
+        where.selling_price = {};
+        if (minPrice !== undefined) where.selling_price.gte = minPrice;
+        if (maxPrice !== undefined) where.selling_price.lte = maxPrice;
+      }
 
-    const skip = (page - 1) * limit;
+      const skip = (page - 1) * limit;
 
-    const [products, total] = await Promise.all([
-      this.prisma.products.findMany({
-        where,
-        include: {
-          category: true,
+      const [products, total] = await Promise.all([
+        this.prisma.products.findMany({
+          where,
+          include: {
+            category: true,
+          },
+          orderBy: { created_at: 'desc' },
+          skip,
+          take: limit,
+        }),
+        this.prisma.products.count({ where }),
+      ]);
+
+      return {
+        products: products.map(p => this.mapProductToDTO(p)),
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
         },
-        orderBy: { created_at: 'desc' },
-        skip,
-        take: limit,
-      }),
-      this.prisma.products.count({ where }),
-    ]);
-
-    return {
-      products: products.map(p => this.mapProductToDTO(p)),
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-      },
-    };
+      };
+    } catch (error: any) {
+      // If table doesn't exist, return empty result instead of throwing error
+      if (error.code === 'P2021' || error.message?.includes('does not exist')) {
+        console.warn(`Products table not found for company ${companyId}. Returning empty array.`);
+        return {
+          products: [],
+          pagination: {
+            page: filters.page || 1,
+            limit: filters.limit || 50,
+            total: 0,
+            totalPages: 0,
+          },
+        };
+      }
+      throw error;
+    }
   }
 
   /**

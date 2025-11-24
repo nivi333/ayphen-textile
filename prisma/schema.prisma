@@ -13,7 +13,7 @@ model companies {
   company_id        String              @unique
   name              String
   slug              String              @unique
-  industry          IndustryType        @default(TEXTILE)
+  industry          IndustryType        @default(TEXTILE_MANUFACTURING)
   description       String?
   logo_url          String?
   website           String?
@@ -722,12 +722,16 @@ enum DesignStatus {
 }
 
 enum IndustryType {
-  TEXTILE
-  FOOD_BEVERAGE
-  AUTOMOTIVE
-  PHARMACEUTICAL
-  ELECTRONICS
-  GENERAL
+  TEXTILE_MANUFACTURING
+  GARMENT_PRODUCTION
+  KNITTING_WEAVING
+  FABRIC_PROCESSING
+  APPAREL_DESIGN
+  FASHION_RETAIL
+  YARN_PRODUCTION
+  DYEING_FINISHING
+  HOME_TEXTILES
+  TECHNICAL_TEXTILES
 }
 
 // New Quality Control Enums

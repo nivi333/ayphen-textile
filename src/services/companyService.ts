@@ -1,6 +1,7 @@
 import { PrismaClient as GlobalPrismaClient } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateCompanyData } from '../types';
+import { industryToEnum, industryToDisplay } from '../utils/industryMapper';
 
 const globalPrisma = new GlobalPrismaClient();
 
@@ -145,7 +146,7 @@ class CompanyService {
             company_id: companyId,
             name: companyData.name,
             slug: uniqueSlug,
-            industry: companyData.industry as any,
+            industry: industryToEnum(companyData.industry) as any,
             description: companyData.description,
             logo_url: companyData.logoUrl,
             website: companyData.website,
@@ -273,7 +274,7 @@ class CompanyService {
           companyId: newCompany.company_id,
           name: newCompany.name,
           slug: newCompany.slug,
-          industry: newCompany.industry,
+          industry: industryToDisplay(newCompany.industry),
           description: newCompany.description,
           logoUrl: newCompany.logo_url,
           website: newCompany.website,
@@ -364,7 +365,7 @@ class CompanyService {
           companyId: company.company_id,
           name: company.name,
           slug: company.slug,
-          industry: company.industry,
+          industry: industryToDisplay(company.industry),
           description: company.description,
           logoUrl: company.logo_url,
           website: company.website,
@@ -418,7 +419,7 @@ class CompanyService {
         companyId: company.company_id,
         name: company.name,
         slug: company.slug,
-        industry: company.industry,
+        industry: industryToDisplay(company.industry),
         description: company.description,
         logoUrl: company.logo_url,
         website: company.website,
