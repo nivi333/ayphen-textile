@@ -111,6 +111,12 @@ export const CORE_MODULES: MenuItem[] = [
         icon: SafetyOutlined,
         path: '/quality/compliance',
       },
+      {
+        key: 'quality-reports',
+        label: 'Quality Reports',
+        icon: BarChartOutlined,
+        path: '/quality/reports',
+      },
     ],
   },
   {

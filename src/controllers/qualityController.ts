@@ -21,6 +21,7 @@ const createCheckpointSchema = Joi.object({
   testedQuantity: Joi.number().integer().min(1).optional(),
   overallScore: Joi.number().min(0).max(100).optional(),
   notes: Joi.string().max(1000).optional(),
+  isActive: Joi.boolean().optional(),
 });
 
 const updateCheckpointSchema = Joi.object({
@@ -30,6 +31,7 @@ const updateCheckpointSchema = Joi.object({
   status: Joi.string().valid(...Object.values(QCStatus)).optional(),
   overallScore: Joi.number().min(0).max(100).optional(),
   notes: Joi.string().max(1000).optional(),
+  isActive: Joi.boolean().optional(),
 });
 
 const createDefectSchema = Joi.object({
@@ -44,6 +46,7 @@ const createDefectSchema = Joi.object({
   lotNumber: Joi.string().optional(),
   description: Joi.string().max(1000).optional(),
   imageUrl: Joi.string().uri().optional(),
+  isActive: Joi.boolean().optional(),
 });
 
 const resolveDefectSchema = Joi.object({

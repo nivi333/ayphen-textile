@@ -1072,7 +1072,7 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
     - Link to location ✅
   - **Sidebar Navigation**: Accessible via Quality Control > Inspections > Details ✅
 
-- [ ] **DefectsListPage** (`frontend/src/pages/DefectsListPage.tsx`)
+- [x] **DefectsListPage** (`frontend/src/pages/DefectsListPage.tsx`) ✅ **COMPLETED**
   - **Header**: "Quality Defects" + "Report Defect" button
   - **Professional AntD Table**:
     - **Columns**:
@@ -1161,47 +1161,8 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
   - **Related Defects**:
     - Similar defects on same product
     - Defects from same inspection
-
-- [ ] **InspectionTemplatesPage** (`frontend/src/pages/InspectionTemplatesPage.tsx`)
-  - **Header**: "Inspection Templates" + "Create Template" button
-  - **Template Cards Grid**:
-    - Card for each template
-    - Template name, description
-    - Checkpoint count
-    - Usage count (how many times used)
-    - Actions: Edit, Duplicate, Delete, Use
-  - **Template Categories**:
-    - Incoming Material Inspection
-    - In-Process Quality Check
-    - Final Product Inspection
-    - Random Quality Audit
-    - Custom Templates
-  - **Empty State**: "No templates found" with "Create Template" button
-
-- [ ] **TemplateFormDrawer** (`frontend/src/components/quality/TemplateFormDrawer.tsx`)
-  - **Drawer** (720px) for create/edit template
-  - **Header**: Active toggle (disabled on create, enabled on edit, default true)
-  - **Section 1: Template Information**
-    - Template Name: Input (required)
-    - Description: Text area
-    - Category: Dropdown (Incoming, In-Process, Final, Random, Custom)
-    - Applicable To: Multi-select (Products, Orders, Batches)
-  - **Section 2: Checkpoints**
-    - Dynamic list of checkpoints
-    - Each checkpoint:
-      - Checkpoint name (required)
-      - Description (optional)
-      - Evaluation Type: Dropdown (Pass/Fail, Rating 1-5, Measurement)
-      - Is Required: Checkbox
-      - Reorder handle (drag to reorder)
-      - Delete button
-    - Add Checkpoint button
-  - **Section 3: Scoring**
-    - Passing Score: Number input (percentage)
-    - Weight Distribution: Auto or Manual
-  - **Cancel & Save buttons** at bottom
-
-- [ ] **QualityReportsPage** (`frontend/src/pages/QualityReportsPage.tsx`)
+ 
+- [x] **QualityReportsPage** (`frontend/src/pages/QualityReportsPage.tsx`) ✅ **COMPLETED**
   - **Header**: "Quality Reports" + "Generate Report" button
   - **Report Filters**:
     - Date Range: Date range picker

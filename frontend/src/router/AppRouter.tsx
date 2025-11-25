@@ -22,6 +22,7 @@ import QualityDefectsListPage from '../pages/QualityDefectsListPage';
 import ComplianceReportsListPage from '../pages/ComplianceReportsListPage';
 import UsersListPage from '../pages/UsersListPage';
 import UserProfilePage from '../pages/UserProfilePage';
+import QualityReportsPage from '../pages/QualityReportsPage';
 
 // Main application router component
 export default function AppRouter() {
@@ -161,6 +162,17 @@ export default function AppRouter() {
               element={
                 <ProtectedRoute requireCompany={true}>
                   <InspectionDetailsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/quality/reports'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <MainLayout>
+                    <QualityReportsPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />

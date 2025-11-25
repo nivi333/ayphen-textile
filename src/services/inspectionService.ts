@@ -329,13 +329,13 @@ export class InspectionService {
       referenceType: inspection.reference_type,
       referenceId: inspection.reference_id,
       locationId: inspection.location_id || undefined,
-      inspector: {
+      inspector: inspection.inspector ? {
         id: inspection.inspector.id,
         firstName: inspection.inspector.first_name,
         lastName: inspection.inspector.last_name,
         email: inspection.inspector.email || '',
         avatarUrl: inspection.inspector.avatar_url || undefined,
-      },
+      } : null,
       template: inspection.template ? {
         id: inspection.template.id,
         name: inspection.template.name,
@@ -359,6 +359,7 @@ export class InspectionService {
         photos: cp.photos,
         orderIndex: cp.order_index,
       })),
+      isActive: inspection.is_active,
       createdAt: inspection.created_at,
       updatedAt: inspection.updated_at,
     };
@@ -375,6 +376,7 @@ export class InspectionService {
     if (data.qualityScore !== undefined) updateData.quality_score = data.qualityScore;
     if (data.inspectorNotes !== undefined) updateData.inspector_notes = data.inspectorNotes;
     if (data.recommendations !== undefined) updateData.recommendations = data.recommendations;
+    if (data.isActive !== undefined) updateData.is_active = data.isActive;
 
     const inspection = await this.prisma.quality_inspections.update({
       where: { id: inspectionId },
@@ -386,6 +388,7 @@ export class InspectionService {
       inspectionNumber: inspection.inspection_number,
       status: inspection.status,
       qualityScore: inspection.quality_score || undefined,
+      isActive: inspection.is_active,
       updatedAt: inspection.updated_at,
     };
   }

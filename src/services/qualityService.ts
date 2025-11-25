@@ -18,6 +18,7 @@ interface CreateCheckpointData {
   testedQuantity?: number;
   overallScore?: number;
   notes?: string;
+  isActive?: boolean;
 }
 
 interface CreateDefectData {
@@ -32,6 +33,7 @@ interface CreateDefectData {
   affectedItems?: number;
   description?: string;
   imageUrl?: string;
+  isActive?: boolean;
 }
 
 interface CreateMetricData {
@@ -187,6 +189,7 @@ export class QualityService {
         notes: data.notes ?? null,
         location_id: data.locationId ?? null,
         order_id: data.orderId ?? null,
+        is_active: data.isActive !== undefined ? data.isActive : true,
         updated_at: now,
       },
     });
@@ -204,6 +207,7 @@ export class QualityService {
       notes: checkpoint.notes ?? undefined,
       locationId: checkpoint.location_id ?? undefined,
       orderId: checkpoint.order_id ?? undefined,
+      isActive: checkpoint.is_active,
       createdAt: checkpoint.created_at,
       updatedAt: checkpoint.updated_at,
     };
@@ -265,6 +269,7 @@ export class QualityService {
         orderId: cp.order_id ?? undefined,
         defectCount: cp.defects.length,
         metricCount: cp.metrics.length,
+        isActive: cp.is_active,
         createdAt: cp.created_at,
         updatedAt: cp.updated_at,
       }));
