@@ -12,6 +12,7 @@ import {
   LocationListPage,
   OrdersListPage,
   ProductsListPage,
+  InventoryListPage,
   InspectionsListPage,
   InspectionDetailsPage,
 } from '../pages';
@@ -112,6 +113,17 @@ export default function AppRouter() {
               element={
                 <ProtectedRoute requireCompany={true}>
                   <ProductsListPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/inventory'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <MainLayout>
+                    <InventoryListPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />

@@ -216,14 +216,14 @@ title={
 - **Error Messages**: Provide specific, actionable error messages (e.g., "Invited user does not exist in the system" not "Invalid token")
 - **Validation**: Check company context before role permissions in middleware chain
 
-Before making ANY changes to a component:
+### Before making ANY changes to a component:
 
-Find and read the EXACT reference component (e.g., CompanyCreationDrawer.tsx,CompanyCreationDrawer.scss and etc.,)
-Copy the EXACT structure - same imports, same layout, same styling approach
-Copy the EXACT CSS approach - no new SCSS files, use what's already there
-Copy the EXACT button/action pattern - same buttons, same positioning, same styling
-Only change the field names and labels - nothing else
-Do NOT create new files or new CSS - use existing patterns only"
+- Find and read the EXACT reference component (e.g., CompanyCreationDrawer.tsx,CompanyCreationDrawer.scss and etc.,)
+- Copy the EXACT structure - same imports, same layout, same styling approach
+- Copy the EXACT CSS approach - no new SCSS files, use what's already there
+- Copy the EXACT button/action pattern - same buttons, same positioning, same styling
+- Only change the field names and labels - nothing else
+- Do NOT create new files or new CSS for existing CSS styles, for those reuse the same className
 ---
 ## 📋 EPIC Overview
 
@@ -1196,9 +1196,9 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
 
 ---
 
-## **PHASE 3.5: TEXTILE-SPECIFIC MODULES** (Week 10.5)
+## **PHASE 3.5: TEXTILE-SPECIFIC MODULES~~  (Optional: Dashboard enhancement - can be implemented later)**(Week 10.5)
 
-### **Sprint 3.5: Industry-Specific Features**
+### **Sprint 3.5: Industry-Specific Features** 
 
 #### **Backend Tasks**
 - [ ] **Textile Manufacturing Modules**
@@ -1221,7 +1221,7 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
 
 #### **Frontend Tasks**
 - [ ] **Textile Manufacturing Interface**
-  - Fabric Production Dashboard with process monitoring
+  - ~~Fabric Production Dashboard with process monitoring~~ *(Optional: Dashboard enhancement - can be implemented later)*
   - Yarn Manufacturing workflow management
   - Dyeing & Finishing quality control interface
   - Pattern & Design CAD integration tools

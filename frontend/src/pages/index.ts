@@ -7,5 +7,6 @@ export { default as DashboardPage } from './DashboardPage';
 export { default as LocationListPage } from './LocationListPage';
 export { default as OrdersListPage } from './OrdersListPage';
 export { default as ProductsListPage } from './ProductsListPage';
+export { default as InventoryListPage } from './InventoryListPage';
 export { default as InspectionsListPage } from './InspectionsListPage';
 export { default as InspectionDetailsPage } from './InspectionDetailsPage';

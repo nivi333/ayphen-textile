@@ -9,8 +9,8 @@ import qualityRoutes from './qualityRoutes';
 import inspectionRoutes from './inspectionRoutes';
 import productRoutes from './productRoutes';
 import textileRoutes from './textileRoutes';
+import inventoryRoutes from './inventoryRoutes';
 import userRoutes from '../userRoutes';
-// import inventoryRoutes from './inventoryRoutes';
 // import productionRoutes from './productionRoutes';
 import { tenantIsolationMiddleware } from '../../middleware/tenantIsolation';
 import { userRateLimit } from '../../middleware/rateLimiter';
@@ -37,7 +37,7 @@ router.get('/', (req, res) => {
       products: '/products',
       textile: '/textile',
       users: '/users',
-      inventory: '/inventory (coming soon)',
+      inventory: '/inventory',
       production: '/production (coming soon)',
       reports: '/reports (coming soon)',
     },
@@ -63,8 +63,8 @@ router.use('/quality', qualityRoutes);
 router.use('/inspections', inspectionRoutes);
 router.use('/products', productRoutes);
 router.use('/textile', textileRoutes);
+router.use('/inventory', inventoryRoutes);
 router.use('/users', userRoutes);
-// router.use('/inventory', inventoryRoutes);
 // router.use('/production', productionRoutes);
 // router.use('/reports', reportRoutes);
 
