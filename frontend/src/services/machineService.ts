@@ -23,6 +23,8 @@ export interface Machine {
   imageUrl?: string;
   qrCode?: string;
   status: MachineStatus;
+  operationalStatus: OperationalStatus;
+  currentOperatorId?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -31,6 +33,11 @@ export interface Machine {
     name: string;
     isDefault: boolean;
     isHeadquarters: boolean;
+  };
+  currentOperator?: {
+    id: string;
+    firstName: string;
+    lastName: string;
   };
   _count?: {
     breakdown_reports: number;
@@ -157,6 +164,8 @@ export interface CreateMachineRequest {
   specifications?: any;
   imageUrl?: string;
   locationId?: string;
+  currentOperatorId?: string;
+  operationalStatus?: OperationalStatus;
   isActive?: boolean;
 }
 
@@ -228,9 +237,27 @@ export interface UpdateMachineStatusRequest {
 // ENUMS
 // ============================================
 
-export type MachineStatus = 'IN_USE' | 'UNDER_MAINTENANCE' | 'UNDER_REPAIR' | 'IDLE' | 'DECOMMISSIONED';
+export type MachineStatus =
+  | 'NEW'
+  | 'IN_USE'
+  | 'UNDER_MAINTENANCE'
+  | 'UNDER_REPAIR'
+  | 'IDLE'
+  | 'DECOMMISSIONED';
 
-export type MaintenanceType = 'DAILY_CHECK' | 'WEEKLY' | 'MONTHLY' | 'QUARTERLY' | 'ANNUAL' | 'EMERGENCY';
+export type OperationalStatus =
+  | 'FREE'
+  | 'BUSY'
+  | 'RESERVED'
+  | 'UNAVAILABLE';
+
+export type MaintenanceType =
+  | 'DAILY_CHECK'
+  | 'WEEKLY'
+  | 'MONTHLY'
+  | 'QUARTERLY'
+  | 'ANNUAL'
+  | 'EMERGENCY';
 
 export type MaintenanceRecordStatus = 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
 
@@ -256,6 +283,45 @@ export interface ApiResponse<T> {
 // ============================================
 
 class MachineService {
+  // Convert snake_case from backend to camelCase for frontend
+  private convertMachineData(data: any): Machine {
+    return {
+      id: data.id,
+      machineId: data.machine_id,
+      machineCode: data.machine_code,
+      companyId: data.company_id,
+      locationId: data.location_id,
+      name: data.name,
+      machineType: data.machine_type,
+      model: data.model,
+      manufacturer: data.manufacturer,
+      serialNumber: data.serial_number,
+      purchaseDate: data.purchase_date,
+      warrantyExpiry: data.warranty_expiry,
+      specifications: data.specifications,
+      imageUrl: data.image_url,
+      qrCode: data.qr_code,
+      status: data.status,
+      operationalStatus: data.operational_status,
+      currentOperatorId: data.current_operator_id,
+      isActive: data.is_active,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at,
+      location: data.location ? {
+        id: data.location.id,
+        name: data.location.name,
+        isDefault: data.location.is_default || false,
+        isHeadquarters: data.location.is_headquarters || false,
+      } : undefined,
+      currentOperator: data.current_operator ? {
+        id: data.current_operator.id,
+        firstName: data.current_operator.first_name,
+        lastName: data.current_operator.last_name,
+      } : undefined,
+      _count: data._count,
+    };
+  }
+
   private getAuthHeaders() {
     const tokens = AuthStorage.getTokens();
     if (!tokens?.accessToken) {
@@ -263,7 +329,7 @@ class MachineService {
     }
 
     return {
-      'Authorization': `Bearer ${tokens.accessToken}`,
+      Authorization: `Bearer ${tokens.accessToken}`,
       'Content-Type': 'application/json',
     };
   }
@@ -276,12 +342,19 @@ class MachineService {
       body: JSON.stringify(data),
     });
 
-    return response.json();
+    const result = await response.json();
+    
+    // Convert snake_case to camelCase
+    if (result.data) {
+      result.data = this.convertMachineData(result.data);
+    }
+    
+    return result;
   }
 
   async getMachines(filters?: MachineFilters): Promise<ApiResponse<Machine[]>> {
     const params = new URLSearchParams();
-    
+
     if (filters?.locationId) params.append('locationId', filters.locationId);
     if (filters?.machineType) params.append('machineType', filters.machineType);
     if (filters?.status) params.append('status', filters.status);
@@ -292,7 +365,14 @@ class MachineService {
       headers: this.getAuthHeaders(),
     });
 
-    return response.json();
+    const result = await response.json();
+    
+    // Convert snake_case to camelCase
+    if (result.data && Array.isArray(result.data)) {
+      result.data = result.data.map((machine: any) => this.convertMachineData(machine));
+    }
+    
+    return result;
   }
 
   async getMachineById(id: string): Promise<ApiResponse<Machine>> {
@@ -300,7 +380,14 @@ class MachineService {
       headers: this.getAuthHeaders(),
     });
 
-    return response.json();
+    const result = await response.json();
+    
+    // Convert snake_case to camelCase
+    if (result.data) {
+      result.data = this.convertMachineData(result.data);
+    }
+    
+    return result;
   }
 
   async updateMachine(id: string, data: UpdateMachineRequest): Promise<ApiResponse<Machine>> {
@@ -310,10 +397,20 @@ class MachineService {
       body: JSON.stringify(data),
     });
 
-    return response.json();
+    const result = await response.json();
+    
+    // Convert snake_case to camelCase
+    if (result.data) {
+      result.data = this.convertMachineData(result.data);
+    }
+    
+    return result;
   }
 
-  async updateMachineStatus(id: string, data: UpdateMachineStatusRequest): Promise<ApiResponse<Machine>> {
+  async updateMachineStatus(
+    id: string,
+    data: UpdateMachineStatusRequest
+  ): Promise<ApiResponse<Machine>> {
     const response = await fetch(`${API_BASE_URL}/machines/${id}/status`, {
       method: 'PATCH',
       headers: this.getAuthHeaders(),
@@ -340,7 +437,7 @@ class MachineService {
     severity?: BreakdownSeverity;
   }): Promise<ApiResponse<BreakdownReport[]>> {
     const params = new URLSearchParams();
-    
+
     if (filters?.machineId) params.append('machineId', filters.machineId);
     if (filters?.status) params.append('status', filters.status);
     if (filters?.severity) params.append('severity', filters.severity);
@@ -352,7 +449,10 @@ class MachineService {
     return response.json();
   }
 
-  async updateBreakdownReport(id: string, data: UpdateBreakdownRequest): Promise<ApiResponse<BreakdownReport>> {
+  async updateBreakdownReport(
+    id: string,
+    data: UpdateBreakdownRequest
+  ): Promise<ApiResponse<BreakdownReport>> {
     const response = await fetch(`${API_BASE_URL}/machines/breakdowns/${id}`, {
       method: 'PATCH',
       headers: this.getAuthHeaders(),
@@ -363,7 +463,9 @@ class MachineService {
   }
 
   // Maintenance Management
-  async createMaintenanceSchedule(data: CreateMaintenanceScheduleRequest): Promise<ApiResponse<MaintenanceSchedule>> {
+  async createMaintenanceSchedule(
+    data: CreateMaintenanceScheduleRequest
+  ): Promise<ApiResponse<MaintenanceSchedule>> {
     const response = await fetch(`${API_BASE_URL}/machines/maintenance/schedules`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
@@ -378,18 +480,23 @@ class MachineService {
     dueWithinDays?: number;
   }): Promise<ApiResponse<MaintenanceSchedule[]>> {
     const params = new URLSearchParams();
-    
+
     if (filters?.machineId) params.append('machineId', filters.machineId);
     if (filters?.dueWithinDays) params.append('dueWithinDays', filters.dueWithinDays.toString());
 
-    const response = await fetch(`${API_BASE_URL}/machines/maintenance/schedules?${params.toString()}`, {
-      headers: this.getAuthHeaders(),
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/machines/maintenance/schedules?${params.toString()}`,
+      {
+        headers: this.getAuthHeaders(),
+      }
+    );
 
     return response.json();
   }
 
-  async createMaintenanceRecord(data: CreateMaintenanceRecordRequest): Promise<ApiResponse<MaintenanceRecord>> {
+  async createMaintenanceRecord(
+    data: CreateMaintenanceRecordRequest
+  ): Promise<ApiResponse<MaintenanceRecord>> {
     const response = await fetch(`${API_BASE_URL}/machines/maintenance/records`, {
       method: 'POST',
       headers: this.getAuthHeaders(),

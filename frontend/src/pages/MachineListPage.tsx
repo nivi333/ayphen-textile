@@ -1,6 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
-import { Table, Tag, Space, Button, Dropdown, Empty, Spin, message, Input, Select } from 'antd';
-import { MoreOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
+import {
+  Table,
+  Tag,
+  Button,
+  Dropdown,
+  Empty,
+  Spin,
+  message,
+  Input,
+  Select,
+  Avatar,
+  Space,
+} from 'antd';
+import {
+  MoreOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  ToolOutlined,
+} from '@ant-design/icons';
 import useAuth from '../contexts/AuthContext';
 import { useHeader } from '../contexts/HeaderContext';
 import { MainLayout } from '../components/layout';
@@ -9,6 +27,8 @@ import { GradientButton } from '../components/ui';
 import { machineService, Machine } from '../services/machineService';
 import { locationService, Location } from '../services/locationService';
 import { MachineFormDrawer } from '../components/machines/MachineFormDrawer';
+import { MaintenanceScheduleModal } from '../components/machines/MaintenanceScheduleModal';
+import { BreakdownReportModal } from '../components/machines/BreakdownReportModal';
 import './MachineListPage.scss';
 
 export default function MachineListPage() {
@@ -20,6 +40,9 @@ export default function MachineListPage() {
   const [tableLoading, setTableLoading] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [editingMachineId, setEditingMachineId] = useState<string | null>(null);
+  const [maintenanceModalVisible, setMaintenanceModalVisible] = useState(false);
+  const [breakdownModalVisible, setBreakdownModalVisible] = useState(false);
+  const [selectedMachine, setSelectedMachine] = useState<Machine | null>(null);
   const [searchText, setSearchText] = useState('');
   const [selectedLocation, setSelectedLocation] = useState<string | undefined>(undefined);
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
@@ -29,7 +52,7 @@ export default function MachineListPage() {
     setHeaderActions(
       <GradientButton onClick={handleCreateMachine} size='small' className='machines-create-btn'>
         Add Machine
-      </GradientButton>,
+      </GradientButton>
     );
 
     return () => setHeaderActions(null);
@@ -55,6 +78,17 @@ export default function MachineListPage() {
         }),
         locationService.getLocations(),
       ]);
+      
+      console.log('=== MACHINES DATA FROM BACKEND (AFTER CONVERSION) ===');
+      console.log('✅ Data converted from snake_case to camelCase');
+      if (machinesData.data && machinesData.data.length > 0) {
+        console.log('First machine:', machinesData.data[0]);
+        console.log('✅ machineCode:', machinesData.data[0].machineCode);
+        console.log('✅ machineType:', machinesData.data[0].machineType);
+        console.log('✅ isActive:', machinesData.data[0].isActive);
+        console.log('✅ location.name:', machinesData.data[0].location?.name);
+      }
+      
       setMachines(machinesData.data || []);
       setLocations(locationsData || []);
     } catch (error: any) {
@@ -98,6 +132,26 @@ export default function MachineListPage() {
     message.info('Delete functionality will be implemented when backend API is ready');
   };
 
+  const handleScheduleMaintenance = (machine: Machine) => {
+    setSelectedMachine(machine);
+    setMaintenanceModalVisible(true);
+  };
+
+  const handleReportBreakdown = (machine: Machine) => {
+    setSelectedMachine(machine);
+    setBreakdownModalVisible(true);
+  };
+
+  const handleMaintenanceScheduled = () => {
+    refreshMachines();
+    message.success('Maintenance scheduled successfully');
+  };
+
+  const handleBreakdownReported = () => {
+    refreshMachines();
+    message.success('Breakdown reported successfully');
+  };
+
   const handleDrawerClose = () => {
     setDrawerVisible(false);
     setEditingMachineId(null);
@@ -109,12 +163,35 @@ export default function MachineListPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'IN_USE': return 'green';
-      case 'UNDER_MAINTENANCE': return 'orange';
-      case 'UNDER_REPAIR': return 'red';
-      case 'IDLE': return 'default';
-      case 'DECOMMISSIONED': return 'red';
-      default: return 'default';
+      case 'NEW':
+        return 'blue';
+      case 'IN_USE':
+        return 'green';
+      case 'UNDER_MAINTENANCE':
+        return 'orange';
+      case 'UNDER_REPAIR':
+        return 'red';
+      case 'IDLE':
+        return 'default';
+      case 'DECOMMISSIONED':
+        return 'red';
+      default:
+        return 'default';
+    }
+  };
+
+  const getOperationalStatusColor = (status: string) => {
+    switch (status) {
+      case 'FREE':
+        return 'green';
+      case 'BUSY':
+        return 'orange';
+      case 'RESERVED':
+        return 'blue';
+      case 'UNAVAILABLE':
+        return 'red';
+      default:
+        return 'default';
     }
   };
 
@@ -126,67 +203,93 @@ export default function MachineListPage() {
 
   const columns = [
     {
-      title: 'Image',
-      dataIndex: 'imageUrl',
-      key: 'imageUrl',
-      width: 80,
-      render: (imageUrl: string | undefined, record: Machine) => (
-        <div className='machine-image-cell'>
-          {imageUrl ? (
-            <img src={imageUrl} alt={record.name} className='machine-thumbnail' />
-          ) : (
-            <div className='machine-placeholder'>{record.name.charAt(0)}</div>
-          )}
+      title: 'Machine',
+      key: 'machine',
+      width: 300,
+      render: (record: Machine) => (
+        <div className='machine-info'>
+          <Avatar 
+            src={record.imageUrl} 
+            icon={<ToolOutlined />}
+            className='machine-avatar'
+          >
+            {record.name.charAt(0)}
+          </Avatar>
+          <div className='machine-details'>
+            <div className='machine-name'>{record.name}</div>
+            <div className='machine-meta'>
+              {record.machineCode} • {record.machineType || 'Not specified'}
+            </div>
+          </div>
         </div>
       ),
     },
     {
-      title: 'Machine Code',
-      dataIndex: 'machineCode',
-      key: 'machineCode',
-      width: 120,
-      render: (machineCode: string) => (
-        <div className='machine-code'>{machineCode}</div>
-      ),
-    },
-    {
-      title: 'Machine Name',
-      dataIndex: 'name',
-      key: 'name',
-      render: (name: string, record: Machine) => (
-        <div>
-          <div className='machine-name'>{name}</div>
-          <div className='machine-type'>Type: {record.machineType || 'Not specified'}</div>
-        </div>
-      ),
+      title: 'Machine Type',
+      dataIndex: 'machineType',
+      key: 'machineType',
+      width: 150,
+      render: (machineType?: string) => machineType || '—',
     },
     {
       title: 'Manufacturer',
       dataIndex: 'manufacturer',
       key: 'manufacturer',
       width: 150,
-      render: (manufacturer?: string) => (
-        <div className='machine-manufacturer'>{manufacturer || '—'}</div>
-      ),
+      render: (manufacturer?: string) => manufacturer || '—',
     },
     {
       title: 'Model',
       dataIndex: 'model',
       key: 'model',
       width: 120,
-      render: (model?: string) => (
-        <div className='machine-model'>{model || '—'}</div>
-      ),
+      render: (model?: string) => model || '—',
+    },
+    {
+      title: 'Purchase Date',
+      dataIndex: 'purchaseDate',
+      key: 'purchaseDate',
+      width: 120,
+      render: (date?: string) => date ? new Date(date).toLocaleDateString() : '—',
+    },
+    {
+      title: 'Warranty Expiry',
+      dataIndex: 'warrantyExpiry',
+      key: 'warrantyExpiry',
+      width: 130,
+      render: (date?: string) => date ? new Date(date).toLocaleDateString() : '—',
     },
     {
       title: 'Location',
       key: 'location',
-      render: (_: any, record: Machine) => getLocationName(record.locationId),
+      width: 150,
+      render: (record: Machine) => record.location?.name || getLocationName(record.locationId) || '—',
+    },
+    {
+      title: 'Current Operator',
+      key: 'currentOperator',
+      width: 150,
+      render: (record: Machine) => {
+        if (record.currentOperator) {
+          return `${record.currentOperator.firstName} ${record.currentOperator.lastName}`;
+        }
+        return '—';
+      },
+    },
+    {
+      title: 'Operational Status',
+      dataIndex: 'operationalStatus',
+      key: 'operationalStatus',
+      width: 140,
+      render: (status: string) => (
+        <Tag color={getOperationalStatusColor(status)}>{status || 'Unknown'}</Tag>
+      ),
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      width: 150,
       render: (status: string) => (
         <Tag color={getStatusColor(status)}>{status?.replace('_', ' ') || 'Unknown'}</Tag>
       ),
@@ -195,13 +298,23 @@ export default function MachineListPage() {
       title: 'Actions',
       key: 'actions',
       width: 100,
-      render: (_: any, record: Machine) => {
+      render: (record: Machine) => {
         const menuItems = [
           {
             key: 'edit',
             icon: <EditOutlined />,
             label: 'Edit',
             onClick: () => handleEditMachine(record),
+          },
+          {
+            key: 'maintenance',
+            label: 'Schedule Maintenance',
+            onClick: () => handleScheduleMaintenance(record),
+          },
+          {
+            key: 'breakdown',
+            label: 'Report Breakdown',
+            onClick: () => handleReportBreakdown(record),
           },
           {
             type: 'divider' as const,
@@ -216,11 +329,9 @@ export default function MachineListPage() {
         ];
 
         return (
-          <Space>
-            <Dropdown menu={{ items: menuItems }} trigger={['click']} placement='bottomRight'>
-              <Button type='text' icon={<MoreOutlined />} />
-            </Dropdown>
-          </Space>
+          <Dropdown menu={{ items: menuItems }} trigger={['click']} placement='bottomRight'>
+            <Button type='text' icon={<MoreOutlined />} />
+          </Dropdown>
         );
       },
     },
@@ -249,7 +360,7 @@ export default function MachineListPage() {
               placeholder='Search machines...'
               prefix={<SearchOutlined />}
               value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
+              onChange={e => setSearchText(e.target.value)}
               style={{ width: 250 }}
               allowClear
             />
@@ -273,6 +384,7 @@ export default function MachineListPage() {
               style={{ width: 150 }}
               allowClear
             >
+              <Select.Option value='NEW'>New</Select.Option>
               <Select.Option value='IN_USE'>In Use</Select.Option>
               <Select.Option value='UNDER_MAINTENANCE'>Under Maintenance</Select.Option>
               <Select.Option value='UNDER_REPAIR'>Under Repair</Select.Option>
@@ -297,12 +409,15 @@ export default function MachineListPage() {
             <Table
               columns={columns}
               dataSource={machines}
-              rowKey={(record) => record.id}
+              rowKey='id'
               loading={tableLoading}
               pagination={{
+                pageSize: 10,
                 showSizeChanger: true,
+                showQuickJumper: true,
                 showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} machines`,
               }}
+              scroll={{ x: 1200 }}
               className='machines-table'
             />
           )}
@@ -317,6 +432,24 @@ export default function MachineListPage() {
         editingMachineId={editingMachineId}
         locations={locations}
       />
+
+      {selectedMachine && (
+        <>
+          <MaintenanceScheduleModal
+            visible={maintenanceModalVisible}
+            onClose={() => setMaintenanceModalVisible(false)}
+            onScheduled={handleMaintenanceScheduled}
+            machine={selectedMachine}
+          />
+
+          <BreakdownReportModal
+            visible={breakdownModalVisible}
+            onClose={() => setBreakdownModalVisible(false)}
+            onReported={handleBreakdownReported}
+            machine={selectedMachine}
+          />
+        </>
+      )}
     </MainLayout>
   );
 }

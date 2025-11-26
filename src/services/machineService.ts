@@ -14,6 +14,8 @@ export interface CreateMachineRequest {
   specifications?: any;
   imageUrl?: string;
   locationId?: string;
+  currentOperatorId?: string;
+  operationalStatus?: string;
   isActive?: boolean;
 }
 
@@ -210,11 +212,20 @@ class MachineService {
           warranty_expiry: data.warrantyExpiry,
           specifications: data.specifications,
           image_url: data.imageUrl,
+          current_operator_id: data.currentOperatorId,
+          operational_status: data.operationalStatus as any || 'FREE',
           is_active: data.isActive ?? true,
           updated_at: new Date(),
         },
         include: {
           location: true,
+          current_operator: {
+            select: {
+              id: true,
+              first_name: true,
+              last_name: true,
+            },
+          },
         },
       });
 
@@ -273,6 +284,13 @@ class MachineService {
         where,
         include: {
           location: true,
+          current_operator: {
+            select: {
+              id: true,
+              first_name: true,
+              last_name: true,
+            },
+          },
           _count: {
             select: {
               breakdown_reports: {
@@ -304,6 +322,13 @@ class MachineService {
         },
         include: {
           location: true,
+          current_operator: {
+            select: {
+              id: true,
+              first_name: true,
+              last_name: true,
+            },
+          },
           status_history: {
             orderBy: { created_at: 'desc' },
             take: 10,

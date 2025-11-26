@@ -137,6 +137,7 @@ model users {
   inspections             quality_inspections[] @relation("InspectionInspector")
   templates_created       inspection_templates[] @relation("TemplateCreator")
   defect_comments         defect_comments[] @relation("DefectCommentUser")
+  operating_machines      machines[] @relation("MachineOperator")
 }
 
 model user_invitations {
@@ -602,13 +603,16 @@ model machines {
   specifications  Json?          // Technical specs
   image_url       String?
   qr_code         String?
-  status          MachineStatus  @default(IDLE)
+  status          MachineStatus  @default(NEW)
+  operational_status OperationalStatus @default(FREE)
+  current_operator_id String?       // Current operator using this machine
   is_active       Boolean        @default(true)
   created_at      DateTime       @default(now())
   updated_at      DateTime
 
   company         companies           @relation(fields: [company_id], references: [id], onDelete: Cascade)
   location        company_locations?  @relation(fields: [location_id], references: [id], onDelete: SetNull)
+  current_operator users?             @relation("MachineOperator", fields: [current_operator_id], references: [id], onDelete: SetNull)
   status_history  machine_status_history[]
   maintenance_schedules maintenance_schedules[]
   maintenance_records maintenance_records[]
@@ -752,11 +756,19 @@ model machine_assignments {
 }
 
 enum MachineStatus {
+  NEW
   IN_USE
   UNDER_MAINTENANCE
   UNDER_REPAIR
   IDLE
   DECOMMISSIONED
+}
+
+enum OperationalStatus {
+  FREE
+  BUSY
+  RESERVED
+  UNAVAILABLE
 }
 
 enum MaintenanceType {

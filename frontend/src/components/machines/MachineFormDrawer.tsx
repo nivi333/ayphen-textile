@@ -14,8 +14,10 @@ import {
   DatePicker,
 } from 'antd';
 import { ToolOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
 import { GradientButton } from '../ui';
-import { machineService, Machine } from '../../services/machineService';
+import { machineService, Machine, MachineStatus, OperationalStatus } from '../../services/machineService';
+import { userService, User } from '../../services/userService';
 import useAuth from '../../contexts/AuthContext';
 import './MachineFormDrawer.scss';
 
@@ -139,9 +141,12 @@ interface MachineFormValues {
   purchaseDate?: any;
   warrantyExpiry?: any;
   locationId: string;
+  currentOperatorId?: string;
+  operationalStatus?: string;
   specifications?: string;
   imageUrl?: string;
   qrCode?: string;
+  status?: MachineStatus;
   isActive: boolean;
 }
 
@@ -156,6 +161,7 @@ export const MachineFormDrawer: React.FC<MachineFormDrawerProps> = ({
   const [form] = Form.useForm<MachineFormValues>();
   const [submitting, setSubmitting] = useState(false);
   const [imageUrl, setImageUrl] = useState<string>('');
+  const [users, setUsers] = useState<any[]>([]);
   const { currentCompany } = useAuth();
 
   const isEditing = mode === 'edit' && !!editingMachineId;
@@ -174,6 +180,10 @@ export const MachineFormDrawer: React.FC<MachineFormDrawerProps> = ({
 
     const loadData = async () => {
       try {
+        // Fetch users for operator dropdown
+        const usersData = await userService.getCompanyUsers({ limit: 100 });
+        setUsers(usersData.users || []);
+
         if (isEditing && editingMachineId) {
           const response = await machineService.getMachineById(editingMachineId);
           if (response.success && response.data) {
@@ -184,6 +194,7 @@ export const MachineFormDrawer: React.FC<MachineFormDrawerProps> = ({
           const machineTypes = getMachineTypeOptions();
           form.setFieldsValue({
             machineType: machineTypes.length > 0 ? machineTypes[0].value : 'Other',
+            operationalStatus: 'FREE',
             isActive: true,
           });
           setImageUrl('');
@@ -205,11 +216,14 @@ export const MachineFormDrawer: React.FC<MachineFormDrawerProps> = ({
       manufacturer: machine.manufacturer,
       model: machine.model,
       serialNumber: machine.serialNumber,
-      purchaseDate: machine.purchaseDate,
-      warrantyExpiry: machine.warrantyExpiry,
+      purchaseDate: machine.purchaseDate ? dayjs(machine.purchaseDate) : undefined,
+      warrantyExpiry: machine.warrantyExpiry ? dayjs(machine.warrantyExpiry) : undefined,
       locationId: machine.locationId,
+      currentOperatorId: machine.currentOperatorId,
+      operationalStatus: machine.operationalStatus,
       specifications: machine.specifications,
       qrCode: machine.qrCode,
+      status: machine.status,
       isActive: machine.isActive,
     });
     if (machine.imageUrl) {
@@ -254,9 +268,12 @@ export const MachineFormDrawer: React.FC<MachineFormDrawerProps> = ({
         purchaseDate: values.purchaseDate,
         warrantyExpiry: values.warrantyExpiry,
         locationId: values.locationId,
+        currentOperatorId: values.currentOperatorId,
+        operationalStatus: values.operationalStatus as OperationalStatus,
         specifications: values.specifications,
         qrCode: values.qrCode,
         imageUrl: imageUrl || undefined,
+        status: values.status as MachineStatus,
         isActive: values.isActive,
       };
 
@@ -370,7 +387,7 @@ export const MachineFormDrawer: React.FC<MachineFormDrawerProps> = ({
           </Row>
 
           <Row gutter={12}>
-            <Col span={24}>
+            <Col span={12}>
               <Form.Item
                 name='machineType'
                 label='Machine Type'
@@ -382,6 +399,58 @@ export const MachineFormDrawer: React.FC<MachineFormDrawerProps> = ({
                       {type.label}
                     </Option>
                   ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name='status'
+                label='Machine Status'
+                rules={[{ required: true, message: 'Please select machine status' }]}
+                initialValue='NEW'
+              >
+                <Select placeholder='Select machine status'>
+                  <Option value='NEW'>New</Option>
+                  <Option value='IDLE'>Idle</Option>
+                  <Option value='IN_USE'>In Use</Option>
+                  <Option value='UNDER_MAINTENANCE'>Under Maintenance</Option>
+                  <Option value='UNDER_REPAIR'>Under Repair</Option>
+                  <Option value='DECOMMISSIONED'>Decommissioned</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={12}>
+            <Col span={12}>
+              <Form.Item
+                name='currentOperatorId'
+                label='Current Operator'
+                rules={[{ required: true, message: 'Please select current operator' }]}
+              >
+                <Select placeholder='Select operator' allowClear showSearch filterOption={(input, option) =>
+                  String(option?.children || '').toLowerCase().includes(input.toLowerCase())
+                }>
+                  {users.map((user: any) => (
+                    <Option key={user.id} value={user.id}>
+                      {user.firstName} {user.lastName}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name='operationalStatus'
+                label='Operational Status'
+                rules={[{ required: true, message: 'Please select operational status' }]}
+                initialValue='FREE'
+              >
+                <Select placeholder='Select operational status'>
+                  <Option value='FREE'>Free</Option>
+                  <Option value='BUSY'>Busy</Option>
+                  <Option value='RESERVED'>Reserved</Option>
+                  <Option value='UNAVAILABLE'>Unavailable</Option>
                 </Select>
               </Form.Item>
             </Col>

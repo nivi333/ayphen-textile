@@ -15,6 +15,8 @@ const createMachineSchema = Joi.object({
   specifications: Joi.object().optional(),
   imageUrl: Joi.string().uri().optional(),
   locationId: Joi.string().uuid().optional(),
+  currentOperatorId: Joi.string().uuid().optional(),
+  operationalStatus: Joi.string().valid('FREE', 'BUSY', 'RESERVED', 'UNAVAILABLE').optional(),
   isActive: Joi.boolean().optional(),
 });
 
@@ -29,12 +31,14 @@ const updateMachineSchema = Joi.object({
   specifications: Joi.object().optional(),
   imageUrl: Joi.string().uri().optional(),
   locationId: Joi.string().uuid().optional(),
-  status: Joi.string().valid('IN_USE', 'UNDER_MAINTENANCE', 'UNDER_REPAIR', 'IDLE', 'DECOMMISSIONED').optional(),
+  currentOperatorId: Joi.string().uuid().optional().allow(null),
+  operationalStatus: Joi.string().valid('FREE', 'BUSY', 'RESERVED', 'UNAVAILABLE').optional(),
+  status: Joi.string().valid('NEW', 'IN_USE', 'UNDER_MAINTENANCE', 'UNDER_REPAIR', 'IDLE', 'DECOMMISSIONED').optional(),
   isActive: Joi.boolean().optional(),
 });
 
 const updateStatusSchema = Joi.object({
-  status: Joi.string().valid('IN_USE', 'UNDER_MAINTENANCE', 'UNDER_REPAIR', 'IDLE', 'DECOMMISSIONED').required(),
+  status: Joi.string().valid('NEW', 'IN_USE', 'UNDER_MAINTENANCE', 'UNDER_REPAIR', 'IDLE', 'DECOMMISSIONED').required(),
   reason: Joi.string().optional().max(500),
 });
 
