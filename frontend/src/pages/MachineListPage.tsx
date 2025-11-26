@@ -78,7 +78,7 @@ export default function MachineListPage() {
         }),
         locationService.getLocations(),
       ]);
-      
+
       console.log('=== MACHINES DATA FROM BACKEND (AFTER CONVERSION) ===');
       console.log('✅ Data converted from snake_case to camelCase');
       if (machinesData.data && machinesData.data.length > 0) {
@@ -88,7 +88,7 @@ export default function MachineListPage() {
         console.log('✅ isActive:', machinesData.data[0].isActive);
         console.log('✅ location.name:', machinesData.data[0].location?.name);
       }
-      
+
       setMachines(machinesData.data || []);
       setLocations(locationsData || []);
     } catch (error: any) {
@@ -208,18 +208,12 @@ export default function MachineListPage() {
       width: 300,
       render: (record: Machine) => (
         <div className='machine-info'>
-          <Avatar 
-            src={record.imageUrl} 
-            icon={<ToolOutlined />}
-            className='machine-avatar'
-          >
+          <Avatar src={record.imageUrl} icon={<ToolOutlined />} className='machine-avatar'>
             {record.name.charAt(0)}
           </Avatar>
           <div className='machine-details'>
             <div className='machine-name'>{record.name}</div>
-            <div className='machine-meta'>
-              {record.machineCode} • {record.machineType || 'Not specified'}
-            </div>
+            <div className='machine-meta'>{record.machineCode} </div>
           </div>
         </div>
       ),
@@ -232,38 +226,25 @@ export default function MachineListPage() {
       render: (machineType?: string) => machineType || '—',
     },
     {
-      title: 'Manufacturer',
-      dataIndex: 'manufacturer',
-      key: 'manufacturer',
-      width: 150,
-      render: (manufacturer?: string) => manufacturer || '—',
-    },
-    {
-      title: 'Model',
-      dataIndex: 'model',
-      key: 'model',
-      width: 120,
-      render: (model?: string) => model || '—',
-    },
-    {
       title: 'Purchase Date',
       dataIndex: 'purchaseDate',
       key: 'purchaseDate',
       width: 120,
-      render: (date?: string) => date ? new Date(date).toLocaleDateString() : '—',
+      render: (date?: string) => (date ? new Date(date).toLocaleDateString() : '—'),
     },
     {
       title: 'Warranty Expiry',
       dataIndex: 'warrantyExpiry',
       key: 'warrantyExpiry',
       width: 130,
-      render: (date?: string) => date ? new Date(date).toLocaleDateString() : '—',
+      render: (date?: string) => (date ? new Date(date).toLocaleDateString() : '—'),
     },
     {
       title: 'Location',
       key: 'location',
       width: 150,
-      render: (record: Machine) => record.location?.name || getLocationName(record.locationId) || '—',
+      render: (record: Machine) =>
+        record.location?.name || getLocationName(record.locationId) || '—',
     },
     {
       title: 'Current Operator',
