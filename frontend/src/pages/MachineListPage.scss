@@ -12,7 +12,10 @@
 
   .machine-avatar {
     flex-shrink: 0;
-
+    width: 100% !important;
+    height: 100% !important;
+    padding: 5px;
+    border-radius: 50%;
   }
 
   .machine-details {

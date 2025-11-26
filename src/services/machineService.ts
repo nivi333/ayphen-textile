@@ -374,11 +374,31 @@ class MachineService {
       const machine = await prisma.machines.update({
         where: { id: machineId },
         data: {
-          ...data,
+          name: data.name,
+          machine_type: data.machineType,
+          model: data.model,
+          manufacturer: data.manufacturer,
+          serial_number: data.serialNumber,
+          purchase_date: data.purchaseDate,
+          warranty_expiry: data.warrantyExpiry,
+          specifications: data.specifications,
+          image_url: data.imageUrl,
+          location_id: data.locationId,
+          current_operator_id: data.currentOperatorId,
+          operational_status: data.operationalStatus as any,
+          status: data.status as any,
+          is_active: data.isActive,
           updated_at: new Date(),
         },
         include: {
           location: true,
+          current_operator: {
+            select: {
+              id: true,
+              first_name: true,
+              last_name: true,
+            },
+          },
         },
       });
 

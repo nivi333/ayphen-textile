@@ -23,7 +23,7 @@
     margin-bottom: var(--spacing3);
   }
 
-  .ant-form-item-label > label {
+  .ant-form-item-label>label {
     font-weight: 500;
     color: var(--text-primary);
   }
@@ -32,6 +32,6 @@
 .drawer-footer {
   display: flex;
   justify-content: flex-end;
-  gap: var(--spacing2);
+  gap: 15px;
   padding: var(--spacing3) 0;
 }

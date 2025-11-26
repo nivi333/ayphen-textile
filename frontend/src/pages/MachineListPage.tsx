@@ -208,7 +208,7 @@ export default function MachineListPage() {
       width: 300,
       render: (record: Machine) => (
         <div className='machine-info'>
-          <Avatar src={record.imageUrl} icon={<ToolOutlined />} className='machine-avatar'>
+          <Avatar src={record.imageUrl} icon={<ToolOutlined />} className='location-avatar'>
             {record.name.charAt(0)}
           </Avatar>
           <div className='machine-details'>
