@@ -34,7 +34,7 @@ import { inventoryService, LocationInventory, InventoryFilters } from '../servic
 import { locationService } from '../services/locationService';
 import useAuth from '../contexts/AuthContext';
 import ProductSelector from '../components/products/ProductSelector';
-import { StockMovementModal, StockReservationModal } from '../components/inventory';
+import { StockMovementModal, StockReservationModal, InventoryFormDrawer } from '../components/inventory';
 import './InventoryListPage.scss';
 
 const { Text } = Typography;
@@ -58,6 +58,7 @@ const InventoryListPage: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<string | undefined>(undefined);
   const [stockMovementModalVisible, setStockMovementModalVisible] = useState(false);
   const [stockReservationModalVisible, setStockReservationModalVisible] = useState(false);
+  const [inventoryFormDrawerVisible, setInventoryFormDrawerVisible] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<LocationInventory | null>(null);
   const { currentCompany } = useAuth();
   const { setHeaderActions } = useHeader();
@@ -146,7 +147,7 @@ const InventoryListPage: React.FC = () => {
 
   // Handle add inventory
   const handleAddInventory = () => {
-    message.info('Add inventory feature coming soon');
+    setInventoryFormDrawerVisible(true);
   };
 
   // Clear filters
@@ -500,7 +501,13 @@ const InventoryListPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Modals */}
+      {/* Modals & Drawers */}
+      <InventoryFormDrawer
+        visible={inventoryFormDrawerVisible}
+        onClose={() => setInventoryFormDrawerVisible(false)}
+        onSuccess={handleModalSuccess}
+      />
+
       <StockMovementModal
         visible={stockMovementModalVisible}
         onClose={handleStockMovementModalClose}

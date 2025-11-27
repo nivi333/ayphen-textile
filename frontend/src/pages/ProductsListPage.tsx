@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Table, Tag, Space, Button, Dropdown, Empty, Spin, message, Input, Select } from 'antd';
-import { MoreOutlined, EditOutlined, DeleteOutlined, StockOutlined, SearchOutlined } from '@ant-design/icons';
+import { Table, Tag, Space, Button, Dropdown, Empty, Spin, message, Input, Select, Avatar } from 'antd';
+import { MoreOutlined, EditOutlined, DeleteOutlined, StockOutlined, SearchOutlined, AppstoreOutlined } from '@ant-design/icons';
 import useAuth from '../contexts/AuthContext';
 import { useHeader } from '../contexts/HeaderContext';
 import { MainLayout } from '../components/layout';
@@ -162,13 +162,13 @@ export default function ProductsListPage() {
       key: 'imageUrl',
       width: 80,
       render: (imageUrl: string | undefined, record: ProductSummary) => (
-        <div className='product-image-cell'>
-          {imageUrl ? (
-            <img src={imageUrl} alt={record.name} className='product-thumbnail' />
-          ) : (
-            <div className='product-placeholder'>{record.name.charAt(0)}</div>
-          )}
-        </div>
+        <Avatar 
+          src={imageUrl} 
+          icon={<AppstoreOutlined />}
+          style={{ flexShrink: 0 }}
+        >
+          {record.name.charAt(0)}
+        </Avatar>
       ),
     },
     {

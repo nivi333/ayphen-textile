@@ -319,6 +319,21 @@
 
 #### **2.2 Inventory Management**
 
+**Add Inventory (Initial Setup)**
+- Drawer-based form for setting up initial inventory levels
+- Form Fields:
+  - Product: Searchable product dropdown (required)
+  - Location: Location dropdown (required)
+  - Stock Quantity: Initial stock level (required, integer only)
+  - Reserved Quantity: Pre-reserved stock (optional, integer only, default 0)
+  - Reorder Level: Minimum threshold for low stock alerts (optional, integer only)
+  - Maximum Stock Level: Maximum inventory threshold (optional, integer only)
+- Purpose: Set up inventory tracking for a product at a specific location
+- Validation: Stock quantity must be 0 or greater
+- Auto-Calculation: Available quantity = Stock quantity - Reserved quantity
+- Use Case: First-time inventory setup or adding new product-location combinations
+- Note: For ongoing stock changes, use Stock Movement Management instead
+
 **Multi-Location Inventory Tracking**
 - Location-Based Stock: Track stock separately for each location
 - Real-Time Stock Levels: Current quantity per location

@@ -100,9 +100,9 @@ export const StockAdjustmentModal: React.FC<StockAdjustmentModalProps> = ({
       open={visible}
       onCancel={handleCancel}
       footer={[
-        <GradientButton key='cancel' onClick={handleCancel} disabled={submitting}>
+        <button key='cancel' className='cancel-btn' onClick={handleCancel} disabled={submitting}>
           Cancel
-        </GradientButton>,
+        </button>,
         <GradientButton key='submit' onClick={handleSubmit} loading={submitting}>
           Adjust Stock
         </GradientButton>,
@@ -194,7 +194,7 @@ export const StockAdjustmentModal: React.FC<StockAdjustmentModalProps> = ({
               >
                 <InputNumber
                   min={0}
-                  precision={2}
+                  precision={0}
                   style={{ width: '100%' }}
                   placeholder='Enter quantity'
                   onChange={(value) => setQuantity(value || 0)}

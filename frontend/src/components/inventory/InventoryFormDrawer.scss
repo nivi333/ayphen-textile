@@ -1,0 +1,12 @@
+.form-section {
+  margin-bottom: var(--spacing-4);
+  
+  .section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-3);
+    padding-bottom: var(--spacing-2);
+    border-bottom: 1px solid var(--border-color);
+  }
+}
