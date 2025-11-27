@@ -34,11 +34,13 @@ const QualityDefectFormDrawer: React.FC<QualityDefectFormDrawerProps> = ({
   const [loading, setLoading] = useState(false);
   const [checkpoints, setCheckpoints] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
+  const [isActive, setIsActive] = useState(true);
 
   useEffect(() => {
     if (visible) {
       form.resetFields();
       form.setFieldsValue({ isActive: true });
+      setIsActive(true);
       fetchCheckpoints();
       fetchProducts();
     }
@@ -102,9 +104,14 @@ const QualityDefectFormDrawer: React.FC<QualityDefectFormDrawerProps> = ({
           <span>Report Quality Defect</span>
           <div className='header-switch'>
             <span className='switch-label'>Active</span>
-            <Form.Item name='isActive' valuePropName='checked' noStyle>
-              <Switch disabled />
-            </Form.Item>
+            <Switch
+              checked={isActive}
+              onChange={checked => {
+                setIsActive(checked);
+                form.setFieldsValue({ isActive: checked });
+              }}
+              disabled
+            />
           </div>
         </div>
       }
@@ -125,7 +132,19 @@ const QualityDefectFormDrawer: React.FC<QualityDefectFormDrawerProps> = ({
         </Space>
       }
     >
-      <Form form={form} layout='vertical' className='quality-defect-form'>
+      <Form
+        form={form}
+        layout='vertical'
+        className='quality-defect-form'
+        onValuesChange={(_, allValues) => {
+          if (allValues.isActive !== undefined) {
+            setIsActive(allValues.isActive);
+          }
+        }}
+      >
+        <Form.Item name='isActive' valuePropName='checked' hidden>
+          <Switch />
+        </Form.Item>
         <div className='form-section'>
           <h3>Defect Information</h3>
 

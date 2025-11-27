@@ -38,6 +38,7 @@ const QualityCheckpointFormDrawer: React.FC<QualityCheckpointFormDrawerProps> = 
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState<any[]>([]);
   const [checkpointType, setCheckpointType] = useState<string>('');
+  const [isActive, setIsActive] = useState(true);
 
   // Load products when drawer opens
   useEffect(() => {
@@ -61,6 +62,7 @@ const QualityCheckpointFormDrawer: React.FC<QualityCheckpointFormDrawerProps> = 
           notes: checkpoint.notes,
           isActive: checkpoint.isActive !== undefined ? checkpoint.isActive : true,
         });
+        setIsActive(checkpoint.isActive !== undefined ? checkpoint.isActive : true);
       } else {
         // Creating new checkpoint - reset form
         setCheckpointType('');
@@ -80,6 +82,7 @@ const QualityCheckpointFormDrawer: React.FC<QualityCheckpointFormDrawerProps> = 
           notes: undefined,
           isActive: true,
         });
+        setIsActive(true);
       }
     }
   }, [visible, checkpoint, form]);
@@ -141,9 +144,14 @@ const QualityCheckpointFormDrawer: React.FC<QualityCheckpointFormDrawerProps> = 
           <span>{checkpoint ? 'Edit Quality Checkpoint' : 'Create Quality Checkpoint'}</span>
           <div className='header-switch'>
             <span className='switch-label'>Active</span>
-            <Form.Item name='isActive' valuePropName='checked' noStyle>
-              <Switch disabled={!checkpoint} />
-            </Form.Item>
+            <Switch
+              checked={isActive}
+              onChange={checked => {
+                setIsActive(checked);
+                form.setFieldsValue({ isActive: checked });
+              }}
+              disabled={!checkpoint}
+            />
           </div>
         </div>
       }
@@ -164,7 +172,19 @@ const QualityCheckpointFormDrawer: React.FC<QualityCheckpointFormDrawerProps> = 
         </Space>
       }
     >
-      <Form form={form} layout='vertical' className='quality-checkpoint-form'>
+      <Form
+        form={form}
+        layout='vertical'
+        className='quality-checkpoint-form'
+        onValuesChange={(_, allValues) => {
+          if (allValues.isActive !== undefined) {
+            setIsActive(allValues.isActive);
+          }
+        }}
+      >
+        <Form.Item name='isActive' valuePropName='checked' hidden>
+          <Switch />
+        </Form.Item>
         <div className='form-section'>
           <h3>Checkpoint Information</h3>
 

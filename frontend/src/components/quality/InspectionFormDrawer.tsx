@@ -32,6 +32,7 @@ const InspectionFormDrawer: React.FC<InspectionFormDrawerProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [isActive, setIsActive] = useState(true);
 
   const resetFormState = useCallback(() => {
     form.resetFields();
@@ -49,6 +50,7 @@ const InspectionFormDrawer: React.FC<InspectionFormDrawerProps> = ({
       form.setFieldsValue({
         isActive: true, // Default to active for new inspections
       });
+      setIsActive(true);
     } else if (visible && inspection) {
       const inspectionDetail = inspection as InspectionDetail;
       form.setFieldsValue({
@@ -64,6 +66,7 @@ const InspectionFormDrawer: React.FC<InspectionFormDrawerProps> = ({
         recommendations: inspectionDetail.recommendations,
         isActive: (inspection as any).isActive !== undefined ? (inspection as any).isActive : true,
       });
+      setIsActive((inspection as any).isActive !== undefined ? (inspection as any).isActive : true);
     }
   }, [visible, inspection, form]);
 
@@ -110,9 +113,14 @@ const InspectionFormDrawer: React.FC<InspectionFormDrawerProps> = ({
           <span>{inspection ? 'Edit Inspection' : 'Create Inspection'}</span>
           <div className='header-switch'>
             <span className='switch-label'>Active</span>
-            <Form.Item name='isActive' valuePropName='checked' noStyle>
-              <Switch disabled={!inspection} />
-            </Form.Item>
+            <Switch
+              checked={isActive}
+              onChange={checked => {
+                setIsActive(checked);
+                form.setFieldsValue({ isActive: checked });
+              }}
+              disabled={!inspection}
+            />
           </div>
         </div>
       }
@@ -128,7 +136,15 @@ const InspectionFormDrawer: React.FC<InspectionFormDrawerProps> = ({
           layout='vertical'
           onFinish={handleSubmit}
           className='ifd-form'
+          onValuesChange={(_, allValues) => {
+            if (allValues.isActive !== undefined) {
+              setIsActive(allValues.isActive);
+            }
+          }}
         >
+          <Form.Item name='isActive' valuePropName='checked' hidden>
+            <Switch />
+          </Form.Item>
           <div className='ifd-form-content'>
             {/* Section 1: Basic Information */}
             <div className='ifd-section'>
