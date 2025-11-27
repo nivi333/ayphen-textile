@@ -12,14 +12,14 @@ type AuthAction =
   | { type: 'REFRESH_COMPANIES'; payload: Company[] }
   | { type: 'REFRESH_TOKEN_SUCCESS'; payload: AuthTokens }
   | {
-      type: 'INITIALIZE_AUTH';
-      payload: {
-        user: User | null;
-        tokens: AuthTokens | null;
-        companies: Company[];
-        currentCompany: Company | null;
-      };
+    type: 'INITIALIZE_AUTH';
+    payload: {
+      user: User | null;
+      tokens: AuthTokens | null;
+      companies: Company[];
+      currentCompany: Company | null;
     };
+  };
 
 // Initial state
 const initialState: AuthState = {
@@ -100,6 +100,7 @@ interface AuthContextType extends AuthState {
   switchCompany: (company: Company) => void;
   refreshToken: () => Promise<void>;
   refreshCompanies: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -317,6 +318,58 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  const refreshUser = async () => {
+    try {
+      const tokens = AuthStorage.getTokens();
+      const currentUser = AuthStorage.getUser();
+
+      if (!tokens?.accessToken || !currentUser?.id) {
+        return;
+      }
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/users/${currentUser.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${tokens.accessToken}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch user details');
+      }
+
+      const result = await response.json();
+      const updatedUser = result.data;
+
+      AuthStorage.setUser(updatedUser);
+
+      // We can reuse LOGIN_SUCCESS or create a new action. 
+      // Reusing LOGIN_SUCCESS requires tokens and companies which we have.
+      // Or just update the user part. 
+      // Let's create a new action type UPDATE_USER or just use INITIALIZE_AUTH logic partially?
+      // Actually, let's just dispatch INITIALIZE_AUTH with updated user and existing other data.
+
+      const companies = AuthStorage.getCompanies();
+      const currentCompany = AuthStorage.getCurrentCompany();
+
+      dispatch({
+        type: 'INITIALIZE_AUTH',
+        payload: {
+          user: updatedUser,
+          tokens,
+          companies,
+          currentCompany
+        },
+      });
+
+    } catch (error) {
+      console.error('Error refreshing user:', error);
+      // Don't throw, just log
+    }
+  };
+
   const value: AuthContextType = {
     ...state,
     login,
@@ -325,6 +378,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     switchCompany,
     refreshToken,
     refreshCompanies,
+    refreshUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -32,7 +32,6 @@ import { GradientButton } from '../../components/ui';
 import UserInviteModal from '../../components/users/UserInviteModal';
 import StockAlertsCard from '../../components/inventory/StockAlertsCard';
 import { productService } from '../../services/productService';
-import { companyService } from '../../services/companyService';
 import './DashboardPage.scss';
 import { COMPANY_TEXT } from '../../constants/company';
 
@@ -41,15 +40,6 @@ interface DashboardStats {
   activeOrders: number;
   teamMembers: number;
   monthlyRevenue: number;
-}
-
-interface UserInvitation {
-  id: string;
-  email: string;
-  role: string;
-  invitedBy: string;
-  invitedAt: string;
-  status: 'PENDING' | 'ACCEPTED' | 'DECLINED';
 }
 
 const DashboardPage: React.FC = () => {

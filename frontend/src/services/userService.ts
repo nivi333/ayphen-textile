@@ -63,6 +63,8 @@ export interface UpdateUserRequest {
   isActive?: boolean;
 }
 
+export type UpdateProfileRequest = UpdateUserRequest;
+
 export interface BulkUpdateRequest {
   userIds: string[];
   role?: string;

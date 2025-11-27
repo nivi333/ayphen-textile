@@ -25,6 +25,9 @@ export { default as MachineListPage } from './machines/MachineListPage';
 // Orders
 export { default as OrdersListPage } from './orders/OrdersListPage';
 
+// Sales
+export { default as CustomerListPage } from './sales/CustomerListPage';
+
 // Quality Control
 export { default as QualityCheckpointsListPage } from './quality/QualityCheckpointsListPage';
 export { default as QualityDefectsListPage } from './quality/QualityDefectsListPage';

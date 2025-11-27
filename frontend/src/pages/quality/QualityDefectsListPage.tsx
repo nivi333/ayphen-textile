@@ -31,7 +31,6 @@ export default function QualityDefectsListPage() {
   const [defects, setDefects] = useState<QualityDefect[]>([]);
   const [loading, setLoading] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
-  const [selectedDefect, setSelectedDefect] = useState<QualityDefect | null>(null);
   const [searchText, setSearchText] = useState('');
   const [selectedSeverity, setSelectedSeverity] = useState<string | undefined>(undefined);
   const [selectedStatus, setSelectedStatus] = useState<string | undefined>(undefined);
@@ -76,12 +75,10 @@ export default function QualityDefectsListPage() {
   };
 
   const handleCreateDefect = () => {
-    setSelectedDefect(null);
     setDrawerVisible(true);
   };
 
-  const handleEditDefect = (defect: QualityDefect) => {
-    setSelectedDefect(defect);
+  const handleEditDefect = (_defect: QualityDefect) => {
     setDrawerVisible(true);
   };
 
@@ -107,7 +104,6 @@ export default function QualityDefectsListPage() {
 
   const handleDrawerClose = () => {
     setDrawerVisible(false);
-    setSelectedDefect(null);
   };
 
   const handleDrawerSuccess = () => {
@@ -295,7 +291,6 @@ export default function QualityDefectsListPage() {
 
       <QualityDefectFormDrawer
         visible={drawerVisible}
-        defect={selectedDefect}
         onClose={handleDrawerClose}
         onSuccess={handleDrawerSuccess}
       />

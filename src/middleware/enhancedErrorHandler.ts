@@ -177,18 +177,26 @@ function convertToAppError(err: Error, requestId: string): AppError {
  */
 function handlePrismaError(err: any, requestId: string): AppError {
   const code = err.code;
+  const meta = err.meta;
 
   switch (code) {
-    case 'P2002':
-      return new ConflictError('Resource already exists', requestId);
+    case 'P2002': {
+      // Unique constraint violation
+      const field = meta?.target?.[0] || 'field';
+      return new ConflictError(`This ${field} is already in use`, requestId);
+    }
     case 'P2025':
       return new NotFoundError('Record', requestId);
     case 'P2003':
-      return new ValidationError('Foreign key constraint failed', undefined, requestId);
+      return new ValidationError('Invalid reference to related record', undefined, requestId);
     case 'P2014':
       return new ValidationError('Invalid relation', undefined, requestId);
+    case 'P2021':
+      return new DatabaseError('The table does not exist. Please contact support.', { code }, requestId);
+    case 'P2022':
+      return new DatabaseError('The column does not exist. Please contact support.', { code }, requestId);
     default:
-      return new DatabaseError('Database operation failed', { code }, requestId);
+      return new DatabaseError('A database error occurred. Please try again later.', { code }, requestId);
   }
 }
 
@@ -225,34 +233,37 @@ function logError(error: AppError, req: Request): void {
  * Send error response
  */
 function sendErrorResponse(error: AppError, res: Response, requestId: string): void {
+  // Simple, user-friendly response
   const response: any = {
     success: false,
-    error: {
-      type: error.type,
-      message: error.message,
-      requestId,
-      timestamp: new Date().toISOString(),
-    },
+    message: error.message, // Simple message at top level
   };
 
-  // Add details in development mode or for validation errors
-  if (config.env === 'development' || error.type === ErrorType.VALIDATION_ERROR) {
+  // Only add technical details in development mode
+  if (config.env === 'development') {
+    response.error = {
+      type: error.type,
+      requestId,
+      timestamp: new Date().toISOString(),
+    };
+
     if (error.details) {
       response.error.details = error.details;
     }
-    if (config.env === 'development' && error.stack) {
-      response.error.stack = error.stack;
+
+    if (error.stack) {
+      response.error.stack = error.stack.split('\n').slice(0, 5).join('\n'); // Limit stack trace
     }
   }
 
   // Add retry information for rate limiting
   if (error.type === ErrorType.RATE_LIMIT_ERROR) {
-    response.error.retryAfter = 60; // seconds
+    response.retryAfter = 60; // seconds
   }
 
   // Add maintenance information
   if (error.type === ErrorType.MAINTENANCE_ERROR) {
-    response.error.retryAfter = 3600; // 1 hour
+    response.retryAfter = 3600; // 1 hour
   }
 
   res.status(error.statusCode).json(response);

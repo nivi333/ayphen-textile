@@ -65,6 +65,7 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
   const [slugChecking, setSlugChecking] = useState(false);
   const [slugUnique, setSlugUnique] = useState(true);
   const [originalSlug, setOriginalSlug] = useState<string | null>(null);
+  const [isActive, setIsActive] = useState(true);
 
   const isEditing = mode === 'edit' && !!companyId;
 
@@ -306,8 +307,14 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
       } else {
         setLogoFile(null);
       }
+      if (initialData.isActive !== undefined) {
+        setIsActive(initialData.isActive);
+      } else {
+        setIsActive(true);
+      }
     } else if (!isEditing) {
       form.setFieldsValue({ isActive: true, slugAuto: true });
+      setIsActive(true);
     }
   }, [open, isEditing, initialData, form]);
 
@@ -321,9 +328,14 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
           <span className='ccd-title'>{drawerTitle}</span>
           <div className='header-switch'>
             <span className='switch-label'>Active</span>
-            <Form.Item name='isActive' valuePropName='checked' noStyle>
-              <Switch disabled={!isEditing} />
-            </Form.Item>
+            <Switch
+              checked={isActive}
+              onChange={(checked) => {
+                setIsActive(checked);
+                form.setFieldsValue({ isActive: checked });
+              }}
+              disabled={!isEditing}
+            />
           </div>
         </div>
       }
@@ -340,336 +352,344 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
           layout='vertical'
           onFinish={handleFinish}
           initialValues={{ slugAuto: true, isActive: true }}
+          onValuesChange={(_, allValues) => {
+            if (allValues.isActive !== undefined) {
+              setIsActive(allValues.isActive);
+            }
+          }}
           className='ccd-form'
         >
+          <Form.Item name='isActive' valuePropName='checked' hidden>
+            <Switch />
+          </Form.Item>
           <div className='ccd-form-content'>
             {/* Section 1: Basic Information */}
-          <div className='ccd-section'>
-            <div className='ccd-section-header'>
-              <div className='ccd-section-title'>Basic Information</div>
-            </div>
-            <Col span={24}>
-              <Upload
-                name='logo'
-                accept='image/*'
-                listType='picture-circle'
-                beforeUpload={() => false}
-                showUploadList={false}
-                onChange={handleLogoChange}
-                maxCount={1}
-                className='ccd-logo-upload'
-              >
-                {logoFile && logoFile.url ? (
-                  <div className='ccd-logo-preview'>
-                    <img src={logoFile.url} alt='Company Logo' />
-                    <button
-                      type='button'
-                      className='ccd-logo-delete-btn'
-                      onClick={handleRemoveLogo}
-                      aria-label='Remove company logo'
-                    >
-                      <DeleteOutlined />
-                    </button>
-                  </div>
-                ) : (
-                  <span className='ccd-upload-icon'>
-                    <BankOutlined />
-                  </span>
-                )}
-              </Upload>
-              <div className='ccd-logo-help-text'>
-                Upload Logo (PNG/JPG, max 2MB)
-                <br />
-                Drag & drop or click to upload
+            <div className='ccd-section'>
+              <div className='ccd-section-header'>
+                <div className='ccd-section-title'>Basic Information</div>
               </div>
-            </Col>
-            <Row gutter={12}>
-              <Col span={12}>
-                <Form.Item
-                  label='Company Name'
-                  name='name'
-                  rules={[{ required: true, message: 'Please enter company name' }]}
+              <Col span={24}>
+                <Upload
+                  name='logo'
+                  accept='image/*'
+                  listType='picture-circle'
+                  beforeUpload={() => false}
+                  showUploadList={false}
+                  onChange={handleLogoChange}
+                  maxCount={1}
+                  className='ccd-logo-upload'
                 >
-                  <Input
-                    onChange={handleNameChange}
-                    maxLength={48}
-                    autoComplete='off'
-                    placeholder='Enter company name'
-                    className='ccd-input'
-                  />
-                </Form.Item>
+                  {logoFile && logoFile.url ? (
+                    <div className='ccd-logo-preview'>
+                      <img src={logoFile.url} alt='Company Logo' />
+                      <button
+                        type='button'
+                        className='ccd-logo-delete-btn'
+                        onClick={handleRemoveLogo}
+                        aria-label='Remove company logo'
+                      >
+                        <DeleteOutlined />
+                      </button>
+                    </div>
+                  ) : (
+                    <span className='ccd-upload-icon'>
+                      <BankOutlined />
+                    </span>
+                  )}
+                </Upload>
+                <div className='ccd-logo-help-text'>
+                  Upload Logo (PNG/JPG, max 2MB)
+                  <br />
+                  Drag & drop or click to upload
+                </div>
               </Col>
-              <Col span={12}>
-                <Form.Item
-                  label='Company Slug'
-                  name='slug'
-                  rules={[
-                    { required: true, message: 'Please enter company slug' },
-                    {
-                      pattern: /^[a-z0-9-]+$/,
-                      message: 'Slug must be lowercase, alphanumeric or hyphens',
-                    },
-                    () => ({
-                      validator(_) {
-                        if (slugChecking) return Promise.reject('Checking slug...');
-                        if (!slugUnique) return Promise.reject('Slug already taken');
-                        return Promise.resolve();
-                      },
-                    }),
-                  ]}
-                >
-                  <Space.Compact block className='ccd-slug-compact'>
-                    <span className='ccd-slug-prefix' aria-hidden='true'>lavoro.ai/</span>
+              <Row gutter={12}>
+                <Col span={12}>
+                  <Form.Item
+                    label='Company Name'
+                    name='name'
+                    rules={[{ required: true, message: 'Please enter company name' }]}
+                  >
                     <Input
-                      value={form.getFieldValue('slug') || ''}
+                      onChange={handleNameChange}
+                      maxLength={48}
+                      autoComplete='off'
+                      placeholder='Enter company name'
+                      className='ccd-input'
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    label='Company Slug'
+                    name='slug'
+                    rules={[
+                      { required: true, message: 'Please enter company slug' },
+                      {
+                        pattern: /^[a-z0-9-]+$/,
+                        message: 'Slug must be lowercase, alphanumeric or hyphens',
+                      },
+                      () => ({
+                        validator(_) {
+                          if (slugChecking) return Promise.reject('Checking slug...');
+                          if (!slugUnique) return Promise.reject('Slug already taken');
+                          return Promise.resolve();
+                        },
+                      }),
+                    ]}
+                  >
+                    <Space.Compact block className='ccd-slug-compact'>
+                      <span className='ccd-slug-prefix' aria-hidden='true'>lavoro.ai/</span>
+                      <Input
+                        value={form.getFieldValue('slug') || ''}
+                        maxLength={32}
+                        autoComplete='off'
+                        placeholder='Enter company slug'
+                        className='ccd-input'
+                        onChange={e => {
+                          const rawValue = e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, '');
+                          form.setFieldsValue({ slug: rawValue, slugAuto: false });
+                          checkSlugUnique(rawValue);
+                        }}
+                      />
+                    </Space.Compact>
+                  </Form.Item>
+                  <Form.Item name='slugAuto' hidden>
+                    <Input type='hidden' />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={12}>
+                <Col span={12}>
+                  <Form.Item
+                    label='Industry'
+                    name='industry'
+                    rules={[{ required: true, message: 'Please select industry' }]}
+                  >
+                    <Select placeholder='Select industry' className='ccd-select'>
+                      <Option value='Textile Manufacturing'>Textile Manufacturing</Option>
+                      <Option value='Garment Production'>Garment Production</Option>
+                      <Option value='Knitting & Weaving'>Knitting & Weaving</Option>
+                      <Option value='Fabric Processing'>Fabric Processing</Option>
+                      <Option value='Apparel Design'>Apparel Design</Option>
+                      <Option value='Fashion Retail'>Fashion Retail</Option>
+                      <Option value='Yarn Production'>Yarn Production</Option>
+                      <Option value='Dyeing & Finishing'>Dyeing & Finishing</Option>
+                      <Option value='Home Textiles'>Home Textiles</Option>
+                      <Option value='Technical Textiles'>Technical Textiles</Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label='Description' name='description'>
+                    <Input.TextArea
+                      rows={1}
+                      maxLength={80}
+                      autoComplete='off'
+                      placeholder='Enter description'
+                      className='ccd-textarea'
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={12}>
+                <Col span={12}>
+                  <Form.Item
+                    label='Country'
+                    name='country'
+                    rules={[{ required: true, message: 'Please select country' }]}
+                  >
+                    <Select showSearch placeholder='Select country' className='ccd-select'>
+                      <Option value='India'>India</Option>
+                      <Option value='USA'>USA</Option>
+                      <Option value='UK'>UK</Option>
+                      <Option value='China'>China</Option>
+                      <Option value='Bangladesh'>Bangladesh</Option>
+                      <Option value='Vietnam'>Vietnam</Option>
+                      <Option value='Turkey'>Turkey</Option>
+                      <Option value='Italy'>Italy</Option>
+                      <Option value='Germany'>Germany</Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    label='Default Location Name'
+                    name='defaultLocation'
+                    rules={[{ required: true, message: 'Please enter location name' }]}
+                  >
+                    <Input
                       maxLength={32}
                       autoComplete='off'
-                      placeholder='Enter company slug'
+                      placeholder='Enter location name'
                       className='ccd-input'
-                      onChange={e => {
-                        const rawValue = e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, '');
-                        form.setFieldsValue({ slug: rawValue, slugAuto: false });
-                        checkSlugUnique(rawValue);
-                      }}
                     />
-                  </Space.Compact>
-                </Form.Item>
-                <Form.Item name='slugAuto' hidden>
-                  <Input type='hidden' />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row gutter={12}>
-              <Col span={12}>
-                <Form.Item
-                  label='Industry'
-                  name='industry'
-                  rules={[{ required: true, message: 'Please select industry' }]}
-                >
-                  <Select placeholder='Select industry' className='ccd-select'>
-                    <Option value='Textile Manufacturing'>Textile Manufacturing</Option>
-                    <Option value='Garment Production'>Garment Production</Option>
-                    <Option value='Knitting & Weaving'>Knitting & Weaving</Option>
-                    <Option value='Fabric Processing'>Fabric Processing</Option>
-                    <Option value='Apparel Design'>Apparel Design</Option>
-                    <Option value='Fashion Retail'>Fashion Retail</Option>
-                    <Option value='Yarn Production'>Yarn Production</Option>
-                    <Option value='Dyeing & Finishing'>Dyeing & Finishing</Option>
-                    <Option value='Home Textiles'>Home Textiles</Option>
-                    <Option value='Technical Textiles'>Technical Textiles</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item label='Description' name='description'>
-                  <Input.TextArea
-                    rows={1}
-                    maxLength={80}
-                    autoComplete='off'
-                    placeholder='Enter description'
-                    className='ccd-textarea'
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row gutter={12}>
-              <Col span={12}>
-                <Form.Item
-                  label='Country'
-                  name='country'
-                  rules={[{ required: true, message: 'Please select country' }]}
-                >
-                  <Select showSearch placeholder='Select country' className='ccd-select'>
-                    <Option value='India'>India</Option>
-                    <Option value='USA'>USA</Option>
-                    <Option value='UK'>UK</Option>
-                    <Option value='China'>China</Option>
-                    <Option value='Bangladesh'>Bangladesh</Option>
-                    <Option value='Vietnam'>Vietnam</Option>
-                    <Option value='Turkey'>Turkey</Option>
-                    <Option value='Italy'>Italy</Option>
-                    <Option value='Germany'>Germany</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item
-                  label='Default Location Name'
-                  name='defaultLocation'
-                  rules={[{ required: true, message: 'Please enter location name' }]}
-                >
-                  <Input
-                    maxLength={32}
-                    autoComplete='off'
-                    placeholder='Enter location name'
-                    className='ccd-input'
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-          </div>
+                  </Form.Item>
+                </Col>
+              </Row>
+            </div>
 
-          <Divider className='ccd-divider' />
+            <Divider className='ccd-divider' />
 
-          {/* Section 2: Address */}
-          <div className='ccd-section'>
-            <div className='ccd-section-title'>Address</div>
-            <Row gutter={12}>
-              <Col span={12}>
-                <Form.Item
-                  label='Address Line 1'
-                  name='addressLine1'
-                  rules={[{ required: true, message: 'Please enter address' }]}
-                >
-                  <Input
-                    maxLength={64}
-                    autoComplete='off'
-                    placeholder='Enter address'
-                    className='ccd-input'
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item label='Address Line 2' name='addressLine2'>
-                  <Input
-                    maxLength={64}
-                    autoComplete='off'
-                    placeholder='Enter address'
-                    className='ccd-input'
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row gutter={12}>
-              <Col span={12}>
-                <Form.Item
-                  label='City'
-                  name='city'
-                  rules={[{ required: true, message: 'Please enter city' }]}
-                >
-                  <Input
-                    maxLength={32}
-                    autoComplete='off'
-                    placeholder='Enter city'
-                    className='ccd-input'
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item
-                  label='State'
-                  name='state'
-                  rules={[{ required: true, message: 'Please enter state' }]}
-                >
-                  <Input
-                    maxLength={32}
-                    autoComplete='off'
-                    placeholder='Enter state'
-                    className='ccd-input'
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item
-                  label='Pincode'
-                  name='pincode'
-                  rules={[{ required: true, message: 'Please enter pincode' }]}
-                >
-                  <Input
-                    maxLength={12}
-                    autoComplete='off'
-                    placeholder='Enter pincode'
-                    className='ccd-input'
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-          </div>
+            {/* Section 2: Address */}
+            <div className='ccd-section'>
+              <div className='ccd-section-title'>Address</div>
+              <Row gutter={12}>
+                <Col span={12}>
+                  <Form.Item
+                    label='Address Line 1'
+                    name='addressLine1'
+                    rules={[{ required: true, message: 'Please enter address' }]}
+                  >
+                    <Input
+                      maxLength={64}
+                      autoComplete='off'
+                      placeholder='Enter address'
+                      className='ccd-input'
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label='Address Line 2' name='addressLine2'>
+                    <Input
+                      maxLength={64}
+                      autoComplete='off'
+                      placeholder='Enter address'
+                      className='ccd-input'
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={12}>
+                <Col span={12}>
+                  <Form.Item
+                    label='City'
+                    name='city'
+                    rules={[{ required: true, message: 'Please enter city' }]}
+                  >
+                    <Input
+                      maxLength={32}
+                      autoComplete='off'
+                      placeholder='Enter city'
+                      className='ccd-input'
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    label='State'
+                    name='state'
+                    rules={[{ required: true, message: 'Please enter state' }]}
+                  >
+                    <Input
+                      maxLength={32}
+                      autoComplete='off'
+                      placeholder='Enter state'
+                      className='ccd-input'
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    label='Pincode'
+                    name='pincode'
+                    rules={[{ required: true, message: 'Please enter pincode' }]}
+                  >
+                    <Input
+                      maxLength={12}
+                      autoComplete='off'
+                      placeholder='Enter pincode'
+                      className='ccd-input'
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </div>
 
-          <Divider className='ccd-divider' />
+            <Divider className='ccd-divider' />
 
-          {/* Section 3: Business Details */}
-          <div className='ccd-section'>
-            <div className='ccd-section-title'>Business Details</div>
-            <Row gutter={12}>
-              <Col span={12}>
-                <Form.Item
-                  label='Established Date'
-                  name='establishedDate'
-                  rules={[{ required: true, message: 'Please select established date' }]}
-                >
-                  <DatePicker
-                    placeholder='Select established date'
-                    className='ccd-input'
-                    style={{ width: '100%' }}
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item
-                  label='Business Type'
-                  name='businessType'
-                  rules={[{ required: true, message: 'Please select type' }]}
-                >
-                  <Select placeholder='Select type' className='ccd-select'>
-                    <Option value='Manufacturer'>Manufacturer</Option>
-                    <Option value='Trader'>Trader</Option>
-                    <Option value='Exporter'>Exporter</Option>
-                    <Option value='Other'>Other</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-            </Row>
-            <Form.Item label='Certifications' name='certifications'>
-              <Input
-                maxLength={64}
-                autoComplete='off'
-                placeholder='Enter certifications (comma separated)'
-                className='ccd-input'
-              />
-            </Form.Item>
-          </div>
-
-          <Divider className='ccd-divider' />
-
-          {/* Section 4: Contact Information */}
-          <div className='ccd-section'>
-            <div className='ccd-section-title'>Contact Information</div>
-            <Row gutter={12}>
-              <Col span={24}>
-                <EmailPhoneInput
-                  name='contactInfo'
-                  label='Contact Information'
-                  placeholder='Enter email or phone number'
-                  required={true}
+            {/* Section 3: Business Details */}
+            <div className='ccd-section'>
+              <div className='ccd-section-title'>Business Details</div>
+              <Row gutter={12}>
+                <Col span={12}>
+                  <Form.Item
+                    label='Established Date'
+                    name='establishedDate'
+                    rules={[{ required: true, message: 'Please select established date' }]}
+                  >
+                    <DatePicker
+                      placeholder='Select established date'
+                      className='ccd-input'
+                      style={{ width: '100%' }}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    label='Business Type'
+                    name='businessType'
+                    rules={[{ required: true, message: 'Please select type' }]}
+                  >
+                    <Select placeholder='Select type' className='ccd-select'>
+                      <Option value='Manufacturer'>Manufacturer</Option>
+                      <Option value='Trader'>Trader</Option>
+                      <Option value='Exporter'>Exporter</Option>
+                      <Option value='Other'>Other</Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Form.Item label='Certifications' name='certifications'>
+                <Input
+                  maxLength={64}
+                  autoComplete='off'
+                  placeholder='Enter certifications (comma separated)'
+                  className='ccd-input'
                 />
-              </Col>
-            </Row>
-            <Row gutter={12}>
-              <Col span={12}>
-                <Form.Item label='Website' name='website'>
-                  <Input
-                    maxLength={48}
-                    autoComplete='off'
-                    placeholder='Enter website'
-                    className='ccd-input'
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item label='Tax ID' name='taxId'>
-                  <Input
-                    maxLength={24}
-                    autoComplete='off'
-                    placeholder='Enter tax ID'
-                    className='ccd-input'
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-          </div>
+              </Form.Item>
+            </div>
 
-          {/* Action Buttons */}
+            <Divider className='ccd-divider' />
+
+            {/* Section 4: Contact Information */}
+            <div className='ccd-section'>
+              <div className='ccd-section-title'>Contact Information</div>
+              <Row gutter={12}>
+                <Col span={24}>
+                  <EmailPhoneInput
+                    name='contactInfo'
+                    label='Contact Information'
+                    placeholder='Enter email or phone number'
+                    required={true}
+                  />
+                </Col>
+              </Row>
+              <Row gutter={12}>
+                <Col span={12}>
+                  <Form.Item label='Website' name='website'>
+                    <Input
+                      maxLength={48}
+                      autoComplete='off'
+                      placeholder='Enter website'
+                      className='ccd-input'
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label='Tax ID' name='taxId'>
+                    <Input
+                      maxLength={24}
+                      autoComplete='off'
+                      placeholder='Enter tax ID'
+                      className='ccd-input'
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </div>
+
+            {/* Action Buttons */}
           </div>
           <div className='ccd-actions'>
             <Button onClick={onClose} className='ccd-cancel-btn'>

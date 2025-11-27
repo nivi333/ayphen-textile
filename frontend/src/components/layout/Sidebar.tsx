@@ -98,7 +98,7 @@ export default function Sidebar() {
   const handleMenuClick = ({ key }: { key: string }) => {
     if (key.startsWith('/')) {
       // Redirect placeholder routes to dashboard
-      const placeholderRoutes = ['/customers', '/reports', '/analytics'];
+      const placeholderRoutes = ['/reports', '/analytics'];
       if (placeholderRoutes.includes(key)) {
         navigate('/dashboard');
       } else {

@@ -1,35 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import {
-  Table,
-  Tag,
-  Button,
-  Dropdown,
-  Empty,
-  Spin,
-  message,
-  Input,
-  Select,
-  Avatar,
-  Space,
-  Card,
-  Row,
-  Col,
-  Statistic,
-  Progress,
-  Tooltip,
-} from 'antd';
+import { Table, Tag, Button, Dropdown, Empty, Spin, message, Input, Select, Avatar, Space, Tooltip } from 'antd';
 import {
   MoreOutlined,
   EditOutlined,
   DeleteOutlined,
   SearchOutlined,
   ToolOutlined,
-  CheckCircleOutlined,
   WarningOutlined,
-  CloseCircleOutlined,
-  ClockCircleOutlined,
-  StopOutlined,
-  ThunderboltOutlined,
   CalendarOutlined,
   HistoryOutlined,
   UserOutlined,
@@ -61,8 +38,6 @@ export default function MachineListPage() {
   const [searchText, setSearchText] = useState('');
   const [selectedLocation, setSelectedLocation] = useState<string | undefined>(undefined);
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
-  const [analytics, setAnalytics] = useState<any>(null);
-  const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const fetchInProgressRef = useRef(false);
 
   useEffect(() => {
@@ -84,7 +59,6 @@ export default function MachineListPage() {
   useEffect(() => {
     if (currentCompany) {
       fetchData();
-      fetchAnalytics();
     }
   }, [currentCompany, searchText, selectedLocation, statusFilter]);
 
@@ -124,18 +98,6 @@ export default function MachineListPage() {
     }
   };
 
-  const fetchAnalytics = async () => {
-    try {
-      setAnalyticsLoading(true);
-      const analyticsData = await machineService.getAnalytics();
-      setAnalytics(analyticsData);
-    } catch (error: any) {
-      console.error('Error fetching analytics:', error);
-    } finally {
-      setAnalyticsLoading(false);
-    }
-  };
-
   const refreshMachines = async () => {
     try {
       setTableLoading(true);
@@ -145,7 +107,6 @@ export default function MachineListPage() {
         status: statusFilter as any,
       });
       setMachines(machinesData.data || []);
-      await fetchAnalytics();
     } catch (error: any) {
       console.error('Error refreshing machines:', error);
       message.error(error.message || 'Failed to refresh machines');

@@ -13,7 +13,6 @@ import {
   ToolOutlined,
   TeamOutlined,
   BarChartOutlined,
-  EnvironmentOutlined,
   ShoppingOutlined,
   FileDoneOutlined,
   FileAddOutlined,
