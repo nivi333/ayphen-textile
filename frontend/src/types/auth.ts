@@ -4,6 +4,8 @@ export interface User {
   firstName: string;
   lastName: string;
   role: UserRole;
+  phone?: string;
+  avatarUrl?: string;
 }
 
 export interface Company {

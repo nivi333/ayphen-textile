@@ -3,12 +3,12 @@ import { Table, Tag, Space, Button, Dropdown, Empty, message, Input, Select } fr
 import { MoreOutlined, EditOutlined, DeleteOutlined, SearchOutlined, FileTextOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
-import useAuth from '../contexts/AuthContext';
-import { useHeader } from '../contexts/HeaderContext';
-import { Heading } from '../components/Heading';
-import { GradientButton } from '../components/ui';
-import ComplianceReportFormDrawer from '../components/quality/ComplianceReportFormDrawer';
-import { qualityService } from '../services/qualityService';
+import useAuth from '../../contexts/AuthContext';
+import { useHeader } from '../../contexts/HeaderContext';
+import { Heading } from '../../components/Heading';
+import { GradientButton } from '../../components/ui';
+import ComplianceReportFormDrawer from '../../components/quality/ComplianceReportFormDrawer';
+import { qualityService } from '../../services/qualityService';
 import './ComplianceReportsListPage.scss';
 
 interface ComplianceReport {

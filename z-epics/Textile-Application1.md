@@ -121,39 +121,92 @@
 
 ### **PRIORITY 1: Core Foundation (COMPLETED ✅)**
 
-#### **1.1 Authentication & User Management**
+#### **1.1 Authentication & User Management** ✅
 
 **User Registration**
-- [ ] Single-screen registration form
-- [ ] Fields: First Name, Last Name, Email/Phone (single field with smart validation), Password, Confirm Password
-- [ ] Email/Phone validation with country code support (+1, +91, etc.)
-- [ ] Password strength validation (8+ chars, uppercase, lowercase, number)
-- [ ] Terms & Conditions checkbox required
-- [ ] Global email/phone uniqueness (one email = one user across all companies)
-- [ ] Users can belong to multiple companies with different roles
+- [✅] Single-screen registration form
+- [✅] Fields: First Name, Last Name, Email/Phone (single field with smart validation), Password, Confirm Password
+- [✅] Email/Phone validation with country code support (+1, +91, etc.)
+- [✅] Password strength validation (8+ chars, uppercase, lowercase, number)
+- [✅] Terms & Conditions checkbox required
+- [✅] Global email/phone uniqueness (one email = one user across all companies)
+- [✅] Users can belong to multiple companies with different roles
 
 **User Login**
-- [ ] Email or Phone login (single field)
-- [ ] Password field with show/hide toggle
-- [ ] Remember me functionality (stores email/phone in localStorage)
-- [ ] JWT token generation (3 days expiration)
-- [ ] Automatic token refresh mechanism
-- [ ] Session management with device tracking
+- [✅] Email or Phone login (single field)
+- [✅] Password field with show/hide toggle
+- [✅] Remember me functionality (stores email/phone in localStorage)
+- [✅] JWT token generation (3 days expiration)
+- [✅] Automatic token refresh mechanism
+- [✅] Session management with device tracking
 
 **Password Management**
-- [ ] Forgot password flow with email/SMS
-- [ ] Password reset with token validation
-- [ ] Password change for authenticated users
-- [ ] Password strength indicator with visual requirements checklist
+- [✅] Forgot password flow with email/SMS
+- [✅] Password reset with token validation
+- [✅] Password change for authenticated users
+- [✅] Password strength indicator with visual requirements checklist
 
-**User Profile Management**
-- [ ] Personal Information: First Name, Last Name, Email, Phone, Avatar
-- [ ] Avatar Upload: Drag-and-drop with cropping, rotation, circular preview (2MB limit, JPG/PNG)
-- [ ] Contact Information: Address, City, State, Country, Postal Code
-- [ ] Account Settings: Language preference, timezone, notifications
-- [ ] Security Settings: 2FA toggle, login notifications, session timeout
-- [ ] Device Management: Active/inactive devices with location, IP, last active
-- [ ] Activity Log: Comprehensive activity tracking with filtering and export
+**User Profile Management (Simplified UI Screen)** ✅
+
+**Profile Screen Layout**
+- [✅] **Access**: Sidebar dropdown menu → "My Profile" or /profile route
+- [✅] **Layout**: Full page with MainLayout (sidebar + header)
+- [✅] **Sections**: Single page layout without tabs (Activity Log removed per user request)
+
+**Profile Information** ✅
+- [✅] **Profile Header**:
+  - [✅] Large circular avatar (120px) with camera icon overlay for upload
+  - [✅] User full name (H2 heading)
+  - [✅] User email display
+  - [✅] Edit Profile button (GradientButton)
+
+- [✅] **Personal Information Section** (Card):
+  - [✅] First Name: Text input (required, max 50 chars)
+  - [✅] Last Name: Text input (required, max 50 chars)
+  - [✅] Email: Email input (required, validated, unique, disabled)
+  - [✅] Phone: Phone input with validation (optional)
+
+- [✅] **Avatar Upload**:
+  - [✅] Click to browse upload
+  - [✅] Image preview in circular avatar
+  - [✅] File size limit: 2MB
+  - [✅] Accepted formats: JPG, PNG, WEBP
+  - [✅] Fallback to initials
+
+- [✅] **Action Buttons**:
+  - [✅] Save Changes (primary button)
+  - [✅] Cancel (secondary button)
+  - [✅] Edit/Cancel Edit toggle
+
+**Security Settings** ✅
+- [✅] **Password Management Section**:
+  - [✅] Change Password button (navigates to password change page)
+
+- [✅] **Two-Factor Authentication Section** (Card):
+  - [✅] 2FA Status: Enabled/Disabled with toggle switch
+  - [✅] Description text
+
+- [✅] **Email Notifications Section** (Card):
+  - [✅] Email notifications toggle switch
+  - [✅] Description text
+
+**Activity Log** - REMOVED (per user request)
+
+**Preferences** - FUTURE ENHANCEMENT
+
+**Profile Update Validation**
+- [ ] Email uniqueness check across system
+- [ ] Phone number format validation
+- [ ] Required field validation with inline error messages
+- [ ] Success message on save: "Profile updated successfully"
+- [ ] Error handling with specific error messages
+
+**Profile Access Control**
+- [ ] All users can view and edit their own profile
+- [ ] OWNER/ADMIN can view other users' profiles (read-only)
+- [ ] Password change requires current password verification
+- [ ] 2FA setup requires password confirmation
+- [ ] Session revocation requires confirmation modal
 
 **Role-Based Access Control**
 - [ ] Roles: OWNER, ADMIN, MANAGER, EMPLOYEE
@@ -256,66 +309,186 @@
 
 ### **PRIORITY 2: Core Operations (IN PROGRESS 🔄)**
 
-#### **2.1 Product Management**
+#### **2.0 Customer & Supplier Management**
 
-**Product Master Data**
+**2.0.1 Customer Management (Detailed)**
+
+**Customer Drawer/Screen**
+- [ ] **Form Type**: Drawer (5-20 fields) with Active toggle in header
+- [ ] **Auto-Generated Code**: CUST001, CUST002, etc. (backend generated)
+- [ ] **Create Mode**: Active toggle disabled, default isActive: true
+- [ ] **Edit Mode**: Active toggle enabled, reflects current status
+
+**Form Fields - Customer**:
+- [ ] **Customer Code**: Auto-generated (e.g., CUST001) - Display only
+- [ ] **Customer Name**: Text input (required, max 100 chars)
+- [ ] **Customer Type**: Dropdown - INDIVIDUAL, BUSINESS, DISTRIBUTOR, RETAILER, WHOLESALER
+- [ ] **Company Name**: Text input (optional, required if type is BUSINESS)
+- [ ] **Active Toggle**: In drawer header (top-right)
+
+**Contact Information**:
+- [ ] **Primary Contact Person**: Text input (required)
+- [ ] **Email**: Email input (required, validated, unique)
+- [ ] **Phone**: Phone input with country code (required, validated)
+- [ ] **Alternate Phone**: Phone input (optional)
+- [ ] **Website**: URL input (optional, validated)
+
+**Address Information**:
+- [ ] **Billing Address**:
+  - [ ] Address Line 1: Text input (required)
+  - [ ] Address Line 2: Text input (optional)
+  - [ ] City: Text input (required)
+  - [ ] State/Province: Text input (required)
+  - [ ] Country: Dropdown with search (required)
+  - [ ] Postal Code: Text input (required, validated)
+- [ ] **Shipping Address**:
+  - [ ] Same as Billing: Checkbox (if checked, copy billing address)
+  - [ ] All address fields same as billing (conditionally shown)
+
+**Financial Information**:
+- [ ] **Payment Terms**: Dropdown - NET_30, NET_60, NET_90, ADVANCE, COD, CREDIT
+- [ ] **Credit Limit**: Number input with 2 decimals (optional)
+- [ ] **Currency**: Dropdown - INR, USD, EUR, GBP (default: INR)
+- [ ] **Tax ID/GST Number**: Text input (optional, validated)
+- [ ] **PAN Number**: Text input (optional, for Indian customers)
+
+**Additional Information**:
+- [ ] **Customer Category**: Dropdown - VIP, REGULAR, NEW, INACTIVE (optional)
+- [ ] **Assigned Sales Rep**: User dropdown (optional, filtered by role)
+- [ ] **Notes**: Text area (optional, max 500 chars)
+- [ ] **Tags**: Multi-select or comma-separated (optional, e.g., "Bulk Buyer", "Export")
+
+**Table Display Columns**:
+- [ ] Customer Code | Customer Name | Contact Person | Email | Phone | Type | Credit Limit | Active Status | Actions
+
+**Customer List Page Features**:
+- [ ] Search: By name, code, email, phone
+- [ ] Filters: Customer Type, Category, Active Status, Payment Terms
+- [ ] Bulk Actions: Activate/Deactivate, Export, Delete
+- [ ] Quick Actions: View Details, Edit, Create Order, View Orders, Delete
+- [ ] Empty State: "No customers found" with "Add Customer" button
+
+---
+
+**2.0.2 Supplier Management (Detailed)**
+
+**Supplier Drawer/Screen**
+- [ ] **Form Type**: Drawer (5-20 fields) with Active toggle in header
+- [ ] **Auto-Generated Code**: SUPP001, SUPP002, etc. (backend generated)
+- [ ] **Create Mode**: Active toggle disabled, default isActive: true
+- [ ] **Edit Mode**: Active toggle enabled, reflects current status
+
+**Form Fields - Supplier**:
+- [ ] **Supplier Code**: Auto-generated (e.g., SUPP001) - Display only
+- [ ] **Supplier Name**: Text input (required, max 100 chars)
+- [ ] **Supplier Type**: Dropdown - MANUFACTURER, DISTRIBUTOR, WHOLESALER, IMPORTER, LOCAL_VENDOR
+- [ ] **Company Registration Number**: Text input (optional)
+- [ ] **Active Toggle**: In drawer header (top-right)
+
+**Contact Information**:
+- [ ] **Primary Contact Person**: Text input (required)
+- [ ] **Email**: Email input (required, validated, unique)
+- [ ] **Phone**: Phone input with country code (required, validated)
+- [ ] **Alternate Phone**: Phone input (optional)
+- [ ] **Website**: URL input (optional, validated)
+- [ ] **Fax**: Text input (optional)
+
+**Address Information**:
+- [ ] **Business Address**:
+  - [ ] Address Line 1: Text input (required)
+  - [ ] Address Line 2: Text input (optional)
+  - [ ] City: Text input (required)
+  - [ ] State/Province: Text input (required)
+  - [ ] Country: Dropdown with search (required)
+  - [ ] Postal Code: Text input (required, validated)
+
+**Financial Information**:
+- [ ] **Payment Terms**: Dropdown - NET_30, NET_60, NET_90, ADVANCE, COD, CREDIT
+- [ ] **Credit Period (Days)**: Number input (optional)
+- [ ] **Currency**: Dropdown - INR, USD, EUR, GBP (default: INR)
+- [ ] **Tax ID/GST Number**: Text input (optional, validated)
+- [ ] **PAN Number**: Text input (optional, for Indian suppliers)
+- [ ] **Bank Account Details**: Text area (optional, for direct transfers)
+
+**Supply Information**:
+- [ ] **Product Categories Supplied**: Multi-select dropdown (e.g., Raw Materials, Fabrics, Chemicals)
+- [ ] **Lead Time (Days)**: Number input (optional, typical delivery time)
+- [ ] **Minimum Order Quantity**: Number input (optional)
+- [ ] **Minimum Order Value**: Number input with 2 decimals (optional)
+
+**Quality & Compliance**:
+- [ ] **Quality Rating**: Dropdown - EXCELLENT, GOOD, AVERAGE, POOR (optional)
+- [ ] **Certifications**: Multi-select or text area (e.g., ISO, GOTS, OEKO-TEX)
+- [ ] **Compliance Status**: Dropdown - COMPLIANT, NON_COMPLIANT, PENDING_REVIEW
+
+**Additional Information**:
+- [ ] **Supplier Category**: Dropdown - PREFERRED, APPROVED, TRIAL, BLACKLISTED
+- [ ] **Assigned Procurement Manager**: User dropdown (optional)
+- [ ] **Notes**: Text area (optional, max 500 chars)
+- [ ] **Tags**: Multi-select or comma-separated (optional, e.g., "Eco-Friendly", "Fast Delivery")
+
+**Table Display Columns**:
+- [ ] Supplier Code | Supplier Name | Contact Person | Email | Phone | Type | Category | Lead Time | Active Status | Actions
+
+**Supplier List Page Features**:
+- [ ] Search: By name, code, email, phone
+- [ ] Filters: Supplier Type, Category, Active Status, Quality Rating
+- [ ] Bulk Actions: Activate/Deactivate, Export, Delete
+- [ ] Quick Actions: View Details, Edit, Create PO, View POs, Delete
+- [ ] Empty State: "No suppliers found" with "Add Supplier" button
+
+**Supplier Performance Tracking** (Future Enhancement):
+- [ ] On-Time Delivery Rate: Percentage
+- [ ] Quality Score: Based on received goods inspection
+- [ ] Total Purchase Value: Lifetime value
+- [ ] Last Purchase Date: Most recent PO date
+- [ ] Average Lead Time: Calculated from PO history
+
+---
+
+#### **2.1 Product Management** ✅
+
+**Product Master Data** ✅
 - [✅] Product Code: Auto-generated or manual (unique within company)
-- [ ] Product Name: Required
-- [ ] Category: Dropdown (with ability to create new categories)
-- [ ] Sub-Category: Dependent on category selection
-- [ ] Description: Rich text area
-- [ ] SKU/Barcode: Optional, unique if provided
-- [ ] Unit of Measure (UOM): PCS, MTR, YDS, KG, LBS, ROLL, BOX, CTN, DOZ, SET, BALE, CONE, SPOOL
-- [ ] Product Type: OWN_MANUFACTURE, VENDOR_SUPPLIED, OUTSOURCED, RAW_MATERIAL, FINISHED_GOODS, SEMI_FINISHED
-- [ ] Active Toggle: In drawer header (disabled on create, enabled on edit, default true)
+- [✅] Product Name: Required
+- [✅] Category: Dropdown (with ability to create new categories)
+- [✅] Description: Text area
+- [✅] SKU/Barcode: Optional, unique if provided
+- [✅] Unit of Measure (UOM): PCS, MTR, YDS, KG, LBS, ROLL, BOX, CTN, DOZ, SET, BALE, CONE, SPOOL
+- [✅] Product Type: OWN_MANUFACTURE, VENDOR_SUPPLIED, OUTSOURCED, RAW_MATERIAL, FINISHED_GOODS, SEMI_FINISHED
+- [✅] Active Toggle: In drawer header (disabled on create, enabled on edit, default true)
 
-**Pricing Management**
-- [ ] Cost Price: Purchase/manufacturing cost
-- [ ] Selling Price: Default selling price
-- [ ] Markup Percentage: Auto-calculated or manual
-- [ ] Tax Rate: Applicable tax percentage
-- [ ] Currency: Multi-currency support
-- [ ] Price History: Track price changes over time
+**Pricing Management** ✅
+- [✅] Cost Price: Purchase/manufacturing cost
+- [✅] Selling Price: Default selling price
+- [✅] Markup Percentage: Auto-calculated or manual
 
-**Inventory Tracking**
-- [ ] Current Stock Quantity: Real-time stock level
-- [ ] Reorder Level: Minimum stock threshold
-- [ ] Reorder Quantity: Suggested reorder amount
-- [ ] Maximum Stock Level: Optional maximum threshold
-- [ ] Stock Valuation Method: FIFO, LIFO, Weighted Average
+**Inventory Tracking** ✅
+- [✅] Current Stock Quantity: Real-time stock level
+- [✅] Reorder Level: Minimum stock threshold
 
-**Textile-Specific Fields**
-- [ ] Fabric Type: Cotton, Silk, Wool, Polyester, Blend, etc.
-- [ ] Color: Color name/code
-- [ ] Size/Dimensions: Length, Width, Thickness
-- [ ] Weight (GSM): Grams per square meter
-- [ ] Composition: Material composition percentage
-- [ ] Thread Count: For fabrics
-- [ ] Pattern/Design: Pattern name or code
+**Textile-Specific Fields** ✅
+- [✅] Material: Material type
+- [✅] Color: Color name/code
+- [✅] Size: Size specification
+- [✅] Weight: Weight specification
 
-**Product Images**
-- [ ] Main Image: Primary product image (required)
-- [ ] Additional Images: Gallery of up to 10 images
-- [ ] Specification Documents: PDF uploads for technical specs
-- [ ] Image Upload: Drag & drop, 2MB per image, JPG/PNG/WEBP
+**Product Images** ✅
+- [✅] Image URL: Product image URL field
 
-**Stock Adjustment**
-- [ ] Adjustment Type: Add, Remove, Set (absolute value)
-- [ ] Quantity: Number input with validation
-- [ ] Reason: Required dropdown (Purchase, Sale, Damage, Return, Correction, etc.)
-- [ ] Notes: Optional text area for details
-- [ ] Location: If multi-location enabled
-- [ ] Date: Adjustment date (defaults to current)
-- [ ] Real-time Calculation: Shows new stock level before saving
-- [ ] Audit Trail: Complete history of all adjustments
+**Stock Adjustment** ✅
+- [✅] Adjustment Type: ADD, REMOVE, SET, SALE, PURCHASE, RETURN, DAMAGE, TRANSFER
+- [✅] Quantity: Number input with validation
+- [✅] Reason: Required text field
+- [✅] Notes: Optional text area for details
+- [✅] Audit Trail: Complete history of all adjustments
 
-**Product List Page**
-- [ ] Table Columns: Image, Product Code, Name, Category, Stock, Price, Status, Actions
-- [ ] Filters: Search (name, code, SKU), Category, Status (Active/Inactive), Stock Level (Low/Normal/High)
-- [ ] Bulk Actions: Activate/Deactivate, Delete, Export
-- [ ] Stock Indicators: Low stock warnings (red badge when below reorder level)
-- [ ] Quick Actions: View, Edit, Adjust Stock, Duplicate, Delete
-- [ ] Empty State: "No products found" with "Add Product" button
+**Product List Page** ✅
+- [✅] Table Columns: Image, Product Code, Name, Category, Stock, Price, Status, Actions
+- [✅] Filters: Search (name, code, SKU), Category, Status (Active/Inactive)
+- [✅] Stock Indicators: Low stock warnings (red badge when below reorder level)
+- [✅] Quick Actions: Edit, Adjust Stock, Delete
+- [✅] Empty State: "No products found" with "Add Product" button
 
 #### **2.2 Inventory Management**
 
@@ -491,6 +664,206 @@
 - [ ] Purchase Order Creation: Link to suppliers
 - [ ] Default Location: Use company default location in financial documents
 - [ ] Location-Based Addressing: Use location details in documents
+
+#### **2.3.1 Sales Order Management (Detailed)**
+
+**Sales Order Drawer/Screen**
+- [ ] **Form Type**: Drawer (5-20 fields) with Active toggle in header
+- [ ] **Create Mode**: Active toggle disabled, default isActive: true
+- [ ] **Edit Mode**: Active toggle enabled, reflects current status
+- [ ] **Auto-Generated Code**: SO001, SO002, etc. (backend generated)
+
+**Form Fields - Sales Order**:
+- [ ] **Order Code**: Auto-generated (e.g., SO001) - Display only, generated by backend
+- [ ] **Customer**: Searchable dropdown (required) - Link to customer master
+- [ ] **Order Date**: DatePicker (required, defaults to current date)
+- [ ] **Expected Delivery Date**: DatePicker (required)
+- [ ] **Location**: Company location dropdown (required)
+- [ ] **Order Status**: Dropdown - DRAFT, CONFIRMED, IN_PRODUCTION, READY_TO_SHIP, SHIPPED, DELIVERED, CANCELLED
+- [ ] **Priority**: Dropdown - URGENT, HIGH, NORMAL, LOW
+- [ ] **Payment Terms**: Dropdown - NET_30, NET_60, ADVANCE, COD, CREDIT
+- [ ] **Currency**: Dropdown - INR, USD, EUR, GBP (default: INR)
+- [ ] **Active Toggle**: In drawer header (top-right)
+
+**Order Items (Line Items)**:
+- [ ] **Product**: Searchable product dropdown (required)
+- [ ] **Quantity**: Number input (required, integer only)
+- [ ] **Unit Price**: Number input with 2 decimal places (required)
+- [ ] **Discount %**: Number input (0-100, optional)
+- [ ] **Tax Rate %**: Auto-filled from product, editable (optional)
+- [ ] **Line Total**: Auto-calculated (Quantity × Unit Price - Discount + Tax)
+- [ ] **Add/Remove Rows**: Dynamic line items with + and - buttons
+
+**Delivery Information**:
+- [ ] **Shipping Address**: Text area (optional)
+- [ ] **Shipping Method**: Dropdown - STANDARD, EXPRESS, OVERNIGHT, PICKUP
+- [ ] **Carrier**: Text input (optional)
+- [ ] **Tracking Number**: Text input (optional)
+
+**Financial Summary**:
+- [ ] **Subtotal**: Auto-calculated sum of line totals (read-only)
+- [ ] **Order Discount**: Number input (optional, can be % or fixed amount)
+- [ ] **Tax Amount**: Auto-calculated total tax (read-only)
+- [ ] **Shipping Charges**: Number input with 2 decimals (optional)
+- [ ] **Grand Total**: Auto-calculated final amount (read-only, bold)
+
+**Additional Fields**:
+- [ ] **Notes**: Text area for internal notes (optional, max 500 chars)
+- [ ] **Customer Notes**: Text area for customer-facing notes (optional)
+- [ ] **Reference Number**: Text input (optional, e.g., customer PO number)
+- [ ] **Attachments**: File upload (PDF, images, max 5MB per file)
+
+**Table Display Columns**:
+- [ ] Order Code | Customer Name | Order Date | Delivery Date | Status | Total Amount | Active Status | Actions
+
+#### **2.3.2 Purchase Order Management (Detailed)**
+
+**Purchase Order Drawer/Screen**
+- [ ] **Form Type**: Drawer (5-20 fields) with Active toggle in header
+- [ ] **Auto-Generated Code**: PO001, PO002, etc. (backend generated)
+
+**Form Fields - Purchase Order**:
+- [ ] **PO Code**: Auto-generated (e.g., PO001) - Display only
+- [ ] **Supplier**: Searchable dropdown (required) - Link to supplier master
+- [ ] **PO Date**: DatePicker (required, defaults to current date)
+- [ ] **Expected Delivery Date**: DatePicker (required)
+- [ ] **Location**: Company location dropdown (required) - Delivery location
+- [ ] **PO Status**: Dropdown - DRAFT, SENT, CONFIRMED, PARTIALLY_RECEIVED, RECEIVED, CANCELLED
+- [ ] **Priority**: Dropdown - URGENT, HIGH, NORMAL, LOW
+- [ ] **Payment Terms**: Dropdown - NET_30, NET_60, ADVANCE, COD, CREDIT
+- [ ] **Currency**: Dropdown - INR, USD, EUR, GBP (default: INR)
+- [ ] **Active Toggle**: In drawer header (top-right)
+
+**Order Items (Line Items)**:
+- [ ] **Product/Material**: Searchable product dropdown (required)
+- [ ] **Quantity**: Number input (required, supports decimals for materials)
+- [ ] **Unit Cost**: Number input with 2 decimal places (required)
+- [ ] **Discount %**: Number input (0-100, optional)
+- [ ] **Tax Rate %**: Number input (optional)
+- [ ] **Line Total**: Auto-calculated
+- [ ] **Expected Delivery**: DatePicker per line item (optional)
+
+**Delivery Information**:
+- [ ] **Delivery Address**: Text area (auto-filled from location, editable)
+- [ ] **Shipping Method**: Dropdown - STANDARD, EXPRESS, FREIGHT, COURIER
+- [ ] **Incoterms**: Dropdown - FOB, CIF, EXW, DDP (optional)
+
+**Financial Summary**:
+- [ ] **Subtotal**: Auto-calculated (read-only)
+- [ ] **Discount**: Number input (optional)
+- [ ] **Tax Amount**: Auto-calculated (read-only)
+- [ ] **Shipping Charges**: Number input with 2 decimals (optional)
+- [ ] **Grand Total**: Auto-calculated (read-only, bold)
+
+**Additional Fields**:
+- [ ] **Notes**: Text area (optional, max 500 chars)
+- [ ] **Terms & Conditions**: Text area (optional)
+- [ ] **Reference Number**: Text input (optional)
+- [ ] **Attachments**: File upload (PDF, images, max 5MB)
+
+**Table Display Columns**:
+- [ ] PO Code | Supplier Name | PO Date | Delivery Date | Status | Total Amount | Active Status | Actions
+
+#### **2.3.3 Invoice Management (Detailed)**
+
+**Invoice Drawer/Screen**
+- [ ] **Form Type**: Drawer (5-20 fields) with Active toggle in header
+- [ ] **Auto-Generated Code**: INV001, INV002, etc. (backend generated)
+- [ ] **Can be created from**: Sales Order (auto-fill) or standalone
+
+**Form Fields - Invoice**:
+- [ ] **Invoice Code**: Auto-generated (e.g., INV001) - Display only
+- [ ] **Invoice Number**: Text input (optional, for custom numbering)
+- [ ] **Customer**: Searchable dropdown (required)
+- [ ] **Invoice Date**: DatePicker (required, defaults to current date)
+- [ ] **Due Date**: DatePicker (required, auto-calculated based on payment terms)
+- [ ] **Sales Order Reference**: Dropdown (optional, link to SO)
+- [ ] **Location**: Company location dropdown (required) - Billing location
+- [ ] **Invoice Status**: Dropdown - DRAFT, SENT, PARTIALLY_PAID, PAID, OVERDUE, CANCELLED
+- [ ] **Payment Terms**: Dropdown - NET_30, NET_60, IMMEDIATE, ADVANCE
+- [ ] **Currency**: Dropdown - INR, USD, EUR, GBP (default: INR)
+- [ ] **Active Toggle**: In drawer header (top-right)
+
+**Invoice Items (Line Items)**:
+- [ ] **Description**: Text input or product dropdown (required)
+- [ ] **Quantity**: Number input (required)
+- [ ] **Unit Price**: Number input with 2 decimals (required)
+- [ ] **Discount %**: Number input (0-100, optional)
+- [ ] **Tax Rate %**: Number input (optional, GST/VAT)
+- [ ] **Line Total**: Auto-calculated
+
+**Financial Summary**:
+- [ ] **Subtotal**: Auto-calculated (read-only)
+- [ ] **Discount**: Number input (optional)
+- [ ] **Tax Amount**: Auto-calculated (read-only, itemized by tax rate)
+- [ ] **Shipping/Handling**: Number input with 2 decimals (optional)
+- [ ] **Grand Total**: Auto-calculated (read-only, bold)
+- [ ] **Amount Paid**: Number input (for partial payments)
+- [ ] **Balance Due**: Auto-calculated (Grand Total - Amount Paid)
+
+**Payment Information**:
+- [ ] **Payment Method**: Dropdown - CASH, CHEQUE, BANK_TRANSFER, UPI, CARD, OTHER
+- [ ] **Payment Date**: DatePicker (optional, when payment received)
+- [ ] **Transaction Reference**: Text input (optional, cheque/transaction number)
+
+**Additional Fields**:
+- [ ] **Notes**: Text area (optional, max 500 chars)
+- [ ] **Terms & Conditions**: Text area (optional)
+- [ ] **Bank Details**: Text area (for payment instructions)
+- [ ] **Attachments**: File upload (PDF, images, max 5MB)
+
+**Table Display Columns**:
+- [ ] Invoice Code | Customer | Invoice Date | Due Date | Status | Total Amount | Balance Due | Active Status | Actions
+
+#### **2.3.4 Bill Management (Detailed)**
+
+**Bill Drawer/Screen**
+- [ ] **Form Type**: Drawer (5-20 fields) with Active toggle in header
+- [ ] **Auto-Generated Code**: BILL001, BILL002, etc. (backend generated)
+- [ ] **Can be created from**: Purchase Order (auto-fill) or standalone
+
+**Form Fields - Bill**:
+- [ ] **Bill Code**: Auto-generated (e.g., BILL001) - Display only
+- [ ] **Bill Number**: Text input (optional, supplier's bill number)
+- [ ] **Supplier**: Searchable dropdown (required)
+- [ ] **Bill Date**: DatePicker (required)
+- [ ] **Due Date**: DatePicker (required)
+- [ ] **Purchase Order Reference**: Dropdown (optional, link to PO)
+- [ ] **Location**: Company location dropdown (required)
+- [ ] **Bill Status**: Dropdown - DRAFT, RECEIVED, PARTIALLY_PAID, PAID, OVERDUE, CANCELLED
+- [ ] **Payment Terms**: Dropdown - NET_30, NET_60, IMMEDIATE, ADVANCE
+- [ ] **Currency**: Dropdown - INR, USD, EUR, GBP (default: INR)
+- [ ] **Active Toggle**: In drawer header (top-right)
+
+**Bill Items (Line Items)**:
+- [ ] **Description**: Text input or product dropdown (required)
+- [ ] **Quantity**: Number input (required, supports decimals)
+- [ ] **Unit Cost**: Number input with 2 decimals (required)
+- [ ] **Discount %**: Number input (0-100, optional)
+- [ ] **Tax Rate %**: Number input (optional)
+- [ ] **Line Total**: Auto-calculated
+
+**Financial Summary**:
+- [ ] **Subtotal**: Auto-calculated (read-only)
+- [ ] **Discount**: Number input (optional)
+- [ ] **Tax Amount**: Auto-calculated (read-only)
+- [ ] **Shipping/Handling**: Number input with 2 decimals (optional)
+- [ ] **Grand Total**: Auto-calculated (read-only, bold)
+- [ ] **Amount Paid**: Number input (for partial payments)
+- [ ] **Balance Due**: Auto-calculated (Grand Total - Amount Paid)
+
+**Payment Information**:
+- [ ] **Payment Method**: Dropdown - CASH, CHEQUE, BANK_TRANSFER, UPI, CARD, OTHER
+- [ ] **Payment Date**: DatePicker (optional, when payment made)
+- [ ] **Transaction Reference**: Text input (optional)
+
+**Additional Fields**:
+- [ ] **Notes**: Text area (optional, max 500 chars)
+- [ ] **Supplier Invoice Number**: Text input (supplier's reference)
+- [ ] **Attachments**: File upload (PDF, images, max 5MB)
+
+**Table Display Columns**:
+- [ ] Bill Code | Supplier | Bill Date | Due Date | Status | Total Amount | Balance Due | Active Status | Actions
 
 #### **2.4 Machine Management**
 

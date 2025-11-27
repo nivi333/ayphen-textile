@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Select, Avatar, Typography, Space, Tag, Spin, Input } from 'antd';
-import { SearchOutlined, AppstoreOutlined } from '@ant-design/icons';
+import { Select, Typography, Space, Tag, Spin, Input } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 import { productService, ProductSummary } from '../../services/productService';
 import useAuth from '../../contexts/AuthContext';
 
@@ -137,6 +137,7 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
       className={className}
       filterOption={filterOption}
       notFoundContent={loading ? <Spin size="small" /> : 'No products found'}
+      optionLabelProp="label"
       dropdownRender={(menu) => (
         <div>
           {showSearch && (
@@ -155,18 +156,12 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
       )}
     >
       {filteredProducts.map((product) => (
-        <Option key={product.id} value={product.id}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Avatar
-              size="small"
-              src={product.imageUrl}
-              icon={<AppstoreOutlined />}
-              style={{ 
-                backgroundColor: product.imageUrl ? undefined : '#f0f0f0',
-                color: '#666'
-              }}
-            />
-            
+        <Option 
+          key={product.id} 
+          value={product.id}
+          label={`${product.name} • ${product.productCode}`}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Text strong style={{ fontSize: '14px' }}>
@@ -176,6 +171,7 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
                 {showStockInfo && (
                   <Tag 
                     color={getStockStatusColor(product)}
+                    style={{ fontSize: '11px' }}
                   >
                     {getStockStatusText(product)}
                   </Tag>
@@ -215,18 +211,20 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
                       </>
                     )}
                   </Space>
-                  
-                  {showStockInfo && (
-                    <div style={{ marginTop: '2px' }}>
-                      <Text type="secondary" style={{ fontSize: '11px' }}>
-                        Stock: {product.stockQuantity} {product.unitOfMeasure} • 
-                        Price: ₹{product.sellingPrice}
-                      </Text>
-                    </div>
-                  )}
                 </div>
               )}
             </div>
+            
+            {showStockInfo && (
+              <div style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                <Text type="secondary" style={{ fontSize: '11px', display: 'block' }}>
+                  Stock: {product.stockQuantity} {product.unitOfMeasure}
+                </Text>
+                <Text type="secondary" style={{ fontSize: '11px', display: 'block' }}>
+                  Price: ₹{product.sellingPrice}
+                </Text>
+              </div>
+            )}
           </div>
         </Option>
       ))}

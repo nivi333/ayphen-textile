@@ -4,11 +4,11 @@ import { Tabs, Button, Space, Tag, Spin, message, Divider, Card, Row, Col, Empty
 import { ArrowLeftOutlined, DeleteOutlined, PrinterOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { MainLayout } from '../components/layout';
-import { Heading } from '../components/Heading';
-import { GradientButton } from '../components/ui';
-import { inspectionService, InspectionDetail } from '../services/inspectionService';
-import InspectionFormDrawer from '../components/quality/InspectionFormDrawer';
+import { MainLayout } from '../../components/layout';
+import { Heading } from '../../components/Heading';
+import { GradientButton } from '../../components/ui';
+import { inspectionService, InspectionDetail } from '../../services/inspectionService';
+import InspectionFormDrawer from '../../components/quality/InspectionFormDrawer';
 
 dayjs.extend(relativeTime);
 

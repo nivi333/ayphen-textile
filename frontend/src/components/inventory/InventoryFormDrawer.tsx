@@ -21,6 +21,7 @@ interface InventoryFormValues {
   locationId: string;
   stockQuantity: number;
   reservedQuantity: number;
+  value?: number;
   reorderLevel?: number;
   maxStockLevel?: number;
 }
@@ -213,6 +214,24 @@ export const InventoryFormDrawer: React.FC<InventoryFormDrawerProps> = ({
                   precision={0}
                   style={{ width: '100%' }}
                   placeholder='Enter reserved quantity'
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name='value'
+                label='Value (₹)'
+                tooltip='Total value of inventory stock'
+              >
+                <InputNumber
+                  min={0}
+                  precision={2}
+                  style={{ width: '100%' }}
+                  placeholder='Enter inventory value'
+                  prefix='₹'
                 />
               </Form.Item>
             </Col>

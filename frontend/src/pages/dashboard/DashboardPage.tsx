@@ -24,16 +24,17 @@ import {
   CheckOutlined,
   CloseOutlined,
 } from '@ant-design/icons';
-import { useHeader } from '../contexts/HeaderContext';
-import useAuth from '../contexts/AuthContext';
-import { Heading } from '../components/Heading';
-import { MainLayout } from '../components/layout';
-import { GradientButton } from '../components/ui';
-import UserInviteModal from '../components/users/UserInviteModal';
-import StockAlertsCard from '../components/inventory/StockAlertsCard';
-import { productService } from '../services/productService';
+import { useHeader } from '../../contexts/HeaderContext';
+import useAuth from '../../contexts/AuthContext';
+import { Heading } from '../../components/Heading';
+import { MainLayout } from '../../components/layout';
+import { GradientButton } from '../../components/ui';
+import UserInviteModal from '../../components/users/UserInviteModal';
+import StockAlertsCard from '../../components/inventory/StockAlertsCard';
+import { productService } from '../../services/productService';
+import { companyService } from '../../services/companyService';
 import './DashboardPage.scss';
-import { COMPANY_TEXT } from '../constants/company';
+import { COMPANY_TEXT } from '../../constants/company';
 
 interface DashboardStats {
   totalProducts: number;
@@ -63,19 +64,24 @@ const DashboardPage: React.FC = () => {
     teamMembers: 0,
     monthlyRevenue: 0,
   });
-  const [userInvitations, setUserInvitations] = useState<UserInvitation[]>([]);
+  const [userInvitations, setUserInvitations] = useState<any[]>([]);
+  const userRole = currentCompany?.role;
 
   // Set header actions when component mounts
   useEffect(() => {
-    setHeaderActions(
-      <GradientButton size='small' onClick={() => setInviteDrawerVisible(true)}>
-        Invite Team Member
-      </GradientButton>
-    );
+    if (userRole && ['OWNER', 'ADMIN'].includes(userRole)) {
+      setHeaderActions(
+        <GradientButton size='small' onClick={() => setInviteDrawerVisible(true)}>
+          Invite Team Member
+        </GradientButton>
+      );
+    } else {
+      setHeaderActions(null);
+    }
 
     // Cleanup when component unmounts
     return () => setHeaderActions(null);
-  }, [setHeaderActions]);
+  }, [setHeaderActions, userRole]);
 
   // Fetch dashboard data
   const fetchDashboardData = async () => {
@@ -84,22 +90,16 @@ const DashboardPage: React.FC = () => {
     setLoading(true);
     try {
       // Fetch products count
-      const productsResponse = await productService.getProducts({ page: 1, limit: 1 });
-
-      // Fetch orders count (mock for now)
-      // const ordersResponse = await orderService.getOrders({ page: 1, limit: 1 });
-
-      // Fetch team members count (mock for now)
-      // const teamResponse = await userService.getTeamMembers();
-
+      const productsResponse = await productService.getProducts();
       setStats({
-        totalProducts: productsResponse.pagination?.total || 0,
-        activeOrders: 0, // Will be implemented when orders API is ready
-        teamMembers: 1, // Current user at minimum
-        monthlyRevenue: 0, // Will be calculated from orders
+        totalProducts: productsResponse.data?.length || 0,
+        activeOrders: 0, // TODO: Implement orders count
+        teamMembers: 0, // TODO: Implement team members count
+        monthlyRevenue: 0, // TODO: Implement revenue calculation
       });
-
-      // Clear invitations - only show live data
+      
+      // Note: User invitations are fetched separately when user logs in
+      // For now, keep invitations empty as they're shown in companies list page
       setUserInvitations([]);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -139,7 +139,7 @@ const DashboardPage: React.FC = () => {
     },
   ];
 
-  const quickActions = [
+  const allQuickActions = [
     {
       title: COMPANY_TEXT.ADD_PRODUCT,
       icon: <PlusOutlined />,
@@ -157,6 +157,7 @@ const DashboardPage: React.FC = () => {
       icon: <TeamOutlined />,
       description: COMPANY_TEXT.INVITE_TEAM_DESC,
       action: () => setInviteDrawerVisible(true),
+      requiresRole: ['OWNER', 'ADMIN'], // Only show for OWNER and ADMIN
     },
     {
       title: COMPANY_TEXT.VIEW_REPORTS,
@@ -165,6 +166,14 @@ const DashboardPage: React.FC = () => {
       action: () => navigate('/reports'),
     },
   ];
+
+  // Filter quick actions based on user role
+  const quickActions = allQuickActions.filter(action => {
+    if (action.requiresRole) {
+      return userRole && action.requiresRole.includes(userRole);
+    }
+    return true;
+  });
 
   // Handle user invitation actions
   const handleAcceptInvitation = (invitationId: string) => {
@@ -241,7 +250,7 @@ const DashboardPage: React.FC = () => {
                 </Col>
 
                 {/* User Invitations Card */}
-                {userInvitations.length > 0 && (
+                {userInvitations.length > 0 && userRole && ['OWNER', 'ADMIN'].includes(userRole) && (
                   <Col xs={24} lg={12}>
                     <Card
                       title={

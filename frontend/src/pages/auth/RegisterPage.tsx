@@ -1,5 +1,5 @@
-import RegistrationWizard from '../components/auth/RegistrationWizard';
-import { AuthLayout } from '../components/ui';
+import RegistrationWizard from '../../components/auth/RegistrationWizard';
+import { AuthLayout } from '../../components/ui';
 
 export default function RegisterPage() {
   return (

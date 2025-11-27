@@ -1,5 +1,5 @@
-import LoginForm from '../components/auth/LoginForm';
-import { AuthLayout } from '../components/ui';
+import LoginForm from '../../components/auth/LoginForm';
+import { AuthLayout } from '../../components/ui';
 
 // Login page component
 function LoginPage() {

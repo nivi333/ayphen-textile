@@ -30,8 +30,8 @@ import {
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { Line, Bar, Pie } from '@ant-design/plots';
-import { GradientButton } from '../components/ui';
-import { Heading } from '../components/Heading';
+import { GradientButton } from '../../components/ui';
+import { Heading } from '../../components/Heading';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;

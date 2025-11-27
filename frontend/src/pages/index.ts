@@ -1,12 +1,38 @@
 // Re-export all page components for better TypeScript module resolution
-export { default as LoginPage } from './LoginPage';
-export { default as RegisterPage } from './RegisterPage';
-export { default as ForgotPasswordPage } from './ForgotPasswordPage';
-export { default as CompaniesListPage } from './CompaniesListPage';
-export { default as DashboardPage } from './DashboardPage';
-export { default as LocationListPage } from './LocationListPage';
-export { default as OrdersListPage } from './OrdersListPage';
-export { default as ProductsListPage } from './ProductsListPage';
-export { default as InventoryListPage } from './InventoryListPage';
-export { default as InspectionsListPage } from './InspectionsListPage';
-export { default as InspectionDetailsPage } from './InspectionDetailsPage';
+
+// Authentication
+export { default as LoginPage } from './auth/LoginPage';
+export { default as RegisterPage } from './auth/RegisterPage';
+export { default as ForgotPasswordPage } from './auth/ForgotPasswordPage';
+
+// Dashboard
+export { default as DashboardPage } from './dashboard/DashboardPage';
+
+// Company Management
+export { default as CompaniesListPage } from './company/CompaniesListPage';
+export { default as CompanyDetailPage } from './company/CompanyDetailPage';
+export { default as LocationListPage } from './company/LocationListPage';
+
+// Products
+export { default as ProductsListPage } from './products/ProductsListPage';
+
+// Inventory
+export { default as InventoryListPage } from './inventory/InventoryListPage';
+
+// Machines
+export { default as MachineListPage } from './machines/MachineListPage';
+
+// Orders
+export { default as OrdersListPage } from './orders/OrdersListPage';
+
+// Quality Control
+export { default as QualityCheckpointsListPage } from './quality/QualityCheckpointsListPage';
+export { default as QualityDefectsListPage } from './quality/QualityDefectsListPage';
+export { default as QualityReportsPage } from './quality/QualityReportsPage';
+export { default as ComplianceReportsListPage } from './quality/ComplianceReportsListPage';
+export { default as InspectionsListPage } from './quality/InspectionsListPage';
+export { default as InspectionDetailsPage } from './quality/InspectionDetailsPage';
+
+// Users
+export { default as UserProfilePage } from './users/UserProfilePage';
+export { default as UsersListPage } from './users/UsersListPage';

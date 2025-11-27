@@ -1,14 +1,33 @@
 import { useEffect, useRef, useState } from 'react';
-import { Table, Tag, Space, Button, Dropdown, Empty, Spin, message, Input, Select, Avatar } from 'antd';
-import { MoreOutlined, EditOutlined, DeleteOutlined, StockOutlined, SearchOutlined, AppstoreOutlined } from '@ant-design/icons';
-import useAuth from '../contexts/AuthContext';
-import { useHeader } from '../contexts/HeaderContext';
-import { MainLayout } from '../components/layout';
-import { Heading } from '../components/Heading';
-import { GradientButton } from '../components/ui';
-import { productService, ProductSummary, ProductCategory } from '../services/productService';
-import { ProductFormDrawer } from '../components/products/ProductFormDrawer';
-import { StockAdjustmentModal } from '../components/products/StockAdjustmentModal';
+import {
+  Table,
+  Tag,
+  Space,
+  Button,
+  Dropdown,
+  Empty,
+  Spin,
+  message,
+  Input,
+  Select,
+  Avatar,
+} from 'antd';
+import {
+  MoreOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  StockOutlined,
+  SearchOutlined,
+  AppstoreOutlined,
+} from '@ant-design/icons';
+import useAuth from '../../contexts/AuthContext';
+import { useHeader } from '../../contexts/HeaderContext';
+import { MainLayout } from '../../components/layout';
+import { Heading } from '../../components/Heading';
+import { GradientButton } from '../../components/ui';
+import { productService, ProductSummary, ProductCategory } from '../../services/productService';
+import { ProductFormDrawer } from '../../components/products/ProductFormDrawer';
+import { StockAdjustmentModal } from '../../components/products/StockAdjustmentModal';
 import './ProductsListPage.scss';
 
 export default function ProductsListPage() {
@@ -29,14 +48,20 @@ export default function ProductsListPage() {
   const fetchInProgressRef = useRef(false);
 
   useEffect(() => {
+    const isEmployee = currentCompany?.role === 'EMPLOYEE';
     setHeaderActions(
-      <GradientButton onClick={handleCreateProduct} size='small' className='products-create-btn'>
+      <GradientButton
+        onClick={handleCreateProduct}
+        size='small'
+        className='products-create-btn'
+        disabled={isEmployee}
+      >
         Create Product
-      </GradientButton>,
+      </GradientButton>
     );
 
     return () => setHeaderActions(null);
-  }, [setHeaderActions]);
+  }, [setHeaderActions, currentCompany?.role]);
 
   useEffect(() => {
     if (currentCompany) {
@@ -162,11 +187,7 @@ export default function ProductsListPage() {
       key: 'imageUrl',
       width: 80,
       render: (imageUrl: string | undefined, record: ProductSummary) => (
-        <Avatar 
-          src={imageUrl} 
-          icon={<AppstoreOutlined />}
-          style={{ flexShrink: 0 }}
-        >
+        <Avatar src={imageUrl} icon={<AppstoreOutlined />} style={{ flexShrink: 0 }}>
           {record.name.charAt(0)}
         </Avatar>
       ),
@@ -176,9 +197,7 @@ export default function ProductsListPage() {
       dataIndex: 'productCode',
       key: 'productCode',
       width: 120,
-      render: (productCode: string) => (
-        <div className='product-code'>{productCode}</div>
-      ),
+      render: (productCode: string) => <div className='product-code'>{productCode}</div>,
     },
     {
       title: 'Product Name',
@@ -196,9 +215,7 @@ export default function ProductsListPage() {
       dataIndex: 'barcode',
       key: 'barcode',
       width: 120,
-      render: (barcode?: string) => (
-        <div className='product-barcode'>{barcode || '—'}</div>
-      ),
+      render: (barcode?: string) => <div className='product-barcode'>{barcode || '—'}</div>,
     },
     {
       title: 'Category',
@@ -215,8 +232,12 @@ export default function ProductsListPage() {
         const status = getStockStatus(record);
         return (
           <div>
-            <div className='stock-quantity'>{stockQuantity} {record.unitOfMeasure}</div>
-            <Tag color={status.color} className='stock-status-tag'>{status.text}</Tag>
+            <div className='stock-quantity'>
+              {stockQuantity} {record.unitOfMeasure}
+            </div>
+            <Tag color={status.color} className='stock-status-tag'>
+              {status.text}
+            </Tag>
           </div>
         );
       },
@@ -248,18 +269,21 @@ export default function ProductsListPage() {
       key: 'actions',
       width: 100,
       render: (_: any, record: ProductSummary) => {
+        const isEmployee = currentCompany?.role === 'EMPLOYEE';
         const menuItems = [
           {
             key: 'edit',
             icon: <EditOutlined />,
             label: 'Edit',
             onClick: () => handleEditProduct(record),
+            disabled: isEmployee,
           },
           {
             key: 'stock',
             icon: <StockOutlined />,
             label: 'Adjust Stock',
             onClick: () => handleAdjustStock(record),
+            disabled: isEmployee,
           },
           {
             type: 'divider' as const,
@@ -270,6 +294,7 @@ export default function ProductsListPage() {
             label: 'Delete',
             danger: true,
             onClick: () => handleDeleteProduct(record),
+            disabled: isEmployee,
           },
         ];
 
@@ -307,7 +332,7 @@ export default function ProductsListPage() {
               placeholder='Search products...'
               prefix={<SearchOutlined />}
               value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
+              onChange={e => setSearchText(e.target.value)}
               style={{ width: 250 }}
               allowClear
             />
@@ -344,7 +369,11 @@ export default function ProductsListPage() {
             </div>
           ) : products.length === 0 ? (
             <Empty description='No products found'>
-              <GradientButton size='small' onClick={handleCreateProduct}>
+              <GradientButton
+                size='small'
+                onClick={handleCreateProduct}
+                disabled={currentCompany?.role === 'EMPLOYEE'}
+              >
                 Create First Product
               </GradientButton>
             </Empty>
@@ -352,7 +381,7 @@ export default function ProductsListPage() {
             <Table
               columns={columns}
               dataSource={products}
-              rowKey={(record) => record.id}
+              rowKey={record => record.id}
               loading={tableLoading}
               pagination={{
                 current: pagination.page,

@@ -430,6 +430,24 @@ class InventoryService {
       message: result.message,
     };
   }
+
+  async deleteInventory(inventoryId: string): Promise<ApiResponse<void>> {
+    const response = await fetch(`${API_BASE_URL}/inventory/${inventoryId}`, {
+      method: 'DELETE',
+      headers: this.getAuthHeaders(),
+    });
+
+    const result = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(result.message || 'Failed to delete inventory');
+    }
+
+    return {
+      success: result.success || true,
+      message: result.message,
+    };
+  }
 }
 
 export const inventoryService = new InventoryService();

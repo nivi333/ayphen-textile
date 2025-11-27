@@ -27,6 +27,17 @@ router.put(
 );
 
 /**
+ * @route   DELETE /api/v1/inventory/:inventoryId
+ * @desc    Delete inventory record
+ * @access  OWNER, ADMIN, MANAGER
+ */
+router.delete(
+  '/:inventoryId',
+  requireRole(['OWNER', 'ADMIN', 'MANAGER']),
+  inventoryController.deleteInventory
+);
+
+/**
  * @route   POST /api/v1/inventory/movements
  * @desc    Record stock movement
  * @access  OWNER, ADMIN, MANAGER

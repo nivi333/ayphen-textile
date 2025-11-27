@@ -1,40 +1,49 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Table, 
-  Button, 
-  Input, 
-  Select, 
-  Space, 
-  Tag, 
-  Avatar, 
-  Typography, 
+import {
+  Table,
+  Button,
+  Input,
+  Select,
+  Space,
+  Tag,
+  Avatar,
+  Typography,
   Empty,
   Spin,
-  message, 
+  message,
   Dropdown,
-  Tooltip
+  Tooltip,
+  Modal,
 } from 'antd';
-import { 
-  SearchOutlined, 
-  FilterOutlined, 
+import {
+  SearchOutlined,
+  FilterOutlined,
   MoreOutlined,
-  StockOutlined,
-  SwapOutlined,
   BookOutlined,
   AlertOutlined,
   AppstoreOutlined,
-  ReloadOutlined
+  ReloadOutlined,
+  EditOutlined,
+  DeleteOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import { Heading } from '../components/Heading';
-import { GradientButton } from '../components/ui';
-import { MainLayout } from '../components/layout';
-import { useHeader } from '../contexts/HeaderContext';
-import { inventoryService, LocationInventory, InventoryFilters } from '../services/inventoryService';
-import { locationService } from '../services/locationService';
-import useAuth from '../contexts/AuthContext';
-import ProductSelector from '../components/products/ProductSelector';
-import { StockMovementModal, StockReservationModal, InventoryFormDrawer } from '../components/inventory';
+import { Heading } from '../../components/Heading';
+import { GradientButton } from '../../components/ui';
+import { MainLayout } from '../../components/layout';
+import { useHeader } from '../../contexts/HeaderContext';
+import {
+  inventoryService,
+  LocationInventory,
+  InventoryFilters,
+} from '../../services/inventoryService';
+import { locationService } from '../../services/locationService';
+import useAuth from '../../contexts/AuthContext';
+import ProductSelector from '../../components/products/ProductSelector';
+import {
+  StockMovementModal,
+  StockReservationModal,
+  InventoryFormDrawer,
+} from '../../components/inventory';
 import './InventoryListPage.scss';
 
 const { Text } = Typography;
@@ -103,7 +112,7 @@ const InventoryListPage: React.FC = () => {
         ...filters,
         search: searchText || undefined,
         locationId: selectedLocation,
-        productId: selectedProduct
+        productId: selectedProduct,
       };
       const response = await inventoryService.getLocationInventory(currentFilters);
       if (response.success) {
@@ -125,7 +134,7 @@ const InventoryListPage: React.FC = () => {
         ...filters,
         search: searchText || undefined,
         locationId: selectedLocation,
-        productId: selectedProduct
+        productId: selectedProduct,
       };
       const response = await inventoryService.getLocationInventory(currentFilters);
       if (response.success) {
@@ -180,9 +189,9 @@ const InventoryListPage: React.FC = () => {
             size={40}
             src={record.product.imageUrl}
             icon={<AppstoreOutlined />}
-            style={{ 
+            style={{
               backgroundColor: record.product.imageUrl ? undefined : '#f0f0f0',
-              color: '#666'
+              color: '#666',
             }}
           />
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -202,16 +211,10 @@ const InventoryListPage: React.FC = () => {
       width: 200,
       render: (_, record) => (
         <div>
-          <div style={{ fontWeight: 500, fontSize: '14px' }}>
-            {record.location.name}
-          </div>
+          <div style={{ fontWeight: 500, fontSize: '14px' }}>{record.location.name}</div>
           <Space size={4} style={{ marginTop: '2px' }}>
-            {record.location.isHeadquarters && (
-              <Tag color="blue">HQ</Tag>
-            )}
-            {record.location.isDefault && (
-              <Tag color="green">Default</Tag>
-            )}
+            {record.location.isHeadquarters && <Tag color='blue'>HQ</Tag>}
+            {record.location.isDefault && <Tag color='green'>Default</Tag>}
           </Space>
         </div>
       ),
@@ -223,12 +226,8 @@ const InventoryListPage: React.FC = () => {
       align: 'right',
       render: (_, record) => (
         <div style={{ textAlign: 'right' }}>
-          <div style={{ fontWeight: 600, fontSize: '16px' }}>
-            {record.stockQuantity}
-          </div>
-          <div style={{ fontSize: '12px', color: '#666' }}>
-            {record.product.unitOfMeasure}
-          </div>
+          <div style={{ fontWeight: 600, fontSize: '16px' }}>{record.stockQuantity}</div>
+          <div style={{ fontSize: '12px', color: '#666' }}>{record.product.unitOfMeasure}</div>
         </div>
       ),
     },
@@ -242,9 +241,7 @@ const InventoryListPage: React.FC = () => {
           <div style={{ fontWeight: 500, fontSize: '14px', color: '#fa8c16' }}>
             {record.reservedQuantity}
           </div>
-          <div style={{ fontSize: '12px', color: '#666' }}>
-            {record.product.unitOfMeasure}
-          </div>
+          <div style={{ fontSize: '12px', color: '#666' }}>{record.product.unitOfMeasure}</div>
         </div>
       ),
     },
@@ -260,9 +257,7 @@ const InventoryListPage: React.FC = () => {
             <div style={{ fontWeight: 600, fontSize: '16px', color: status.color }}>
               {record.availableQuantity}
             </div>
-            <div style={{ fontSize: '12px', color: '#666' }}>
-              {record.product.unitOfMeasure}
-            </div>
+            <div style={{ fontSize: '12px', color: '#666' }}>{record.product.unitOfMeasure}</div>
           </div>
         );
       },
@@ -290,15 +285,11 @@ const InventoryListPage: React.FC = () => {
         <div style={{ textAlign: 'right' }}>
           {record.reorderLevel ? (
             <>
-              <div style={{ fontWeight: 500, fontSize: '14px' }}>
-                {record.reorderLevel}
-              </div>
-              <div style={{ fontSize: '12px', color: '#666' }}>
-                {record.product.unitOfMeasure}
-              </div>
+              <div style={{ fontWeight: 500, fontSize: '14px' }}>{record.reorderLevel}</div>
+              <div style={{ fontSize: '12px', color: '#666' }}>{record.product.unitOfMeasure}</div>
             </>
           ) : (
-            <Text type="secondary">Not set</Text>
+            <Text type='secondary'>Not set</Text>
           )}
         </div>
       ),
@@ -313,9 +304,7 @@ const InventoryListPage: React.FC = () => {
           <div style={{ fontWeight: 600, fontSize: '14px' }}>
             ₹{(record.stockQuantity * record.product.costPrice).toLocaleString()}
           </div>
-          <div style={{ fontSize: '12px', color: '#666' }}>
-            @ ₹{record.product.costPrice}
-          </div>
+          <div style={{ fontSize: '12px', color: '#666' }}>@ ₹{record.product.costPrice}</div>
         </div>
       ),
     },
@@ -324,63 +313,83 @@ const InventoryListPage: React.FC = () => {
       key: 'actions',
       width: 80,
       align: 'center',
-      render: (_, record) => (
-        <Dropdown
-          menu={{
-            items: [
-              {
-                key: 'adjust',
-                label: 'Adjust Stock',
-                icon: <StockOutlined />,
-                onClick: () => handleStockAdjustment(record),
-              },
-              {
-                key: 'transfer',
-                label: 'Transfer Stock',
-                icon: <SwapOutlined />,
-                onClick: () => handleStockTransfer(record),
-              },
-              {
-                key: 'reserve',
-                label: 'Reserve Stock',
-                icon: <BookOutlined />,
-                onClick: () => handleStockReservation(record),
-              },
-              {
-                key: 'history',
-                label: 'View History',
-                icon: <AlertOutlined />,
-                onClick: () => handleViewHistory(record),
-              },
-            ],
-          }}
-          trigger={['click']}
-        >
-          <Button
-            type="text"
-            icon={<MoreOutlined />}
-            size="small"
-            style={{ color: '#666' }}
-          />
-        </Dropdown>
-      ),
+      render: (_, record) => {
+        const isEmployee = currentCompany?.role === 'EMPLOYEE';
+        return (
+          <Dropdown
+            menu={{
+              items: [
+                {
+                  key: 'edit',
+                  label: 'Edit',
+                  icon: <EditOutlined />,
+                  onClick: () => handleEditInventory(record),
+                  disabled: isEmployee,
+                },
+                {
+                  key: 'record-movement',
+                  label: 'Record Stock Movement',
+                  icon: <BookOutlined />,
+                  onClick: () => handleRecordStockMovement(record),
+                  disabled: isEmployee,
+                },
+                {
+                  key: 'history',
+                  label: 'View History',
+                  icon: <AlertOutlined />,
+                  onClick: () => handleViewHistory(record),
+                },
+                {
+                  type: 'divider' as const,
+                },
+                {
+                  key: 'delete',
+                  label: 'Delete',
+                  icon: <DeleteOutlined />,
+                  onClick: () => handleDeleteInventory(record),
+                  disabled: isEmployee,
+                  danger: true,
+                },
+              ],
+            }}
+            trigger={['click']}
+          >
+            <Button type='text' icon={<MoreOutlined />} size='small' style={{ color: '#666' }} />
+          </Dropdown>
+        );
+      },
     },
   ];
 
   // Action handlers
-  const handleStockAdjustment = (record: LocationInventory) => {
+  const handleRecordStockMovement = (record: LocationInventory) => {
     setSelectedRecord(record);
     setStockMovementModalVisible(true);
   };
 
-  const handleStockTransfer = (record: LocationInventory) => {
+  const handleEditInventory = (record: LocationInventory) => {
     setSelectedRecord(record);
-    setStockMovementModalVisible(true);
+    setInventoryFormDrawerVisible(true);
   };
 
-  const handleStockReservation = (record: LocationInventory) => {
-    setSelectedRecord(record);
-    setStockReservationModalVisible(true);
+  const handleDeleteInventory = async (record: LocationInventory) => {
+    Modal.confirm({
+      title: 'Delete Inventory',
+      content: `Are you sure you want to delete inventory for "${record.product.name}" at "${record.location.name}"?`,
+      okText: 'Delete',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      onOk: async () => {
+        try {
+          await inventoryService.deleteInventory(record.id);
+          message.success('Inventory deleted successfully');
+          fetchInventory();
+        } catch (error: any) {
+          console.error('Error deleting inventory:', error);
+          message.error(error.response?.data?.message || 'Failed to delete inventory');
+        }
+      },
+    });
   };
 
   const handleViewHistory = (_record: LocationInventory) => {
@@ -425,7 +434,7 @@ const InventoryListPage: React.FC = () => {
               placeholder='Search products...'
               prefix={<SearchOutlined />}
               value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
+              onChange={e => setSearchText(e.target.value)}
               style={{ width: 250 }}
               allowClear
             />
@@ -444,19 +453,15 @@ const InventoryListPage: React.FC = () => {
               ))}
             </Select>
             <ProductSelector
-              placeholder="All Products"
+              placeholder='All Products'
               style={{ width: 200 }}
               value={selectedProduct}
               onChange={setSelectedProduct}
               allowClear
               showStockInfo={false}
             />
-            <Tooltip title="Refresh">
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={refreshInventory}
-                loading={tableLoading}
-              />
+            <Tooltip title='Refresh'>
+              <Button icon={<ReloadOutlined />} onClick={refreshInventory} loading={tableLoading} />
             </Tooltip>
             <Button
               icon={<FilterOutlined />}
@@ -483,18 +488,17 @@ const InventoryListPage: React.FC = () => {
             <Table
               columns={columns}
               dataSource={inventory}
-              rowKey="id"
+              rowKey='id'
               loading={tableLoading}
               pagination={{
                 total: inventory.length,
                 pageSize: 20,
                 showSizeChanger: true,
                 showQuickJumper: true,
-                showTotal: (total, range) =>
-                  `${range[0]}-${range[1]} of ${total} items`,
+                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
               }}
               scroll={{ x: 1200 }}
-              size="middle"
+              size='middle'
               className='inventory-table'
             />
           )}
@@ -504,8 +508,15 @@ const InventoryListPage: React.FC = () => {
       {/* Modals & Drawers */}
       <InventoryFormDrawer
         visible={inventoryFormDrawerVisible}
-        onClose={() => setInventoryFormDrawerVisible(false)}
-        onSuccess={handleModalSuccess}
+        onClose={() => {
+          setInventoryFormDrawerVisible(false);
+          setSelectedRecord(null);
+        }}
+        onSuccess={() => {
+          setInventoryFormDrawerVisible(false);
+          setSelectedRecord(null);
+          handleModalSuccess();
+        }}
       />
 
       <StockMovementModal

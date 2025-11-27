@@ -7,6 +7,7 @@ import {
   DownOutlined,
   BankOutlined,
   SettingOutlined,
+  EnvironmentOutlined,
 } from '@ant-design/icons';
 import useAuth from '../../contexts/AuthContext';
 import { getNavigationByIndustry, type IndustryType } from '../../config/navigationConfig';
@@ -72,7 +73,7 @@ export default function Sidebar() {
     },
     {
       key: 'location',
-      icon: <BankOutlined />,
+      icon: <EnvironmentOutlined />,
       label: 'Location',
       onClick: () => navigate('/locations'),
     },

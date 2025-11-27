@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Button, Typography, message, Modal, Spin, Badge, Avatar } from 'antd';
-import { ExclamationCircleOutlined, TeamOutlined } from '@ant-design/icons';
+import { ExclamationCircleOutlined, TeamOutlined, BankOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import useAuth from '../contexts/AuthContext';
-import { CompanyCreationDrawer } from '../components/CompanyCreationDrawer';
-import HeadingText from '../components/ui/HeadingText';
-import { GradientButton } from '../components/ui';
-import { BrandLogo } from '../components/BrandLogo';
-import { companyService } from '../services/companyService';
+import useAuth from '../../contexts/AuthContext';
+import { CompanyCreationDrawer } from '../../components/CompanyCreationDrawer';
+import HeadingText from '../../components/ui/HeadingText';
+import { GradientButton } from '../../components/ui';
+import { BrandLogo } from '../../components/BrandLogo';
+import { companyService } from '../../services/companyService';
 import './CompaniesListPage.scss';
-import { COMPANY_TEXT } from '../constants/company';
-import { Company } from '../types/auth';
+import { COMPANY_TEXT } from '../../constants/company';
+import { Company } from '../../types/auth';
 
 export default function CompaniesListPage() {
   const { companies, switchCompany, isLoading, logout, refreshCompanies } = useAuth();
@@ -140,6 +140,7 @@ export default function CompaniesListPage() {
         <div className='companies-top-bar-actions'>
           <GradientButton
             type='primary'
+            size='middle'
             className='companies-add-btn'
             onClick={() => setDrawerOpen(true)}
           >
@@ -148,10 +149,10 @@ export default function CompaniesListPage() {
           <Button
             type='default'
             danger
+            size='middle'
             loading={logoutLoading}
             onClick={handleLogout}
             disabled={logoutLoading}
-            style={{ height: '40px' }}
           >
             {COMPANY_TEXT.LOGOUT}
           </Button>
@@ -236,9 +237,7 @@ export default function CompaniesListPage() {
             </>
           ) : (
             <div className='companies-empty-state'>
-              <Avatar size={64} style={{ border: '2px solid #b3b3b3', padding: '4px', backgroundColor: '#f0f0f0' }}>
-                C
-              </Avatar>
+              <Avatar size={64} style={{ border: '2px solid #b3b3b3', padding: '4px', backgroundColor: '#f0f0f0' }} icon={<BankOutlined />} />
               <div className='companies-empty-text'>{COMPANY_TEXT.NO_COMPANY_CREATED}</div>
             </div>
           )}

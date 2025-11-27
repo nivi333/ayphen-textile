@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { Table, Tag, Space, Button, Dropdown, Empty, Spin, message } from 'antd';
 import { MoreOutlined, EditOutlined } from '@ant-design/icons';
-import useAuth from '../contexts/AuthContext';
-import { useHeader } from '../contexts/HeaderContext';
-import { MainLayout } from '../components/layout';
-import { Heading } from '../components/Heading';
-import { GradientButton } from '../components/ui';
-import { locationService, Location } from '../services/locationService';
-import { orderService, OrderSummary, OrderStatus } from '../services/orderService';
-import { OrderFormDrawer } from '../components/orders/OrderFormDrawer';
+import useAuth from '../../contexts/AuthContext';
+import { useHeader } from '../../contexts/HeaderContext';
+import { MainLayout } from '../../components/layout';
+import { Heading } from '../../components/Heading';
+import { GradientButton } from '../../components/ui';
+import { locationService, Location } from '../../services/locationService';
+import { orderService, OrderSummary, OrderStatus } from '../../services/orderService';
+import { OrderFormDrawer } from '../../components/orders/OrderFormDrawer';
 import './OrdersListPage.scss';
 
 const STATUS_COLORS: Record<OrderStatus, string> = {
@@ -64,14 +64,20 @@ export default function OrdersListPage() {
   const fetchInProgressRef = useRef(false);
 
   useEffect(() => {
+    const isEmployee = currentCompany?.role === 'EMPLOYEE';
     setHeaderActions(
-      <GradientButton onClick={handleCreateOrder} size='small' className='orders-create-btn'>
+      <GradientButton 
+        onClick={handleCreateOrder} 
+        size='small' 
+        className='orders-create-btn'
+        disabled={isEmployee}
+      >
         Create Order
       </GradientButton>,
     );
 
     return () => setHeaderActions(null);
-  }, [setHeaderActions]);
+  }, [setHeaderActions, currentCompany?.role]);
 
   useEffect(() => {
     if (currentCompany) {
@@ -222,6 +228,7 @@ export default function OrdersListPage() {
       key: 'actions',
       width: 160,
       render: (_: any, record: OrderSummary) => {
+        const isEmployee = currentCompany?.role === 'EMPLOYEE';
         const statusItems = getStatusMenuItems(record);
         const menuItems = [
           {
@@ -229,6 +236,7 @@ export default function OrdersListPage() {
             icon: <EditOutlined />,
             label: 'Edit',
             onClick: () => handleEditOrder(record),
+            disabled: isEmployee,
           },
           ...(statusItems.length
             ? ([{ type: 'divider' as const }] as any[]).concat(statusItems as any)
@@ -270,7 +278,11 @@ export default function OrdersListPage() {
             </div>
           ) : orders.length === 0 ? (
             <Empty description='No orders found'>
-              <GradientButton size='small' onClick={handleCreateOrder}>
+              <GradientButton 
+                size='small' 
+                onClick={handleCreateOrder}
+                disabled={currentCompany?.role === 'EMPLOYEE'}
+              >
                 Create First Order
               </GradientButton>
             </Empty>

@@ -23,10 +23,10 @@ import {
   PhoneOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
-import useAuth from '../contexts/AuthContext';
-import { MainLayout } from '../components/layout';
-import { CompanyCreationDrawer } from '../components/CompanyCreationDrawer';
-import { companyService, CompanyDetails } from '../services/companyService';
+import useAuth from '../../contexts/AuthContext';
+import { MainLayout } from '../../components/layout';
+import { CompanyCreationDrawer } from '../../components/CompanyCreationDrawer';
+import { companyService, CompanyDetails } from '../../services/companyService';
 import './CompanyDetailPage.scss';
 
 const { Title, Text } = Typography;
@@ -296,7 +296,7 @@ export default function CompanyDetailPage() {
               icon={<EditOutlined />}
               onClick={handleEditCompany}
               loading={loadingCompany}
-              disabled={loadingCompany}
+              disabled={loadingCompany || extendedCompany?.role === 'EMPLOYEE'}
             >
               Edit
             </Button>

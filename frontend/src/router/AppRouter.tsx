@@ -8,24 +8,23 @@ import {
   RegisterPage,
   ForgotPasswordPage,
   CompaniesListPage,
+  CompanyDetailPage,
   DashboardPage,
   LocationListPage,
   OrdersListPage,
   ProductsListPage,
   InventoryListPage,
+  MachineListPage,
   InspectionsListPage,
   InspectionDetailsPage,
+  QualityCheckpointsListPage,
+  QualityDefectsListPage,
+  QualityReportsPage,
+  ComplianceReportsListPage,
+  UsersListPage,
+  UserProfilePage,
 } from '../pages';
-import MachineListPage from '../pages/MachineListPage';
-import CompanyDetailPage from '../pages/CompanyDetailPage';
 import GoogleAuthCallback from '../components/auth/GoogleAuthCallback';
-import QualityCheckpointsListPage from '../pages/QualityCheckpointsListPage';
-import QualityDefectsListPage from '../pages/QualityDefectsListPage';
-import ComplianceReportsListPage from '../pages/ComplianceReportsListPage';
-import UsersListPage from '../pages/UsersListPage';
-import UserProfilePage from '../pages/UserProfilePage';
-import QualityReportsPage from '../pages/QualityReportsPage';
-import FabricProductionPage from '../pages/textile/FabricProductionPage';
 
 // Main application router component
 export default function AppRouter() {
@@ -216,14 +215,11 @@ export default function AppRouter() {
               }
             />
 
-            {/* Textile Manufacturing Routes */}
             <Route
-              path='/textile/fabric-production'
+              path='/profile'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <MainLayout>
-                    <FabricProductionPage />
-                  </MainLayout>
+                  <UserProfilePage />
                 </ProtectedRoute>
               }
             />

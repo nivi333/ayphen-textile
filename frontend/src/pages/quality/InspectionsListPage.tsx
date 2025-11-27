@@ -10,13 +10,13 @@ import {
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import useAuth from '../contexts/AuthContext';
-import { useHeader } from '../contexts/HeaderContext';
-import { MainLayout } from '../components/layout';
-import { Heading } from '../components/Heading';
-import { GradientButton } from '../components/ui';
-import { inspectionService, Inspection } from '../services/inspectionService';
-import InspectionFormDrawer from '../components/quality/InspectionFormDrawer';
+import useAuth from '../../contexts/AuthContext';
+import { useHeader } from '../../contexts/HeaderContext';
+import { MainLayout } from '../../components/layout';
+import { Heading } from '../../components/Heading';
+import { GradientButton } from '../../components/ui';
+import { inspectionService, Inspection } from '../../services/inspectionService';
+import InspectionFormDrawer from '../../components/quality/InspectionFormDrawer';
 
 dayjs.extend(relativeTime);
 

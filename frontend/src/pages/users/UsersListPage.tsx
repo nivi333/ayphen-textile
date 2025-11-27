@@ -23,14 +23,14 @@ import {
   CheckCircleOutlined,
   FolderOpenOutlined,
 } from '@ant-design/icons';
-import useAuth from '../contexts/AuthContext';
-import { useHeader } from '../contexts/HeaderContext';
-import { MainLayout } from '../components/layout';
-import { Heading } from '../components/Heading';
-import { GradientButton } from '../components/ui';
-import { userService, User, UserFilters } from '../services/userService';
-import UserInviteModal from '../components/users/UserInviteModal';
-import UserEditModal from '../components/users/UserEditModal';
+import useAuth from '../../contexts/AuthContext';
+import { useHeader } from '../../contexts/HeaderContext';
+import { MainLayout } from '../../components/layout';
+import { Heading } from '../../components/Heading';
+import { GradientButton } from '../../components/ui';
+import { userService, User, UserFilters } from '../../services/userService';
+import UserInviteModal from '../../components/users/UserInviteModal';
+import UserEditModal from '../../components/users/UserEditModal';
 import './UsersListPage.scss';
 
 const { Option } = Select;

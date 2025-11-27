@@ -12,20 +12,20 @@ import {
   Checkbox,
 } from 'antd';
 import { EditOutlined, DeleteOutlined, EnvironmentOutlined, MoreOutlined } from '@ant-design/icons';
-import useAuth from '../contexts/AuthContext';
-import { useHeader } from '../contexts/HeaderContext';
-import { locationService, Location } from '../services/locationService';
-import { MainLayout } from '../components/layout';
-import { Heading } from '../components/Heading';
-import { GradientButton } from '../components/ui';
+import useAuth from '../../contexts/AuthContext';
+import { useHeader } from '../../contexts/HeaderContext';
+import { locationService, Location } from '../../services/locationService';
+import { MainLayout } from '../../components/layout';
+import { Heading } from '../../components/Heading';
+import { GradientButton } from '../../components/ui';
 import {
   LOCATION_STATUS_COLORS,
   LOCATION_TABLE_CONFIG,
   LOCATION_EMPTY_STATE,
   LOCATION_SUCCESS_MESSAGES,
   LOCATION_ERROR_MESSAGES,
-} from '../constants/location';
-import LocationDrawer from '../components/location/LocationDrawer';
+} from '../../constants/location';
+import LocationDrawer from '../../components/location/LocationDrawer';
 import './LocationListPage.scss';
 
 export default function LocationListPage() {
@@ -40,15 +40,21 @@ export default function LocationListPage() {
 
   // Set header actions when component mounts
   useEffect(() => {
+    const isEmployee = currentCompany?.role === 'EMPLOYEE';
     setHeaderActions(
-      <GradientButton onClick={handleAddLocation} size='small' className='add-location-btn'>
+      <GradientButton 
+        onClick={handleAddLocation} 
+        size='small' 
+        className='add-location-btn'
+        disabled={isEmployee}
+      >
         Add Location
       </GradientButton>
     );
 
     // Cleanup when component unmounts
     return () => setHeaderActions(null);
-  }, [setHeaderActions]);
+  }, [setHeaderActions, currentCompany?.role]);
 
   useEffect(() => {
     if (currentCompany) {
@@ -118,12 +124,15 @@ export default function LocationListPage() {
     handleDrawerClose();
   };
 
-  const getActionMenuItems = (location: Location) => [
+  const getActionMenuItems = (location: Location) => {
+    const isEmployee = currentCompany?.role === 'EMPLOYEE';
+    return [
     {
       key: 'edit',
       icon: <EditOutlined />,
       label: 'Edit',
       onClick: () => handleEditLocation(location),
+      disabled: isEmployee,
     },
     {
       type: 'divider' as const,
@@ -134,9 +143,10 @@ export default function LocationListPage() {
       label: 'Delete',
       onClick: () => handleDeleteLocation(location),
       danger: true,
-      disabled: location.isHeadquarters, // Cannot delete headquarters
+      disabled: location.isHeadquarters || isEmployee, // Cannot delete headquarters or if employee
     },
   ];
+  };
 
   const columns = [
     {
@@ -257,7 +267,11 @@ export default function LocationListPage() {
               image={Empty.PRESENTED_IMAGE_SIMPLE}
               description={LOCATION_EMPTY_STATE.DESCRIPTION}
             >
-              <GradientButton size='small' onClick={handleAddLocation}>
+              <GradientButton 
+                size='small' 
+                onClick={handleAddLocation}
+                disabled={currentCompany?.role === 'EMPLOYEE'}
+              >
                 {LOCATION_EMPTY_STATE.BUTTON_TEXT}
               </GradientButton>
             </Empty>

@@ -294,6 +294,27 @@ class UserService {
       throw error;
     }
   }
+
+  async updateProfile(data: UpdateUserRequest): Promise<User> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/profile`, {
+        method: 'PUT',
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to update profile');
+      }
+
+      return result.data;
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      throw error;
+    }
+  }
 }
 
 export const userService = new UserService();

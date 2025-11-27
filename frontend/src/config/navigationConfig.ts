@@ -13,6 +13,11 @@ import {
   ToolOutlined,
   TeamOutlined,
   BarChartOutlined,
+  EnvironmentOutlined,
+  ShoppingOutlined,
+  FileDoneOutlined,
+  FileAddOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 
 export type IndustryType =
@@ -46,40 +51,88 @@ export const CORE_MODULES: MenuItem[] = [
     path: '/dashboard',
   },
   {
-    key: 'products',
-    label: 'Products',
-    icon: InboxOutlined,
-    path: '/products',
+    key: 'sales',
+    label: 'Sales',
+    icon: ShoppingOutlined,
+    path: '/sales',
+    children: [
+      {
+        key: 'customers',
+        label: 'Customers',
+        icon: UserOutlined,
+        path: '/customers',
+      },
+      {
+        key: 'sales-orders',
+        label: 'Sales Orders',
+        icon: FileAddOutlined,
+        path: '/sales/orders',
+      },
+      {
+        key: 'invoices',
+        label: 'Invoices',
+        icon: FileDoneOutlined,
+        path: '/sales/invoices',
+      },
+    ],
   },
   {
-    key: 'inventory',
-    label: 'Inventory',
-    icon: AppstoreOutlined,
-    path: '/inventory',
-  },
-  {
-    key: 'orders',
-    label: 'Orders',
+    key: 'purchase',
+    label: 'Purchase',
     icon: ShoppingCartOutlined,
-    path: '/orders',
+    path: '/purchase',
+    children: [
+      {
+        key: 'suppliers',
+        label: 'Suppliers',
+        icon: TeamOutlined,
+        path: '/suppliers',
+      },
+      {
+        key: 'purchase-orders',
+        label: 'Purchase Orders',
+        icon: FileAddOutlined,
+        path: '/purchase/orders',
+      },
+      {
+        key: 'bills',
+        label: 'Bills',
+        icon: FileDoneOutlined,
+        path: '/purchase/bills',
+      },
+    ],
   },
   {
-    key: 'customers',
-    label: 'Customers',
-    icon: TeamOutlined,
-    path: '/customers', // Placeholder - routes to dashboard via click handler
-  },
-  {
-    key: 'users',
-    label: 'Users',
-    icon: TeamOutlined,
-    path: '/users',
+    key: 'stock',
+    label: 'Stock',
+    icon: AppstoreOutlined,
+    path: '/stock',
+    children: [
+      {
+        key: 'products',
+        label: 'Products',
+        icon: InboxOutlined,
+        path: '/products',
+      },
+      {
+        key: 'inventory',
+        label: 'Inventory',
+        icon: AppstoreOutlined,
+        path: '/inventory',
+      },
+    ],
   },
   {
     key: 'machines',
     label: 'Machines',
     icon: ToolOutlined,
     path: '/machines',
+  },
+  {
+    key: 'users',
+    label: 'Users',
+    icon: TeamOutlined,
+    path: '/users',
   },
   {
     key: 'quality',
@@ -129,13 +182,13 @@ export const CORE_MODULES: MenuItem[] = [
     key: 'reports',
     label: 'Reports',
     icon: FileTextOutlined,
-    path: '/reports', // Placeholder - routes to dashboard via click handler
+    path: '/reports',
   },
   {
     key: 'analytics',
     label: 'Analytics',
     icon: BarChartOutlined,
-    path: '/analytics', // Placeholder - routes to dashboard via click handler
+    path: '/analytics',
   },
 ];
 

@@ -34,16 +34,16 @@ import {
   HistoryOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import useAuth from '../contexts/AuthContext';
-import { useHeader } from '../contexts/HeaderContext';
-import { MainLayout } from '../components/layout';
-import { Heading } from '../components/Heading';
-import { GradientButton } from '../components/ui';
-import { machineService, Machine } from '../services/machineService';
-import { locationService, Location } from '../services/locationService';
-import { MachineFormDrawer } from '../components/machines/MachineFormDrawer';
-import { MaintenanceScheduleModal } from '../components/machines/MaintenanceScheduleModal';
-import { BreakdownReportModal } from '../components/machines/BreakdownReportModal';
+import useAuth from '../../contexts/AuthContext';
+import { useHeader } from '../../contexts/HeaderContext';
+import { MainLayout } from '../../components/layout';
+import { Heading } from '../../components/Heading';
+import { GradientButton } from '../../components/ui';
+import { machineService, Machine } from '../../services/machineService';
+import { locationService, Location } from '../../services/locationService';
+import { MachineFormDrawer } from '../../components/machines/MachineFormDrawer';
+import { MaintenanceScheduleModal } from '../../components/machines/MaintenanceScheduleModal';
+import { BreakdownReportModal } from '../../components/machines/BreakdownReportModal';
 import './MachineListPage.scss';
 
 export default function MachineListPage() {
@@ -66,14 +66,20 @@ export default function MachineListPage() {
   const fetchInProgressRef = useRef(false);
 
   useEffect(() => {
+    const isEmployee = currentCompany?.role === 'EMPLOYEE';
     setHeaderActions(
-      <GradientButton onClick={handleCreateMachine} size='small' className='machines-create-btn'>
+      <GradientButton 
+        onClick={handleCreateMachine} 
+        size='small' 
+        className='machines-create-btn'
+        disabled={isEmployee}
+      >
         Add Machine
       </GradientButton>
     );
 
     return () => setHeaderActions(null);
-  }, [setHeaderActions]);
+  }, [setHeaderActions, currentCompany?.role]);
 
   useEffect(() => {
     if (currentCompany) {
@@ -320,18 +326,21 @@ export default function MachineListPage() {
       key: 'actions',
       width: 100,
       render: (record: Machine) => {
+        const isEmployee = currentCompany?.role === 'EMPLOYEE';
         const menuItems = [
           {
             key: 'edit',
             icon: <EditOutlined />,
             label: 'Edit',
             onClick: () => handleEditMachine(record),
+            disabled: isEmployee,
           },
           {
             key: 'maintenance',
             icon: <CalendarOutlined />,
             label: 'Schedule Maintenance',
             onClick: () => handleScheduleMaintenance(record),
+            disabled: isEmployee,
           },
           {
             key: 'breakdown',
@@ -435,7 +444,11 @@ export default function MachineListPage() {
             </div>
           ) : machines.length === 0 ? (
             <Empty description='No machines found'>
-              <GradientButton size='small' onClick={handleCreateMachine}>
+              <GradientButton 
+                size='small' 
+                onClick={handleCreateMachine}
+                disabled={currentCompany?.role === 'EMPLOYEE'}
+              >
                 Add First Machine
               </GradientButton>
             </Empty>

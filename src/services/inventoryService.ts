@@ -734,6 +734,20 @@ class InventoryService {
       // Don't throw error here as it's a background operation
     }
   }
+
+  /**
+   * Delete inventory record
+   */
+  async deleteInventory(inventoryId: string): Promise<void> {
+    try {
+      await this.prisma.location_inventory.delete({
+        where: { id: inventoryId },
+      });
+    } catch (error) {
+      console.error('Error deleting inventory:', error);
+      throw error;
+    }
+  }
 }
 
 export const inventoryService = new InventoryService();

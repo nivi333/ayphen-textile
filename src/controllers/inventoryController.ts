@@ -260,7 +260,7 @@ export class InventoryController {
       logger.error('Error fetching stock movement types:', error);
       res.status(500).json({
         success: false,
-        error: error.message || 'Failed to fetch stock movement types',
+        message: 'Failed to fetch stock movement types',
       });
     }
   }
@@ -282,6 +282,33 @@ export class InventoryController {
       res.status(500).json({
         success: false,
         error: error.message || 'Failed to fetch reservation types',
+      });
+    }
+  }
+
+  // Delete inventory
+  async deleteInventory(req: Request, res: Response) {
+    try {
+      const { inventoryId } = req.params;
+
+      if (!inventoryId) {
+        return res.status(400).json({
+          success: false,
+          error: 'Inventory ID is required',
+        });
+      }
+
+      await inventoryService.deleteInventory(inventoryId);
+
+      res.json({
+        success: true,
+        message: 'Inventory deleted successfully',
+      });
+    } catch (error: any) {
+      logger.error('Error deleting inventory:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Failed to delete inventory',
       });
     }
   }

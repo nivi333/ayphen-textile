@@ -275,18 +275,19 @@ const StockMovementModal: React.FC<StockMovementModalProps> = ({
             placeholder="Select movement type"
             onChange={handleMovementTypeChange}
             size="large"
+            optionLabelProp="label"
           >
             {MOVEMENT_TYPES.map(type => (
-              <Option key={type.value} value={type.value}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ color: type.color }}>{type.icon}</span>
-                  <div>
+              <Option key={type.value} value={type.value} label={type.label}>
+                <Space align="start" style={{ width: '100%' }}>
+                  <span style={{ color: type.color, marginTop: '2px' }}>{type.icon}</span>
+                  <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 500 }}>{type.label}</div>
                     <div style={{ fontSize: '12px', color: '#666' }}>
                       {type.description}
                     </div>
                   </div>
-                </div>
+                </Space>
               </Option>
             ))}
           </Select>

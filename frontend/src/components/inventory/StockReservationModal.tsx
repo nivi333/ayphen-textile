@@ -203,15 +203,15 @@ const StockReservationModal: React.FC<StockReservationModalProps> = ({
           >
             {RESERVATION_TYPES.map(type => (
               <Option key={type.value} value={type.value}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <BookOutlined style={{ color: type.color }} />
-                  <div>
+                <Space align="start" style={{ width: '100%' }}>
+                  <BookOutlined style={{ color: type.color, marginTop: '2px' }} />
+                  <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 500 }}>{type.label}</div>
                     <div style={{ fontSize: '12px', color: '#666' }}>
                       {type.description}
                     </div>
                   </div>
-                </div>
+                </Space>
               </Option>
             ))}
           </Select>
@@ -275,15 +275,15 @@ const StockReservationModal: React.FC<StockReservationModalProps> = ({
           label="Reserved Quantity"
           rules={[
             { required: true, message: 'Please enter reserved quantity' },
-            { type: 'number', min: 0.001, message: 'Quantity must be greater than 0' }
+            { type: 'number', min: 1, message: 'Quantity must be at least 1' }
           ]}
         >
           <InputNumber
             placeholder="Enter quantity to reserve"
             style={{ width: '100%' }}
-            min={0.001}
-            step={0.001}
-            precision={3}
+            min={1}
+            step={1}
+            precision={0}
           />
         </Form.Item>
 
