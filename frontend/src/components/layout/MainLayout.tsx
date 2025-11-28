@@ -46,11 +46,7 @@ function MainLayoutContent({ children }: MainLayoutProps) {
             </Button>
             {user && (
               <div className='header-user'>
-                <UserAvatar 
-                  firstName={user.firstName}
-                  lastName={user.lastName}
-                  size={36}
-                />
+                <UserAvatar firstName={user.firstName} lastName={user.lastName} size={38} />
                 <div className='header-user-info'>
                   <span className='header-user-name'>
                     {user.firstName} {user.lastName}

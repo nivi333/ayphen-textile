@@ -1,16 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Button,
-  Card,
-  Col,
-  Divider,
-  Row,
-  Space,
-  Spin,
-  Typography,
-  Tag,
-} from 'antd';
+import { Button, Card, Col, Divider, Row, Space, Spin, Typography, Tag } from 'antd';
 import {
   ArrowLeftOutlined,
   EditOutlined,
@@ -99,16 +89,33 @@ const UserProfilePage: React.FC = () => {
       items: [
         {
           label: 'Two-Factor Authentication',
-          value: <Tag icon={<SafetyCertificateOutlined />} color="default">Disabled</Tag>
+          value: (
+            <Tag icon={<SafetyCertificateOutlined />} color='default'>
+              Disabled
+            </Tag>
+          ),
         },
         {
           label: 'Email Notifications',
-          value: <Tag icon={<BellOutlined />} color="success">Enabled</Tag>
+          value: (
+            <Tag icon={<BellOutlined />} color='success'>
+              Enabled
+            </Tag>
+          ),
         },
         {
           label: 'Password',
-          value: <Button type="link" size="small" onClick={() => navigate('/profile/change-password')} style={{ padding: 0 }}>Change Password</Button>
-        }
+          value: (
+            <Button
+              type='link'
+              size='small'
+              onClick={() => navigate('/profile/change-password')}
+              style={{ padding: 0 }}
+            >
+              Change Password
+            </Button>
+          ),
+        },
       ],
     },
   ];
@@ -126,26 +133,25 @@ const UserProfilePage: React.FC = () => {
 
   return (
     <MainLayout>
-      <div className='company-detail-page'> {/* Reusing company detail page styles */}
+      <div className='company-detail-page'>
+        {' '}
+        {/* Reusing company detail page styles */}
         <div className='company-detail-top'>
           <div>
-            <Title level={3} className='company-detail-title'>My Profile</Title>
+            <Title level={3} className='company-detail-title'>
+              My Profile
+            </Title>
             <Text type='secondary'>Manage your personal information and security settings</Text>
           </div>
           <Space size={8} wrap>
             <Button icon={<ArrowLeftOutlined />} onClick={handleBack} className='ghost-button'>
               Back to Dashboard
             </Button>
-            <Button
-              type='primary'
-              icon={<EditOutlined />}
-              onClick={handleEditProfile}
-            >
+            <Button type='primary' icon={<EditOutlined />} onClick={handleEditProfile}>
               Edit Profile
             </Button>
           </Space>
         </div>
-
         <Card className='company-profile-card' bodyStyle={{ padding: 24 }}>
           <div className='company-profile-overview'>
             <Space size={20} align='start'>
@@ -154,6 +160,7 @@ const UserProfilePage: React.FC = () => {
                 lastName={currentUser.lastName}
                 imageUrl={currentUser.avatarUrl}
                 size={96}
+                style={{ fontSize: 35 }}
               />
               <div className='company-profile-meta'>
                 <Title level={4} className='company-profile-name'>
@@ -161,12 +168,16 @@ const UserProfilePage: React.FC = () => {
                 </Title>
                 <div className='company-profile-tags'>
                   {/* Add roles or other tags if available */}
-                  <Tag color="blue">User</Tag>
+                  <Tag color='blue'>User</Tag>
                 </div>
                 {contactPills.length > 0 && (
                   <div className='company-profile-contact'>
                     {contactPills.map(item => (
-                      <Space key={String(item.text)} size={8} className='company-profile-contact-item'>
+                      <Space
+                        key={String(item.text)}
+                        size={8}
+                        className='company-profile-contact-item'
+                      >
                         {item.icon}
                         <span>{item.text}</span>
                       </Space>

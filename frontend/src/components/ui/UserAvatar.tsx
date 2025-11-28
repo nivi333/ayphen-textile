@@ -8,6 +8,7 @@ interface UserAvatarProps {
   lastName?: string;
   imageUrl?: string;
   size?: number;
+  style?: React.CSSProperties;
 }
 
 export const UserAvatar: React.FC<UserAvatarProps> = ({
@@ -15,6 +16,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
   lastName,
   imageUrl,
   size = 36,
+  style,
 }) => {
   const getInitials = () => {
     const first = firstName?.charAt(0)?.toUpperCase() || '';
@@ -25,16 +27,23 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
   const initials = getInitials();
 
   if (imageUrl) {
-    return <Avatar size={size} src={imageUrl} />;
+    return <Avatar size={size} src={imageUrl} style={style} />;
   }
 
   if (initials) {
     return (
-      <Avatar size={size} className='user-avatar-gradient'>
+      <Avatar size={size} className='user-avatar-gradient' style={style}>
         {initials}
       </Avatar>
     );
   }
 
-  return <Avatar size={size} icon={<UserOutlined />} className='user-avatar-gradient' />;
+  return (
+    <Avatar
+      size={size}
+      icon={<UserOutlined />}
+      className='user-avatar-gradient'
+      style={style}
+    />
+  );
 };

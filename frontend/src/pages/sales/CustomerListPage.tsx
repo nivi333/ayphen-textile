@@ -11,6 +11,7 @@ import {
   Spin,
   Input,
   Space,
+  Select,
 } from 'antd';
 import {
   EditOutlined,
@@ -18,6 +19,9 @@ import {
   UserOutlined,
   MoreOutlined,
   SearchOutlined,
+  EyeOutlined,
+  ShoppingCartOutlined,
+  FileTextOutlined,
 } from '@ant-design/icons';
 import useAuth from '../../contexts/AuthContext';
 import { useHeader } from '../../contexts/HeaderContext';
@@ -37,6 +41,10 @@ export default function CustomerListPage() {
   const [editingCustomer, setEditingCustomer] = useState<Customer | undefined>(undefined);
   const [tableLoading, setTableLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
+  const [customerTypeFilter, setCustomerTypeFilter] = useState<string | undefined>(undefined);
+  const [customerCategoryFilter, setCustomerCategoryFilter] = useState<string | undefined>(undefined);
+  const [paymentTermsFilter, setPaymentTermsFilter] = useState<string | undefined>(undefined);
+  const [activeStatusFilter, setActiveStatusFilter] = useState<boolean | undefined>(undefined);
   const fetchInProgressRef = useRef(false);
 
   // Set header actions when component mounts
@@ -61,7 +69,7 @@ export default function CustomerListPage() {
     if (currentCompany) {
       fetchCustomers();
     }
-  }, [currentCompany, searchText]);
+  }, [currentCompany, searchText, customerTypeFilter, customerCategoryFilter, paymentTermsFilter, activeStatusFilter]);
 
   const fetchCustomers = async () => {
     if (fetchInProgressRef.current) {
@@ -73,6 +81,10 @@ export default function CustomerListPage() {
       setLoading(true);
       const filters: CustomerFilters = {
         search: searchText || undefined,
+        customerType: customerTypeFilter,
+        customerCategory: customerCategoryFilter,
+        paymentTerms: paymentTermsFilter,
+        isActive: activeStatusFilter,
       };
       const result = await customerService.getCustomers(filters);
       setCustomers(result.customers);
@@ -132,11 +144,37 @@ export default function CustomerListPage() {
     const isEmployee = currentCompany?.role === 'EMPLOYEE';
     return [
       {
+        key: 'view',
+        icon: <EyeOutlined />,
+        label: 'View Details',
+        onClick: () => handleEditCustomer(customer),
+      },
+      {
         key: 'edit',
         icon: <EditOutlined />,
         label: 'Edit',
         onClick: () => handleEditCustomer(customer),
         disabled: isEmployee,
+      },
+      {
+        type: 'divider' as const,
+      },
+      {
+        key: 'create-order',
+        icon: <ShoppingCartOutlined />,
+        label: 'Create Order',
+        onClick: () => {
+          message.info('Create Order functionality coming soon');
+        },
+        disabled: isEmployee,
+      },
+      {
+        key: 'view-orders',
+        icon: <FileTextOutlined />,
+        label: 'View Orders',
+        onClick: () => {
+          message.info('View Orders functionality coming soon');
+        },
       },
       {
         type: 'divider' as const,
@@ -154,55 +192,95 @@ export default function CustomerListPage() {
 
   const columns = [
     {
-      title: 'Customer',
-      key: 'customer',
-      width: 300,
-      render: (record: Customer) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <Avatar icon={<UserOutlined />} style={{ flexShrink: 0, backgroundColor: '#1890ff' }}>
-            {record.name.charAt(0)}
+      title: 'Customer Code',
+      dataIndex: 'code',
+      key: 'code',
+      width: 120,
+      render: (code: string) => (
+        <span style={{ fontFamily: 'monospace', backgroundColor: '#f5f5f5', padding: '2px 6px', borderRadius: '4px' }}>
+          {code}
+        </span>
+      ),
+    },
+    {
+      title: 'Customer Name',
+      dataIndex: 'name',
+      key: 'name',
+      width: 200,
+      render: (name: string, record: Customer) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Avatar icon={<UserOutlined />} style={{ flexShrink: 0, backgroundColor: '#7b5fc9' }}>
+            {name.charAt(0)}
           </Avatar>
           <div style={{ minWidth: 0, flex: 1 }}>
             <div className='customer-name' style={{ fontWeight: 500, marginBottom: 2 }}>
-              {record.name}
+              {name}
             </div>
-            <div className='customer-code' style={{ color: '#666', fontSize: '12px' }}>
-              {record.code}
-            </div>
+            {record.companyName && (
+              <div className='company-name' style={{ color: '#666', fontSize: '12px' }}>
+                {record.companyName}
+              </div>
+            )}
           </div>
         </div>
       ),
     },
     {
+      title: 'Contact Person',
+      dataIndex: 'primaryContactPerson',
+      key: 'primaryContactPerson',
+      width: 150,
+      render: (contactPerson: string) => contactPerson || '—',
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+      width: 200,
+      render: (email: string) => email || '—',
+    },
+    {
+      title: 'Phone',
+      dataIndex: 'phone',
+      key: 'phone',
+      width: 120,
+      render: (phone: string) => phone || '—',
+    },
+    {
       title: 'Type',
       dataIndex: 'customerType',
       key: 'customerType',
-      render: (type: string) => <Tag color='blue'>{type}</Tag>,
+      width: 100,
+      render: (type: string) => {
+        const colorMap: Record<string, string> = {
+          INDIVIDUAL: 'blue',
+          BUSINESS: 'green',
+          DISTRIBUTOR: 'purple',
+          RETAILER: 'orange',
+          WHOLESALER: 'cyan',
+        };
+        const color = colorMap[type] || 'default';
+        return <Tag color={color}>{type}</Tag>;
+      },
     },
     {
-      title: 'Contact',
-      key: 'contact',
-      width: 250,
-      render: (record: Customer) => (
-        <div className='customer-contact'>
-          {record.email && <div style={{ fontSize: '12px', marginBottom: 2 }}>{record.email}</div>}
-          {record.phone && <div style={{ fontSize: '12px', color: '#666' }}>{record.phone}</div>}
-        </div>
-      ),
-    },
-    {
-      title: 'Location',
-      key: 'location',
-      render: (record: Customer) => (
-        <div style={{ fontSize: '12px', color: '#666' }}>
-          {record.city && record.state ? `${record.city}, ${record.state}` : '-'}
-        </div>
-      ),
+      title: 'Credit Limit',
+      dataIndex: 'creditLimit',
+      key: 'creditLimit',
+      width: 120,
+      render: (creditLimit?: number) => {
+        if (!creditLimit) return '—';
+        return new Intl.NumberFormat('en-IN', {
+          style: 'currency',
+          currency: 'INR',
+          minimumFractionDigits: 2,
+        }).format(creditLimit);
+      },
     },
     {
       title: 'Status',
       key: 'status',
-      width: 100,
+      width: 80,
       render: (record: Customer) => (
         <Tag color={record.isActive ? 'success' : 'default'}>
           {record.isActive ? 'Active' : 'Inactive'}
@@ -241,15 +319,64 @@ export default function CustomerListPage() {
         </div>
 
         <div className='filters-section'>
-          <Space>
+          <Space wrap>
             <Input
-              placeholder='Search customers...'
+              placeholder='Search by name, code, email, phone...'
               prefix={<SearchOutlined />}
               value={searchText}
               onChange={e => setSearchText(e.target.value)}
               style={{ width: 300 }}
               allowClear
             />
+            <Select
+              placeholder='Customer Type'
+              value={customerTypeFilter}
+              onChange={setCustomerTypeFilter}
+              style={{ width: 140 }}
+              allowClear
+            >
+              <Select.Option value='INDIVIDUAL'>Individual</Select.Option>
+              <Select.Option value='BUSINESS'>Business</Select.Option>
+              <Select.Option value='DISTRIBUTOR'>Distributor</Select.Option>
+              <Select.Option value='RETAILER'>Retailer</Select.Option>
+              <Select.Option value='WHOLESALER'>Wholesaler</Select.Option>
+            </Select>
+            <Select
+              placeholder='Category'
+              value={customerCategoryFilter}
+              onChange={setCustomerCategoryFilter}
+              style={{ width: 120 }}
+              allowClear
+            >
+              <Select.Option value='VIP'>VIP</Select.Option>
+              <Select.Option value='REGULAR'>Regular</Select.Option>
+              <Select.Option value='NEW'>New</Select.Option>
+              <Select.Option value='INACTIVE'>Inactive</Select.Option>
+            </Select>
+            <Select
+              placeholder='Payment Terms'
+              value={paymentTermsFilter}
+              onChange={setPaymentTermsFilter}
+              style={{ width: 140 }}
+              allowClear
+            >
+              <Select.Option value='NET_30'>Net 30</Select.Option>
+              <Select.Option value='NET_60'>Net 60</Select.Option>
+              <Select.Option value='NET_90'>Net 90</Select.Option>
+              <Select.Option value='ADVANCE'>Advance</Select.Option>
+              <Select.Option value='COD'>Cash on Delivery</Select.Option>
+              <Select.Option value='CREDIT'>Credit</Select.Option>
+            </Select>
+            <Select
+              placeholder='Status'
+              value={activeStatusFilter !== undefined ? (activeStatusFilter ? 'true' : 'false') : undefined}
+              onChange={value => setActiveStatusFilter(value !== undefined ? value === 'true' : undefined)}
+              style={{ width: 100 }}
+              allowClear
+            >
+              <Select.Option value='true'>Active</Select.Option>
+              <Select.Option value='false'>Inactive</Select.Option>
+            </Select>
           </Space>
         </div>
 

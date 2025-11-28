@@ -11,6 +11,9 @@ import {
   Col,
   Switch,
   InputNumber,
+  Checkbox,
+  Space,
+  Tag,
 } from 'antd';
 import {
   customerService,
@@ -19,7 +22,8 @@ import {
   Customer,
 } from '../../services/customerService';
 import { GradientButton } from '../ui';
-import '../CompanyCreationDrawer.scss'; // Reuse existing styles
+import '../CompanyCreationDrawer.scss'; // Reuse existing layout styles
+import '../products/ProductFormDrawer.scss'; // Reuse drawer header styles
 
 interface CustomerDrawerProps {
   open: boolean;
@@ -43,28 +47,68 @@ export const CustomerDrawer: React.FC<CustomerDrawerProps> = ({
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [isActive, setIsActive] = useState(true);
+  const [sameAsBilling, setSameAsBilling] = useState(true);
+  const [tags, setTags] = useState<string[]>([]);
+  const [inputTag, setInputTag] = useState('');
 
   const isEditing = mode === 'edit' && !!customerId;
 
   const handleDrawerClose = () => {
     form.resetFields();
+    setTags([]);
+    setInputTag('');
+    setSameAsBilling(true);
     onClose();
+  };
+
+  const handleAddTag = () => {
+    if (inputTag && !tags.includes(inputTag)) {
+      setTags([...tags, inputTag]);
+      setInputTag('');
+      form.setFieldsValue({ tags: [...tags, inputTag] });
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    const newTags = tags.filter(tag => tag !== tagToRemove);
+    setTags(newTags);
+    form.setFieldsValue({ tags: newTags });
+  };
+
+  const handleSameAsBillingChange = (checked: boolean) => {
+    setSameAsBilling(checked);
+    form.setFieldsValue({ sameAsBillingAddress: checked });
+    if (checked) {
+      // Copy billing address to shipping address
+      const billingValues = {
+        shippingAddressLine1: form.getFieldValue('billingAddressLine1'),
+        shippingAddressLine2: form.getFieldValue('billingAddressLine2'),
+        shippingCity: form.getFieldValue('billingCity'),
+        shippingState: form.getFieldValue('billingState'),
+        shippingCountry: form.getFieldValue('billingCountry'),
+        shippingPostalCode: form.getFieldValue('billingPostalCode'),
+      };
+      form.setFieldsValue(billingValues);
+    }
   };
 
   const handleFinish = async (values: any) => {
     setLoading(true);
     try {
+      const payload = {
+        ...values,
+        tags: tags,
+      };
+
       if (isEditing && customerId) {
-        const updatePayload: UpdateCustomerRequest = {
-          ...values,
-        };
+        const updatePayload: UpdateCustomerRequest = payload;
         const updatedCustomer = await customerService.updateCustomer(customerId, updatePayload);
         message.success('Customer updated successfully!');
         onCustomerUpdated?.(updatedCustomer);
         handleDrawerClose();
       } else {
         const createPayload: CreateCustomerRequest = {
-          ...values,
+          ...payload,
           isActive: true, // Default for new customers
         };
         await customerService.createCustomer(createPayload);
@@ -86,10 +130,20 @@ export const CustomerDrawer: React.FC<CustomerDrawerProps> = ({
           ...initialData,
         });
         setIsActive(initialData.isActive ?? true);
+        setTags(initialData.tags || []);
+        setSameAsBilling(initialData.sameAsBillingAddress ?? true);
       } else {
         form.resetFields();
-        form.setFieldsValue({ isActive: true, customerType: 'RETAIL' });
+        form.setFieldsValue({
+          isActive: true,
+          customerType: 'INDIVIDUAL',
+          customerCategory: 'REGULAR',
+          currency: 'INR',
+          sameAsBillingAddress: true,
+        });
         setIsActive(true);
+        setSameAsBilling(true);
+        setTags([]);
       }
     }
   }, [open, isEditing, initialData, form]);
@@ -101,7 +155,7 @@ export const CustomerDrawer: React.FC<CustomerDrawerProps> = ({
     <Drawer
       title={
         <div className='drawer-header-with-switch'>
-          <span className='ccd-title'>{drawerTitle}</span>
+          <span>{drawerTitle}</span>
           <div className='header-switch'>
             <span className='switch-label'>Active</span>
             <Switch
@@ -127,7 +181,13 @@ export const CustomerDrawer: React.FC<CustomerDrawerProps> = ({
           form={form}
           layout='vertical'
           onFinish={handleFinish}
-          initialValues={{ isActive: true, customerType: 'RETAIL' }}
+          initialValues={{
+            isActive: true,
+            customerType: 'INDIVIDUAL',
+            customerCategory: 'REGULAR',
+            currency: 'INR',
+            sameAsBillingAddress: true,
+          }}
           className='ccd-form'
           onValuesChange={(_, allValues) => {
             if (allValues.isActive !== undefined) {
@@ -179,20 +239,80 @@ export const CustomerDrawer: React.FC<CustomerDrawerProps> = ({
                     rules={[{ required: true, message: 'Please select type' }]}
                   >
                     <Select placeholder='Select type' className='ccd-select'>
-                      <Select.Option value='RETAIL'>Retail</Select.Option>
-                      <Select.Option value='WHOLESALE'>Wholesale</Select.Option>
+                      <Select.Option value='INDIVIDUAL'>Individual</Select.Option>
+                      <Select.Option value='BUSINESS'>Business</Select.Option>
                       <Select.Option value='DISTRIBUTOR'>Distributor</Select.Option>
-                      <Select.Option value='ONLINE'>Online</Select.Option>
+                      <Select.Option value='RETAILER'>Retailer</Select.Option>
+                      <Select.Option value='WHOLESALER'>Wholesaler</Select.Option>
                     </Select>
                   </Form.Item>
                 </Col>
+                <Col span={12}>
+                  <Form.Item
+                    label='Company Name'
+                    name='companyName'
+                    rules={[
+                      ({ getFieldValue }) => ({
+                        validator(_, value) {
+                          if (getFieldValue('customerType') === 'BUSINESS' && !value) {
+                            return Promise.reject(
+                              new Error('Company name is required for business type')
+                            );
+                          }
+                          return Promise.resolve();
+                        },
+                      }),
+                    ]}
+                  >
+                    <Input
+                      maxLength={100}
+                      autoComplete='off'
+                      placeholder='Enter company name'
+                      className='ccd-input'
+                    />
+                  </Form.Item>
+                </Col>
               </Row>
+              <Row gutter={12}>
+                <Col span={12}>
+                  <Form.Item label='Customer Category' name='customerCategory'>
+                    <Select placeholder='Select category' className='ccd-select' allowClear>
+                      <Select.Option value='VIP'>VIP</Select.Option>
+                      <Select.Option value='REGULAR'>Regular</Select.Option>
+                      <Select.Option value='NEW'>New</Select.Option>
+                      <Select.Option value='INACTIVE'>Inactive</Select.Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    label='Primary Contact Person'
+                    name='primaryContactPerson'
+                    rules={[{ required: true, message: 'Please enter primary contact person' }]}
+                  >
+                    <Input
+                      maxLength={100}
+                      autoComplete='off'
+                      placeholder='Enter contact person name'
+                      className='ccd-input'
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </div>
+
+            <Divider className='ccd-divider' />
+
+            {/* Contact Information */}
+            <div className='ccd-section'>
+              <div className='ccd-section-title'>Contact Information</div>
               <Row gutter={12}>
                 <Col span={12}>
                   <Form.Item
                     label='Email Address'
                     name='email'
                     rules={[
+                      { required: true, message: 'Please enter email address' },
                       {
                         type: 'email',
                         message: 'Please enter a valid email address',
@@ -207,7 +327,17 @@ export const CustomerDrawer: React.FC<CustomerDrawerProps> = ({
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  <Form.Item label='Phone Number' name='phone'>
+                  <Form.Item
+                    label='Phone Number'
+                    name='phone'
+                    rules={[
+                      { required: true, message: 'Please enter phone number' },
+                      {
+                        pattern: /^[+]?[1-9][\d]{0,15}$/,
+                        message: 'Please enter a valid phone number with country code',
+                      },
+                    ]}
+                  >
                     <Input autoComplete='off' placeholder='+1 234 567 8900' className='ccd-input' />
                   </Form.Item>
                 </Col>
@@ -215,8 +345,97 @@ export const CustomerDrawer: React.FC<CustomerDrawerProps> = ({
               <Row gutter={12}>
                 <Col span={12}>
                   <Form.Item
+                    label='Alternate Phone'
+                    name='alternatePhone'
+                    rules={[
+                      {
+                        pattern: /^[+]?[1-9][\d]{0,15}$/,
+                        message: 'Please enter a valid phone number with country code',
+                      },
+                    ]}
+                  >
+                    <Input autoComplete='off' placeholder='+1 234 567 8900' className='ccd-input' />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    label='Website'
+                    name='website'
+                    rules={[
+                      {
+                        type: 'url',
+                        message: 'Please enter a valid URL',
+                      },
+                    ]}
+                  >
+                    <Input
+                      autoComplete='off'
+                      placeholder='https://www.example.com'
+                      className='ccd-input'
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </div>
+
+            <Divider className='ccd-divider' />
+
+            {/* Billing Address */}
+            <div className='ccd-section'>
+              <div className='ccd-section-title'>Billing Address</div>
+              <Row gutter={12}>
+                <Col span={12}>
+                  <Form.Item label='Address Line 1' name='billingAddressLine1'>
+                    <Input
+                      maxLength={255}
+                      autoComplete='off'
+                      placeholder='Street address'
+                      className='ccd-input'
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label='Address Line 2' name='billingAddressLine2'>
+                    <Input
+                      maxLength={255}
+                      autoComplete='off'
+                      placeholder='Apartment, suite, unit, building, floor, etc.'
+                      className='ccd-input'
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={12}>
+                <Col span={12}>
+                  <Form.Item
+                    label='City'
+                    name='billingCity'
+                    rules={[{ required: true, message: 'Please enter billing city' }]}
+                  >
+                    <Input
+                      maxLength={100}
+                      autoComplete='off'
+                      placeholder='Enter city'
+                      className='ccd-input'
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label='State/Province' name='billingState'>
+                    <Input
+                      maxLength={100}
+                      autoComplete='off'
+                      placeholder='Enter state'
+                      className='ccd-input'
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={12}>
+                <Col span={12}>
+                  <Form.Item
                     label='Country'
-                    name='country'
+                    name='billingCountry'
                     rules={[{ required: true, message: 'Please select country' }]}
                   >
                     <Select showSearch placeholder='Select country' className='ccd-select'>
@@ -294,71 +513,8 @@ export const CustomerDrawer: React.FC<CustomerDrawerProps> = ({
                     </Select>
                   </Form.Item>
                 </Col>
-              </Row>
-            </div>
-
-            <Divider className='ccd-divider' />
-
-            {/* Address Information */}
-            <div className='ccd-section'>
-              <div className='ccd-section-title'>Address Information</div>
-              <Row gutter={12}>
                 <Col span={12}>
-                  <Form.Item
-                    label='Address Line 1'
-                    name='addressLine1'
-                  >
-                    <Input
-                      maxLength={255}
-                      autoComplete='off'
-                      placeholder='Street address'
-                      className='ccd-input'
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item label='Address Line 2' name='addressLine2'>
-                    <Input
-                      maxLength={255}
-                      autoComplete='off'
-                      placeholder='Apartment, suite, unit, building, floor, etc.'
-                      className='ccd-input'
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={12}>
-                <Col span={12}>
-                  <Form.Item
-                    label='City'
-                    name='city'
-                  >
-                    <Input
-                      maxLength={100}
-                      autoComplete='off'
-                      placeholder='Enter city'
-                      className='ccd-input'
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    label='State/Province'
-                    name='state'
-                  >
-                    <Input
-                      maxLength={100}
-                      autoComplete='off'
-                      placeholder='Enter state'
-                      className='ccd-input'
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    label='Postal/ZIP Code'
-                    name='pincode'
-                  >
+                  <Form.Item label='Postal/ZIP Code' name='billingPostalCode'>
                     <Input
                       maxLength={20}
                       autoComplete='off'
@@ -372,13 +528,183 @@ export const CustomerDrawer: React.FC<CustomerDrawerProps> = ({
 
             <Divider className='ccd-divider' />
 
-            {/* Financial Details */}
+            {/* Shipping Address */}
             <div className='ccd-section'>
-              <div className='ccd-section-title'>Financial Details</div>
+              <div className='ccd-section-title'>Shipping Address</div>
+              <Row gutter={12}>
+                <Col span={24}>
+                  <Form.Item name='sameAsBillingAddress' valuePropName='checked'>
+                    <Checkbox onChange={e => handleSameAsBillingChange(e.target.checked)}>
+                      Same as billing address
+                    </Checkbox>
+                  </Form.Item>
+                </Col>
+              </Row>
+              {!sameAsBilling && (
+                <>
+                  <Row gutter={12}>
+                    <Col span={12}>
+                      <Form.Item label='Address Line 1' name='shippingAddressLine1'>
+                        <Input
+                          maxLength={255}
+                          autoComplete='off'
+                          placeholder='Street address'
+                          className='ccd-input'
+                        />
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item label='Address Line 2' name='shippingAddressLine2'>
+                        <Input
+                          maxLength={255}
+                          autoComplete='off'
+                          placeholder='Apartment, suite, unit, building, floor, etc.'
+                          className='ccd-input'
+                        />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                  <Row gutter={12}>
+                    <Col span={12}>
+                      <Form.Item label='City' name='shippingCity'>
+                        <Input
+                          maxLength={100}
+                          autoComplete='off'
+                          placeholder='Enter city'
+                          className='ccd-input'
+                        />
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item label='State/Province' name='shippingState'>
+                        <Input
+                          maxLength={100}
+                          autoComplete='off'
+                          placeholder='Enter state'
+                          className='ccd-input'
+                        />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                  <Row gutter={12}>
+                    <Col span={12}>
+                      <Form.Item label='Country' name='shippingCountry'>
+                        <Select showSearch placeholder='Select country' className='ccd-select'>
+                          <Select.Option value='Afghanistan'>Afghanistan</Select.Option>
+                          <Select.Option value='Albania'>Albania</Select.Option>
+                          <Select.Option value='Algeria'>Algeria</Select.Option>
+                          <Select.Option value='Argentina'>Argentina</Select.Option>
+                          <Select.Option value='Australia'>Australia</Select.Option>
+                          <Select.Option value='Austria'>Austria</Select.Option>
+                          <Select.Option value='Bangladesh'>Bangladesh</Select.Option>
+                          <Select.Option value='Belgium'>Belgium</Select.Option>
+                          <Select.Option value='Brazil'>Brazil</Select.Option>
+                          <Select.Option value='Bulgaria'>Bulgaria</Select.Option>
+                          <Select.Option value='Canada'>Canada</Select.Option>
+                          <Select.Option value='Chile'>Chile</Select.Option>
+                          <Select.Option value='China'>China</Select.Option>
+                          <Select.Option value='Colombia'>Colombia</Select.Option>
+                          <Select.Option value='Croatia'>Croatia</Select.Option>
+                          <Select.Option value='Czech Republic'>Czech Republic</Select.Option>
+                          <Select.Option value='Denmark'>Denmark</Select.Option>
+                          <Select.Option value='Egypt'>Egypt</Select.Option>
+                          <Select.Option value='Finland'>Finland</Select.Option>
+                          <Select.Option value='France'>France</Select.Option>
+                          <Select.Option value='Germany'>Germany</Select.Option>
+                          <Select.Option value='Greece'>Greece</Select.Option>
+                          <Select.Option value='Hungary'>Hungary</Select.Option>
+                          <Select.Option value='Iceland'>Iceland</Select.Option>
+                          <Select.Option value='India'>India</Select.Option>
+                          <Select.Option value='Indonesia'>Indonesia</Select.Option>
+                          <Select.Option value='Iran'>Iran</Select.Option>
+                          <Select.Option value='Iraq'>Iraq</Select.Option>
+                          <Select.Option value='Ireland'>Ireland</Select.Option>
+                          <Select.Option value='Israel'>Israel</Select.Option>
+                          <Select.Option value='Italy'>Italy</Select.Option>
+                          <Select.Option value='Japan'>Japan</Select.Option>
+                          <Select.Option value='Jordan'>Jordan</Select.Option>
+                          <Select.Option value='Kenya'>Kenya</Select.Option>
+                          <Select.Option value='South Korea'>South Korea</Select.Option>
+                          <Select.Option value='Kuwait'>Kuwait</Select.Option>
+                          <Select.Option value='Lebanon'>Lebanon</Select.Option>
+                          <Select.Option value='Libya'>Libya</Select.Option>
+                          <Select.Option value='Malaysia'>Malaysia</Select.Option>
+                          <Select.Option value='Mexico'>Mexico</Select.Option>
+                          <Select.Option value='Morocco'>Morocco</Select.Option>
+                          <Select.Option value='Netherlands'>Netherlands</Select.Option>
+                          <Select.Option value='New Zealand'>New Zealand</Select.Option>
+                          <Select.Option value='Norway'>Norway</Select.Option>
+                          <Select.Option value='Pakistan'>Pakistan</Select.Option>
+                          <Select.Option value='Peru'>Peru</Select.Option>
+                          <Select.Option value='Philippines'>Philippines</Select.Option>
+                          <Select.Option value='Poland'>Poland</Select.Option>
+                          <Select.Option value='Portugal'>Portugal</Select.Option>
+                          <Select.Option value='Qatar'>Qatar</Select.Option>
+                          <Select.Option value='Romania'>Romania</Select.Option>
+                          <Select.Option value='Russia'>Russia</Select.Option>
+                          <Select.Option value='Saudi Arabia'>Saudi Arabia</Select.Option>
+                          <Select.Option value='Singapore'>Singapore</Select.Option>
+                          <Select.Option value='South Africa'>South Africa</Select.Option>
+                          <Select.Option value='Spain'>Spain</Select.Option>
+                          <Select.Option value='Sweden'>Sweden</Select.Option>
+                          <Select.Option value='Switzerland'>Switzerland</Select.Option>
+                          <Select.Option value='Syria'>Syria</Select.Option>
+                          <Select.Option value='Thailand'>Thailand</Select.Option>
+                          <Select.Option value='Tunisia'>Tunisia</Select.Option>
+                          <Select.Option value='Turkey'>Turkey</Select.Option>
+                          <Select.Option value='Ukraine'>Ukraine</Select.Option>
+                          <Select.Option value='United Arab Emirates'>
+                            United Arab Emirates
+                          </Select.Option>
+                          <Select.Option value='United Kingdom'>United Kingdom</Select.Option>
+                          <Select.Option value='United States'>United States</Select.Option>
+                          <Select.Option value='Venezuela'>Venezuela</Select.Option>
+                          <Select.Option value='Vietnam'>Vietnam</Select.Option>
+                          <Select.Option value='Yemen'>Yemen</Select.Option>
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item label='Postal/ZIP Code' name='shippingPostalCode'>
+                        <Input
+                          maxLength={20}
+                          autoComplete='off'
+                          placeholder='Enter postal code'
+                          className='ccd-input'
+                        />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                </>
+              )}
+            </div>
+
+            <Divider className='ccd-divider' />
+
+            {/* Financial Information */}
+            <div className='ccd-section'>
+              <div className='ccd-section-title'>Financial Information</div>
               <Row gutter={12}>
                 <Col span={8}>
-                  <Form.Item label='Tax ID' name='taxId'>
-                    <Input placeholder='Tax ID / GSTIN' className='ccd-input' maxLength={50} />
+                  <Form.Item label='Currency' name='currency'>
+                    <Select placeholder='Select currency' className='ccd-select'>
+                      <Select.Option value='INR'>INR (Indian Rupee)</Select.Option>
+                      <Select.Option value='USD'>USD (US Dollar)</Select.Option>
+                      <Select.Option value='EUR'>EUR (Euro)</Select.Option>
+                      <Select.Option value='GBP'>GBP (British Pound)</Select.Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item label='Payment Terms' name='paymentTerms'>
+                    <Select placeholder='Select terms' className='ccd-select'>
+                      <Select.Option value='NET_30'>Net 30</Select.Option>
+                      <Select.Option value='NET_60'>Net 60</Select.Option>
+                      <Select.Option value='NET_90'>Net 90</Select.Option>
+                      <Select.Option value='ADVANCE'>Advance</Select.Option>
+                      <Select.Option value='COD'>Cash on Delivery</Select.Option>
+                      <Select.Option value='CREDIT'>Credit</Select.Option>
+                    </Select>
                   </Form.Item>
                 </Col>
                 <Col span={8}>
@@ -392,14 +718,76 @@ export const CustomerDrawer: React.FC<CustomerDrawerProps> = ({
                     />
                   </Form.Item>
                 </Col>
-                <Col span={8}>
-                  <Form.Item label='Payment Terms' name='paymentTerms'>
-                    <Select placeholder='Select terms' className='ccd-select'>
-                      <Select.Option value='IMMEDIATE'>Immediate</Select.Option>
-                      <Select.Option value='NET15'>Net 15</Select.Option>
-                      <Select.Option value='NET30'>Net 30</Select.Option>
-                      <Select.Option value='NET60'>Net 60</Select.Option>
-                    </Select>
+              </Row>
+              <Row gutter={12}>
+                <Col span={12}>
+                  <Form.Item label='Tax ID / GST Number' name='taxId'>
+                    <Input placeholder='Tax ID / GSTIN' className='ccd-input' maxLength={50} />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    label='PAN Number'
+                    name='panNumber'
+                    rules={[
+                      {
+                        pattern: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
+                        message: 'Please enter a valid PAN number (e.g., ABCDE1234F)',
+                      },
+                    ]}
+                  >
+                    <Input placeholder='PAN Number' className='ccd-input' maxLength={10} />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </div>
+
+            <Divider className='ccd-divider' />
+
+            {/* Additional Information */}
+            <div className='ccd-section'>
+              <div className='ccd-section-title'>Additional Information</div>
+              <Row gutter={12}>
+                <Col span={24}>
+                  <Form.Item label='Tags' name='tags'>
+                    <div>
+                      <Space style={{ marginBottom: 8 }}>
+                        <Input
+                          style={{ width: 200 }}
+                          placeholder='Add a tag'
+                          value={inputTag}
+                          onChange={e => setInputTag(e.target.value)}
+                          onPressEnter={handleAddTag}
+                        />
+                        <Button type='primary' onClick={handleAddTag}>
+                          Add
+                        </Button>
+                      </Space>
+                      <div>
+                        {tags.map(tag => (
+                          <Tag
+                            key={tag}
+                            closable
+                            onClose={() => handleRemoveTag(tag)}
+                            style={{ marginBottom: 4 }}
+                          >
+                            {tag}
+                          </Tag>
+                        ))}
+                      </div>
+                    </div>
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={12}>
+                <Col span={24}>
+                  <Form.Item label='Notes' name='notes'>
+                    <Input.TextArea
+                      rows={3}
+                      maxLength={500}
+                      placeholder='Additional notes about this customer...'
+                      className='ccd-input'
+                    />
                   </Form.Item>
                 </Col>
               </Row>

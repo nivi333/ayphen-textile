@@ -3,52 +3,98 @@ import { AuthStorage } from '../utils/storage';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 export interface Customer {
-    id: string;
-    customerId: string;
-    code: string;
-    name: string;
-    customerType: string;
-    email?: string;
-    phone?: string;
-    addressLine1?: string;
-    addressLine2?: string;
-    city?: string;
-    state?: string;
-    country?: string;
-    pincode?: string;
-    taxId?: string;
-    creditLimit?: number;
-    paymentTerms?: string;
-    isActive: boolean;
-    createdAt: string;
-    updatedAt: string;
+  id: string;
+  customerId: string;
+  code: string;
+  name: string;
+  customerType: string;
+  companyName?: string;
+  customerCategory?: string;
+  primaryContactPerson?: string;
+  email?: string;
+  phone?: string;
+  alternatePhone?: string;
+  website?: string;
+  // Billing Address
+  billingAddressLine1?: string;
+  billingAddressLine2?: string;
+  billingCity?: string;
+  billingState?: string;
+  billingCountry?: string;
+  billingPostalCode?: string;
+  // Shipping Address
+  shippingAddressLine1?: string;
+  shippingAddressLine2?: string;
+  shippingCity?: string;
+  shippingState?: string;
+  shippingCountry?: string;
+  shippingPostalCode?: string;
+  sameAsBillingAddress?: boolean;
+  // Financial Information
+  paymentTerms?: string;
+  creditLimit?: number;
+  currency?: string;
+  taxId?: string;
+  panNumber?: string;
+  // Additional Information
+  assignedSalesRep?: string;
+  notes?: string;
+  tags?: string[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateCustomerRequest {
-    name: string;
-    customerType?: string;
-    email?: string;
-    phone?: string;
-    addressLine1?: string;
-    addressLine2?: string;
-    city?: string;
-    state?: string;
-    country?: string;
-    pincode?: string;
-    taxId?: string;
-    creditLimit?: number;
-    paymentTerms?: string;
-    isActive?: boolean;
+  name: string;
+  customerType?: string;
+  companyName?: string;
+  customerCategory?: string;
+  primaryContactPerson?: string;
+  email?: string;
+  phone?: string;
+  alternatePhone?: string;
+  website?: string;
+  // Billing Address
+  billingAddressLine1?: string;
+  billingAddressLine2?: string;
+  billingCity?: string;
+  billingState?: string;
+  billingCountry?: string;
+  billingPostalCode?: string;
+  // Shipping Address
+  shippingAddressLine1?: string;
+  shippingAddressLine2?: string;
+  shippingCity?: string;
+  shippingState?: string;
+  shippingCountry?: string;
+  shippingPostalCode?: string;
+  sameAsBillingAddress?: boolean;
+  // Financial Information
+  paymentTerms?: string;
+  creditLimit?: number;
+  currency?: string;
+  taxId?: string;
+  panNumber?: string;
+  // Additional Information
+  assignedSalesRep?: string;
+  notes?: string;
+  tags?: string[];
+  isActive?: boolean;
 }
 
 export interface UpdateCustomerRequest extends Partial<CreateCustomerRequest> { }
 
 export interface CustomerFilters {
-    search?: string;
-    type?: string;
-    isActive?: boolean;
-    page?: number;
-    limit?: number;
+  search?: string;
+  customerType?: string;
+  customerCategory?: string;
+  isActive?: boolean;
+  paymentTerms?: string;
+  currency?: string;
+  assignedSalesRep?: string;
+  page?: number;
+  limit?: number;
 }
 
 class CustomerService {
@@ -72,38 +118,32 @@ class CustomerService {
         return company.id;
     }
 
-    async getCustomers(filters?: CustomerFilters): Promise<{ customers: Customer[]; pagination: any }> {
-        try {
-            const tenantId = this.getTenantId();
-            const queryParams = new URLSearchParams();
-            if (filters?.search) queryParams.append('search', filters.search);
-            if (filters?.type) queryParams.append('type', filters.type);
-            if (filters?.isActive !== undefined) queryParams.append('isActive', filters.isActive.toString());
-            if (filters?.page) queryParams.append('page', filters.page.toString());
-            if (filters?.limit) queryParams.append('limit', filters.limit.toString());
+    async getCustomers(filters: CustomerFilters = {}): Promise<{ customers: Customer[]; pagination: any }> {
+        const params = new URLSearchParams();
+        
+        if (filters.search) params.append('search', filters.search);
+        if (filters.customerType) params.append('customerType', filters.customerType);
+        if (filters.customerCategory) params.append('customerCategory', filters.customerCategory);
+        if (filters.isActive !== undefined) params.append('isActive', filters.isActive.toString());
+        if (filters.paymentTerms) params.append('paymentTerms', filters.paymentTerms);
+        if (filters.currency) params.append('currency', filters.currency);
+        if (filters.assignedSalesRep) params.append('assignedSalesRep', filters.assignedSalesRep);
+        if (filters.page) params.append('page', filters.page.toString());
+        if (filters.limit) params.append('limit', filters.limit.toString());
 
-            const response = await fetch(`${API_BASE_URL}/companies/${tenantId}/customers?${queryParams.toString()}`, {
-                method: 'GET',
-                headers: this.getAuthHeaders(),
-            });
+        const response = await fetch(`${API_BASE_URL}/customers?${params}`, {
+            headers: this.getAuthHeaders(),
+        });
 
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.message || 'Failed to fetch customers');
-            }
-
-            // Controller response shape:
-            // res.json({ success: true, data: result.customers, pagination: result.pagination });
-            // So `result.data` is the customers array and `result.pagination` is the pagination object.
-            return {
-                customers: (result.data || []) as Customer[],
-                pagination: result.pagination ?? {},
-            };
-        } catch (error) {
-            console.error('Error fetching customers:', error);
-            throw error;
+        if (!response.ok) {
+            throw new Error('Failed to fetch customers');
         }
+
+        const data = await response.json();
+        return {
+            customers: data.data || [],
+            pagination: data.pagination || { page: 1, limit: 10, total: 0 },
+        };
     }
 
     async getCustomerById(id: string): Promise<Customer> {
