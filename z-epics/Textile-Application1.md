@@ -793,6 +793,7 @@
 - [ ] **Form Type**: Drawer (5-20 fields) with Active toggle in header
 - [ ] **Auto-Generated Code**: INV001, INV002, etc. (backend generated)
 - [ ] **Can be created from**: Sales Order (auto-fill) or standalone
+- [ ] **Product Requirement**: If SO reference is provided, items auto-fill from SO. If no SO, Product field is MANDATORY for each line item (for inventory tracking)
 
 **Form Fields - Invoice**:
 - [ ] **Invoice Code**: Auto-generated (e.g., INV001) - Display only
@@ -800,7 +801,7 @@
 - [ ] **Customer**: Searchable dropdown (required)
 - [ ] **Invoice Date**: DatePicker (required, defaults to current date)
 - [ ] **Due Date**: DatePicker (required, auto-calculated based on payment terms)
-- [ ] **Sales Order Reference**: Dropdown (optional, link to SO)
+- [ ] **Sales Order Reference**: Dropdown (optional, link to SO) - If selected, auto-fills items from SO
 - [ ] **Location**: Company location dropdown (required) - Billing location
 - [ ] **Invoice Status**: Dropdown - DRAFT, SENT, PARTIALLY_PAID, PAID, OVERDUE, CANCELLED
 - [ ] **Payment Terms**: Dropdown - NET_30, NET_60, IMMEDIATE, ADVANCE
@@ -808,9 +809,11 @@
 - [ ] **Active Toggle**: In drawer header (top-right)
 
 **Invoice Items (Line Items)**:
-- [ ] **Description**: Text input or product dropdown (required)
+- [ ] **Product**: Searchable product dropdown (REQUIRED if no SO reference, auto-filled if SO linked)
+- [ ] **Item Code**: Auto-filled from product or SO item
+- [ ] **Description**: Text input (auto-filled from product, editable)
 - [ ] **Quantity**: Number input (required)
-- [ ] **Unit Price**: Number input with 2 decimals (required)
+- [ ] **Unit Price**: Number input with 2 decimals (required, auto-filled from product)
 - [ ] **Discount %**: Number input (0-100, optional)
 - [ ] **Tax Rate %**: Number input (optional, GST/VAT)
 - [ ] **Line Total**: Auto-calculated
@@ -835,6 +838,12 @@
 - [ ] **Bank Details**: Text area (for payment instructions)
 - [ ] **Attachments**: File upload (PDF, images, max 5MB)
 
+**Deletion Rules (Industry Standard)**:
+- [ ] **DRAFT Status**: Can be deleted (soft delete, sets is_active = false)
+- [ ] **SENT/PARTIALLY_PAID/PAID/OVERDUE Status**: CANNOT be deleted - maintains audit trail and stock integrity
+- [ ] **CANCELLED Status**: CANNOT be deleted - keeps record for audit purposes
+- [ ] **Delete Action**: Shows confirmation modal explaining why deletion is not allowed for non-draft invoices
+
 **Table Display Columns**:
 - [ ] Invoice Code | Customer | Invoice Date | Due Date | Status | Total Amount | Balance Due | Active Status | Actions
 
@@ -844,6 +853,7 @@
 - [ ] **Form Type**: Drawer (5-20 fields) with Active toggle in header
 - [ ] **Auto-Generated Code**: BILL001, BILL002, etc. (backend generated)
 - [ ] **Can be created from**: Purchase Order (auto-fill) or standalone
+- [ ] **Product Requirement**: If PO reference is provided, items auto-fill from PO. If no PO, Product field is MANDATORY for each line item (for inventory tracking)
 
 **Form Fields - Bill**:
 - [ ] **Bill Code**: Auto-generated (e.g., BILL001) - Display only
@@ -851,7 +861,7 @@
 - [ ] **Supplier**: Searchable dropdown (required)
 - [ ] **Bill Date**: DatePicker (required)
 - [ ] **Due Date**: DatePicker (required)
-- [ ] **Purchase Order Reference**: Dropdown (optional, link to PO)
+- [ ] **Purchase Order Reference**: Dropdown (optional, link to PO) - If selected, auto-fills items from PO
 - [ ] **Location**: Company location dropdown (required)
 - [ ] **Bill Status**: Dropdown - DRAFT, RECEIVED, PARTIALLY_PAID, PAID, OVERDUE, CANCELLED
 - [ ] **Payment Terms**: Dropdown - NET_30, NET_60, IMMEDIATE, ADVANCE
@@ -859,9 +869,11 @@
 - [ ] **Active Toggle**: In drawer header (top-right)
 
 **Bill Items (Line Items)**:
-- [ ] **Description**: Text input or product dropdown (required)
+- [ ] **Product**: Searchable product dropdown (REQUIRED if no PO reference, auto-filled if PO linked)
+- [ ] **Item Code**: Auto-filled from product or PO item
+- [ ] **Description**: Text input (auto-filled from product, editable)
 - [ ] **Quantity**: Number input (required, supports decimals)
-- [ ] **Unit Cost**: Number input with 2 decimals (required)
+- [ ] **Unit Cost**: Number input with 2 decimals (required, auto-filled from product)
 - [ ] **Discount %**: Number input (0-100, optional)
 - [ ] **Tax Rate %**: Number input (optional)
 - [ ] **Line Total**: Auto-calculated
@@ -884,6 +896,12 @@
 - [ ] **Notes**: Text area (optional, max 500 chars)
 - [ ] **Supplier Invoice Number**: Text input (supplier's reference)
 - [ ] **Attachments**: File upload (PDF, images, max 5MB)
+
+**Deletion Rules (Industry Standard)**:
+- [ ] **DRAFT Status**: Can be deleted (soft delete, sets is_active = false)
+- [ ] **RECEIVED/PARTIALLY_PAID/PAID/OVERDUE Status**: CANNOT be deleted - maintains audit trail and stock integrity
+- [ ] **CANCELLED Status**: CANNOT be deleted - keeps record for audit purposes
+- [ ] **Delete Action**: Shows confirmation modal explaining why deletion is not allowed for non-draft bills
 
 **Table Display Columns**:
 - [ ] Bill Code | Supplier | Bill Date | Due Date | Status | Total Amount | Balance Due | Active Status | Actions

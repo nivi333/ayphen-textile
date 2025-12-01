@@ -180,3 +180,70 @@ export interface ListFinancialDocumentFilters {
   locationId?: string;
   orderId?: string;
 }
+
+// Invoice Management Types
+export type InvoiceStatusType = 'DRAFT' | 'SENT' | 'PARTIALLY_PAID' | 'PAID' | 'OVERDUE' | 'CANCELLED';
+export type PaymentMethodType = 'CASH' | 'CHEQUE' | 'BANK_TRANSFER' | 'UPI' | 'CARD' | 'OTHER';
+export type PaymentTermsType = 'IMMEDIATE' | 'NET_15' | 'NET_30' | 'NET_60' | 'NET_90' | 'ADVANCE' | 'COD' | 'CREDIT';
+
+export interface InvoiceItemInput {
+  lineNumber?: number;
+  productId?: string;
+  itemCode: string;
+  description?: string;
+  quantity: number;
+  unitOfMeasure: string;
+  unitPrice: number;
+  discountPercent?: number;
+  taxRate?: number;
+  notes?: string;
+}
+
+export interface CreateInvoiceData {
+  customerId?: string;
+  customerName: string;
+  customerCode?: string;
+  orderId?: string; // Optional link to Sales Order
+  locationId: string; // Required
+  invoiceNumber?: string;
+  invoiceDate: Date;
+  dueDate: Date;
+  paymentTerms?: PaymentTermsType;
+  currency?: string;
+  shippingCharges?: number;
+  notes?: string;
+  termsConditions?: string;
+  bankDetails?: string;
+  items: InvoiceItemInput[];
+}
+
+export interface UpdateInvoiceData {
+  customerId?: string;
+  customerName?: string;
+  customerCode?: string;
+  locationId?: string;
+  invoiceNumber?: string;
+  invoiceDate?: Date;
+  dueDate?: Date;
+  paymentTerms?: PaymentTermsType;
+  currency?: string;
+  shippingCharges?: number;
+  amountPaid?: number;
+  paymentMethod?: PaymentMethodType;
+  paymentDate?: Date;
+  transactionRef?: string;
+  notes?: string;
+  termsConditions?: string;
+  bankDetails?: string;
+  items?: InvoiceItemInput[];
+}
+
+export interface ListInvoiceFilters {
+  status?: InvoiceStatusType;
+  fromDate?: Date;
+  toDate?: Date;
+  customerName?: string;
+  customerId?: string;
+  orderId?: string;
+  locationId?: string;
+}

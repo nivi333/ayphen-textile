@@ -57,6 +57,7 @@ model companies {
   customers             customers[]
   suppliers             suppliers[]
   purchase_orders       purchase_orders[]       @relation("CompanyPurchaseOrders")
+  invoices              invoices[]              @relation("CompanyInvoices")
 }
 
 model company_locations {
@@ -95,6 +96,7 @@ model company_locations {
   stock_alerts          stock_alerts[]
   machines              machines[]
   purchase_orders       purchase_orders[]       @relation("LocationPurchaseOrders")
+  invoices              invoices[]              @relation("LocationInvoices")
 }
 
 model sessions {
@@ -244,6 +246,7 @@ model orders {
   financial_documents   financial_documents[]   @relation("OrderFinancialDocuments")
   quality_checkpoints   quality_checkpoints[]
   garment_manufacturing garment_manufacturing[]
+  invoices              invoices[]              @relation("OrderInvoices")
 }
 
 model order_items {
@@ -534,16 +537,17 @@ model products {
   created_at        DateTime    @default(now())
   updated_at        DateTime
 
-  company             companies             @relation(fields: [company_id], references: [id], onDelete: Cascade)
-  category            product_categories?   @relation(fields: [category_id], references: [id], onDelete: SetNull)
-  stock_adjustments   stock_adjustments[]
-  quality_checkpoints quality_checkpoints[]
-  quality_defects     quality_defects[]     @relation("ProductDefects")
-  location_inventory  location_inventory[]
-  stock_reservations  stock_reservations[]
-  product_pricing     product_pricing[]
-  order_items         order_items[]         @relation("OrderItemProduct")
+  company              companies              @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  category             product_categories?    @relation(fields: [category_id], references: [id], onDelete: SetNull)
+  stock_adjustments    stock_adjustments[]
+  quality_checkpoints  quality_checkpoints[]
+  quality_defects      quality_defects[]      @relation("ProductDefects")
+  location_inventory   location_inventory[]
+  stock_reservations   stock_reservations[]
+  product_pricing      product_pricing[]
+  order_items          order_items[]          @relation("OrderItemProduct")
   purchase_order_items purchase_order_items[] @relation("PurchaseOrderItemProduct")
+  invoice_items        invoice_items[]        @relation("InvoiceItemProduct")
 
   @@unique([company_id, product_id])
   @@unique([company_id, product_code])
@@ -816,8 +820,9 @@ model customers {
   created_at              DateTime @default(now())
   updated_at              DateTime
 
-  company companies @relation(fields: [company_id], references: [id], onDelete: Cascade)
-  orders  orders[]
+  company  companies  @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  orders   orders[]
+  invoices invoices[] @relation("CustomerInvoices")
 
   @@unique([company_id, code])
   @@index([company_id])
@@ -1542,6 +1547,120 @@ enum POStatus {
   PARTIALLY_RECEIVED
   RECEIVED
   CANCELLED
+}
+
+// ============================================
+// INVOICE MANAGEMENT (Sprint 3.3)
+// ============================================
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  CHEQUE
+  BANK_TRANSFER
+  UPI
+  CARD
+  OTHER
+}
+
+enum PaymentTerms {
+  IMMEDIATE
+  NET_15
+  NET_30
+  NET_60
+  NET_90
+  ADVANCE
+  COD
+  CREDIT
+}
+
+model invoices {
+  id                  String        @id @default(uuid())
+  invoice_id          String        @unique
+  company_id          String
+  customer_id         String?
+  customer_name       String
+  customer_code       String?
+  order_id            String?       // Optional link to Sales Order
+  location_id         String
+  
+  // Invoice Details
+  invoice_number      String?       // Optional custom invoice number
+  invoice_date        DateTime
+  due_date            DateTime
+  status              InvoiceStatus @default(DRAFT)
+  payment_terms       PaymentTerms  @default(NET_30)
+  currency            String        @default("INR")
+  
+  // Financial calculations
+  subtotal            Decimal       @default(0) @db.Decimal(12, 2)
+  discount_amount     Decimal       @default(0) @db.Decimal(12, 2)
+  tax_amount          Decimal       @default(0) @db.Decimal(12, 2)
+  shipping_charges    Decimal       @default(0) @db.Decimal(12, 2)
+  total_amount        Decimal       @db.Decimal(12, 2)
+  amount_paid         Decimal       @default(0) @db.Decimal(12, 2)
+  balance_due         Decimal       @db.Decimal(12, 2)
+  
+  // Payment Information
+  payment_method      PaymentMethod?
+  payment_date        DateTime?
+  transaction_ref     String?
+  
+  // Additional fields
+  notes               String?
+  terms_conditions    String?
+  bank_details        String?
+  
+  is_active           Boolean       @default(true)
+  created_at          DateTime      @default(now())
+  updated_at          DateTime
+  
+  company             companies           @relation("CompanyInvoices", fields: [company_id], references: [id], onDelete: Cascade)
+  customer            customers?          @relation("CustomerInvoices", fields: [customer_id], references: [id])
+  order               orders?             @relation("OrderInvoices", fields: [order_id], references: [id], onDelete: SetNull)
+  location            company_locations   @relation("LocationInvoices", fields: [location_id], references: [id])
+  invoice_items       invoice_items[]
+  
+  @@unique([company_id, invoice_id])
+  @@index([company_id])
+  @@index([customer_id])
+  @@index([order_id])
+  @@index([location_id])
+  @@index([status])
+  @@index([invoice_date])
+  @@index([due_date])
+}
+
+model invoice_items {
+  id               String  @id @default(uuid())
+  invoice_id       String
+  product_id       String? // Required if no order reference
+  line_number      Int
+  item_code        String
+  description      String?
+  quantity         Decimal @db.Decimal(12, 3)
+  unit_of_measure  String
+  unit_price       Decimal @db.Decimal(12, 2)
+  discount_percent Decimal @default(0) @db.Decimal(5, 2)
+  discount_amount  Decimal @default(0) @db.Decimal(12, 2)
+  tax_rate         Decimal @default(0) @db.Decimal(5, 2)
+  tax_amount       Decimal @default(0) @db.Decimal(12, 2)
+  line_amount      Decimal @db.Decimal(12, 2)
+  notes            String?
+  
+  invoice          invoices  @relation(fields: [invoice_id], references: [id], onDelete: Cascade)
+  product          products? @relation("InvoiceItemProduct", fields: [product_id], references: [id], onDelete: SetNull)
+  
+  @@unique([invoice_id, line_number])
+  @@index([product_id])
 }
 
 model purchase_orders {

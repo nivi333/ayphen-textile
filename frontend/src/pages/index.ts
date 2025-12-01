@@ -25,6 +25,9 @@ export { default as MachineListPage } from './machines/MachineListPage';
 // Orders
 export { default as OrdersListPage } from './orders/OrdersListPage';
 
+// Invoices
+export { default as InvoicesListPage } from './invoices/InvoicesListPage';
+
 // Sales
 export { default as CustomerListPage } from './sales/CustomerListPage';
 
