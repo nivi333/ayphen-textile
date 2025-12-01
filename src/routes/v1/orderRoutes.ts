@@ -36,4 +36,11 @@ router.patch(
   orderController.updateOrderStatus.bind(orderController),
 );
 
+// Delete order (soft delete) (OWNER/ADMIN)
+router.delete(
+  '/:orderId',
+  requireRole(['OWNER', 'ADMIN']),
+  orderController.deleteOrder.bind(orderController),
+);
+
 export default router;

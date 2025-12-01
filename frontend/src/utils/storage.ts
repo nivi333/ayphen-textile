@@ -60,6 +60,8 @@ export class AuthStorage {
 
   static setCurrentCompany(company: Company): void {
     localStorage.setItem(STORAGE_KEYS.CURRENT_COMPANY, JSON.stringify(company));
+    // Also store company ID separately for backward compatibility
+    localStorage.setItem('currentCompanyId', company.id);
   }
 
   static getCurrentCompany(): Company | null {
@@ -70,6 +72,7 @@ export class AuthStorage {
   static clearCompanyData(): void {
     localStorage.removeItem(STORAGE_KEYS.COMPANIES);
     localStorage.removeItem(STORAGE_KEYS.CURRENT_COMPANY);
+    localStorage.removeItem('currentCompanyId');
   }
 
   // Clear all auth data

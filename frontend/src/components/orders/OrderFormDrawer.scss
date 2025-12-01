@@ -1,49 +1,88 @@
+@import '../../index.scss';
+
 .order-form-drawer {
-  .order-drawer-title {
-    font-size: 18px;
-    font-weight: 600;
-  }
-
   .order-drawer-content {
-    padding: 16px 24px;
+    padding: 24px 32px 0 32px;
+    font-family: $font-family-body;
+    font-size: 1rem;
+    color: $primary-text-color;
+    background: $bg-primary;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
 
-  .order-form-content {
-    max-height: calc(100vh - 160px);
-    overflow-y: auto;
-    padding-right: 8px;
+  .order-drawer-title {
+    font-family: $font-family-heading;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $primary-text-color;
+    margin-bottom: 0;
   }
 
   .order-section {
-    margin-bottom: 16px;
+    margin-bottom: 0;
+    padding-bottom: 0;
   }
 
   .order-section-title {
-    font-weight: 600;
-    margin-bottom: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: $primary-text-color;
+    margin-bottom: 12px;
+    margin-top: 0;
   }
 
   .order-divider {
-    margin: 16px 0;
+    margin: 8px 0 16px 0;
+    border-color: $border-light;
+  }
+
+  .ant-form-item {
+    margin-bottom: 10px;
+  }
+
+  .ant-input,
+  .ant-select-selector,
+  .ant-input-textarea,
+  .ant-input-number,
+  .ant-picker {
+    font-size: 14px;
+    border-radius: 6px;
+  }
+
+  .order-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 18px;
+    padding-bottom: 18px;
+    border-top: 1px solid $border-light;
+    position: sticky;
+    bottom: 0;
+    background: $bg-primary;
+    padding-top: 16px;
+    margin-top: auto;
+  }
+
+  .order-cancel-btn {
+    margin-right: $spacing-sm;
+  }
+
+  .order-form {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex: 1;
+  }
+
+  .order-form-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 16px;
   }
 
   .order-item-row {
     margin-bottom: 0;
-  }
-
-  .order-actions {
-    position: sticky;
-    bottom: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0 4px;
-    background: #fff;
-    border-top: 1px solid #f0f0f0;
-    margin-top: 16px;
-  }
-
-  .order-cancel-btn {
-    margin-right: 8px;
   }
 }

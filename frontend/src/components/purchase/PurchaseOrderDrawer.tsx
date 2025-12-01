@@ -4,10 +4,10 @@ import { DeleteOutlined } from '@ant-design/icons';
 import dayjs, { Dayjs } from 'dayjs';
 import { GradientButton } from '../ui';
 import { locationService, Location } from '../../services/locationService';
-import { customerService, Customer } from '../../services/customerService';
+import { supplierService, Supplier } from '../../services/supplierService';
 import { productService, ProductSummary } from '../../services/productService';
-import { orderService, CreateOrderRequest, OrderDetail, OrderItemInput } from '../../services/orderService';
-import './OrderFormDrawer.scss';
+import { purchaseOrderService, CreatePurchaseOrderRequest, PurchaseOrderDetail, PurchaseOrderItemInput } from '../../services/purchaseOrderService';
+import '../orders/OrderFormDrawer.scss';
 
 const { Option } = Select;
 
@@ -27,29 +27,25 @@ const UOM_OPTIONS = [
   { value: 'SPOOL', label: 'SPOOL - Spools' },
 ];
 
-interface OrderFormDrawerProps {
+interface PurchaseOrderDrawerProps {
   visible: boolean;
   onClose: () => void;
   onSaved: () => void;
   mode?: 'create' | 'edit';
-  editingOrderId?: string | null;
+  editingPOId?: string | null;
 }
 
-interface OrderFormValues {
-  orderCode?: string;
-  customerId?: string;
-  customerName: string;
-  customerCode?: string;
-  orderDate: Dayjs;
-  deliveryDate?: Dayjs;
+interface POFormValues {
+  poCode?: string;
+  supplierId?: string;
+  supplierName: string;
+  supplierCode?: string;
+  poDate: Dayjs;
+  expectedDeliveryDate?: Dayjs;
   currency?: string;
   notes?: string;
   locationId?: string;
-  shippingCarrier?: string;
-  trackingNumber?: string;
   shippingMethod?: string;
-  deliveryWindowStart?: Dayjs;
-  deliveryWindowEnd?: Dayjs;
   isActive?: boolean;
   items: {
     productId?: string;
@@ -57,82 +53,82 @@ interface OrderFormValues {
     description?: string;
     quantity: number;
     unitOfMeasure: string;
-    unitPrice: number;
+    unitCost: number;
   }[];
 }
 
-export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
+export const PurchaseOrderDrawer: React.FC<PurchaseOrderDrawerProps> = ({
   visible,
   onClose,
   onSaved,
   mode = 'create',
-  editingOrderId,
+  editingPOId,
 }) => {
-  const [form] = Form.useForm<OrderFormValues>();
+  const [form] = Form.useForm<POFormValues>();
   const [submitting, setSubmitting] = useState(false);
   const [locations, setLocations] = useState<Location[]>([]);
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [products, setProducts] = useState<ProductSummary[]>([]);
-  const [loadingCustomers, setLoadingCustomers] = useState(false);
+  const [loadingSuppliers, setLoadingSuppliers] = useState(false);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [isActive, setIsActive] = useState(true);
 
-  const isEditing = mode === 'edit' && !!editingOrderId;
+  const isEditing = mode === 'edit' && !!editingPOId;
 
   useEffect(() => {
     if (!visible) return;
 
     const loadData = async () => {
       try {
-        const [locs, customersData, productsData, order] = await Promise.all([
+        const [locs, suppliersData, productsData, po] = await Promise.all([
           locationService.getLocations(),
-          fetchCustomers(),
+          fetchSuppliers(),
           fetchProducts(),
-          isEditing && editingOrderId ? orderService.getOrderById(editingOrderId) : Promise.resolve(null),
+          isEditing && editingPOId ? purchaseOrderService.getPurchaseOrderById(editingPOId) : Promise.resolve(null),
         ]);
 
         setLocations(locs);
-        setCustomers(customersData);
+        setSuppliers(suppliersData);
         setProducts(productsData);
 
-        if (order) {
-          populateForm(order);
+        if (po) {
+          populateForm(po);
         } else {
           form.resetFields();
           form.setFieldsValue({
             currency: 'INR',
-            orderDate: dayjs(),
+            poDate: dayjs(),
             items: [
               {
                 itemCode: '',
                 description: '',
                 quantity: 1,
                 unitOfMeasure: 'PCS',
-                unitPrice: 0,
+                unitCost: 0,
               },
             ],
           } as any);
         }
       } catch (error: any) {
-        console.error('Error initializing order form:', error);
-        message.error(error.message || 'Failed to initialize order form');
+        console.error('Error initializing PO form:', error);
+        message.error(error.message || 'Failed to initialize PO form');
       }
     };
 
     loadData();
-  }, [visible, isEditing, editingOrderId, form]);
+  }, [visible, isEditing, editingPOId, form]);
 
-  const fetchCustomers = async (): Promise<Customer[]> => {
+  const fetchSuppliers = async (): Promise<Supplier[]> => {
     try {
-      setLoadingCustomers(true);
-      const response = await customerService.getCustomers({ isActive: true });
-      return response.customers || [];
+      setLoadingSuppliers(true);
+      const response = await supplierService.getSuppliers({ isActive: true });
+      return response.suppliers || [];
     } catch (error: any) {
-      console.error('Error fetching customers:', error);
-      message.error('Failed to load customers');
+      console.error('Error fetching suppliers:', error);
+      message.error('Failed to load suppliers');
       return [];
     } finally {
-      setLoadingCustomers(false);
+      setLoadingSuppliers(false);
     }
   };
 
@@ -150,12 +146,12 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
     }
   };
 
-  const handleCustomerChange = (customerId: string) => {
-    const customer = customers.find(c => c.id === customerId);
-    if (customer) {
+  const handleSupplierChange = (supplierId: string) => {
+    const supplier = suppliers.find(s => s.id === supplierId);
+    if (supplier) {
       form.setFieldsValue({
-        customerName: customer.name,
-        customerCode: customer.code,
+        supplierName: supplier.name,
+        supplierCode: supplier.code,
       });
     }
   };
@@ -170,37 +166,33 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
         itemCode: product.productCode,
         description: product.name,
         unitOfMeasure: product.unitOfMeasure,
-        unitPrice: product.sellingPrice,
+        unitCost: product.costPrice,
       };
       form.setFieldsValue({ items });
     }
   };
 
-  const populateForm = (order: OrderDetail) => {
-    setIsActive(order.isActive ?? true);
+  const populateForm = (po: PurchaseOrderDetail) => {
+    setIsActive(po.isActive ?? true);
     form.setFieldsValue({
-      orderCode: order.orderId,
-      customerId: order.customerId,
-      customerName: order.customerName,
-      customerCode: order.customerCode,
-      orderDate: dayjs(order.orderDate),
-      deliveryDate: order.deliveryDate ? dayjs(order.deliveryDate) : undefined,
-      currency: order.currency,
-      notes: order.notes,
-      locationId: order.locationId,
-      shippingCarrier: order.shippingCarrier,
-      trackingNumber: order.trackingNumber,
-      shippingMethod: order.shippingMethod,
-      deliveryWindowStart: order.deliveryWindowStart ? dayjs(order.deliveryWindowStart) : undefined,
-      deliveryWindowEnd: order.deliveryWindowEnd ? dayjs(order.deliveryWindowEnd) : undefined,
-      isActive: order.isActive ?? true,
-      items: order.items.map(item => ({
+      poCode: po.poId,
+      supplierId: po.supplierId,
+      supplierName: po.supplierName,
+      supplierCode: po.supplierCode,
+      poDate: dayjs(po.poDate),
+      expectedDeliveryDate: po.expectedDeliveryDate ? dayjs(po.expectedDeliveryDate) : undefined,
+      currency: po.currency,
+      notes: po.notes,
+      locationId: po.locationId,
+      shippingMethod: po.shippingMethod,
+      isActive: po.isActive ?? true,
+      items: po.items.map(item => ({
         productId: item.productId,
         itemCode: item.itemCode,
         description: item.description,
         quantity: item.quantity,
         unitOfMeasure: item.unitOfMeasure,
-        unitPrice: item.unitPrice,
+        unitCost: item.unitCost,
       })),
     } as any);
   };
@@ -210,61 +202,55 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
     onClose();
   };
 
-  const buildPayload = (values: OrderFormValues): CreateOrderRequest => {
-    const items: OrderItemInput[] = values.items.map(item => ({
+  const buildPayload = (values: POFormValues): CreatePurchaseOrderRequest => {
+    const items: PurchaseOrderItemInput[] = values.items.map(item => ({
       productId: item.productId,
       itemCode: item.itemCode,
       description: item.description,
       quantity: item.quantity,
       unitOfMeasure: item.unitOfMeasure,
-      unitPrice: item.unitPrice,
+      unitCost: item.unitCost,
     }));
 
     return {
-      customerId: values.customerId,
-      customerName: values.customerName,
-      customerCode: values.customerCode || undefined,
-      orderDate: values.orderDate.toISOString(),
-      deliveryDate: values.deliveryDate ? values.deliveryDate.toISOString() : undefined,
+      supplierId: values.supplierId,
+      supplierName: values.supplierName,
+      supplierCode: values.supplierCode || undefined,
+      poDate: values.poDate.toISOString(),
+      expectedDeliveryDate: values.expectedDeliveryDate ? values.expectedDeliveryDate.toISOString() : undefined,
       currency: values.currency || 'INR',
       notes: values.notes || undefined,
       locationId: values.locationId || undefined,
-      shippingCarrier: values.shippingCarrier || undefined,
-      trackingNumber: values.trackingNumber || undefined,
       shippingMethod: values.shippingMethod || undefined,
-      deliveryWindowStart: values.deliveryWindowStart
-        ? values.deliveryWindowStart.toISOString()
-        : undefined,
-      deliveryWindowEnd: values.deliveryWindowEnd ? values.deliveryWindowEnd.toISOString() : undefined,
       items,
     };
   };
 
-  const handleSubmit = async (values: OrderFormValues) => {
+  const handleSubmit = async (values: POFormValues) => {
     try {
       setSubmitting(true);
       const payload = buildPayload(values);
 
-      if (isEditing && editingOrderId) {
-        await orderService.updateOrder(editingOrderId, payload);
-        message.success('Order updated successfully');
+      if (isEditing && editingPOId) {
+        await purchaseOrderService.updatePurchaseOrder(editingPOId, payload);
+        message.success('Purchase Order updated successfully');
       } else {
-        await orderService.createOrder(payload);
-        message.success('Order created successfully');
+        await purchaseOrderService.createPurchaseOrder(payload);
+        message.success('Purchase Order created successfully');
       }
 
       onSaved();
       handleClose();
     } catch (error: any) {
-      console.error('Error saving order:', error);
-      message.error(error.message || 'Failed to save order');
+      console.error('Error saving PO:', error);
+      message.error(error.message || 'Failed to save purchase order');
     } finally {
       setSubmitting(false);
     }
   };
 
-  const drawerTitle = isEditing ? 'Edit Order' : 'Create Order';
-  const submitLabel = isEditing ? 'Update Order' : 'Create Order';
+  const drawerTitle = isEditing ? 'Edit Purchase Order' : 'Create Purchase Order';
+  const submitLabel = isEditing ? 'Update PO' : 'Create PO';
 
   return (
     <Drawer
@@ -292,7 +278,7 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
       footer={null}
     >
       <div className='order-drawer-content'>
-        <Form<OrderFormValues>
+        <Form<POFormValues>
           form={form}
           layout='vertical'
           onFinish={handleSubmit}
@@ -304,50 +290,50 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
               <Switch />
             </Form.Item>
 
-            {/* Order Info */}
+            {/* PO Info */}
             <div className='order-section'>
-              <div className='order-section-title'>Order Info</div>
+              <div className='order-section-title'>Purchase Order Info</div>
               <Row gutter={[5, 10]}>
                 <Col span={12}>
-                  <Form.Item label='Order Code' name='orderCode'>
+                  <Form.Item label='PO Code' name='poCode'>
                     <Input disabled placeholder='Auto-generated' />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
                   <Form.Item
-                    label='Customer'
-                    name='customerId'
-                    rules={[{ required: true, message: 'Please select a customer' }]}
+                    label='Supplier'
+                    name='supplierId'
+                    rules={[{ required: true, message: 'Please select a supplier' }]}
                   >
                     <Select
                       showSearch
-                      placeholder='Search and select customer'
-                      loading={loadingCustomers}
-                      onChange={handleCustomerChange}
+                      placeholder='Search and select supplier'
+                      loading={loadingSuppliers}
+                      onChange={handleSupplierChange}
                       filterOption={(input, option) =>
                         String(option?.children || '').toLowerCase().includes(input.toLowerCase())
                       }
                     >
-                      {customers.map(customer => (
-                        <Option key={customer.id} value={customer.id}>
-                          {customer.name} {customer.code ? `(${customer.code})` : ''}
+                      {suppliers.map(supplier => (
+                        <Option key={supplier.id} value={supplier.id}>
+                          {supplier.name} {supplier.code ? `(${supplier.code})` : ''}
                         </Option>
                       ))}
                     </Select>
                   </Form.Item>
                 </Col>
-                {/* Hidden fields for customer name and code */}
-                <Form.Item name='customerName' hidden>
+                {/* Hidden fields for supplier name and code */}
+                <Form.Item name='supplierName' hidden>
                   <Input />
                 </Form.Item>
-                <Form.Item name='customerCode' hidden>
+                <Form.Item name='supplierCode' hidden>
                   <Input />
                 </Form.Item>
                 <Col span={12}>
                   <Form.Item
-                    label='Order Date'
-                    name='orderDate'
-                    rules={[{ required: true, message: 'Please select order date' }]}
+                    label='PO Date'
+                    name='poDate'
+                    rules={[{ required: true, message: 'Please select PO date' }]}
                   >
                     <DatePicker style={{ width: '100%' }} />
                   </Form.Item>
@@ -366,7 +352,7 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
                   <Form.Item label='Location' name='locationId'>
                     <Select
                       allowClear
-                      placeholder='Select shipping location'
+                      placeholder='Select receiving location'
                       showSearch
                       optionFilterProp='children'
                     >
@@ -412,6 +398,7 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
                               {...field}
                               label={index === 0 ? 'Product' : ''}
                               name={[field.name, 'productId']}
+                              fieldKey={[field.fieldKey!, 'productId']}
                             >
                               <Select
                                 showSearch
@@ -438,6 +425,7 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
                               {...field}
                               label={index === 0 ? 'Item Code' : ''}
                               name={[field.name, 'itemCode']}
+                              fieldKey={[field.fieldKey!, 'itemCode']}
                               rules={[{ required: true, message: 'Required' }]}
                             >
                               <Input maxLength={255} placeholder='Item code' />
@@ -448,6 +436,7 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
                               {...field}
                               label={index === 0 ? 'Description' : ''}
                               name={[field.name, 'description']}
+                              fieldKey={[field.fieldKey!, 'description']}
                             >
                               <Input maxLength={500} placeholder='Description (optional)' />
                             </Form.Item>
@@ -457,6 +446,7 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
                               {...field}
                               label={index === 0 ? 'Qty' : ''}
                               name={[field.name, 'quantity']}
+                              fieldKey={[field.fieldKey!, 'quantity']}
                               rules={[{ required: true, message: 'Required' }]}
                             >
                               <InputNumber min={0.001} step={1} style={{ width: '100%' }} placeholder='1' />
@@ -467,6 +457,7 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
                               {...field}
                               label={index === 0 ? 'UOM' : ''}
                               name={[field.name, 'unitOfMeasure']}
+                              fieldKey={[field.fieldKey!, 'unitOfMeasure']}
                               rules={[{ required: true, message: 'Required' }]}
                             >
                               <Select placeholder='Select UOM' showSearch>
@@ -481,8 +472,9 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
                           <Col span={5}>
                             <Form.Item
                               {...field}
-                              label={index === 0 ? 'Unit Price' : ''}
-                              name={[field.name, 'unitPrice']}
+                              label={index === 0 ? 'Unit Cost' : ''}
+                              name={[field.name, 'unitCost']}
+                              fieldKey={[field.fieldKey!, 'unitCost']}
                               rules={[{ required: true, message: 'Required' }]}
                             >
                               <InputNumber
@@ -531,33 +523,13 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
               <div className='order-section-title'>Delivery Details</div>
               <Row gutter={[5, 10]}>
                 <Col span={12}>
-                  <Form.Item label='Delivery Date' name='deliveryDate'>
+                  <Form.Item label='Expected Delivery Date' name='expectedDeliveryDate'>
                     <DatePicker style={{ width: '100%' }} placeholder='Select date' />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
                   <Form.Item label='Shipping Method' name='shippingMethod'>
                     <Input maxLength={255} placeholder='e.g., Air, Sea, Road' />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item label='Shipping Carrier' name='shippingCarrier'>
-                    <Input maxLength={255} placeholder='e.g., FedEx, DHL' />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item label='Tracking Number' name='trackingNumber'>
-                    <Input maxLength={255} placeholder='Tracking number' />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item label='Delivery Window Start' name='deliveryWindowStart'>
-                    <DatePicker style={{ width: '100%' }} showTime placeholder='Start date & time' />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item label='Delivery Window End' name='deliveryWindowEnd'>
-                    <DatePicker style={{ width: '100%' }} showTime placeholder='End date & time' />
                   </Form.Item>
                 </Col>
               </Row>

@@ -7,44 +7,40 @@ import { MainLayout } from '../../components/layout';
 import { Heading } from '../../components/Heading';
 import { GradientButton } from '../../components/ui';
 import { locationService, Location } from '../../services/locationService';
-import { orderService, OrderSummary, OrderStatus } from '../../services/orderService';
-import { OrderFormDrawer } from '../../components/orders/OrderFormDrawer';
+import { purchaseOrderService, PurchaseOrderSummary, POStatus } from '../../services/purchaseOrderService';
 import '../../pages/sales/CustomerListPage.scss';
+import { PurchaseOrderDrawer } from '@/components/purchase/PurchaseOrderDrawer';
 
-const STATUS_COLORS: Record<OrderStatus, string> = {
+const STATUS_COLORS: Record<POStatus, string> = {
   DRAFT: 'default',
-  CONFIRMED: 'processing',
-  IN_PRODUCTION: 'gold',
-  READY_TO_SHIP: 'cyan',
-  SHIPPED: 'blue',
-  DELIVERED: 'green',
+  SENT: 'processing',
+  CONFIRMED: 'gold',
+  PARTIALLY_RECEIVED: 'cyan',
+  RECEIVED: 'green',
   CANCELLED: 'red',
 };
 
-const NEXT_STATUS_MAP: Record<OrderStatus, OrderStatus[]> = {
-  DRAFT: ['CONFIRMED', 'CANCELLED'],
-  CONFIRMED: ['IN_PRODUCTION', 'CANCELLED'],
-  IN_PRODUCTION: ['READY_TO_SHIP', 'CANCELLED'],
-  READY_TO_SHIP: ['SHIPPED'],
-  SHIPPED: ['DELIVERED'],
-  DELIVERED: [],
+const NEXT_STATUS_MAP: Record<POStatus, POStatus[]> = {
+  DRAFT: ['SENT', 'CANCELLED'],
+  SENT: ['CONFIRMED', 'CANCELLED'],
+  CONFIRMED: ['PARTIALLY_RECEIVED', 'RECEIVED', 'CANCELLED'],
+  PARTIALLY_RECEIVED: ['RECEIVED'],
+  RECEIVED: [],
   CANCELLED: [],
 };
 
-function getStatusLabel(status: OrderStatus): string {
+function getStatusLabel(status: POStatus): string {
   switch (status) {
     case 'DRAFT':
       return 'Draft';
+    case 'SENT':
+      return 'Sent';
     case 'CONFIRMED':
       return 'Confirmed';
-    case 'IN_PRODUCTION':
-      return 'In Production';
-    case 'READY_TO_SHIP':
-      return 'Ready to Ship';
-    case 'SHIPPED':
-      return 'Shipped';
-    case 'DELIVERED':
-      return 'Delivered';
+    case 'PARTIALLY_RECEIVED':
+      return 'Partially Received';
+    case 'RECEIVED':
+      return 'Received';
     case 'CANCELLED':
       return 'Cancelled';
     default:
@@ -52,27 +48,27 @@ function getStatusLabel(status: OrderStatus): string {
   }
 }
 
-export default function OrdersListPage() {
+export default function PurchaseOrdersListPage() {
   const { currentCompany } = useAuth();
   const { setHeaderActions } = useHeader();
-  const [orders, setOrders] = useState<OrderSummary[]>([]);
+  const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrderSummary[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(false);
   const [tableLoading, setTableLoading] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
-  const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
+  const [editingPOId, setEditingPOId] = useState<string | null>(null);
   const fetchInProgressRef = useRef(false);
 
   useEffect(() => {
     const isEmployee = currentCompany?.role === 'EMPLOYEE';
     setHeaderActions(
       <GradientButton 
-        onClick={handleCreateOrder} 
+        onClick={handleCreatePurchaseOrder} 
         size='small' 
         className='orders-create-btn'
         disabled={isEmployee}
       >
-        Create Order
+        Create Purchase Order
       </GradientButton>,
     );
 
@@ -91,62 +87,62 @@ export default function OrdersListPage() {
     try {
       fetchInProgressRef.current = true;
       setLoading(true);
-      const [ordersData, locationsData] = await Promise.all([
-        orderService.getOrders(),
+      const [posData, locationsData] = await Promise.all([
+        purchaseOrderService.getPurchaseOrders(),
         locationService.getLocations(),
       ]);
-      setOrders(ordersData);
+      setPurchaseOrders(posData);
       setLocations(locationsData);
     } catch (error: any) {
-      console.error('Error fetching orders:', error);
-      message.error(error.message || 'Failed to fetch orders');
+      console.error('Error fetching purchase orders:', error);
+      message.error(error.message || 'Failed to fetch purchase orders');
     } finally {
       setLoading(false);
       fetchInProgressRef.current = false;
     }
   };
 
-  const refreshOrders = async () => {
+  const refreshPurchaseOrders = async () => {
     try {
       setTableLoading(true);
-      const ordersData = await orderService.getOrders();
-      setOrders(ordersData);
+      const posData = await purchaseOrderService.getPurchaseOrders();
+      setPurchaseOrders(posData);
     } catch (error: any) {
-      console.error('Error refreshing orders:', error);
-      message.error(error.message || 'Failed to refresh orders');
+      console.error('Error refreshing purchase orders:', error);
+      message.error(error.message || 'Failed to refresh purchase orders');
     } finally {
       setTableLoading(false);
     }
   };
 
-  const handleCreateOrder = () => {
-    setEditingOrderId(null);
+  const handleCreatePurchaseOrder = () => {
+    setEditingPOId(null);
     setDrawerVisible(true);
   };
 
-  const handleEditOrder = (order: OrderSummary) => {
-    setEditingOrderId(order.orderId);
+  const handleEditPurchaseOrder = (po: PurchaseOrderSummary) => {
+    setEditingPOId(po.poId);
     setDrawerVisible(true);
   };
 
   const handleDrawerClose = () => {
     setDrawerVisible(false);
-    setEditingOrderId(null);
+    setEditingPOId(null);
   };
 
-  const handleOrderSaved = () => {
-    refreshOrders();
+  const handlePurchaseOrderSaved = () => {
+    refreshPurchaseOrders();
   };
 
-  const handleChangeStatus = async (order: OrderSummary, nextStatus: OrderStatus) => {
+  const handleChangeStatus = async (po: PurchaseOrderSummary, nextStatus: POStatus) => {
     try {
       setTableLoading(true);
-      await orderService.updateOrderStatus(order.orderId, nextStatus);
-      message.success(`Order status updated to ${getStatusLabel(nextStatus)}`);
-      refreshOrders();
+      await purchaseOrderService.updatePOStatus(po.poId, nextStatus);
+      message.success(`Purchase Order status updated to ${getStatusLabel(nextStatus)}`);
+      refreshPurchaseOrders();
     } catch (error: any) {
-      console.error('Error updating order status:', error);
-      message.error(error.message || 'Failed to update order status');
+      console.error('Error updating purchase order status:', error);
+      message.error(error.message || 'Failed to update purchase order status');
     } finally {
       setTableLoading(false);
     }
@@ -162,45 +158,45 @@ export default function OrdersListPage() {
     return label;
   };
 
-  const getStatusMenuItems = (order: OrderSummary) => {
-    const allowedNext = NEXT_STATUS_MAP[order.status] || [];
+  const getStatusMenuItems = (po: PurchaseOrderSummary) => {
+    const allowedNext = NEXT_STATUS_MAP[po.status] || [];
 
     return allowedNext.map(status => ({
       key: status,
       label: getStatusLabel(status),
-      onClick: () => handleChangeStatus(order, status),
+      onClick: () => handleChangeStatus(po, status),
     }));
   };
 
   const columns = [
     {
-      title: 'Order ID',
-      dataIndex: 'orderId',
-      key: 'orderId',
+      title: 'PO ID',
+      dataIndex: 'poId',
+      key: 'poId',
     },
     {
-      title: 'Customer',
-      dataIndex: 'customerName',
-      key: 'customerName',
+      title: 'Supplier',
+      dataIndex: 'supplierName',
+      key: 'supplierName',
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status: OrderStatus) => (
+      render: (status: POStatus) => (
         <Tag color={STATUS_COLORS[status]}>{getStatusLabel(status)}</Tag>
       ),
     },
     {
-      title: 'Order Date',
-      dataIndex: 'orderDate',
-      key: 'orderDate',
+      title: 'PO Date',
+      dataIndex: 'poDate',
+      key: 'poDate',
       render: (value: string) => new Date(value).toLocaleDateString(),
     },
     {
-      title: 'Delivery Date',
-      dataIndex: 'deliveryDate',
-      key: 'deliveryDate',
+      title: 'Expected Delivery',
+      dataIndex: 'expectedDeliveryDate',
+      key: 'expectedDeliveryDate',
       render: (value?: string) => (value ? new Date(value).toLocaleDateString() : '—'),
     },
     {
@@ -214,7 +210,7 @@ export default function OrdersListPage() {
       dataIndex: 'totalAmount',
       key: 'totalAmount',
       align: 'right' as const,
-      render: (value: number, record: OrderSummary) => {
+      render: (value: number, record: PurchaseOrderSummary) => {
         const amount = typeof value === 'number' ? value : parseFloat(value || '0');
         return (
           <span>
@@ -227,7 +223,7 @@ export default function OrdersListPage() {
       title: 'Actions',
       key: 'actions',
       width: 160,
-      render: (_: any, record: OrderSummary) => {
+      render: (_: any, record: PurchaseOrderSummary) => {
         const isEmployee = currentCompany?.role === 'EMPLOYEE';
         const statusItems = getStatusMenuItems(record);
         const menuItems = [
@@ -235,7 +231,7 @@ export default function OrdersListPage() {
             key: 'edit',
             icon: <EditOutlined />,
             label: 'Edit',
-            onClick: () => handleEditOrder(record),
+            onClick: () => handleEditPurchaseOrder(record),
             disabled: isEmployee,
           },
           ...(statusItems.length
@@ -257,7 +253,7 @@ export default function OrdersListPage() {
   if (!currentCompany) {
     return (
       <MainLayout>
-        <div className='no-company-message'>Please select a company to manage orders.</div>
+        <div className='no-company-message'>Please select a company to manage purchase orders.</div>
       </MainLayout>
     );
   }
@@ -268,7 +264,7 @@ export default function OrdersListPage() {
         <div className='page-container'>
           <div className='page-header-section'>
             <Heading level={2} className='page-title'>
-              Orders
+              Purchase Orders
             </Heading>
           </div>
 
@@ -277,21 +273,21 @@ export default function OrdersListPage() {
               <div className='loading-container'>
                 <Spin size='large' />
               </div>
-            ) : orders.length === 0 ? (
-              <Empty description='No orders found'>
+            ) : purchaseOrders.length === 0 ? (
+              <Empty description='No purchase orders found'>
                 <GradientButton 
                   size='small' 
-                  onClick={handleCreateOrder}
+                  onClick={handleCreatePurchaseOrder}
                   disabled={currentCompany?.role === 'EMPLOYEE'}
                 >
-                  Create First Order
+                  Create First PO
                 </GradientButton>
               </Empty>
             ) : (
               <Table
                 columns={columns}
-                dataSource={orders}
-                rowKey={(record) => record.id || record.orderId}
+                dataSource={purchaseOrders}
+                rowKey={(record) => record.id || record.poId}
                 loading={tableLoading}
                 pagination={{ pageSize: 10, showSizeChanger: true }}
                 className='customers-table'
@@ -301,12 +297,12 @@ export default function OrdersListPage() {
         </div>
       </div>
 
-      <OrderFormDrawer
+      <PurchaseOrderDrawer
         visible={drawerVisible}
         onClose={handleDrawerClose}
-        onSaved={handleOrderSaved}
-        mode={editingOrderId ? 'edit' : 'create'}
-        editingOrderId={editingOrderId}
+        onSaved={handlePurchaseOrderSaved}
+        mode={editingPOId ? 'edit' : 'create'}
+        editingPOId={editingPOId}
       />
     </MainLayout>
   );

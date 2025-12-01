@@ -1,4 +1,6 @@
 import { message } from 'antd';
+import axios from 'axios';
+import { AuthStorage } from '../utils/storage';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';
 
@@ -248,7 +250,8 @@ export interface CreateDesignPatternData {
 // UTILITY FUNCTIONS
 // ============================================
 const getAuthToken = (): string | null => {
-  return localStorage.getItem('accessToken');
+  const tokens = AuthStorage.getTokens();
+  return tokens?.accessToken;
 };
 
 const handleApiError = (error: any, defaultMessage: string) => {

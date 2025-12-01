@@ -9,90 +9,92 @@ datasource db {
 }
 
 model companies {
-  id                String              @id
-  company_id        String              @unique
-  name              String
-  slug              String              @unique
-  industry          IndustryType        @default(TEXTILE_MANUFACTURING)
-  description       String?
-  logo_url          String?
-  website           String?
-  tax_id            String?
-  email             String?
-  phone             String?
-  address_line_1    String?
-  address_line_2    String?
-  city              String?
-  state             String?
-  country           String?
-  pincode           String?
-  contact_info      Json?
-  established_date  DateTime?
-  business_type     String?
-  certifications    String[]
-  is_active         Boolean             @default(true)
-  created_at        DateTime            @default(now())
-  updated_at        DateTime
-  default_location  String?
-  company_locations company_locations[]
-  user_companies    user_companies[]
-  user_invitations  user_invitations[]
-  orders            orders[]            @relation("CompanyOrders")
-  financial_documents financial_documents[]
-  quality_checkpoints quality_checkpoints[]
-  quality_defects   quality_defects[]
-  quality_metrics   quality_metrics[]
-  compliance_reports compliance_reports[]
-  products          products[]
-  product_categories product_categories[]
-  fabric_production fabric_production[]
-  yarn_manufacturing yarn_manufacturing[]
-  dyeing_finishing  dyeing_finishing[]
+  id                    String                  @id
+  company_id            String                  @unique
+  name                  String
+  slug                  String                  @unique
+  industry              IndustryType            @default(TEXTILE_MANUFACTURING)
+  description           String?
+  logo_url              String?
+  website               String?
+  tax_id                String?
+  email                 String?
+  phone                 String?
+  address_line_1        String?
+  address_line_2        String?
+  city                  String?
+  state                 String?
+  country               String?
+  pincode               String?
+  contact_info          Json?
+  established_date      DateTime?
+  business_type         String?
+  certifications        String[]
+  is_active             Boolean                 @default(true)
+  created_at            DateTime                @default(now())
+  updated_at            DateTime
+  default_location      String?
+  company_locations     company_locations[]
+  user_companies        user_companies[]
+  user_invitations      user_invitations[]
+  orders                orders[]                @relation("CompanyOrders")
+  financial_documents   financial_documents[]
+  quality_checkpoints   quality_checkpoints[]
+  quality_defects       quality_defects[]
+  quality_metrics       quality_metrics[]
+  compliance_reports    compliance_reports[]
+  products              products[]
+  product_categories    product_categories[]
+  fabric_production     fabric_production[]
+  yarn_manufacturing    yarn_manufacturing[]
+  dyeing_finishing      dyeing_finishing[]
   garment_manufacturing garment_manufacturing[]
-  quality_inspections quality_inspections[]
-  inspection_templates inspection_templates[]
-  inspection_metrics inspection_metrics[]
-  design_patterns   design_patterns[]
-  machines          machines[]
-  customers         customers[]
-  suppliers         suppliers[]
+  quality_inspections   quality_inspections[]
+  inspection_templates  inspection_templates[]
+  inspection_metrics    inspection_metrics[]
+  design_patterns       design_patterns[]
+  machines              machines[]
+  customers             customers[]
+  suppliers             suppliers[]
+  purchase_orders       purchase_orders[]       @relation("CompanyPurchaseOrders")
 }
 
 model company_locations {
-  id              String       @id
-  location_id     String       @unique
-  company_id      String
-  name            String
-  is_default      Boolean      @default(false)
-  is_headquarters Boolean      @default(false)
-  location_type   LocationType @default(BRANCH)
-  is_active       Boolean      @default(true)
-  created_at      DateTime     @default(now())
-  updated_at      DateTime
-  address_line_1  String
-  address_line_2  String?
-  city            String
-  state           String
-  country         String
-  contact_info    Json?
-  email           String?
-  phone           String?
-  pincode         String?
-  image_url       String?
-  companies       companies    @relation(fields: [company_id], references: [id], onDelete: Cascade)
-  orders          orders[]     @relation("LocationOrders")
-  financial_documents financial_documents[]
-  quality_checkpoints quality_checkpoints[]
-  fabric_production fabric_production[]
-  yarn_manufacturing yarn_manufacturing[]
-  dyeing_finishing  dyeing_finishing[]
+  id                    String                  @id
+  location_id           String                  @unique
+  company_id            String
+  name                  String
+  is_default            Boolean                 @default(false)
+  is_headquarters       Boolean                 @default(false)
+  location_type         LocationType            @default(BRANCH)
+  is_active             Boolean                 @default(true)
+  created_at            DateTime                @default(now())
+  updated_at            DateTime
+  address_line_1        String
+  address_line_2        String?
+  city                  String
+  state                 String
+  country               String
+  contact_info          Json?
+  email                 String?
+  phone                 String?
+  pincode               String?
+  image_url             String?
+  companies             companies               @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  orders                orders[]                @relation("LocationOrders")
+  financial_documents   financial_documents[]
+  quality_checkpoints   quality_checkpoints[]
+  fabric_production     fabric_production[]
+  yarn_manufacturing    yarn_manufacturing[]
+  dyeing_finishing      dyeing_finishing[]
   garment_manufacturing garment_manufacturing[]
-  location_inventory location_inventory[]
-  stock_reservations stock_reservations[]
-  stock_movements_from stock_movements[] @relation("StockMovementFrom")
-  stock_movements_to stock_movements[] @relation("StockMovementTo")
-  stock_alerts stock_alerts[]
-  machines machines[]
+  location_inventory    location_inventory[]
+  stock_reservations    stock_reservations[]
+  stock_movements_from  stock_movements[]       @relation("StockMovementFrom")
+  stock_movements_to    stock_movements[]       @relation("StockMovementTo")
+  stock_alerts          stock_alerts[]
+  machines              machines[]
+  purchase_orders       purchase_orders[]       @relation("LocationPurchaseOrders")
 }
 
 model sessions {
@@ -122,40 +124,40 @@ model user_companies {
 }
 
 model users {
-  id                      String           @id
-  first_name              String
-  last_name               String
-  email                   String?          @unique
-  phone                   String?          @unique
-  password                String
-  avatar_url              String?
-  is_active               Boolean          @default(true)
-  created_at              DateTime         @default(now())
-  updated_at              DateTime
-  sessions                sessions[]
-  user_companies          user_companies[]
-  invitations_sent        user_invitations[] @relation("InvitationSender")
-  invitations_received    user_invitations[] @relation("InvitationReceiver")
-  inspections             quality_inspections[] @relation("InspectionInspector")
-  templates_created       inspection_templates[] @relation("TemplateCreator")
-  defect_comments         defect_comments[] @relation("DefectCommentUser")
-  operating_machines      machines[] @relation("MachineOperator")
+  id                   String                 @id
+  first_name           String
+  last_name            String
+  email                String?                @unique
+  phone                String?                @unique
+  password             String
+  avatar_url           String?
+  is_active            Boolean                @default(true)
+  created_at           DateTime               @default(now())
+  updated_at           DateTime
+  sessions             sessions[]
+  user_companies       user_companies[]
+  invitations_sent     user_invitations[]     @relation("InvitationSender")
+  invitations_received user_invitations[]     @relation("InvitationReceiver")
+  inspections          quality_inspections[]  @relation("InspectionInspector")
+  templates_created    inspection_templates[] @relation("TemplateCreator")
+  defect_comments      defect_comments[]      @relation("DefectCommentUser")
+  operating_machines   machines[]             @relation("MachineOperator")
 }
 
 model user_invitations {
-  id          String    @id
+  id          String   @id
   user_id     String
   company_id  String
   invited_by  String
   role        String
   location_id String?
-  status      String    @default("PENDING")
-  created_at  DateTime  @default(now())
+  status      String   @default("PENDING")
+  created_at  DateTime @default(now())
   updated_at  DateTime
 
-  user        users     @relation("InvitationReceiver", fields: [user_id], references: [id], onDelete: Cascade)
-  company     companies @relation(fields: [company_id], references: [id], onDelete: Cascade)
-  inviter     users     @relation("InvitationSender", fields: [invited_by], references: [id], onDelete: Cascade)
+  user    users     @relation("InvitationReceiver", fields: [user_id], references: [id], onDelete: Cascade)
+  company companies @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  inviter users     @relation("InvitationSender", fields: [invited_by], references: [id], onDelete: Cascade)
 
   @@index([user_id])
   @@index([company_id])
@@ -186,6 +188,13 @@ enum OrderStatus {
   CANCELLED
 }
 
+enum OrderPriority {
+  URGENT
+  HIGH
+  NORMAL
+  LOW
+}
+
 enum DocumentType {
   INVOICE
   BILL
@@ -193,55 +202,77 @@ enum DocumentType {
 }
 
 model orders {
-  id              String        @id
-  order_id        String        @unique
-  company_id      String
-  customer_name   String
-  customer_code   String?
-  status          OrderStatus   @default(DRAFT)
-  order_date      DateTime
-  delivery_date   DateTime?
-  currency        String        @default("INR")
-  total_amount    Decimal       @db.Decimal(12, 2)
-  notes           String?
-  location_id     String?
-  customer_id     String?
+  id                     String        @id
+  order_id               String        @unique
+  company_id             String
+  customer_name          String
+  customer_code          String?
+  status                 OrderStatus   @default(DRAFT)
+  priority               OrderPriority @default(NORMAL)
+  order_date             DateTime
+  delivery_date          DateTime?
+  expected_delivery_date DateTime?
+  currency               String        @default("INR")
+  payment_terms          String? // NET_30, NET_60, ADVANCE, COD, CREDIT
+  reference_number       String? // Customer PO number or reference
+  // Financial calculations
+  subtotal               Decimal       @default(0) @db.Decimal(12, 2)
+  discount_amount        Decimal       @default(0) @db.Decimal(12, 2)
+  tax_amount             Decimal       @default(0) @db.Decimal(12, 2)
+  shipping_charges       Decimal       @default(0) @db.Decimal(12, 2)
+  total_amount           Decimal       @db.Decimal(12, 2)
+  // Notes
+  notes                  String? // Internal notes
+  customer_notes         String? // Customer-facing notes
+  // Location and delivery
+  location_id            String?
+  customer_id            String?
+  shipping_address       String? // Full shipping address
   shipping_carrier       String?
   tracking_number        String?
-  shipping_method        String?
+  shipping_method        String? // STANDARD, EXPRESS, OVERNIGHT, PICKUP
   delivery_window_start  DateTime?
   delivery_window_end    DateTime?
-  created_at      DateTime      @default(now())
-  updated_at      DateTime
+  is_active              Boolean       @default(true)
+  created_at             DateTime      @default(now())
+  updated_at             DateTime
 
-  company         companies      @relation("CompanyOrders", fields: [company_id], references: [id], onDelete: Cascade)
-  location        company_locations? @relation("LocationOrders", fields: [location_id], references: [id])
-  customer        customers?     @relation(fields: [customer_id], references: [id])
-  order_items     order_items[]
-  financial_documents financial_documents[] @relation("OrderFinancialDocuments")
-  quality_checkpoints quality_checkpoints[]
+  company               companies               @relation("CompanyOrders", fields: [company_id], references: [id], onDelete: Cascade)
+  location              company_locations?      @relation("LocationOrders", fields: [location_id], references: [id])
+  customer              customers?              @relation(fields: [customer_id], references: [id])
+  order_items           order_items[]
+  financial_documents   financial_documents[]   @relation("OrderFinancialDocuments")
+  quality_checkpoints   quality_checkpoints[]
   garment_manufacturing garment_manufacturing[]
 }
 
 model order_items {
-  id              String   @id
-  order_id        String
-  line_number     Int
-  item_code       String
-  description     String?
-  quantity        Decimal  @db.Decimal(12, 3)
-  unit_of_measure String
-  unit_price      Decimal  @db.Decimal(12, 2)
-  line_amount     Decimal  @db.Decimal(12, 2)
+  id               String  @id
+  order_id         String
+  product_id       String? // Link to products table
+  line_number      Int
+  item_code        String
+  description      String?
+  quantity         Decimal @db.Decimal(12, 3)
+  unit_of_measure  String
+  unit_price       Decimal @db.Decimal(12, 2)
+  discount_percent Decimal @default(0) @db.Decimal(5, 2)
+  discount_amount  Decimal @default(0) @db.Decimal(12, 2)
+  tax_rate         Decimal @default(0) @db.Decimal(5, 2)
+  tax_amount       Decimal @default(0) @db.Decimal(12, 2)
+  line_amount      Decimal @db.Decimal(12, 2)
+  notes            String?
 
-  orders          orders   @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  orders  orders    @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  product products? @relation("OrderItemProduct", fields: [product_id], references: [id], onDelete: SetNull)
 
   @@unique([order_id, line_number])
+  @@index([product_id])
 }
 
 model financial_documents {
-  id              String        @id
-  document_id     String        @unique
+  id              String       @id
+  document_id     String       @unique
   company_id      String
   location_id     String
   order_id        String?
@@ -250,17 +281,17 @@ model financial_documents {
   party_code      String?
   issue_date      DateTime
   due_date        DateTime?
-  currency        String        @default("INR")
-  subtotal_amount Decimal       @db.Decimal(12, 2)
-  tax_amount      Decimal       @db.Decimal(12, 2)
-  total_amount    Decimal       @db.Decimal(12, 2)
+  currency        String       @default("INR")
+  subtotal_amount Decimal      @db.Decimal(12, 2)
+  tax_amount      Decimal      @db.Decimal(12, 2)
+  total_amount    Decimal      @db.Decimal(12, 2)
   notes           String?
-  created_at      DateTime      @default(now())
+  created_at      DateTime     @default(now())
   updated_at      DateTime
 
-  company         companies         @relation(fields: [company_id], references: [id], onDelete: Cascade)
-  location        company_locations @relation(fields: [location_id], references: [id])
-  order           orders?           @relation("OrderFinancialDocuments", fields: [order_id], references: [id], onDelete: SetNull)
+  company  companies         @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  location company_locations @relation(fields: [location_id], references: [id])
+  order    orders?           @relation("OrderFinancialDocuments", fields: [order_id], references: [id], onDelete: SetNull)
 }
 
 // Quality Control System Tables
@@ -288,12 +319,12 @@ model quality_checkpoints {
   created_at      DateTime       @default(now())
   updated_at      DateTime
 
-  company companies          @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  company  companies          @relation(fields: [company_id], references: [id], onDelete: Cascade)
   location company_locations? @relation(fields: [location_id], references: [id])
-  order   orders?            @relation(fields: [order_id], references: [id])
-  product products?          @relation(fields: [product_id], references: [id])
-  defects quality_defects[]
-  metrics quality_metrics[]
+  order    orders?            @relation(fields: [order_id], references: [id])
+  product  products?          @relation(fields: [product_id], references: [id])
+  defects  quality_defects[]
+  metrics  quality_metrics[]
 
   @@index([company_id])
   @@index([checkpoint_type])
@@ -446,17 +477,17 @@ enum ComplianceStatus {
 // Product Management System Tables
 
 model product_categories {
-  id          String    @id @default(uuid())
+  id          String   @id @default(uuid())
   category_id String
   company_id  String
   name        String
   description String?
   parent_id   String?
-  is_active   Boolean   @default(true)
-  created_at  DateTime  @default(now())
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
   updated_at  DateTime
 
-  company  companies @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  company  companies  @relation(fields: [company_id], references: [id], onDelete: Cascade)
   products products[]
 
   @@unique([company_id, category_id])
@@ -465,52 +496,54 @@ model product_categories {
 }
 
 model products {
-  id              String         @id @default(uuid())
-  product_id      String
-  product_code    String
-  company_id      String
-  category_id     String?
-  sku             String
-  name            String
-  description     String?
-  product_type    ProductType    @default(OWN_MANUFACTURE)
-  material        String?
-  color           String?
-  size            String?
-  weight          Decimal?       @db.Decimal(10, 3)
-  unit_of_measure String         @default("PCS")
-  cost_price      Decimal        @db.Decimal(12, 2)
-  selling_price   Decimal        @db.Decimal(12, 2)
-  markup_percent  Decimal?       @db.Decimal(5, 2)
-  stock_quantity  Int            @default(0)
-  reorder_level   Int?
-  barcode         String?
-  image_url       String?
-  specifications  Json?
+  id                String      @id @default(uuid())
+  product_id        String
+  product_code      String
+  company_id        String
+  category_id       String?
+  sku               String
+  name              String
+  description       String?
+  product_type      ProductType @default(OWN_MANUFACTURE)
+  material          String?
+  color             String?
+  size              String?
+  weight            Decimal?    @db.Decimal(10, 3)
+  unit_of_measure   String      @default("PCS")
+  cost_price        Decimal     @db.Decimal(12, 2)
+  selling_price     Decimal     @db.Decimal(12, 2)
+  markup_percent    Decimal?    @db.Decimal(5, 2)
+  stock_quantity    Int         @default(0)
+  reorder_level     Int?
+  barcode           String?
+  image_url         String?
+  specifications    Json?
   // Textile-specific fields
-  fabric_type     String?        // Cotton, Silk, Wool, Polyester, etc.
-  weave_type      String?        // Plain, Twill, Satin, etc.
-  thread_count    Int?           // Threads per inch
-  gsm             Decimal?       @db.Decimal(8, 2) // Grams per square meter
-  shrinkage       Decimal?       @db.Decimal(5, 2) // Shrinkage percentage
-  color_fastness  String?        // Color fastness rating
-  care_instructions String?      // Washing and care instructions
-  origin_country  String?        // Country of origin
-  supplier_info   Json?          // Supplier details
-  certifications  String[]       // Certifications like GOTS, OEKO-TEX
-  seasonal_tag    String?        // Spring, Summer, Fall, Winter
-  is_active       Boolean        @default(true)
-  created_at      DateTime       @default(now())
-  updated_at      DateTime
+  fabric_type       String? // Cotton, Silk, Wool, Polyester, etc.
+  weave_type        String? // Plain, Twill, Satin, etc.
+  thread_count      Int? // Threads per inch
+  gsm               Decimal?    @db.Decimal(8, 2) // Grams per square meter
+  shrinkage         Decimal?    @db.Decimal(5, 2) // Shrinkage percentage
+  color_fastness    String? // Color fastness rating
+  care_instructions String? // Washing and care instructions
+  origin_country    String? // Country of origin
+  supplier_info     Json? // Supplier details
+  certifications    String[] // Certifications like GOTS, OEKO-TEX
+  seasonal_tag      String? // Spring, Summer, Fall, Winter
+  is_active         Boolean     @default(true)
+  created_at        DateTime    @default(now())
+  updated_at        DateTime
 
-  company         companies           @relation(fields: [company_id], references: [id], onDelete: Cascade)
-  category        product_categories? @relation(fields: [category_id], references: [id], onDelete: SetNull)
-  stock_adjustments stock_adjustments[]
+  company             companies             @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  category            product_categories?   @relation(fields: [category_id], references: [id], onDelete: SetNull)
+  stock_adjustments   stock_adjustments[]
   quality_checkpoints quality_checkpoints[]
-  quality_defects quality_defects[] @relation("ProductDefects")
-  location_inventory location_inventory[]
-  stock_reservations stock_reservations[]
-  product_pricing product_pricing[]
+  quality_defects     quality_defects[]     @relation("ProductDefects")
+  location_inventory  location_inventory[]
+  stock_reservations  stock_reservations[]
+  product_pricing     product_pricing[]
+  order_items         order_items[]         @relation("OrderItemProduct")
+  purchase_order_items purchase_order_items[] @relation("PurchaseOrderItemProduct")
 
   @@unique([company_id, product_id])
   @@unique([company_id, product_code])
@@ -565,21 +598,21 @@ enum ProductType {
 
 // Pricing Management System
 model product_pricing {
-  id              String          @id @default(uuid())
-  pricing_id      String
-  product_id      String
-  company_id      String
-  tier_name       String          // Wholesale, Retail, Premium, etc.
-  min_quantity    Int             @default(1)
-  max_quantity    Int?
-  price           Decimal         @db.Decimal(12, 2)
-  discount_percent Decimal?       @db.Decimal(5, 2)
-  currency        String          @default("INR")
-  effective_from  DateTime        @default(now())
-  effective_until DateTime?
-  is_active       Boolean         @default(true)
-  created_at      DateTime        @default(now())
-  updated_at      DateTime
+  id               String    @id @default(uuid())
+  pricing_id       String
+  product_id       String
+  company_id       String
+  tier_name        String // Wholesale, Retail, Premium, etc.
+  min_quantity     Int       @default(1)
+  max_quantity     Int?
+  price            Decimal   @db.Decimal(12, 2)
+  discount_percent Decimal?  @db.Decimal(5, 2)
+  currency         String    @default("INR")
+  effective_from   DateTime  @default(now())
+  effective_until  DateTime?
+  is_active        Boolean   @default(true)
+  created_at       DateTime  @default(now())
+  updated_at       DateTime
 
   product products @relation(fields: [product_id], references: [id], onDelete: Cascade)
 
@@ -592,36 +625,36 @@ model product_pricing {
 
 // Machine Maintenance & Service Management System
 model machines {
-  id              String         @id @default(uuid())
-  machine_id      String
-  machine_code    String         // Machine code for easy identification
-  company_id      String
-  location_id     String?
-  name            String
-  machine_type    String?        // Loom, Knitting, Dyeing, etc.
-  model           String?
-  manufacturer    String?
-  serial_number   String?
-  purchase_date   DateTime?
-  warranty_expiry DateTime?
-  specifications  Json?          // Technical specs
-  image_url       String?
-  qr_code         String?
-  status          MachineStatus  @default(NEW)
-  operational_status OperationalStatus @default(FREE)
-  current_operator_id String?       // Current operator using this machine
-  is_active       Boolean        @default(true)
-  created_at      DateTime       @default(now())
-  updated_at      DateTime
+  id                  String            @id @default(uuid())
+  machine_id          String
+  machine_code        String // Machine code for easy identification
+  company_id          String
+  location_id         String?
+  name                String
+  machine_type        String? // Loom, Knitting, Dyeing, etc.
+  model               String?
+  manufacturer        String?
+  serial_number       String?
+  purchase_date       DateTime?
+  warranty_expiry     DateTime?
+  specifications      Json? // Technical specs
+  image_url           String?
+  qr_code             String?
+  status              MachineStatus     @default(NEW)
+  operational_status  OperationalStatus @default(FREE)
+  current_operator_id String? // Current operator using this machine
+  is_active           Boolean           @default(true)
+  created_at          DateTime          @default(now())
+  updated_at          DateTime
 
-  company         companies           @relation(fields: [company_id], references: [id], onDelete: Cascade)
-  location        company_locations?  @relation(fields: [location_id], references: [id], onDelete: SetNull)
-  current_operator users?             @relation("MachineOperator", fields: [current_operator_id], references: [id], onDelete: SetNull)
-  status_history  machine_status_history[]
+  company               companies                @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  location              company_locations?       @relation(fields: [location_id], references: [id], onDelete: SetNull)
+  current_operator      users?                   @relation("MachineOperator", fields: [current_operator_id], references: [id], onDelete: SetNull)
+  status_history        machine_status_history[]
   maintenance_schedules maintenance_schedules[]
-  maintenance_records maintenance_records[]
-  breakdown_reports breakdown_reports[]
-  machine_assignments machine_assignments[]
+  maintenance_records   maintenance_records[]
+  breakdown_reports     breakdown_reports[]
+  machine_assignments   machine_assignments[]
 
   @@unique([company_id, machine_id])
   @@unique([company_id, machine_code])
@@ -632,14 +665,14 @@ model machines {
 }
 
 model machine_status_history {
-  id              String        @id @default(uuid())
+  id              String         @id @default(uuid())
   machine_id      String
   company_id      String
   previous_status MachineStatus?
   new_status      MachineStatus
   changed_by      String?
   reason          String?
-  created_at      DateTime      @default(now())
+  created_at      DateTime       @default(now())
 
   machine machines @relation(fields: [machine_id], references: [id], onDelete: Cascade)
 
@@ -649,25 +682,25 @@ model machine_status_history {
 }
 
 model maintenance_schedules {
-  id                  String            @id @default(uuid())
+  id                  String          @id @default(uuid())
   schedule_id         String
   machine_id          String
   company_id          String
   maintenance_type    MaintenanceType
   title               String
   description         String?
-  frequency_days      Int?              // Every X days
+  frequency_days      Int? // Every X days
   last_completed      DateTime?
   next_due            DateTime
-  estimated_hours     Decimal?          @db.Decimal(5, 2)
+  estimated_hours     Decimal?        @db.Decimal(5, 2)
   assigned_technician String?
-  checklist           Json?             // Array of tasks
-  parts_required      Json?             // Array of parts
-  is_active           Boolean           @default(true)
-  created_at          DateTime          @default(now())
+  checklist           Json? // Array of tasks
+  parts_required      Json? // Array of parts
+  is_active           Boolean         @default(true)
+  created_at          DateTime        @default(now())
   updated_at          DateTime
 
-  machine machines @relation(fields: [machine_id], references: [id], onDelete: Cascade)
+  machine             machines              @relation(fields: [machine_id], references: [id], onDelete: Cascade)
   maintenance_records maintenance_records[]
 
   @@unique([company_id, schedule_id])
@@ -678,24 +711,24 @@ model maintenance_schedules {
 }
 
 model maintenance_records {
-  id                   String                  @id @default(uuid())
-  record_id            String
-  machine_id           String
-  schedule_id          String?
-  company_id           String
-  maintenance_type     MaintenanceType
-  performed_by         String?
-  performed_date       DateTime
-  duration_hours       Decimal?                @db.Decimal(5, 2)
-  tasks_completed      Json?
-  parts_used           Json?
-  cost                 Decimal?                @db.Decimal(10, 2)
-  notes                String?
+  id                    String                  @id @default(uuid())
+  record_id             String
+  machine_id            String
+  schedule_id           String?
+  company_id            String
+  maintenance_type      MaintenanceType
+  performed_by          String?
+  performed_date        DateTime
+  duration_hours        Decimal?                @db.Decimal(5, 2)
+  tasks_completed       Json?
+  parts_used            Json?
+  cost                  Decimal?                @db.Decimal(10, 2)
+  notes                 String?
   next_maintenance_date DateTime?
-  status               MaintenanceRecordStatus @default(COMPLETED)
-  created_at           DateTime                @default(now())
+  status                MaintenanceRecordStatus @default(COMPLETED)
+  created_at            DateTime                @default(now())
 
-  machine  machines              @relation(fields: [machine_id], references: [id], onDelete: Cascade)
+  machine  machines               @relation(fields: [machine_id], references: [id], onDelete: Cascade)
   schedule maintenance_schedules? @relation(fields: [schedule_id], references: [id], onDelete: SetNull)
 
   @@unique([company_id, record_id])
@@ -726,7 +759,7 @@ model breakdown_reports {
   production_loss     Decimal?          @db.Decimal(12, 2)
   status              BreakdownStatus   @default(OPEN)
   priority            BreakdownPriority @default(MEDIUM)
-  images              Json?             // Array of image URLs
+  images              Json? // Array of image URLs
   created_at          DateTime          @default(now())
   updated_at          DateTime
 
@@ -741,19 +774,19 @@ model breakdown_reports {
 }
 
 model customers {
-  id              String   @id @default(uuid())
-  customer_id     String   @unique
-  company_id      String
-  code            String
-  name            String
-  customer_type   String   @default("RETAIL")
-  company_name    String?  // Required if type is BUSINESS
-  customer_category String?
-  primary_contact_person String?
-  email           String?
-  phone           String?
-  alternate_phone String?
-  website         String?
+  id                      String   @id @default(uuid())
+  customer_id             String   @unique
+  company_id              String
+  code                    String
+  name                    String
+  customer_type           String   @default("RETAIL")
+  company_name            String? // Required if type is BUSINESS
+  customer_category       String?
+  primary_contact_person  String?
+  email                   String?
+  phone                   String?
+  alternate_phone         String?
+  website                 String?
   // Billing Address
   billing_address_line_1  String?
   billing_address_line_2  String?
@@ -770,21 +803,21 @@ model customers {
   shipping_postal_code    String?
   same_as_billing_address Boolean  @default(true)
   // Financial Information
-  payment_terms   String?
-  credit_limit    Decimal? @db.Decimal(12, 2)
-  currency        String   @default("INR")
-  tax_id          String?
-  pan_number      String?
+  payment_terms           String?
+  credit_limit            Decimal? @db.Decimal(12, 2)
+  currency                String   @default("INR")
+  tax_id                  String?
+  pan_number              String?
   // Additional Information
-  assigned_sales_rep String?
-  notes           String?
-  tags            String[] // Array of tags like "Bulk Buyer", "Export"
-  is_active       Boolean  @default(true)
-  created_at      DateTime @default(now())
-  updated_at      DateTime
+  assigned_sales_rep      String?
+  notes                   String?
+  tags                    String[] // Array of tags like "Bulk Buyer", "Export"
+  is_active               Boolean  @default(true)
+  created_at              DateTime @default(now())
+  updated_at              DateTime
 
-  company         companies @relation(fields: [company_id], references: [id], onDelete: Cascade)
-  orders          orders[]
+  company companies @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  orders  orders[]
 
   @@unique([company_id, code])
   @@index([company_id])
@@ -797,15 +830,15 @@ model customers {
 }
 
 model machine_assignments {
-  id           String     @id @default(uuid())
-  machine_id   String
-  operator_id  String
-  company_id   String
-  shift_type   ShiftType?
+  id            String     @id @default(uuid())
+  machine_id    String
+  operator_id   String
+  company_id    String
+  shift_type    ShiftType?
   assigned_date DateTime
-  is_primary   Boolean    @default(false)
-  is_active    Boolean    @default(true)
-  created_at   DateTime   @default(now())
+  is_primary    Boolean    @default(false)
+  is_active     Boolean    @default(true)
+  created_at    DateTime   @default(now())
 
   machine machines @relation(fields: [machine_id], references: [id], onDelete: Cascade)
 
@@ -876,18 +909,18 @@ enum ShiftType {
 
 // Multi-Location Inventory Management
 model location_inventory {
-  id              String   @id @default(uuid())
-  inventory_code  String   // Auto-generated: INV001, INV002, etc.
-  product_id      String
-  location_id     String
-  company_id      String
-  stock_quantity  Decimal  @db.Decimal(12, 3)
-  reserved_quantity Decimal @db.Decimal(12, 3) @default(0)
-  available_quantity Decimal @db.Decimal(12, 3)
-  reorder_level   Decimal? @db.Decimal(12, 3)
-  max_stock_level Decimal? @db.Decimal(12, 3)
-  last_updated    DateTime @default(now())
-  updated_by      String?
+  id                 String   @id @default(uuid())
+  inventory_code     String // Auto-generated: INV001, INV002, etc.
+  product_id         String
+  location_id        String
+  company_id         String
+  stock_quantity     Decimal  @db.Decimal(12, 3)
+  reserved_quantity  Decimal  @default(0) @db.Decimal(12, 3)
+  available_quantity Decimal  @db.Decimal(12, 3)
+  reorder_level      Decimal? @db.Decimal(12, 3)
+  max_stock_level    Decimal? @db.Decimal(12, 3)
+  last_updated       DateTime @default(now())
+  updated_by         String?
 
   product  products          @relation(fields: [product_id], references: [id], onDelete: Cascade)
   location company_locations @relation(fields: [location_id], references: [id], onDelete: Cascade)
@@ -901,20 +934,20 @@ model location_inventory {
 
 // Stock Reservations for Orders
 model stock_reservations {
-  id              String            @id @default(uuid())
-  reservation_id  String
-  product_id      String
-  location_id     String
-  company_id      String
-  order_id        String?
-  reserved_quantity Decimal         @db.Decimal(12, 3)
-  reservation_type ReservationType
-  status          ReservationStatus @default(ACTIVE)
-  expires_at      DateTime?
-  notes           String?
-  created_by      String
-  created_at      DateTime          @default(now())
-  updated_at      DateTime          @updatedAt
+  id                String            @id @default(uuid())
+  reservation_id    String
+  product_id        String
+  location_id       String
+  company_id        String
+  order_id          String?
+  reserved_quantity Decimal           @db.Decimal(12, 3)
+  reservation_type  ReservationType
+  status            ReservationStatus @default(ACTIVE)
+  expires_at        DateTime?
+  notes             String?
+  created_by        String
+  created_at        DateTime          @default(now())
+  updated_at        DateTime          @updatedAt
 
   product  products          @relation(fields: [product_id], references: [id], onDelete: Cascade)
   location company_locations @relation(fields: [location_id], references: [id], onDelete: Cascade)
@@ -929,21 +962,21 @@ model stock_reservations {
 
 // Enhanced Stock Movements with Location Support
 model stock_movements {
-  id              String              @id @default(uuid())
-  movement_id     String
-  product_id      String
-  company_id      String
+  id               String            @id @default(uuid())
+  movement_id      String
+  product_id       String
+  company_id       String
   from_location_id String?
-  to_location_id  String?
-  movement_type   StockMovementType
-  quantity        Decimal             @db.Decimal(12, 3)
-  unit_cost       Decimal?            @db.Decimal(12, 2)
-  total_cost      Decimal?            @db.Decimal(12, 2)
-  reference_type  String?             // 'ORDER', 'PURCHASE', 'TRANSFER', 'ADJUSTMENT'
-  reference_id    String?             // Order ID, Purchase ID, etc.
-  notes           String?
-  created_by      String
-  created_at      DateTime            @default(now())
+  to_location_id   String?
+  movement_type    StockMovementType
+  quantity         Decimal           @db.Decimal(12, 3)
+  unit_cost        Decimal?          @db.Decimal(12, 2)
+  total_cost       Decimal?          @db.Decimal(12, 2)
+  reference_type   String? // 'ORDER', 'PURCHASE', 'TRANSFER', 'ADJUSTMENT'
+  reference_id     String? // Order ID, Purchase ID, etc.
+  notes            String?
+  created_by       String
+  created_at       DateTime          @default(now())
 
   from_location company_locations? @relation("StockMovementFrom", fields: [from_location_id], references: [id])
   to_location   company_locations? @relation("StockMovementTo", fields: [to_location_id], references: [id])
@@ -1030,26 +1063,26 @@ enum AlertStatus {
 // ============================================
 
 model fabric_production {
-  id              String   @id @default(uuid())
+  id              String       @id @default(uuid())
   fabric_id       String
   company_id      String
   location_id     String?
   fabric_type     FabricType
   fabric_name     String
   composition     String
-  weight_gsm      Decimal  @db.Decimal(8, 2)
-  width_inches    Decimal  @db.Decimal(6, 2)
+  weight_gsm      Decimal      @db.Decimal(8, 2)
+  width_inches    Decimal      @db.Decimal(6, 2)
   color           String
   pattern         String?
   finish_type     String?
-  quantity_meters Decimal  @db.Decimal(10, 2)
+  quantity_meters Decimal      @db.Decimal(10, 2)
   production_date DateTime
   batch_number    String
   quality_grade   QualityGrade
   notes           String?
-  is_active       Boolean  @default(true)
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
+  is_active       Boolean      @default(true)
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @updatedAt
 
   company  companies          @relation(fields: [company_id], references: [id], onDelete: Cascade)
   location company_locations? @relation(fields: [location_id], references: [id])
@@ -1080,25 +1113,25 @@ enum QualityGrade {
 }
 
 model yarn_manufacturing {
-  id              String      @id @default(uuid())
+  id              String       @id @default(uuid())
   yarn_id         String
   company_id      String
   location_id     String?
   yarn_type       YarnType
   yarn_count      String
-  twist_per_inch  Decimal?    @db.Decimal(6, 2)
+  twist_per_inch  Decimal?     @db.Decimal(6, 2)
   ply             Int
   color           String
   dye_lot         String?
-  quantity_kg     Decimal     @db.Decimal(10, 2)
+  quantity_kg     Decimal      @db.Decimal(10, 2)
   production_date DateTime
   batch_number    String
   process_type    YarnProcess
   quality_grade   QualityGrade
   notes           String?
-  is_active       Boolean     @default(true)
-  created_at      DateTime    @default(now())
-  updated_at      DateTime    @updatedAt
+  is_active       Boolean      @default(true)
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @updatedAt
 
   company  companies          @relation(fields: [company_id], references: [id], onDelete: Cascade)
   location company_locations? @relation(fields: [location_id], references: [id])
@@ -1127,7 +1160,7 @@ enum YarnProcess {
 }
 
 model dyeing_finishing {
-  id                String         @id @default(uuid())
+  id                String        @id @default(uuid())
   process_id        String
   company_id        String
   location_id       String?
@@ -1137,19 +1170,19 @@ model dyeing_finishing {
   color_name        String
   dye_method        String?
   recipe_code       String?
-  quantity_meters   Decimal        @db.Decimal(10, 2)
+  quantity_meters   Decimal       @db.Decimal(10, 2)
   process_date      DateTime
   batch_number      String
   machine_number    String?
-  temperature_c     Decimal?       @db.Decimal(5, 2)
+  temperature_c     Decimal?      @db.Decimal(5, 2)
   duration_minutes  Int?
-  quality_check     Boolean        @default(false)
+  quality_check     Boolean       @default(false)
   color_fastness    String?
-  shrinkage_percent Decimal?       @db.Decimal(5, 2)
+  shrinkage_percent Decimal?      @db.Decimal(5, 2)
   notes             String?
-  is_active         Boolean        @default(true)
-  created_at        DateTime       @default(now())
-  updated_at        DateTime       @updatedAt
+  is_active         Boolean       @default(true)
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
 
   company  companies          @relation(fields: [company_id], references: [id], onDelete: Cascade)
   location company_locations? @relation(fields: [location_id], references: [id])
@@ -1230,22 +1263,22 @@ enum ProductionStage {
 }
 
 model design_patterns {
-  id                String         @id @default(uuid())
-  design_id         String
-  company_id        String
-  design_name       String
-  design_category   DesignCategory
-  designer_name     String?
-  season            String?
-  color_palette     String[]
-  pattern_repeat    String?
-  design_file_url   String?
-  sample_image_url  String?
-  status            DesignStatus
-  notes             String?
-  is_active         Boolean        @default(true)
-  created_at        DateTime       @default(now())
-  updated_at        DateTime       @updatedAt
+  id               String         @id @default(uuid())
+  design_id        String
+  company_id       String
+  design_name      String
+  design_category  DesignCategory
+  designer_name    String?
+  season           String?
+  color_palette    String[]
+  pattern_repeat   String?
+  design_file_url  String?
+  sample_image_url String?
+  status           DesignStatus
+  notes            String?
+  is_active        Boolean        @default(true)
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
 
   company companies @relation(fields: [company_id], references: [id], onDelete: Cascade)
 
@@ -1315,35 +1348,35 @@ enum EvaluationType {
 
 // New Quality Control Models
 model quality_inspections {
-  id                String            @id @default(uuid())
-  company_id        String
-  inspection_number String
-  inspection_type   InspectionType
-  reference_type    String            // PRODUCT, ORDER, BATCH
-  reference_id      String
-  location_id       String?
-  inspector_id      String?
-  inspector_name    String?
-  template_id       String?
-  scheduled_date    DateTime?
-  inspection_date   DateTime?
+  id                   String           @id @default(uuid())
+  company_id           String
+  inspection_number    String
+  inspection_type      InspectionType
+  reference_type       String // PRODUCT, ORDER, BATCH
+  reference_id         String
+  location_id          String?
+  inspector_id         String?
+  inspector_name       String?
+  template_id          String?
+  scheduled_date       DateTime?
+  inspection_date      DateTime?
   next_inspection_date DateTime?
-  started_at        DateTime?
-  completed_at      DateTime?
-  status            InspectionStatus  @default(PENDING)
-  overall_result    String?           // PASS, FAIL, CONDITIONAL
-  quality_score     Float?
-  inspector_notes   String?
-  recommendations   String?
-  is_active         Boolean           @default(true)
-  created_at        DateTime          @default(now())
-  updated_at        DateTime          @updatedAt
-  
-  companies         companies         @relation(fields: [company_id], references: [id], onDelete: Cascade)
-  inspector         users?            @relation("InspectionInspector", fields: [inspector_id], references: [id])
-  template          inspection_templates? @relation(fields: [template_id], references: [id])
-  checkpoints       inspection_checkpoints[]
-  
+  started_at           DateTime?
+  completed_at         DateTime?
+  status               InspectionStatus @default(PENDING)
+  overall_result       String? // PASS, FAIL, CONDITIONAL
+  quality_score        Float?
+  inspector_notes      String?
+  recommendations      String?
+  is_active            Boolean          @default(true)
+  created_at           DateTime         @default(now())
+  updated_at           DateTime         @updatedAt
+
+  companies   companies                @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  inspector   users?                   @relation("InspectionInspector", fields: [inspector_id], references: [id])
+  template    inspection_templates?    @relation(fields: [template_id], references: [id])
+  checkpoints inspection_checkpoints[]
+
   @@unique([company_id, inspection_number])
   @@index([company_id, status])
   @@index([inspector_id])
@@ -1351,153 +1384,229 @@ model quality_inspections {
 }
 
 model inspection_templates {
-  id              String            @id @default(uuid())
-  company_id      String
-  name            String
-  description     String?
-  category        String            // INCOMING, IN_PROCESS, FINAL, RANDOM, CUSTOM
-  applicable_to   String[]          // PRODUCTS, ORDERS, BATCHES
-  passing_score   Float             @default(70)
-  is_active       Boolean           @default(true)
-  created_by      String
-  created_at      DateTime          @default(now())
-  updated_at      DateTime          @updatedAt
-  
-  companies       companies         @relation(fields: [company_id], references: [id], onDelete: Cascade)
-  creator         users             @relation("TemplateCreator", fields: [created_by], references: [id])
-  checkpoints     template_checkpoints[]
-  inspections     quality_inspections[]
-  
+  id            String   @id @default(uuid())
+  company_id    String
+  name          String
+  description   String?
+  category      String // INCOMING, IN_PROCESS, FINAL, RANDOM, CUSTOM
+  applicable_to String[] // PRODUCTS, ORDERS, BATCHES
+  passing_score Float    @default(70)
+  is_active     Boolean  @default(true)
+  created_by    String
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  companies   companies              @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  creator     users                  @relation("TemplateCreator", fields: [created_by], references: [id])
+  checkpoints template_checkpoints[]
+  inspections quality_inspections[]
+
   @@index([company_id, is_active])
 }
 
 model template_checkpoints {
-  id              String            @id @default(uuid())
+  id              String         @id @default(uuid())
   template_id     String
   name            String
   description     String?
   evaluation_type EvaluationType
-  is_required     Boolean           @default(true)
+  is_required     Boolean        @default(true)
   order_index     Int
-  created_at      DateTime          @default(now())
-  
-  template        inspection_templates @relation(fields: [template_id], references: [id], onDelete: Cascade)
-  
+  created_at      DateTime       @default(now())
+
+  template inspection_templates @relation(fields: [template_id], references: [id], onDelete: Cascade)
+
   @@index([template_id, order_index])
 }
 
 model inspection_checkpoints {
-  id              String            @id @default(uuid())
+  id              String         @id @default(uuid())
   inspection_id   String
   name            String
   description     String?
   evaluation_type EvaluationType
-  result          String?           // PASS, FAIL, or rating value
+  result          String? // PASS, FAIL, or rating value
   notes           String?
   photos          String[]
   order_index     Int
-  created_at      DateTime          @default(now())
-  
-  inspection      quality_inspections @relation(fields: [inspection_id], references: [id], onDelete: Cascade)
-  
+  created_at      DateTime       @default(now())
+
+  inspection quality_inspections @relation(fields: [inspection_id], references: [id], onDelete: Cascade)
+
   @@index([inspection_id, order_index])
 }
 
 model defect_comments {
-  id              String            @id @default(uuid())
-  defect_id       String
-  user_id         String
-  comment         String
-  attachments     String[]
-  created_at      DateTime          @default(now())
-  
-  defect          quality_defects   @relation(fields: [defect_id], references: [id])
-  user            users             @relation("DefectCommentUser", fields: [user_id], references: [id])
-  
+  id          String   @id @default(uuid())
+  defect_id   String
+  user_id     String
+  comment     String
+  attachments String[]
+  created_at  DateTime @default(now())
+
+  defect quality_defects @relation(fields: [defect_id], references: [id])
+  user   users           @relation("DefectCommentUser", fields: [user_id], references: [id])
+
   @@index([defect_id, created_at])
 }
 
 model inspection_metrics {
-  id                  String      @id @default(uuid())
+  id                  String   @id @default(uuid())
   company_id          String
   period_start        DateTime
   period_end          DateTime
-  total_inspections   Int         @default(0)
-  passed_inspections  Int         @default(0)
-  failed_inspections  Int         @default(0)
-  pass_rate           Float       @default(0)
-  total_defects       Int         @default(0)
-  critical_defects    Int         @default(0)
+  total_inspections   Int      @default(0)
+  passed_inspections  Int      @default(0)
+  failed_inspections  Int      @default(0)
+  pass_rate           Float    @default(0)
+  total_defects       Int      @default(0)
+  critical_defects    Int      @default(0)
   avg_inspection_time Float?
-  created_at          DateTime    @default(now())
-  updated_at          DateTime    @updatedAt
-  
-  companies           companies   @relation(fields: [company_id], references: [id], onDelete: Cascade)
-  
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  companies companies @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
   @@unique([company_id, period_start, period_end])
   @@index([company_id, period_start])
 }
 
 model suppliers {
-  id              String   @id @default(uuid())
-  supplier_id     String   @unique
-  company_id      String
-  code            String
-  name            String
-  supplier_type   String   @default("MANUFACTURER")
-  company_reg_no  String?
-  
+  id             String  @id @default(uuid())
+  supplier_id    String  @unique
+  company_id     String
+  code           String
+  name           String
+  supplier_type  String  @default("MANUFACTURER")
+  company_reg_no String?
+
   // Contact Info
   primary_contact_person String?
-  email           String?
-  phone           String?
-  alternate_phone String?
-  website         String?
-  fax             String?
+  email                  String?
+  phone                  String?
+  alternate_phone        String?
+  website                String?
+  fax                    String?
 
   // Address
-  address_line_1  String?
-  address_line_2  String?
-  city            String?
-  state           String?
-  country         String?
-  postal_code     String?
+  address_line_1 String?
+  address_line_2 String?
+  city           String?
+  state          String?
+  country        String?
+  postal_code    String?
 
   // Financial
-  payment_terms   String?
-  credit_period   Int?
-  currency        String   @default("INR")
-  tax_id          String?
-  pan_number      String?
-  bank_details    String?
+  payment_terms String?
+  credit_period Int?
+  currency      String  @default("INR")
+  tax_id        String?
+  pan_number    String?
+  bank_details  String?
 
   // Supply Info
   product_categories String[]
-  lead_time_days  Int?
-  min_order_qty   Int?
-  min_order_value Decimal? @db.Decimal(12, 2)
+  lead_time_days     Int?
+  min_order_qty      Int?
+  min_order_value    Decimal? @db.Decimal(12, 2)
 
   // Quality & Compliance
-  quality_rating  String?
-  certifications  String[]
+  quality_rating    String?
+  certifications    String[]
   compliance_status String?
 
   // Additional
   supplier_category String?
-  assigned_manager String?
-  notes           String?
-  tags            String[]
-  
-  is_active       Boolean  @default(true)
-  created_at      DateTime @default(now())
-  updated_at      DateTime
+  assigned_manager  String?
+  notes             String?
+  tags              String[]
 
-  company         companies @relation(fields: [company_id], references: [id], onDelete: Cascade)
-  
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime
+
+  company companies @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
   @@unique([company_id, code])
   @@index([company_id])
   @@index([email])
   @@index([supplier_type])
   @@index([code])
+  purchase_orders purchase_orders[]
 }
 
+enum POStatus {
+  DRAFT
+  SENT
+  CONFIRMED
+  PARTIALLY_RECEIVED
+  RECEIVED
+  CANCELLED
+}
+
+model purchase_orders {
+  id                     String        @id
+  po_id                  String        @unique
+  company_id             String
+  supplier_name          String
+  supplier_code          String?
+  status                 POStatus      @default(DRAFT)
+  priority               OrderPriority @default(NORMAL)
+  po_date                DateTime
+  expected_delivery_date DateTime?
+  currency               String        @default("INR")
+  payment_terms          String?
+  reference_number       String?
+  
+  // Financial calculations
+  subtotal               Decimal       @default(0) @db.Decimal(12, 2)
+  discount_amount        Decimal       @default(0) @db.Decimal(12, 2)
+  tax_amount             Decimal       @default(0) @db.Decimal(12, 2)
+  shipping_charges       Decimal       @default(0) @db.Decimal(12, 2)
+  total_amount           Decimal       @db.Decimal(12, 2)
+  
+  // Notes
+  notes                  String?
+  terms_conditions       String?
+  
+  // Location and delivery
+  location_id            String?
+  supplier_id            String?
+  delivery_address       String?
+  shipping_method        String?
+  incoterms              String?
+  
+  is_active              Boolean       @default(true)
+  created_at             DateTime      @default(now())
+  updated_at             DateTime
+
+  company               companies               @relation("CompanyPurchaseOrders", fields: [company_id], references: [id], onDelete: Cascade)
+  location              company_locations?      @relation("LocationPurchaseOrders", fields: [location_id], references: [id])
+  supplier              suppliers?              @relation(fields: [supplier_id], references: [id])
+  purchase_order_items  purchase_order_items[]
+}
+
+model purchase_order_items {
+  id               String  @id
+  po_id            String
+  product_id       String?
+  line_number      Int
+  item_code        String
+  description      String?
+  quantity         Decimal @db.Decimal(12, 3)
+  unit_of_measure  String
+  unit_cost        Decimal @db.Decimal(12, 2)
+  discount_percent Decimal @default(0) @db.Decimal(5, 2)
+  discount_amount  Decimal @default(0) @db.Decimal(12, 2)
+  tax_rate         Decimal @default(0) @db.Decimal(5, 2)
+  tax_amount       Decimal @default(0) @db.Decimal(12, 2)
+  line_amount      Decimal @db.Decimal(12, 2)
+  expected_delivery DateTime?
+  notes            String?
+
+  purchase_order   purchase_orders @relation(fields: [po_id], references: [id], onDelete: Cascade)
+  product          products?       @relation("PurchaseOrderItemProduct", fields: [product_id], references: [id], onDelete: SetNull)
+
+  @@unique([po_id, line_number])
+  @@index([product_id])
+}

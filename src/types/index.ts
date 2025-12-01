@@ -65,34 +65,48 @@ export interface UpdateLocationData {
 
 export interface OrderItemInput {
   lineNumber?: number;
+  productId?: string;
   itemCode: string;
   description?: string;
   quantity: number;
   unitOfMeasure: string;
   unitPrice: number;
+  discountPercent?: number;
+  taxRate?: number;
+  notes?: string;
 }
 
 export interface CreateOrderData {
+  customerId?: string;
   customerName: string;
   customerCode?: string;
+  priority?: 'URGENT' | 'HIGH' | 'NORMAL' | 'LOW';
   orderDate: Date;
   deliveryDate?: Date;
+  expectedDeliveryDate?: Date;
   currency?: string;
+  paymentTerms?: string;
+  referenceNumber?: string;
   notes?: string;
+  customerNotes?: string;
   locationId?: string;
+  shippingAddress?: string;
   shippingCarrier?: string;
   trackingNumber?: string;
   shippingMethod?: string;
   deliveryWindowStart?: Date;
   deliveryWindowEnd?: Date;
+  shippingCharges?: number;
   items: OrderItemInput[];
 }
 
 export interface ListOrderFilters {
   status?: string;
+  priority?: string;
   fromDate?: Date;
   toDate?: Date;
   customerName?: string;
+  customerId?: string;
 }
 
 export type FinancialDocumentType = 'INVOICE' | 'BILL' | 'PURCHASE_ORDER';
@@ -116,9 +130,47 @@ export interface CreateInvoiceForOrderData extends CreateFinancialDocumentBase {
 
 export interface CreateBillData extends CreateFinancialDocumentBase {}
 
-export interface CreatePurchaseOrderData extends CreateFinancialDocumentBase {
-  // For purchase orders, locationId is required and represents the receiving branch/warehouse
-  locationId: string;
+export interface PurchaseOrderItemInput {
+  lineNumber?: number;
+  productId?: string;
+  itemCode: string;
+  description?: string;
+  quantity: number;
+  unitOfMeasure: string;
+  unitCost: number;
+  discountPercent?: number;
+  taxRate?: number;
+  expectedDelivery?: Date;
+  notes?: string;
+}
+
+export interface CreatePurchaseOrderData {
+  supplierId?: string;
+  supplierName: string;
+  supplierCode?: string;
+  priority?: 'URGENT' | 'HIGH' | 'NORMAL' | 'LOW';
+  poDate: Date;
+  expectedDeliveryDate?: Date;
+  currency?: string;
+  paymentTerms?: string;
+  referenceNumber?: string;
+  notes?: string;
+  termsConditions?: string;
+  locationId?: string;
+  deliveryAddress?: string;
+  shippingMethod?: string;
+  incoterms?: string;
+  shippingCharges?: number;
+  items: PurchaseOrderItemInput[];
+}
+
+export interface ListPurchaseOrderFilters {
+  status?: string;
+  priority?: string;
+  fromDate?: Date;
+  toDate?: Date;
+  supplierName?: string;
+  supplierId?: string;
 }
 
 export interface ListFinancialDocumentFilters {

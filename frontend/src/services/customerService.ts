@@ -119,31 +119,37 @@ class CustomerService {
     }
 
     async getCustomers(filters: CustomerFilters = {}): Promise<{ customers: Customer[]; pagination: any }> {
-        const params = new URLSearchParams();
-        
-        if (filters.search) params.append('search', filters.search);
-        if (filters.customerType) params.append('customerType', filters.customerType);
-        if (filters.customerCategory) params.append('customerCategory', filters.customerCategory);
-        if (filters.isActive !== undefined) params.append('isActive', filters.isActive.toString());
-        if (filters.paymentTerms) params.append('paymentTerms', filters.paymentTerms);
-        if (filters.currency) params.append('currency', filters.currency);
-        if (filters.assignedSalesRep) params.append('assignedSalesRep', filters.assignedSalesRep);
-        if (filters.page) params.append('page', filters.page.toString());
-        if (filters.limit) params.append('limit', filters.limit.toString());
+        try {
+            const tenantId = this.getTenantId();
+            const params = new URLSearchParams();
+            
+            if (filters.search) params.append('search', filters.search);
+            if (filters.customerType) params.append('customerType', filters.customerType);
+            if (filters.customerCategory) params.append('customerCategory', filters.customerCategory);
+            if (filters.isActive !== undefined) params.append('isActive', filters.isActive.toString());
+            if (filters.paymentTerms) params.append('paymentTerms', filters.paymentTerms);
+            if (filters.currency) params.append('currency', filters.currency);
+            if (filters.assignedSalesRep) params.append('assignedSalesRep', filters.assignedSalesRep);
+            if (filters.page) params.append('page', filters.page.toString());
+            if (filters.limit) params.append('limit', filters.limit.toString());
 
-        const response = await fetch(`${API_BASE_URL}/customers?${params}`, {
-            headers: this.getAuthHeaders(),
-        });
+            const response = await fetch(`${API_BASE_URL}/companies/${tenantId}/customers?${params}`, {
+                headers: this.getAuthHeaders(),
+            });
 
-        if (!response.ok) {
-            throw new Error('Failed to fetch customers');
+            if (!response.ok) {
+                throw new Error('Failed to fetch customers');
+            }
+
+            const data = await response.json();
+            return {
+                customers: data.data || [],
+                pagination: data.pagination || { page: 1, limit: 10, total: 0 },
+            };
+        } catch (error) {
+            console.error('Error fetching customers:', error);
+            throw error;
         }
-
-        const data = await response.json();
-        return {
-            customers: data.data || [],
-            pagination: data.pagination || { page: 1, limit: 10, total: 0 },
-        };
     }
 
     async getCustomerById(id: string): Promise<Customer> {

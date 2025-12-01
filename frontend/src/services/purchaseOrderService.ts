@@ -2,30 +2,30 @@ import { AuthStorage } from '../utils/storage';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
-export type OrderStatus =
+export type POStatus =
   | 'DRAFT'
+  | 'SENT'
   | 'CONFIRMED'
-  | 'IN_PRODUCTION'
-  | 'READY_TO_SHIP'
-  | 'SHIPPED'
-  | 'DELIVERED'
+  | 'PARTIALLY_RECEIVED'
+  | 'RECEIVED'
   | 'CANCELLED';
 
 export type OrderPriority = 'URGENT' | 'HIGH' | 'NORMAL' | 'LOW';
 
-export interface OrderItemInput {
+export interface PurchaseOrderItemInput {
   productId?: string;
   itemCode: string;
   description?: string;
   quantity: number;
   unitOfMeasure: string;
-  unitPrice: number;
+  unitCost: number;
   discountPercent?: number;
   taxRate?: number;
+  expectedDelivery?: string; // ISO string
   notes?: string;
 }
 
-export interface OrderItem {
+export interface PurchaseOrderItem {
   id: string;
   lineNumber: number;
   productId?: string;
@@ -33,12 +33,13 @@ export interface OrderItem {
   description?: string;
   quantity: number;
   unitOfMeasure: string;
-  unitPrice: number;
+  unitCost: number;
   discountPercent: number;
   discountAmount: number;
   taxRate: number;
   taxAmount: number;
   lineAmount: number;
+  expectedDelivery?: string;
   notes?: string;
   product?: {
     id: string;
@@ -48,17 +49,16 @@ export interface OrderItem {
   };
 }
 
-export interface OrderSummary {
+export interface PurchaseOrderSummary {
   id: string;
-  orderId: string;
+  poId: string;
   companyId: string;
-  customerId?: string;
-  customerName: string;
-  customerCode?: string;
-  status: OrderStatus;
+  supplierId?: string;
+  supplierName: string;
+  supplierCode?: string;
+  status: POStatus;
   priority: OrderPriority;
-  orderDate: string;
-  deliveryDate?: string;
+  poDate: string;
   expectedDeliveryDate?: string;
   currency: string;
   paymentTerms?: string;
@@ -69,27 +69,24 @@ export interface OrderSummary {
   shippingCharges: number;
   totalAmount: number;
   notes?: string;
-  customerNotes?: string;
+  termsConditions?: string;
   locationId?: string;
-  shippingAddress?: string;
-  shippingCarrier?: string;
-  trackingNumber?: string;
+  deliveryAddress?: string;
   shippingMethod?: string;
-  deliveryWindowStart?: string;
-  deliveryWindowEnd?: string;
+  incoterms?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
-  customer?: {
+  supplier?: {
     id: string;
     name: string;
     code: string;
   };
 }
 
-export interface OrderDetail extends OrderSummary {
-  items: OrderItem[];
-  customer?: {
+export interface PurchaseOrderDetail extends PurchaseOrderSummary {
+  items: PurchaseOrderItem[];
+  supplier?: {
     id: string;
     name: string;
     code: string;
@@ -98,40 +95,36 @@ export interface OrderDetail extends OrderSummary {
   };
 }
 
-export interface CreateOrderRequest {
-  customerId?: string;
-  customerName: string;
-  customerCode?: string;
+export interface CreatePurchaseOrderRequest {
+  supplierId?: string;
+  supplierName: string;
+  supplierCode?: string;
   priority?: OrderPriority;
-  orderDate: string; // ISO string
-  deliveryDate?: string; // ISO string
+  poDate: string; // ISO string
   expectedDeliveryDate?: string; // ISO string
   currency?: string;
   paymentTerms?: string;
   referenceNumber?: string;
   notes?: string;
-  customerNotes?: string;
+  termsConditions?: string;
   locationId?: string;
-  shippingAddress?: string;
-  shippingCarrier?: string;
-  trackingNumber?: string;
+  deliveryAddress?: string;
   shippingMethod?: string;
-  deliveryWindowStart?: string; // ISO string
-  deliveryWindowEnd?: string; // ISO string
+  incoterms?: string;
   shippingCharges?: number;
-  items: OrderItemInput[];
+  items: PurchaseOrderItemInput[];
 }
 
-export interface ListOrdersParams {
-  status?: OrderStatus | string;
+export interface ListPurchaseOrdersParams {
+  status?: POStatus | string;
   priority?: OrderPriority | string;
-  customerId?: string;
+  supplierId?: string;
   from?: string; // ISO date string (date only is fine)
   to?: string;
-  customerName?: string;
+  supplierName?: string;
 }
 
-class OrderService {
+class PurchaseOrderService {
   private getAuthHeaders() {
     const tokens = AuthStorage.getTokens();
     if (!tokens?.accessToken) {
@@ -144,17 +137,17 @@ class OrderService {
     };
   }
 
-  async getOrders(params?: ListOrdersParams): Promise<OrderSummary[]> {
+  async getPurchaseOrders(params?: ListPurchaseOrdersParams): Promise<PurchaseOrderSummary[]> {
     const query = new URLSearchParams();
 
     if (params?.status) query.append('status', params.status);
     if (params?.priority) query.append('priority', params.priority);
-    if (params?.customerId) query.append('customerId', params.customerId);
+    if (params?.supplierId) query.append('supplierId', params.supplierId);
     if (params?.from) query.append('from', params.from);
     if (params?.to) query.append('to', params.to);
-    if (params?.customerName) query.append('customerName', params.customerName);
+    if (params?.supplierName) query.append('supplierName', params.supplierName);
 
-    const url = `${API_BASE_URL}/orders${query.toString() ? `?${query.toString()}` : ''}`;
+    const url = `${API_BASE_URL}/purchase-orders${query.toString() ? `?${query.toString()}` : ''}`;
 
     const response = await fetch(url, {
       headers: this.getAuthHeaders(),
@@ -163,14 +156,14 @@ class OrderService {
     const result = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      throw new Error(result.message || 'Failed to fetch orders');
+      throw new Error(result.message || 'Failed to fetch purchase orders');
     }
 
     return result.data || [];
   }
 
-  async createOrder(data: CreateOrderRequest): Promise<OrderDetail> {
-    const response = await fetch(`${API_BASE_URL}/orders`, {
+  async createPurchaseOrder(data: CreatePurchaseOrderRequest): Promise<PurchaseOrderDetail> {
+    const response = await fetch(`${API_BASE_URL}/purchase-orders`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(data),
@@ -179,28 +172,28 @@ class OrderService {
     const result = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      throw new Error(result.message || 'Failed to create order');
+      throw new Error(result.message || 'Failed to create purchase order');
     }
 
-    return result.data as OrderDetail;
+    return result.data as PurchaseOrderDetail;
   }
 
-  async getOrderById(orderId: string): Promise<OrderDetail> {
-    const response = await fetch(`${API_BASE_URL}/orders/${encodeURIComponent(orderId)}`, {
+  async getPurchaseOrderById(poId: string): Promise<PurchaseOrderDetail> {
+    const response = await fetch(`${API_BASE_URL}/purchase-orders/${encodeURIComponent(poId)}`, {
       headers: this.getAuthHeaders(),
     });
 
     const result = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      throw new Error(result.message || 'Failed to fetch order');
+      throw new Error(result.message || 'Failed to fetch purchase order');
     }
 
-    return result.data as OrderDetail;
+    return result.data as PurchaseOrderDetail;
   }
 
-  async updateOrder(orderId: string, data: Partial<CreateOrderRequest>): Promise<OrderDetail> {
-    const response = await fetch(`${API_BASE_URL}/orders/${encodeURIComponent(orderId)}`, {
+  async updatePurchaseOrder(poId: string, data: Partial<CreatePurchaseOrderRequest>): Promise<PurchaseOrderDetail> {
+    const response = await fetch(`${API_BASE_URL}/purchase-orders/${encodeURIComponent(poId)}`, {
       method: 'PUT',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(data),
@@ -209,26 +202,22 @@ class OrderService {
     const result = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      throw new Error(result.message || 'Failed to update order');
+      throw new Error(result.message || 'Failed to update purchase order');
     }
 
-    return result.data as OrderDetail;
+    return result.data as PurchaseOrderDetail;
   }
 
-  async updateOrderStatus(
-    orderId: string,
-    status: OrderStatus,
+  async updatePOStatus(
+    poId: string,
+    status: POStatus,
     payload?: {
-      deliveryDate?: string;
-      shippingCarrier?: string;
-      trackingNumber?: string;
+      expectedDeliveryDate?: string;
       shippingMethod?: string;
-      deliveryWindowStart?: string;
-      deliveryWindowEnd?: string;
     },
-  ): Promise<OrderSummary> {
+  ): Promise<PurchaseOrderSummary> {
     const response = await fetch(
-      `${API_BASE_URL}/orders/${encodeURIComponent(orderId)}/status`,
+      `${API_BASE_URL}/purchase-orders/${encodeURIComponent(poId)}/status`,
       {
         method: 'PATCH',
         headers: this.getAuthHeaders(),
@@ -239,14 +228,14 @@ class OrderService {
     const result = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      throw new Error(result.message || 'Failed to update order status');
+      throw new Error(result.message || 'Failed to update purchase order status');
     }
 
-    return result.data as OrderSummary;
+    return result.data as PurchaseOrderSummary;
   }
 
-  async deleteOrder(orderId: string): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/orders/${encodeURIComponent(orderId)}`, {
+  async deletePurchaseOrder(poId: string): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/purchase-orders/${encodeURIComponent(poId)}`, {
       method: 'DELETE',
       headers: this.getAuthHeaders(),
     });
@@ -254,9 +243,9 @@ class OrderService {
     const result = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      throw new Error(result.message || 'Failed to delete order');
+      throw new Error(result.message || 'Failed to delete purchase order');
     }
   }
 }
 
-export const orderService = new OrderService();
+export const purchaseOrderService = new PurchaseOrderService();

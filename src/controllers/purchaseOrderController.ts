@@ -1,29 +1,25 @@
 import { Request, Response } from 'express';
 import Joi from 'joi';
-import { orderService } from '../services/orderService';
+import { purchaseOrderService } from '../services/purchaseOrderService';
 import { logger } from '../utils/logger';
-import { ListOrderFilters } from '../types';
+import { ListPurchaseOrderFilters } from '../types';
 
-const createOrderSchema = Joi.object({
-  customerId: Joi.string().uuid().optional(),
-  customerName: Joi.string().min(1).max(255).required(),
-  customerCode: Joi.string().max(100).optional(),
+const createPurchaseOrderSchema = Joi.object({
+  supplierId: Joi.string().uuid().optional(),
+  supplierName: Joi.string().min(1).max(255).required(),
+  supplierCode: Joi.string().max(100).optional(),
   priority: Joi.string().valid('URGENT', 'HIGH', 'NORMAL', 'LOW').optional(),
-  orderDate: Joi.date().required(),
-  deliveryDate: Joi.date().min(Joi.ref('orderDate')).optional(),
-  expectedDeliveryDate: Joi.date().min(Joi.ref('orderDate')).optional(),
+  poDate: Joi.date().required(),
+  expectedDeliveryDate: Joi.date().min(Joi.ref('poDate')).optional(),
   currency: Joi.string().max(10).optional(),
   paymentTerms: Joi.string().max(100).optional(),
   referenceNumber: Joi.string().max(255).optional(),
   notes: Joi.string().max(1000).optional(),
-  customerNotes: Joi.string().max(1000).optional(),
+  termsConditions: Joi.string().max(2000).optional(),
   locationId: Joi.string().optional(),
-  shippingAddress: Joi.string().max(500).optional(),
-  shippingCarrier: Joi.string().max(255).optional(),
-  trackingNumber: Joi.string().max(255).optional(),
+  deliveryAddress: Joi.string().max(500).optional(),
   shippingMethod: Joi.string().max(255).optional(),
-  deliveryWindowStart: Joi.date().optional(),
-  deliveryWindowEnd: Joi.date().min(Joi.ref('deliveryWindowStart')).optional(),
+  incoterms: Joi.string().max(100).optional(),
   shippingCharges: Joi.number().min(0).optional(),
   items: Joi.array()
     .items(
@@ -34,9 +30,10 @@ const createOrderSchema = Joi.object({
         description: Joi.string().max(500).allow('', null).optional(),
         quantity: Joi.number().greater(0).required(),
         unitOfMeasure: Joi.string().min(1).max(50).required(),
-        unitPrice: Joi.number().min(0).required(),
+        unitCost: Joi.number().min(0).required(),
         discountPercent: Joi.number().min(0).max(100).optional(),
         taxRate: Joi.number().min(0).max(100).optional(),
+        expectedDelivery: Joi.date().optional(),
         notes: Joi.string().max(500).allow('', null).optional(),
       }),
     )
@@ -44,26 +41,22 @@ const createOrderSchema = Joi.object({
     .required(),
 });
 
-const updateOrderSchema = Joi.object({
-  customerId: Joi.string().uuid().allow(null).optional(),
-  customerName: Joi.string().min(1).max(255).optional(),
-  customerCode: Joi.string().max(100).allow(null).optional(),
+const updatePurchaseOrderSchema = Joi.object({
+  supplierId: Joi.string().uuid().allow(null).optional(),
+  supplierName: Joi.string().min(1).max(255).optional(),
+  supplierCode: Joi.string().max(100).allow(null).optional(),
   priority: Joi.string().valid('URGENT', 'HIGH', 'NORMAL', 'LOW').optional(),
-  orderDate: Joi.date().optional(),
-  deliveryDate: Joi.date().min(Joi.ref('orderDate')).allow(null).optional(),
-  expectedDeliveryDate: Joi.date().min(Joi.ref('orderDate')).allow(null).optional(),
+  poDate: Joi.date().optional(),
+  expectedDeliveryDate: Joi.date().min(Joi.ref('poDate')).allow(null).optional(),
   currency: Joi.string().max(10).optional(),
   paymentTerms: Joi.string().max(100).allow(null).optional(),
   referenceNumber: Joi.string().max(255).allow(null).optional(),
   notes: Joi.string().max(1000).allow(null).optional(),
-  customerNotes: Joi.string().max(1000).allow(null).optional(),
+  termsConditions: Joi.string().max(2000).allow(null).optional(),
   locationId: Joi.string().allow(null).optional(),
-  shippingAddress: Joi.string().max(500).allow(null).optional(),
-  shippingCarrier: Joi.string().max(255).allow(null).optional(),
-  trackingNumber: Joi.string().max(255).allow(null).optional(),
+  deliveryAddress: Joi.string().max(500).allow(null).optional(),
   shippingMethod: Joi.string().max(255).allow(null).optional(),
-  deliveryWindowStart: Joi.date().allow(null).optional(),
-  deliveryWindowEnd: Joi.date().min(Joi.ref('deliveryWindowStart')).allow(null).optional(),
+  incoterms: Joi.string().max(100).allow(null).optional(),
   shippingCharges: Joi.number().min(0).allow(null).optional(),
   items: Joi.array()
     .items(
@@ -74,9 +67,10 @@ const updateOrderSchema = Joi.object({
         description: Joi.string().max(500).allow('', null).optional(),
         quantity: Joi.number().greater(0).required(),
         unitOfMeasure: Joi.string().min(1).max(50).required(),
-        unitPrice: Joi.number().min(0).required(),
+        unitCost: Joi.number().min(0).required(),
         discountPercent: Joi.number().min(0).max(100).optional(),
         taxRate: Joi.number().min(0).max(100).optional(),
+        expectedDelivery: Joi.date().allow(null).optional(),
         notes: Joi.string().max(500).allow('', null).optional(),
       }),
     )
@@ -84,22 +78,18 @@ const updateOrderSchema = Joi.object({
     .optional(),
 }).min(1);
 
-const updateOrderStatusSchema = Joi.object({
+const updatePOStatusSchema = Joi.object({
   status: Joi.string()
-    .valid('DRAFT', 'CONFIRMED', 'IN_PRODUCTION', 'READY_TO_SHIP', 'SHIPPED', 'DELIVERED', 'CANCELLED')
+    .valid('DRAFT', 'SENT', 'CONFIRMED', 'PARTIALLY_RECEIVED', 'RECEIVED', 'CANCELLED')
     .required(),
-  deliveryDate: Joi.date().optional(),
-  shippingCarrier: Joi.string().max(255).optional(),
-  trackingNumber: Joi.string().max(255).optional(),
+  expectedDeliveryDate: Joi.date().optional(),
   shippingMethod: Joi.string().max(255).optional(),
-  deliveryWindowStart: Joi.date().optional(),
-  deliveryWindowEnd: Joi.date().min(Joi.ref('deliveryWindowStart')).optional(),
 });
 
-export class OrderController {
-  async createOrder(req: Request, res: Response): Promise<void> {
+export class PurchaseOrderController {
+  async createPurchaseOrder(req: Request, res: Response): Promise<void> {
     try {
-      const { error, value } = createOrderSchema.validate(req.body);
+      const { error, value } = createPurchaseOrderSchema.validate(req.body);
       if (error) {
         res.status(400).json({
           success: false,
@@ -118,23 +108,23 @@ export class OrderController {
         return;
       }
 
-      const order = await orderService.createOrder(tenantId, value);
+      const po = await purchaseOrderService.createPurchaseOrder(tenantId, value);
 
       res.status(201).json({
         success: true,
-        message: 'Order created successfully',
-        data: order,
+        message: 'Purchase Order created successfully',
+        data: po,
       });
     } catch (error: any) {
-      logger.error('Error creating order:', error);
+      logger.error('Error creating purchase order:', error);
       res.status(500).json({
         success: false,
-        message: error?.message || 'Failed to create order',
+        message: error?.message || 'Failed to create purchase order',
       });
     }
   }
 
-  async getOrders(req: Request, res: Response): Promise<void> {
+  async getPurchaseOrders(req: Request, res: Response): Promise<void> {
     try {
       const { tenantId } = req;
       if (!tenantId) {
@@ -145,9 +135,9 @@ export class OrderController {
         return;
       }
 
-      const filters: ListOrderFilters = {};
+      const filters: ListPurchaseOrderFilters = {};
 
-      const { status, priority, from, to, customerName, customerId } = req.query;
+      const { status, priority, from, to, supplierName, supplierId } = req.query;
 
       if (typeof status === 'string' && status.trim().length > 0) {
         filters.status = status;
@@ -157,8 +147,8 @@ export class OrderController {
         filters.priority = priority;
       }
 
-      if (typeof customerId === 'string' && customerId.trim().length > 0) {
-        filters.customerId = customerId;
+      if (typeof supplierId === 'string' && supplierId.trim().length > 0) {
+        filters.supplierId = supplierId;
       }
 
       if (typeof from === 'string') {
@@ -175,29 +165,29 @@ export class OrderController {
         }
       }
 
-      if (typeof customerName === 'string' && customerName.trim().length > 0) {
-        filters.customerName = customerName;
+      if (typeof supplierName === 'string' && supplierName.trim().length > 0) {
+        filters.supplierName = supplierName;
       }
 
-      const orders = await orderService.getOrders(tenantId, filters);
+      const pos = await purchaseOrderService.getPurchaseOrders(tenantId, filters);
 
       res.status(200).json({
         success: true,
-        data: orders,
+        data: pos,
       });
     } catch (error: any) {
-      logger.error('Error fetching orders:', error);
+      logger.error('Error fetching purchase orders:', error);
       res.status(500).json({
         success: false,
-        message: error?.message || 'Failed to fetch orders',
+        message: error?.message || 'Failed to fetch purchase orders',
       });
     }
   }
 
-  async getOrderById(req: Request, res: Response): Promise<void> {
+  async getPurchaseOrderById(req: Request, res: Response): Promise<void> {
     try {
       const { tenantId } = req;
-      const { orderId } = req.params;
+      const { poId } = req.params;
 
       if (!tenantId) {
         res.status(400).json({
@@ -207,41 +197,41 @@ export class OrderController {
         return;
       }
 
-      if (!orderId) {
+      if (!poId) {
         res.status(400).json({
           success: false,
-          message: 'orderId is required',
+          message: 'poId is required',
         });
         return;
       }
 
-      const order = await orderService.getOrderById(tenantId, orderId);
+      const po = await purchaseOrderService.getPurchaseOrderById(tenantId, poId);
 
       res.status(200).json({
         success: true,
-        data: order,
+        data: po,
       });
     } catch (error: any) {
-      logger.error('Error fetching order by id:', error);
+      logger.error('Error fetching purchase order by id:', error);
 
-      if (error.message === 'Order not found') {
+      if (error.message === 'Purchase Order not found') {
         res.status(404).json({
           success: false,
-          message: 'Order not found',
+          message: 'Purchase Order not found',
         });
         return;
       }
 
       res.status(500).json({
         success: false,
-        message: error?.message || 'Failed to fetch order',
+        message: error?.message || 'Failed to fetch purchase order',
       });
     }
   }
 
-  async updateOrder(req: Request, res: Response): Promise<void> {
+  async updatePurchaseOrder(req: Request, res: Response): Promise<void> {
     try {
-      const { error, value } = updateOrderSchema.validate(req.body);
+      const { error, value } = updatePurchaseOrderSchema.validate(req.body);
       if (error) {
         res.status(400).json({
           success: false,
@@ -252,7 +242,7 @@ export class OrderController {
       }
 
       const { tenantId } = req;
-      const { orderId } = req.params;
+      const { poId } = req.params;
 
       if (!tenantId) {
         res.status(400).json({
@@ -262,33 +252,33 @@ export class OrderController {
         return;
       }
 
-      if (!orderId) {
+      if (!poId) {
         res.status(400).json({
           success: false,
-          message: 'orderId is required',
+          message: 'poId is required',
         });
         return;
       }
 
-      const order = await orderService.updateOrder(tenantId, orderId, value);
+      const po = await purchaseOrderService.updatePurchaseOrder(tenantId, poId, value);
 
       res.status(200).json({
         success: true,
-        message: 'Order updated successfully',
-        data: order,
+        message: 'Purchase Order updated successfully',
+        data: po,
       });
     } catch (error: any) {
-      logger.error('Error updating order:', error);
+      logger.error('Error updating purchase order:', error);
 
-      if (error.message === 'Order not found') {
+      if (error.message === 'Purchase Order not found') {
         res.status(404).json({
           success: false,
-          message: 'Order not found',
+          message: 'Purchase Order not found',
         });
         return;
       }
 
-      if (error.message === 'Cannot update an order that is delivered or cancelled') {
+      if (error.message === 'Cannot update a PO that is received or cancelled') {
         res.status(400).json({
           success: false,
           message: error.message,
@@ -298,14 +288,14 @@ export class OrderController {
 
       res.status(500).json({
         success: false,
-        message: error?.message || 'Failed to update order',
+        message: error?.message || 'Failed to update purchase order',
       });
     }
   }
 
-  async updateOrderStatus(req: Request, res: Response): Promise<void> {
+  async updatePOStatus(req: Request, res: Response): Promise<void> {
     try {
-      const { error, value } = updateOrderStatusSchema.validate(req.body);
+      const { error, value } = updatePOStatusSchema.validate(req.body);
       if (error) {
         res.status(400).json({
           success: false,
@@ -316,7 +306,7 @@ export class OrderController {
       }
 
       const { tenantId } = req;
-      const { orderId } = req.params;
+      const { poId } = req.params;
 
       if (!tenantId) {
         res.status(400).json({
@@ -326,45 +316,33 @@ export class OrderController {
         return;
       }
 
-      if (!orderId) {
+      if (!poId) {
         res.status(400).json({
           success: false,
-          message: 'orderId is required',
+          message: 'poId is required',
         });
         return;
       }
 
-      const {
-        status,
-        deliveryDate,
-        shippingCarrier,
-        trackingNumber,
-        shippingMethod,
-        deliveryWindowStart,
-        deliveryWindowEnd,
-      } = value;
+      const { status, expectedDeliveryDate, shippingMethod } = value;
 
-      const order = await orderService.updateOrderStatus(tenantId, orderId, status as any, {
-        deliveryDate,
-        shippingCarrier,
-        trackingNumber,
+      const po = await purchaseOrderService.updatePOStatus(tenantId, poId, status as any, {
+        expectedDeliveryDate,
         shippingMethod,
-        deliveryWindowStart,
-        deliveryWindowEnd,
       });
 
       res.status(200).json({
         success: true,
-        message: 'Order status updated successfully',
-        data: order,
+        message: 'Purchase Order status updated successfully',
+        data: po,
       });
     } catch (error: any) {
-      logger.error('Error updating order status:', error);
+      logger.error('Error updating purchase order status:', error);
 
-      if (error.message === 'Order not found') {
+      if (error.message === 'Purchase Order not found') {
         res.status(404).json({
           success: false,
-          message: 'Order not found',
+          message: 'Purchase Order not found',
         });
         return;
       }
@@ -379,15 +357,15 @@ export class OrderController {
 
       res.status(500).json({
         success: false,
-        message: error?.message || 'Failed to update order status',
+        message: error?.message || 'Failed to update purchase order status',
       });
     }
   }
 
-  async deleteOrder(req: Request, res: Response): Promise<void> {
+  async deletePurchaseOrder(req: Request, res: Response): Promise<void> {
     try {
       const { tenantId } = req;
-      const { orderId } = req.params;
+      const { poId } = req.params;
 
       if (!tenantId) {
         res.status(400).json({
@@ -397,37 +375,45 @@ export class OrderController {
         return;
       }
 
-      if (!orderId) {
+      if (!poId) {
         res.status(400).json({
           success: false,
-          message: 'orderId is required',
+          message: 'poId is required',
         });
         return;
       }
 
-      await orderService.deleteOrder(tenantId, orderId);
+      await purchaseOrderService.deletePurchaseOrder(tenantId, poId);
 
       res.status(200).json({
         success: true,
-        message: 'Order deleted successfully',
+        message: 'Purchase Order deleted successfully',
       });
     } catch (error: any) {
-      logger.error('Error deleting order:', error);
+      logger.error('Error deleting purchase order:', error);
 
-      if (error.message === 'Order not found') {
+      if (error.message === 'Purchase Order not found') {
         res.status(404).json({
           success: false,
-          message: 'Order not found',
+          message: 'Purchase Order not found',
+        });
+        return;
+      }
+
+      if (error.message === 'Only DRAFT purchase orders can be deleted') {
+        res.status(400).json({
+          success: false,
+          message: error.message,
         });
         return;
       }
 
       res.status(500).json({
         success: false,
-        message: error?.message || 'Failed to delete order',
+        message: error?.message || 'Failed to delete purchase order',
       });
     }
   }
 }
 
-export const orderController = new OrderController();
+export const purchaseOrderController = new PurchaseOrderController();

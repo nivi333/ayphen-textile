@@ -30,6 +30,7 @@ export { default as CustomerListPage } from './sales/CustomerListPage';
 
 // Purchase
 export { default as SupplierListPage } from './purchase/SupplierListPage';
+export { default as PurchaseOrdersListPage } from './purchase/PurchaseOrdersListPage';
 
 // Quality Control
 export { default as QualityCheckpointsListPage } from './quality/QualityCheckpointsListPage';

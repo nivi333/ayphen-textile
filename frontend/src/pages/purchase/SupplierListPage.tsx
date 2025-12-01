@@ -402,7 +402,7 @@ export default function SupplierListPage() {
         <div className='table-container'>
           {loading && suppliers.length === 0 ? (
             <div className='loading-container'>
-              <Spin size='large' tip='Loading suppliers...' />
+              <Spin size='large' />
             </div>
           ) : suppliers.length === 0 && !searchText ? (
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='No Suppliers found'>

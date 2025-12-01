@@ -4,7 +4,9 @@ import healthRoutes from './healthRoutes';
 import companyRoutes from './companyRoutes';
 import locationRoutes from './locationRoutes';
 import orderRoutes from './orderRoutes';
+import purchaseOrderRoutes from './purchaseOrderRoutes';
 import financialDocumentRoutes from './financialDocumentRoutes';
+
 import qualityRoutes from './qualityRoutes';
 import inspectionRoutes from './inspectionRoutes';
 import productRoutes from './productRoutes';
@@ -64,6 +66,7 @@ router.use('/companies/:tenantId/suppliers', supplierRoutes);
 router.use('/companies', companyRoutes);
 router.use('/locations', locationRoutes);
 router.use('/orders', orderRoutes);
+router.use('/purchase-orders', purchaseOrderRoutes);
 router.use('/financial-documents', financialDocumentRoutes);
 router.use('/quality', qualityRoutes);
 router.use('/inspections', inspectionRoutes);
