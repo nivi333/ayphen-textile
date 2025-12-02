@@ -16,7 +16,12 @@ import {
 import { ToolOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { GradientButton } from '../ui';
-import { machineService, Machine, MachineStatus, OperationalStatus } from '../../services/machineService';
+import {
+  machineService,
+  Machine,
+  MachineStatus,
+  OperationalStatus,
+} from '../../services/machineService';
 import { userService } from '../../services/userService';
 import useAuth from '../../contexts/AuthContext';
 import './MachineFormDrawer.scss';
@@ -163,17 +168,40 @@ export const MachineFormDrawer: React.FC<MachineFormDrawerProps> = ({
   const [imageUrl, setImageUrl] = useState<string>('');
   const [users, setUsers] = useState<any[]>([]);
   const [isActive, setIsActive] = useState(true);
+  const [operationalStatus, setOperationalStatus] = useState<string>('FREE');
   const { currentCompany } = useAuth();
 
   const isEditing = mode === 'edit' && !!editingMachineId;
 
+  // Determine if current operator is required based on operational status
+  const isOperatorRequired = operationalStatus === 'BUSY' || operationalStatus === 'RESERVED';
+
   // Get machine types based on company industry
   const getMachineTypeOptions = () => {
-    const industry = currentCompany?.industry || 'other';
-    return (
-      MACHINE_TYPE_OPTIONS_BY_INDUSTRY[industry as keyof typeof MACHINE_TYPE_OPTIONS_BY_INDUSTRY] ||
-      MACHINE_TYPE_OPTIONS_BY_INDUSTRY.other
-    );
+    const industry = (currentCompany?.industry || 'other').toLowerCase().replace(/[\s-]/g, '_');
+    
+    // Map common industry names to our keys
+    const industryMapping: Record<string, keyof typeof MACHINE_TYPE_OPTIONS_BY_INDUSTRY> = {
+      textile_manufacturing: 'textile_manufacturing',
+      textile: 'textile_manufacturing',
+      textiles: 'textile_manufacturing',
+      garment_production: 'garment_production',
+      garment: 'garment_production',
+      garments: 'garment_production',
+      apparel: 'garment_production',
+      fabric_processing: 'fabric_processing',
+      fabric: 'fabric_processing',
+      knitting_weaving: 'knitting_weaving',
+      knitting: 'knitting_weaving',
+      weaving: 'knitting_weaving',
+      dyeing_finishing: 'dyeing_finishing',
+      dyeing: 'dyeing_finishing',
+      finishing: 'dyeing_finishing',
+      other: 'other',
+    };
+
+    const mappedIndustry = industryMapping[industry] || 'other';
+    return MACHINE_TYPE_OPTIONS_BY_INDUSTRY[mappedIndustry];
   };
 
   useEffect(() => {
@@ -231,6 +259,7 @@ export const MachineFormDrawer: React.FC<MachineFormDrawerProps> = ({
       isActive: machine.isActive,
     });
     setIsActive(machine.isActive);
+    setOperationalStatus(machine.operationalStatus || 'FREE');
     if (machine.imageUrl) {
       setImageUrl(machine.imageUrl);
     }
@@ -264,7 +293,6 @@ export const MachineFormDrawer: React.FC<MachineFormDrawerProps> = ({
       setSubmitting(true);
 
       const payload = {
-        machineCode: values.machineCode,
         name: values.name,
         machineType: values.machineType,
         manufacturer: values.manufacturer,
@@ -273,7 +301,7 @@ export const MachineFormDrawer: React.FC<MachineFormDrawerProps> = ({
         purchaseDate: values.purchaseDate,
         warrantyExpiry: values.warrantyExpiry,
         locationId: values.locationId,
-        currentOperatorId: values.currentOperatorId,
+        currentOperatorId: values.currentOperatorId || undefined,
         operationalStatus: values.operationalStatus as OperationalStatus,
         specifications: values.specifications,
         qrCode: values.qrCode,
@@ -282,14 +310,19 @@ export const MachineFormDrawer: React.FC<MachineFormDrawerProps> = ({
         isActive: values.isActive,
       };
 
+      let response;
       if (isEditing && editingMachineId) {
-        await machineService.updateMachine(editingMachineId, payload);
-        message.success('Machine updated successfully');
+        response = await machineService.updateMachine(editingMachineId, payload);
       } else {
-        await machineService.createMachine(payload);
-        message.success('Machine created successfully');
+        response = await machineService.createMachine(payload);
       }
 
+      // Check if API returned success
+      if (!response.success) {
+        throw new Error(response.message || response.details || 'Failed to save machine');
+      }
+
+      message.success(isEditing ? 'Machine updated successfully' : 'Machine created successfully');
       onSaved();
       onClose();
     } catch (error: any) {
@@ -446,33 +479,54 @@ export const MachineFormDrawer: React.FC<MachineFormDrawerProps> = ({
           <Row gutter={12}>
             <Col span={12}>
               <Form.Item
-                name='currentOperatorId'
-                label='Current Operator'
-                rules={[{ required: true, message: 'Please select current operator' }]}
-              >
-                <Select placeholder='Select operator' allowClear showSearch filterOption={(input, option) =>
-                  String(option?.children || '').toLowerCase().includes(input.toLowerCase())
-                }>
-                  {users.map((user: any) => (
-                    <Option key={user.id} value={user.id}>
-                      {user.firstName} {user.lastName}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
                 name='operationalStatus'
                 label='Operational Status'
                 rules={[{ required: true, message: 'Please select operational status' }]}
                 initialValue='FREE'
               >
-                <Select placeholder='Select operational status'>
+                <Select
+                  placeholder='Select operational status'
+                  onChange={(value: string) => setOperationalStatus(value)}
+                >
                   <Option value='FREE'>Free</Option>
                   <Option value='BUSY'>Busy</Option>
                   <Option value='RESERVED'>Reserved</Option>
                   <Option value='UNAVAILABLE'>Unavailable</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name='currentOperatorId'
+                label={
+                  <span>
+                    Current Operator
+                    {isOperatorRequired && <span style={{ color: '#ff4d4f' }}> *</span>}
+                    {!isOperatorRequired && <span style={{ color: '#999', fontSize: '12px' }}> (optional)</span>}
+                  </span>
+                }
+                rules={[
+                  {
+                    required: isOperatorRequired,
+                    message: 'Operator is required when machine is Busy or Reserved',
+                  },
+                ]}
+              >
+                <Select
+                  placeholder={isOperatorRequired ? 'Select operator (required)' : 'Select operator (optional)'}
+                  allowClear
+                  showSearch
+                  filterOption={(input, option) =>
+                    String(option?.children || '')
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
+                  }
+                >
+                  {users.map((user: any) => (
+                    <Option key={user.id} value={user.id}>
+                      {user.firstName} {user.lastName}
+                    </Option>
+                  ))}
                 </Select>
               </Form.Item>
             </Col>

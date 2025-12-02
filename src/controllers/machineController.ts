@@ -12,11 +12,13 @@ const createMachineSchema = Joi.object({
   serialNumber: Joi.string().optional().allow(null).max(100),
   purchaseDate: Joi.date().optional().allow(null),
   warrantyExpiry: Joi.date().optional().allow(null),
-  specifications: Joi.object().optional().allow(null),
+  specifications: Joi.alternatives().try(Joi.object(), Joi.string()).optional().allow(null),
   imageUrl: Joi.string().optional().allow(null),
   locationId: Joi.string().uuid().optional().allow(null),
   currentOperatorId: Joi.string().uuid().optional().allow(null),
   operationalStatus: Joi.string().valid('FREE', 'BUSY', 'RESERVED', 'UNAVAILABLE').optional(),
+  status: Joi.string().valid('NEW', 'IN_USE', 'UNDER_MAINTENANCE', 'UNDER_REPAIR', 'IDLE', 'DECOMMISSIONED').optional(),
+  qrCode: Joi.string().optional().allow(null).max(255),
   isActive: Joi.boolean().optional(),
 });
 
@@ -28,12 +30,13 @@ const updateMachineSchema = Joi.object({
   serialNumber: Joi.string().optional().allow(null).max(100),
   purchaseDate: Joi.date().optional().allow(null),
   warrantyExpiry: Joi.date().optional().allow(null),
-  specifications: Joi.object().optional().allow(null),
+  specifications: Joi.alternatives().try(Joi.object(), Joi.string()).optional().allow(null),
   imageUrl: Joi.string().optional().allow(null),
   locationId: Joi.string().uuid().optional().allow(null),
   currentOperatorId: Joi.string().uuid().optional().allow(null),
   operationalStatus: Joi.string().valid('FREE', 'BUSY', 'RESERVED', 'UNAVAILABLE').optional(),
   status: Joi.string().valid('NEW', 'IN_USE', 'UNDER_MAINTENANCE', 'UNDER_REPAIR', 'IDLE', 'DECOMMISSIONED').optional(),
+  qrCode: Joi.string().optional().allow(null).max(255),
   isActive: Joi.boolean().optional(),
 });
 

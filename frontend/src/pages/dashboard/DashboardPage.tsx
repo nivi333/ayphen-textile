@@ -23,6 +23,10 @@ import {
   UserAddOutlined,
   CheckOutlined,
   CloseOutlined,
+  ToolOutlined,
+  WarningOutlined,
+  CalendarOutlined,
+  ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import { useHeader } from '../../contexts/HeaderContext';
 import useAuth from '../../contexts/AuthContext';
@@ -32,6 +36,7 @@ import { GradientButton } from '../../components/ui';
 import UserInviteModal from '../../components/users/UserInviteModal';
 import StockAlertsCard from '../../components/inventory/StockAlertsCard';
 import { productService } from '../../services/productService';
+import { machineService, MachineAnalytics } from '../../services/machineService';
 import './DashboardPage.scss';
 import { COMPANY_TEXT } from '../../constants/company';
 
@@ -54,6 +59,7 @@ const DashboardPage: React.FC = () => {
     teamMembers: 0,
     monthlyRevenue: 0,
   });
+  const [machineAnalytics, setMachineAnalytics] = useState<MachineAnalytics | null>(null);
   const [userInvitations, setUserInvitations] = useState<any[]>([]);
   const userRole = currentCompany?.role;
 
@@ -79,14 +85,20 @@ const DashboardPage: React.FC = () => {
 
     setLoading(true);
     try {
-      // Fetch products count
-      const productsResponse = await productService.getProducts();
+      // Fetch products count and machine analytics in parallel
+      const [productsResponse, machineAnalyticsData] = await Promise.all([
+        productService.getProducts(),
+        machineService.getAnalytics(),
+      ]);
+
       setStats({
         totalProducts: productsResponse.data?.length || 0,
         activeOrders: 0, // TODO: Implement orders count
         teamMembers: 0, // TODO: Implement team members count
         monthlyRevenue: 0, // TODO: Implement revenue calculation
       });
+
+      setMachineAnalytics(machineAnalyticsData);
       
       // Note: User invitations are fetched separately when user logs in
       // For now, keep invitations empty as they're shown in companies list page
@@ -231,6 +243,81 @@ const DashboardPage: React.FC = () => {
                 ))}
               </Row>
             </div>
+
+            {/* Machine Analytics Section */}
+            {machineAnalytics && (
+              <div className='dashboard-machine-analytics'>
+                <Heading level={3}>Machine Analytics</Heading>
+                <Row gutter={[16, 16]}>
+                  <Col xs={12} sm={6}>
+                    <Card className='dashboard-stat-card'>
+                      <Statistic
+                        title='Total Machines'
+                        value={machineAnalytics.totalMachines}
+                        prefix={<ToolOutlined style={{ color: '#7b5fc9' }} />}
+                        valueStyle={{ color: '#7b5fc9' }}
+                      />
+                    </Card>
+                  </Col>
+                  <Col xs={12} sm={6}>
+                    <Card className='dashboard-stat-card'>
+                      <Statistic
+                        title='Active Breakdowns'
+                        value={machineAnalytics.activeBreakdowns}
+                        prefix={<WarningOutlined style={{ color: machineAnalytics.activeBreakdowns > 0 ? '#ff4d4f' : '#52c41a' }} />}
+                        valueStyle={{ color: machineAnalytics.activeBreakdowns > 0 ? '#ff4d4f' : '#52c41a' }}
+                      />
+                    </Card>
+                  </Col>
+                  <Col xs={12} sm={6}>
+                    <Card className='dashboard-stat-card'>
+                      <Statistic
+                        title='Maintenance Due (7 days)'
+                        value={machineAnalytics.dueMaintenance}
+                        prefix={<CalendarOutlined style={{ color: machineAnalytics.dueMaintenance > 0 ? '#faad14' : '#52c41a' }} />}
+                        valueStyle={{ color: machineAnalytics.dueMaintenance > 0 ? '#faad14' : '#52c41a' }}
+                      />
+                    </Card>
+                  </Col>
+                  <Col xs={12} sm={6}>
+                    <Card className='dashboard-stat-card'>
+                      <Statistic
+                        title='Overdue Maintenance'
+                        value={machineAnalytics.overdueMaintenance}
+                        prefix={<ExclamationCircleOutlined style={{ color: machineAnalytics.overdueMaintenance > 0 ? '#ff4d4f' : '#52c41a' }} />}
+                        valueStyle={{ color: machineAnalytics.overdueMaintenance > 0 ? '#ff4d4f' : '#52c41a' }}
+                      />
+                    </Card>
+                  </Col>
+                </Row>
+                {/* Machine Status Breakdown */}
+                {machineAnalytics.machinesByStatus && Object.keys(machineAnalytics.machinesByStatus).length > 0 && (
+                  <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+                    <Col xs={24}>
+                      <Card title='Machine Status Overview' size='small'>
+                        <Space wrap>
+                          {Object.entries(machineAnalytics.machinesByStatus).map(([status, count]) => (
+                            <Tag
+                              key={status}
+                              color={
+                                status === 'IN_USE' ? 'green' :
+                                status === 'IDLE' ? 'default' :
+                                status === 'UNDER_MAINTENANCE' ? 'orange' :
+                                status === 'UNDER_REPAIR' ? 'red' :
+                                status === 'NEW' ? 'blue' :
+                                status === 'DECOMMISSIONED' ? 'volcano' : 'default'
+                              }
+                            >
+                              {status.replace(/_/g, ' ')}: {count}
+                            </Tag>
+                          ))}
+                        </Space>
+                      </Card>
+                    </Col>
+                  </Row>
+                )}
+              </div>
+            )}
 
             {/* Stock Alerts Section */}
             <div className='dashboard-alerts-section'>
