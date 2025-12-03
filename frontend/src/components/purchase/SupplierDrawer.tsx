@@ -282,20 +282,6 @@ export const SupplierDrawer: React.FC<SupplierDrawerProps> = ({
                     </Select>
                   </Form.Item>
                 </Col>
-                <Col span={12}>
-                  <Form.Item
-                    label='Primary Contact Person'
-                    name='primaryContactPerson'
-                    rules={[{ required: true, message: 'Please enter primary contact person' }]}
-                  >
-                    <Input
-                      maxLength={100}
-                      autoComplete='off'
-                      placeholder='Enter contact person name'
-                      className='ccd-input'
-                    />
-                  </Form.Item>
-                </Col>
               </Row>
             </div>
 

@@ -11,7 +11,6 @@ export interface Supplier {
   supplierType: string;
   companyRegNo?: string;
   // Contact Info
-  primaryContactPerson?: string;
   email?: string;
   phone?: string;
   alternatePhone?: string;
@@ -55,7 +54,6 @@ export interface CreateSupplierRequest {
   supplierType?: string;
   companyRegNo?: string;
   // Contact Info
-  primaryContactPerson?: string;
   email?: string;
   phone?: string;
   alternatePhone?: string;

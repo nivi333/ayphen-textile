@@ -11,7 +11,6 @@ const createSupplierSchema = Joi.object({
     .optional().allow(null),
   companyRegNo: Joi.string().max(50).optional().allow('', null),
   // Contact Info
-  primaryContactPerson: Joi.string().min(2).max(100).required(),
   email: Joi.string().email().required(),
   phone: Joi.string()
     .pattern(/^[+]?[1-9][\d]{0,15}$/)
@@ -81,7 +80,6 @@ const updateSupplierSchema = Joi.object({
     .optional().allow(null),
   companyRegNo: Joi.string().max(50).optional().allow('', null),
   // Contact Info
-  primaryContactPerson: Joi.string().min(2).max(100).optional().allow('', null),
   email: Joi.string().email().optional().allow('', null),
   phone: Joi.string()
     .pattern(/^[+]?[1-9][\d]{0,15}$/)

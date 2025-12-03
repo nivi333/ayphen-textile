@@ -28,6 +28,9 @@ import {
   CustomerListPage,
   SupplierListPage,
   PurchaseOrdersListPage,
+  FabricProductionListPage,
+  YarnManufacturingListPage,
+  DyeingFinishingListPage,
 } from '../pages';
 import GoogleAuthCallback from '../components/auth/GoogleAuthCallback';
 
@@ -163,6 +166,34 @@ export default function AppRouter() {
               element={
                 <ProtectedRoute requireCompany={true}>
                   <ProductsListPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Textile Operations */}
+            <Route
+              path='/textile/fabrics'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <FabricProductionListPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/textile/yarns'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <YarnManufacturingListPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/textile/dyeing'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <DyeingFinishingListPage />
                 </ProtectedRoute>
               }
             />

@@ -9,7 +9,6 @@ export interface CreateCustomerData {
   customerType?: string;
   companyName?: string;
   customerCategory?: string;
-  primaryContactPerson?: string;
   email?: string;
   phone?: string;
   alternatePhone?: string;
@@ -116,7 +115,6 @@ class CustomerService {
         customer_type: customerData.customerType || 'RETAIL',
         company_name: customerData.companyName,
         customer_category: customerData.customerCategory,
-        primary_contact_person: customerData.primaryContactPerson,
         email: customerData.email,
         phone: customerData.phone,
         alternate_phone: customerData.alternatePhone,
@@ -282,7 +280,6 @@ class CustomerService {
         customer_type: updateData.customerType,
         company_name: updateData.companyName,
         customer_category: updateData.customerCategory,
-        primary_contact_person: updateData.primaryContactPerson,
         email: updateData.email,
         phone: updateData.phone,
         alternate_phone: updateData.alternatePhone,
@@ -349,7 +346,6 @@ class CustomerService {
       customerType: customer.customer_type,
       companyName: customer.company_name,
       customerCategory: customer.customer_category,
-      primaryContactPerson: customer.primary_contact_person,
       email: customer.email,
       phone: customer.phone,
       alternatePhone: customer.alternate_phone,

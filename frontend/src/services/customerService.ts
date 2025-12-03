@@ -10,7 +10,6 @@ export interface Customer {
   customerType: string;
   companyName?: string;
   customerCategory?: string;
-  primaryContactPerson?: string;
   email?: string;
   phone?: string;
   alternatePhone?: string;
@@ -50,7 +49,6 @@ export interface CreateCustomerRequest {
   customerType?: string;
   companyName?: string;
   customerCategory?: string;
-  primaryContactPerson?: string;
   email?: string;
   phone?: string;
   alternatePhone?: string;

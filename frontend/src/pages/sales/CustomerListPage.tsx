@@ -226,13 +226,6 @@ export default function CustomerListPage() {
       ),
     },
     {
-      title: 'Contact Person',
-      dataIndex: 'primaryContactPerson',
-      key: 'primaryContactPerson',
-      width: 150,
-      render: (contactPerson: string) => contactPerson || '—',
-    },
-    {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',

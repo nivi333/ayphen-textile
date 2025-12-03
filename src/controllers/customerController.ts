@@ -15,7 +15,6 @@ const createCustomerSchema = Joi.object({
     otherwise: Joi.string().max(100).optional().allow('', null),
   }),
   customerCategory: Joi.string().valid('VIP', 'REGULAR', 'NEW', 'INACTIVE').optional().allow(null),
-  primaryContactPerson: Joi.string().min(2).max(100).required(),
   email: Joi.string().email().required(),
   phone: Joi.string()
     .pattern(/^[+]?[1-9][\d]{0,15}$/)
@@ -79,7 +78,6 @@ const updateCustomerSchema = Joi.object({
     otherwise: Joi.string().max(100).optional().allow('', null),
   }),
   customerCategory: Joi.string().valid('VIP', 'REGULAR', 'NEW', 'INACTIVE').optional().allow(null),
-  primaryContactPerson: Joi.string().min(2).max(100).optional().allow('', null),
   email: Joi.string().email().optional().allow('', null),
   phone: Joi.string()
     .pattern(/^[+]?[1-9][\d]{0,15}$/)

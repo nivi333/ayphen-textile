@@ -327,11 +327,10 @@
 - [✅] **Active Toggle**: In drawer header (top-right)
 
 **Contact Information**:
-- [ ] **Primary Contact Person**: Text input (required)
-- [ ] **Email**: Email input (required, validated, unique)
-- [ ] **Phone**: Phone input with country code (required, validated)
-- [ ] **Alternate Phone**: Phone input (optional)
-- [ ] **Website**: URL input (optional, validated)
+- [✅] **Email**: Email input (optional, validated)
+- [✅] **Phone**: Phone input with country code (optional, validated)
+- [✅] **Alternate Phone**: Phone input (optional)
+- [✅] **Website**: URL input (optional, validated)
 
 **Address Information**:
 - [✅] **Billing Address**:
@@ -359,7 +358,7 @@
 - [✅] **Tags**: Multi-select with add/remove UI (optional, e.g., "Bulk Buyer", "Export")
 
 **Table Display Columns**:
-- [✅] Customer Code | Customer Name | Contact Person | Email | Phone | Type | Credit Limit | Active Status | Actions
+- [✅] Customer Code | Customer Name | Email | Phone | Type | Credit Limit | Active Status | Actions
 
 **Customer List Page Features**:
 - [✅] Search: By name, code, email, phone
@@ -401,9 +400,8 @@
 - [✅] **Active Toggle**: In drawer header (top-right)
 
 **Contact Information**:
-- [✅] **Primary Contact Person**: Text input (required)
-- [✅] **Email**: Email input (required, validated, unique)
-- [✅] **Phone**: Phone input with country code (required, validated)
+- [✅] **Email**: Email input (optional, validated)
+- [✅] **Phone**: Phone input with country code (optional, validated)
 - [✅] **Alternate Phone**: Phone input (optional)
 - [✅] **Website**: URL input (optional, validated)
 - [✅] **Fax**: Text input (optional)
@@ -443,7 +441,7 @@
 - [✅] **Tags**: Multi-select with add/remove UI (optional, e.g., "Eco-Friendly", "Fast Delivery")
 
 **Table Display Columns**:
-- [✅] Supplier Code | Supplier Name | Contact Person | Email | Phone | Type | Lead Time | Active Status | Actions
+- [✅] Supplier Code | Supplier Name | Email | Phone | Type | Lead Time | Active Status | Actions
 
 **Supplier List Page Features**:
 - [✅] Search: By name, code, email, phone

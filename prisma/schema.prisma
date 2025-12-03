@@ -789,7 +789,6 @@ model customers {
   customer_type           String   @default("RETAIL")
   company_name            String? // Required if type is BUSINESS
   customer_category       String?
-  primary_contact_person  String?
   email                   String?
   phone                   String?
   alternate_phone         String?
@@ -1489,12 +1488,11 @@ model suppliers {
   company_reg_no String?
 
   // Contact Info
-  primary_contact_person String?
-  email                  String?
-  phone                  String?
-  alternate_phone        String?
-  website                String?
-  fax                    String?
+  email           String?
+  phone           String?
+  alternate_phone String?
+  website         String?
+  fax             String?
 
   // Address
   address_line_1 String?

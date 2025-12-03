@@ -9,7 +9,6 @@ export interface CreateSupplierData {
   supplierType?: string;
   companyRegNo?: string;
   // Contact Info
-  primaryContactPerson?: string;
   email?: string;
   phone?: string;
   alternatePhone?: string;
@@ -104,7 +103,6 @@ class SupplierService {
         supplier_type: supplierData.supplierType || 'MANUFACTURER',
         company_reg_no: supplierData.companyRegNo,
         // Contact Info
-        primary_contact_person: supplierData.primaryContactPerson,
         email: supplierData.email,
         phone: supplierData.phone,
         alternate_phone: supplierData.alternatePhone,
@@ -251,7 +249,6 @@ class SupplierService {
         supplier_type: updateData.supplierType,
         company_reg_no: updateData.companyRegNo,
         // Contact Info
-        primary_contact_person: updateData.primaryContactPerson,
         email: updateData.email,
         phone: updateData.phone,
         alternate_phone: updateData.alternatePhone,
@@ -322,7 +319,6 @@ class SupplierService {
       supplierType: supplier.supplier_type,
       companyRegNo: supplier.company_reg_no,
       // Contact Info
-      primaryContactPerson: supplier.primary_contact_person,
       email: supplier.email,
       phone: supplier.phone,
       alternatePhone: supplier.alternate_phone,
