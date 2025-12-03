@@ -31,8 +31,14 @@ export const INDUSTRY_ENUM_TO_DISPLAY: Record<string, string> = {
 
 /**
  * Convert frontend display name to backend enum value
+ * Also handles if the value is already an enum value
  */
 export function industryToEnum(displayName: string): string {
+  // If it's already an enum value, return it
+  if (INDUSTRY_ENUM_TO_DISPLAY[displayName]) {
+    return displayName;
+  }
+  // Otherwise, convert from display name
   return INDUSTRY_DISPLAY_TO_ENUM[displayName] || 'TEXTILE_MANUFACTURING';
 }
 

@@ -11,13 +11,13 @@ import {
   InputNumber,
   Switch,
   Divider,
-  Space,
   App,
+  Upload,
 } from 'antd';
+import { UploadOutlined, DeleteOutlined } from '@ant-design/icons';
 import {
   yarnManufacturingService,
   YarnManufacturing,
-  CreateYarnManufacturingData,
   YARN_TYPES,
   YARN_PROCESSES,
   QUALITY_GRADES
@@ -49,6 +49,7 @@ export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = (
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [isActive, setIsActive] = useState(true);
+  const [imageUrl, setImageUrl] = useState<string>('');
 
   const isEditing = mode === 'edit' && !!yarnId;
 
@@ -83,6 +84,7 @@ export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = (
       productionDate: data.productionDate ? dayjs(data.productionDate) : undefined,
     });
     setIsActive(data.isActive ?? true);
+    setImageUrl(data.imageUrl || '');
   };
 
   const resetForm = () => {
@@ -94,6 +96,28 @@ export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = (
       processType: 'SPINNING',
     });
     setIsActive(true);
+    setImageUrl('');
+  };
+
+  const beforeUpload = (file: File) => {
+    const isValidType = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/svg+xml';
+    if (!isValidType) {
+      message.error('You can only upload JPG/PNG/SVG files!');
+      return false;
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      message.error('Image must be smaller than 2MB!');
+      return false;
+    }
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      setImageUrl(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    return false;
   };
 
   const handleFinish = async (values: any) => {
@@ -102,6 +126,7 @@ export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = (
       const payload: any = {
         ...values,
         productionDate: values.productionDate.toISOString(),
+        imageUrl: imageUrl || undefined,
       };
 
       if (isEditing && yarnId) {
@@ -291,6 +316,45 @@ export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = (
                       ))}
                     </Select>
                   </Form.Item>
+                </Col>
+              </Row>
+            </div>
+
+            <Divider className='ccd-divider' />
+
+            {/* Image Upload */}
+            <div className='ccd-section'>
+              <div className='ccd-section-title'>Product Image</div>
+              <Row gutter={16}>
+                <Col span={24}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <Upload
+                      name="image"
+                      accept="image/png,image/jpeg,image/svg+xml"
+                      showUploadList={false}
+                      beforeUpload={beforeUpload}
+                    >
+                      <Button icon={<UploadOutlined />}>Upload Image</Button>
+                    </Upload>
+                    {imageUrl && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <img
+                          src={imageUrl}
+                          alt="Yarn"
+                          style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 4 }}
+                        />
+                        <Button
+                          type="text"
+                          danger
+                          icon={<DeleteOutlined />}
+                          onClick={() => setImageUrl('')}
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ marginTop: 8, color: '#888', fontSize: 12 }}>
+                    Supported: PNG, JPG, SVG (max 2MB)
+                  </div>
                 </Col>
               </Row>
             </div>

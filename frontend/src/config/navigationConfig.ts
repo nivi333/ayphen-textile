@@ -270,7 +270,20 @@ export const ELECTRONICS_MODULES: MenuItem[] = [
  */
 export const getNavigationByIndustry = (industry: IndustryType): MenuItem[] => {
   // All textile industries use the same TEXTILE_MODULES
-  const industryModules: Record<IndustryType, MenuItem[]> = {
+  // Support both enum values and display labels for backward compatibility
+  const industryModules: Record<string, MenuItem[]> = {
+    // Enum values
+    'TEXTILE_MANUFACTURING': TEXTILE_MODULES,
+    'GARMENT_PRODUCTION': TEXTILE_MODULES,
+    'KNITTING_WEAVING': TEXTILE_MODULES,
+    'FABRIC_PROCESSING': TEXTILE_MODULES,
+    'APPAREL_DESIGN': TEXTILE_MODULES,
+    'FASHION_RETAIL': TEXTILE_MODULES,
+    'YARN_PRODUCTION': TEXTILE_MODULES,
+    'DYEING_FINISHING': TEXTILE_MODULES,
+    'HOME_TEXTILES': TEXTILE_MODULES,
+    'TECHNICAL_TEXTILES': TEXTILE_MODULES,
+    // Display labels (backward compatibility)
     'Textile Manufacturing': TEXTILE_MODULES,
     'Garment Production': TEXTILE_MODULES,
     'Knitting & Weaving': TEXTILE_MODULES,
@@ -297,16 +310,49 @@ export const getNavigationByIndustry = (industry: IndustryType): MenuItem[] => {
 
 /**
  * Get all available industries for company creation
+ * Values must match the IndustryType enum in the backend
  */
 export const AVAILABLE_INDUSTRIES = [
-  { value: 'Textile Manufacturing', label: 'Textile Manufacturing' },
-  { value: 'Garment Production', label: 'Garment Production' },
-  { value: 'Knitting & Weaving', label: 'Knitting & Weaving' },
-  { value: 'Fabric Processing', label: 'Fabric Processing' },
-  { value: 'Apparel Design', label: 'Apparel Design' },
-  { value: 'Fashion Retail', label: 'Fashion Retail' },
-  { value: 'Yarn Production', label: 'Yarn Production' },
-  { value: 'Dyeing & Finishing', label: 'Dyeing & Finishing' },
-  { value: 'Home Textiles', label: 'Home Textiles' },
-  { value: 'Technical Textiles', label: 'Technical Textiles' },
+  { value: 'TEXTILE_MANUFACTURING', label: 'Textile Manufacturing' },
+  { value: 'GARMENT_PRODUCTION', label: 'Garment Production' },
+  { value: 'KNITTING_WEAVING', label: 'Knitting & Weaving' },
+  { value: 'FABRIC_PROCESSING', label: 'Fabric Processing' },
+  { value: 'APPAREL_DESIGN', label: 'Apparel Design' },
+  { value: 'FASHION_RETAIL', label: 'Fashion Retail' },
+  { value: 'YARN_PRODUCTION', label: 'Yarn Production' },
+  { value: 'DYEING_FINISHING', label: 'Dyeing & Finishing' },
+  { value: 'HOME_TEXTILES', label: 'Home Textiles' },
+  { value: 'TECHNICAL_TEXTILES', label: 'Technical Textiles' },
 ] as const;
+
+/**
+ * Map display label to enum value (for backward compatibility)
+ */
+export const INDUSTRY_LABEL_TO_ENUM: Record<string, string> = {
+  'Textile Manufacturing': 'TEXTILE_MANUFACTURING',
+  'Garment Production': 'GARMENT_PRODUCTION',
+  'Knitting & Weaving': 'KNITTING_WEAVING',
+  'Fabric Processing': 'FABRIC_PROCESSING',
+  'Apparel Design': 'APPAREL_DESIGN',
+  'Fashion Retail': 'FASHION_RETAIL',
+  'Yarn Production': 'YARN_PRODUCTION',
+  'Dyeing & Finishing': 'DYEING_FINISHING',
+  'Home Textiles': 'HOME_TEXTILES',
+  'Technical Textiles': 'TECHNICAL_TEXTILES',
+};
+
+/**
+ * Map enum value to display label
+ */
+export const INDUSTRY_ENUM_TO_LABEL: Record<string, string> = {
+  'TEXTILE_MANUFACTURING': 'Textile Manufacturing',
+  'GARMENT_PRODUCTION': 'Garment Production',
+  'KNITTING_WEAVING': 'Knitting & Weaving',
+  'FABRIC_PROCESSING': 'Fabric Processing',
+  'APPAREL_DESIGN': 'Apparel Design',
+  'FASHION_RETAIL': 'Fashion Retail',
+  'YARN_PRODUCTION': 'Yarn Production',
+  'DYEING_FINISHING': 'Dyeing & Finishing',
+  'HOME_TEXTILES': 'Home Textiles',
+  'TECHNICAL_TEXTILES': 'Technical Textiles',
+};

@@ -522,7 +522,7 @@ class CompanyService {
 
       if (updateData.name !== undefined) data.name = updateData.name;
       if ((updateData as any).slug !== undefined) data.slug = (updateData as any).slug;
-      if (updateData.industry !== undefined) data.industry = updateData.industry;
+      if (updateData.industry !== undefined) data.industry = industryToEnum(updateData.industry);
       if (updateData.description !== undefined) data.description = updateData.description;
       if ((updateData as any).logoUrl !== undefined) data.logo_url = (updateData as any).logoUrl;
       if ((updateData as any).website !== undefined) data.website = (updateData as any).website;

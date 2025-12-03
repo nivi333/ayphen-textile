@@ -471,16 +471,16 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
                     rules={[{ required: true, message: 'Please select industry' }]}
                   >
                     <Select placeholder='Select industry' className='ccd-select'>
-                      <Option value='Textile Manufacturing'>Textile Manufacturing</Option>
-                      <Option value='Garment Production'>Garment Production</Option>
-                      <Option value='Knitting & Weaving'>Knitting & Weaving</Option>
-                      <Option value='Fabric Processing'>Fabric Processing</Option>
-                      <Option value='Apparel Design'>Apparel Design</Option>
-                      <Option value='Fashion Retail'>Fashion Retail</Option>
-                      <Option value='Yarn Production'>Yarn Production</Option>
-                      <Option value='Dyeing & Finishing'>Dyeing & Finishing</Option>
-                      <Option value='Home Textiles'>Home Textiles</Option>
-                      <Option value='Technical Textiles'>Technical Textiles</Option>
+                      <Option value='TEXTILE_MANUFACTURING'>Textile Manufacturing</Option>
+                      <Option value='GARMENT_PRODUCTION'>Garment Production</Option>
+                      <Option value='KNITTING_WEAVING'>Knitting & Weaving</Option>
+                      <Option value='FABRIC_PROCESSING'>Fabric Processing</Option>
+                      <Option value='APPAREL_DESIGN'>Apparel Design</Option>
+                      <Option value='FASHION_RETAIL'>Fashion Retail</Option>
+                      <Option value='YARN_PRODUCTION'>Yarn Production</Option>
+                      <Option value='DYEING_FINISHING'>Dyeing & Finishing</Option>
+                      <Option value='HOME_TEXTILES'>Home Textiles</Option>
+                      <Option value='TECHNICAL_TEXTILES'>Technical Textiles</Option>
                     </Select>
                   </Form.Item>
                 </Col>
