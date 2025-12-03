@@ -1120,6 +1120,7 @@
 - [✅] Production Date: Date of production
 - [✅] Batch Number: Batch tracking
 - [✅] Quality Grade: A_GRADE, B_GRADE, C_GRADE, REJECT
+- [✅] Image URL: Product image (max 2MB, PNG/JPG)
 - [✅] Location: Link to company location
 - [✅] Notes: Additional notes
 - [✅] Active Toggle: isActive field
@@ -1136,6 +1137,7 @@
 - [✅] Batch Number: Batch tracking
 - [✅] Process Type: Spinning, Weaving, Knitting
 - [✅] Quality Grade: A_GRADE, B_GRADE, C_GRADE, REJECT
+- [✅] Image URL: Product image (max 2MB, PNG/JPG)
 - [✅] Location: Link to company location
 - [✅] Notes: Additional notes
 - [✅] Active Toggle: isActive field
@@ -1155,6 +1157,7 @@
 - [✅] Quality Check: Pass/Fail status
 - [✅] Color Fastness: Test results
 - [✅] Shrinkage %: Shrinkage percentage
+- [✅] Image URL: Process image (max 2MB, PNG/JPG)
 - [✅] Fabric ID: Link to fabric production
 - [✅] Location: Link to company location
 - [✅] Notes: Additional notes
@@ -1176,6 +1179,7 @@
 - [✅] Line Number: Production line
 - [✅] Quality Passed: Pass/Fail status
 - [✅] Defect Count: Number of defects
+- [✅] Image URL: Garment image (max 2MB, PNG/JPG)
 - [✅] Order ID: Link to sales order
 - [✅] Location: Link to company location
 - [✅] Notes: Additional notes
@@ -1196,6 +1200,7 @@
 
 **Backend Implementation** ✅
 - [✅] Database schema with all textile models (fabric_production, yarn_manufacturing, dyeing_finishing, garment_manufacturing, design_patterns)
+- [✅] Image URL support for all textile models (max 2MB, PNG/JPG)
 - [✅] TextileService with complete CRUD operations for all modules
 - [✅] TextileController with comprehensive Joi validation
 - [✅] TextileRoutes registered under /api/v1/textile
