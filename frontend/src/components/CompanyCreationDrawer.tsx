@@ -136,9 +136,9 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
 
     // Validate file type
     const isValidType =
-      file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg';
+      file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg' || file.type === 'image/svg+xml';
     if (!isValidType) {
-      message.error('You can only upload JPG/PNG files!');
+      message.error('You can only upload JPG/PNG/SVG files!');
       return;
     }
 
@@ -183,16 +183,18 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
 
       // Prepare the data for API call
       if (isEditing && companyId) {
-        // Convert certifications string to array
+        // Convert certifications string to array (handle both string and array)
         const certificationsArray = values.certifications
-          ? values.certifications.split(',').map((cert: string) => cert.trim()).filter(Boolean)
+          ? (Array.isArray(values.certifications) 
+              ? values.certifications 
+              : values.certifications.split(',').map((cert: string) => cert.trim()).filter(Boolean))
           : [];
 
         const updatePayload: UpdateCompanyRequest = {
           name: values.name,
           slug: values.slug,
           industry: values.industry,
-          description: values.description,
+          description: values.description || undefined,
           ...(logoUrl ? { logoUrl } : {}),
           country: values.country,
           defaultLocation: values.defaultLocation,
@@ -216,9 +218,11 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
         onCompanyUpdated?.(updatedCompany);
         handleDrawerClose();
       } else {
-        // Convert certifications string to array
+        // Convert certifications string to array (handle both string and array)
         const certificationsArray = values.certifications
-          ? values.certifications.split(',').map((cert: string) => cert.trim()).filter(Boolean)
+          ? (Array.isArray(values.certifications) 
+              ? values.certifications 
+              : values.certifications.split(',').map((cert: string) => cert.trim()).filter(Boolean))
           : [];
 
         const companyData: CreateCompanyRequest = {
@@ -278,8 +282,8 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
           description: initialData.description,
           country: initialData.country,
           defaultLocation: initialData.defaultLocation,
-          address1: initialData.address1,
-          address2: initialData.address2,
+          addressLine1: initialData.address1,
+          addressLine2: initialData.address2,
           city: initialData.city,
           state: initialData.state,
           pincode: initialData.pincode,
@@ -398,7 +402,7 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
                   )}
                 </Upload>
                 <div className='ccd-logo-help-text'>
-                  Upload Logo (PNG/JPG, max 2MB)
+                  Upload Logo (PNG/JPG/SVG, max 2MB)
                   <br />
                   Drag & drop or click to upload
                 </div>

@@ -60,9 +60,9 @@ export const UserProfileDrawer: React.FC<UserProfileDrawerProps> = ({
         }
 
         const isValidType =
-            file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg' || file.type === 'image/webp';
+            file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg' || file.type === 'image/svg+xml';
         if (!isValidType) {
-            message.error('You can only upload JPG/PNG/WEBP files!');
+            message.error('You can only upload JPG/PNG/SVG files!');
             return;
         }
 
@@ -217,7 +217,7 @@ export const UserProfileDrawer: React.FC<UserProfileDrawerProps> = ({
                                     )}
                                 </Upload>
                                 <div className='ccd-logo-help-text'>
-                                    Upload Avatar (PNG/JPG, max 2MB)
+                                    Upload Avatar (PNG/JPG/SVG, max 2MB)
                                     <br />
                                     Drag & drop or click to upload
                                 </div>

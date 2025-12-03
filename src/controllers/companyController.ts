@@ -20,10 +20,10 @@ const createCompanySchema = Joi.object({
   establishedDate: Joi.date().required(),
   businessType: Joi.string().max(100).required(),
   defaultLocation: Joi.string().min(1).max(255).required(),
-  description: Joi.string().max(500).optional(),
+  description: Joi.string().max(500).allow(null, '').optional(),
   logoUrl: Joi.string().max(3000000).optional(), // Allow up to ~3MB for base64 encoded 2MB images
-  website: Joi.string().max(300).optional(),
-  taxId: Joi.string().max(50).optional(),
+  website: Joi.string().max(300).allow(null, '').optional(),
+  taxId: Joi.string().max(50).allow(null, '').optional(),
   email: Joi.string().email().optional(),
   phone: Joi.string().max(20).optional(),
   addressLine1: Joi.string().max(255).required(),
@@ -44,7 +44,7 @@ const updateCompanySchema = Joi.object({
     .pattern(/^[a-z0-9-]+$/)
     .optional(),
   industry: Joi.string().max(100).optional(),
-  description: Joi.string().max(500).optional(),
+  description: Joi.string().max(500).allow(null, '').optional(),
   logoUrl: Joi.string().max(3000000).optional(), // Allow up to ~3MB for base64 encoded 2MB images
   country: Joi.string().max(100).optional(),
   defaultLocation: Joi.string().min(1).max(255).optional(),
@@ -57,8 +57,8 @@ const updateCompanySchema = Joi.object({
   businessType: Joi.string().max(100).optional(),
   certifications: Joi.string().max(500).optional(),
   contactInfo: Joi.string().min(1).max(100).optional(),
-  website: Joi.string().max(255).optional(),
-  taxId: Joi.string().max(50).optional(),
+  website: Joi.string().max(255).allow(null, '').optional(),
+  taxId: Joi.string().max(50).allow(null, '').optional(),
   isActive: Joi.boolean().optional(),
 });
 
