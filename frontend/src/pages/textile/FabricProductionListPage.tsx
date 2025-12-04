@@ -187,7 +187,7 @@ export default function FabricProductionListPage() {
       key: 'isActive',
       width: 90,
       render: (isActive: boolean) => (
-        <Tag color={isActive ? 'green' : 'default'}>{isActive ? 'Active' : 'Inactive'}</Tag>
+        <Tag color={isActive ? 'green' : 'orange'}>{isActive ? 'Active' : 'Inactive'}</Tag>
       ),
     },
     {

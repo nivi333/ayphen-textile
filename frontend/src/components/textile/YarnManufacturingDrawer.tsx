@@ -21,6 +21,7 @@ import {
   CreateYarnManufacturingData,
   YARN_TYPES,
   QUALITY_GRADES,
+  YARN_PROCESSES,
 } from '../../services/textileService';
 import { GradientButton, ImageUpload } from '../ui';
 import '../CompanyCreationDrawer.scss';
@@ -29,15 +30,17 @@ const { Option } = Select;
 const { TextArea } = Input;
 
 interface YarnManufacturingDrawerProps {
-  visible: boolean;
-  onClose: (shouldRefresh?: boolean) => void;
-  yarn?: YarnManufacturing | null;
+  open: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+  initialData?: YarnManufacturing;
 }
 
 export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = ({
-  visible,
+  open,
   onClose,
-  yarn,
+  onSuccess,
+  initialData,
 }) => {
   const { message } = App.useApp();
   const [form] = Form.useForm();
@@ -45,17 +48,17 @@ export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = (
   const [isActive, setIsActive] = useState(true);
   const [imageUrl, setImageUrl] = useState<string>('');
 
-  const isEditing = !!yarn;
+  const isEditing = !!initialData;
 
   useEffect(() => {
-    if (visible) {
-      if (yarn) {
+    if (open) {
+      if (initialData) {
         form.setFieldsValue({
-          ...yarn,
-          productionDate: dayjs(yarn.productionDate),
+          ...initialData,
+          productionDate: dayjs(initialData.productionDate),
         });
-        setIsActive(yarn.isActive ?? true);
-        setImageUrl(yarn.imageUrl || '');
+        setIsActive(initialData.isActive ?? true);
+        setImageUrl(initialData.imageUrl || '');
       } else {
         form.resetFields();
         form.setFieldsValue({
@@ -66,7 +69,7 @@ export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = (
         setImageUrl('');
       }
     }
-  }, [visible, yarn, form]);
+  }, [open, initialData, form]);
 
   const handleFinish = async (values: any) => {
     setLoading(true);
@@ -80,15 +83,15 @@ export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = (
         isActive,
       };
 
-      if (isEditing && yarn) {
-        await yarnManufacturingService.updateYarnManufacturing(yarn.yarnId, yarnData);
+      if (isEditing && initialData) {
+        await yarnManufacturingService.updateYarnManufacturing(initialData.yarnId, yarnData);
         message.success('Yarn manufacturing updated successfully');
       } else {
         await yarnManufacturingService.createYarnManufacturing(yarnData);
         message.success('Yarn manufacturing created successfully');
       }
 
-      onClose(true);
+      onSuccess();
     } catch (error) {
       console.error('Error saving yarn manufacturing:', error);
       message.error('Failed to save yarn manufacturing');
@@ -127,7 +130,7 @@ export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = (
       }
       width={720}
       onClose={handleClose}
-      open={visible}
+      open={open}
       className='company-creation-drawer'
       styles={{ body: { padding: 0 } }}
       footer={null}
@@ -159,6 +162,11 @@ export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = (
               </Col>
               <Row gutter={12}>
                 <Col span={12}>
+                  <Form.Item label='Yarn Code' name='code'>
+                    <Input disabled placeholder='Auto-generated' className='ccd-input' />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
                   <Form.Item
                     label='Yarn Name'
                     name='yarnName'
@@ -172,6 +180,8 @@ export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = (
                     />
                   </Form.Item>
                 </Col>
+              </Row>
+              <Row gutter={12}>
                 <Col span={12}>
                   <Form.Item
                     label='Yarn Type'
@@ -295,6 +305,22 @@ export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = (
                       placeholder='Enter batch number'
                       className='ccd-input'
                     />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={12}>
+                <Col span={12}>
+                  <Form.Item
+                    label='Process Type'
+                    name='processType'
+                  >
+                    <Select placeholder='Select process type (optional)' className='ccd-select' allowClear>
+                      {YARN_PROCESSES.map(process => (
+                        <Option key={process.value} value={process.value}>
+                          {process.label}
+                        </Option>
+                      ))}
+                    </Select>
                   </Form.Item>
                 </Col>
                 <Col span={12}>

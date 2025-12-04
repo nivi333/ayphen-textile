@@ -196,7 +196,7 @@ export default function DyeingFinishingListPage() {
       key: 'isActive',
       width: 90,
       render: (isActive: boolean) => (
-        <Tag color={isActive ? 'green' : 'default'}>{isActive ? 'Active' : 'Inactive'}</Tag>
+        <Tag color={isActive ? 'green' : 'orange'}>{isActive ? 'Active' : 'Inactive'}</Tag>
       ),
     },
     {
@@ -311,6 +311,8 @@ export default function DyeingFinishingListPage() {
         open={drawerOpen}
         onClose={() => handleDrawerClose(false)}
         onSuccess={() => handleDrawerClose(true)}
+        mode={editingProcess ? 'edit' : 'create'}
+        processId={editingProcess?.processId}
         initialData={editingProcess}
       />
     </MainLayout>

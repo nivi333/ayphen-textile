@@ -62,8 +62,11 @@ export interface YarnManufacturing {
   yarnId: string;
   companyId: string;
   locationId?: string;
+  yarnName: string;
+  fiberContent: string;
   yarnType: string;
   yarnCount: string;
+  twistType?: string;
   twistPerInch?: number;
   ply: number;
   color: string;
@@ -71,7 +74,7 @@ export interface YarnManufacturing {
   quantityKg: number;
   productionDate: string;
   batchNumber: string;
-  processType: string;
+  processType?: string;
   qualityGrade: string;
   imageUrl?: string;
   notes?: string;
@@ -86,16 +89,19 @@ export interface YarnManufacturing {
 }
 
 export interface CreateYarnManufacturingData {
+  yarnName: string;
+  fiberContent: string;
   yarnType: string;
-  yarnCount: string;
+  yarnCount: number;
+  twistType?: string;
   twistPerInch?: number;
-  ply: number;
+  ply?: number;
   color: string;
   dyeLot?: string;
   quantityKg: number;
   productionDate: string;
   batchNumber: string;
-  processType: string;
+  processType?: string;
   qualityGrade: string;
   imageUrl?: string;
   locationId?: string;

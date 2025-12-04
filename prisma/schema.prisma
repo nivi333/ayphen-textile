@@ -1088,6 +1088,7 @@ model fabric_production {
   quality_grade   QualityGrade
   image_url       String?
   notes           String?
+  code            String       @unique // Auto-generated
   is_active       Boolean      @default(true)
   created_at      DateTime     @default(now())
   updated_at      DateTime     @updatedAt
@@ -1125,19 +1126,23 @@ model yarn_manufacturing {
   yarn_id         String
   company_id      String
   location_id     String?
+  yarn_name       String?
+  fiber_content   String?
   yarn_type       YarnType
   yarn_count      String
+  twist_type      String?
   twist_per_inch  Decimal?     @db.Decimal(6, 2)
-  ply             Int
+  ply             Int?         @default(1)
   color           String
   dye_lot         String?
   quantity_kg     Decimal      @db.Decimal(10, 2)
   production_date DateTime
   batch_number    String
-  process_type    YarnProcess
+  process_type    YarnProcess?
   quality_grade   QualityGrade
   image_url       String?
   notes           String?
+  code            String       @unique // Auto-generated
   is_active       Boolean      @default(true)
   created_at      DateTime     @default(now())
   updated_at      DateTime     @updatedAt
@@ -1151,6 +1156,15 @@ model yarn_manufacturing {
   @@index([process_type])
 }
 
+
+
+enum YarnProcess {
+  SPINNING
+  WEAVING
+  KNITTING
+  TWISTING
+}
+
 enum YarnType {
   COTTON
   POLYESTER
@@ -1159,13 +1173,7 @@ enum YarnType {
   ACRYLIC
   NYLON
   BLEND
-}
-
-enum YarnProcess {
-  SPINNING
-  WEAVING
-  KNITTING
-  TWISTING
+  SYNTHETIC
 }
 
 model dyeing_finishing {
@@ -1190,6 +1198,7 @@ model dyeing_finishing {
   shrinkage_percent Decimal?      @db.Decimal(5, 2)
   image_url         String?
   notes             String?
+  code              String        @unique // Auto-generated
   is_active         Boolean       @default(true)
   created_at        DateTime      @default(now())
   updated_at        DateTime      @updatedAt
@@ -1234,6 +1243,7 @@ model garment_manufacturing {
   defect_count     Int             @default(0)
   image_url        String?
   notes            String?
+  code             String          @unique // Auto-generated
   is_active        Boolean         @default(true)
   created_at       DateTime        @default(now())
   updated_at       DateTime        @updatedAt
@@ -1287,6 +1297,7 @@ model design_patterns {
   sample_image_url String?
   status           DesignStatus
   notes            String?
+  code             String       @unique // Auto-generated
   is_active        Boolean        @default(true)
   created_at       DateTime       @default(now())
   updated_at       DateTime       @updatedAt
@@ -1303,6 +1314,7 @@ enum DesignCategory {
   PRINT
   EMBROIDERY
   WEAVE
+  WOVEN
   KNIT
   APPLIQUE
   DIGITAL_PRINT
@@ -1310,8 +1322,11 @@ enum DesignCategory {
 
 enum DesignStatus {
   CONCEPT
+  DRAFT
+  REVIEW
   APPROVED
   IN_PRODUCTION
+  PRODUCTION
   ARCHIVED
 }
 

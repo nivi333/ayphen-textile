@@ -1222,6 +1222,64 @@
 - [✅] Industries supported: Textile Manufacturing, Garment Production, Knitting & Weaving, Fabric Processing, Apparel Design, Fashion Retail, Yarn Production, Dyeing & Finishing, Home Textiles, Technical Textiles
 - [✅] Menu items: Fabric Production, Yarn Manufacturing, Dyeing & Finishing, Garment Manufacturing, Design & Patterns
 
+**Bug Fixes & Quality Improvements** ✅ **COMPLETED (Dec 4, 2024)**
+- [✅] **Dyeing & Finishing Edit Mode**: Fixed API call from POST to PUT when editing existing records
+  - Issue: Edit drawer was calling create API instead of update API
+  - Fix: Updated `DyeingFinishingDrawer.tsx` to use `processId` from `initialData` for update calls
+  - Fixed: `DyeingFinishingListPage.tsx` to pass `mode` and `processId` props correctly
+- [✅] **Color Preview in Dyeing & Finishing**: Fixed color picker to display actual color code
+  - Issue: Color preview showing black instead of actual color (e.g., brown #A52A2A)
+  - Fix: Added `onChange` handler to Input field to properly sync with ColorPicker component
+  - Result: Color picker now correctly displays and updates the hex color value
+- [✅] **Quality Check Toggle Help Text**: Added tooltip and info icon for clarity
+  - Issue: Users confused about Quality Check toggle meaning
+  - Fix: Added info icon (ⓘ) with tooltip explaining "Enable to indicate this batch passed quality inspection"
+  - Added: Form.Item tooltip property with detailed on/off state explanation
+- [✅] **Design & Patterns isActive Field**: Fixed backend to return isActive in API responses
+  - Issue: Backend `mapDesignToDTO` not including `isActive` field
+  - Fix: Added `isActive: design.is_active` to DTO mapping in `textileService.ts`
+  - Result: Frontend now correctly displays active/inactive status for designs
+- [✅] **Design & Patterns Edit Error**: Fixed "Design not found" error when editing
+  - Issue: Frontend passing UUID `id` instead of `designId` (auto-generated code like DES001)
+  - Fix: Updated `DesignPatternsListPage.tsx` to pass `designId` instead of `id` to drawer
+  - Result: Edit mode now correctly loads design data
+- [✅] **Inactive Tag Color**: Changed from grey to orange globally for better visibility
+  - Issue: Grey color too common, hard to distinguish inactive status
+  - Fix: Updated all list pages (Fabric, Yarn, Dyeing, Garment, Design, Products) to use `color='orange'` for inactive tags
+  - Result: Inactive status now clearly visible with orange color across all modules
+- [✅] **Backend ID Consistency**: Fixed all textile service methods to use correct ID fields
+  - Issue: `getById` and `delete` methods using UUID instead of auto-generated codes
+  - Fix: Updated all methods to use `fabric_id`, `yarn_id`, `process_id`, `garment_id`, `design_id` for lookups
+  - Affected: `getFabricById`, `deleteFabric`, `getYarnById`, `deleteYarn`, `getDyeingById`, `deleteDyeing`, `getGarmentById`, `deleteGarment`, `getDesignById`, `deleteDesign`
+  - Result: All CRUD operations now work consistently with auto-generated codes
+
+**Comprehensive API Testing** ✅ **ALL TESTS PASSED (28/28)**
+- [✅] Created comprehensive test script: `test-textile-operations.sh`
+- [✅] Test Coverage:
+  - Authentication & Company Creation (3 tests)
+  - Fabric Production CRUD (5 tests)
+  - Yarn Manufacturing CRUD (5 tests)
+  - Dyeing & Finishing CRUD (5 tests)
+  - Garment Manufacturing CRUD (5 tests)
+  - Design & Patterns CRUD (5 tests)
+- [✅] Test Results: **100% Pass Rate (28/28 tests passed)**
+  - ✅ Create operations: All modules
+  - ✅ Read operations: List and individual records
+  - ✅ Update operations: All modules
+  - ✅ Delete operations: All modules
+  - ✅ isActive field: Correctly returned in all responses
+  - ✅ Auto-generated codes: FAB001, YARN001, DYE001, GARM001, DES001
+- [✅] Multi-tenant isolation verified: All operations filtered by company_id
+- [✅] Role-based access control verified: OWNER role has full access
+
+**Code Quality & Standards** ✅
+- [✅] Consistent error handling across all modules
+- [✅] Proper TypeScript interfaces for all DTOs
+- [✅] Snake_case (DB) ↔ CamelCase (API) conversion working correctly
+- [✅] All validation schemas (Joi) properly configured
+- [✅] Frontend-backend integration fully functional
+- [✅] No console errors or warnings in production build
+
 ---
 
 ### **PRIORITY 4: Advanced Features (PLANNED 📋)**

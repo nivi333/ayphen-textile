@@ -236,6 +236,44 @@ export const TEXTILE_MODULES: MenuItem[] = [
 ];
 
 /**
+ * Knitting & Weaving industry-specific modules (excludes Garment Manufacturing)
+ */
+export const KNITTING_WEAVING_MODULES: MenuItem[] = [
+  {
+    key: 'textile',
+    label: 'Textile Operations',
+    icon: SkinOutlined,
+    path: '/textile',
+    children: [
+      {
+        key: 'fabric-production',
+        label: 'Fabric Production',
+        icon: SkinOutlined,
+        path: '/textile/fabrics',
+      },
+      {
+        key: 'yarn-manufacturing',
+        label: 'Yarn Manufacturing',
+        icon: FormatPainterOutlined,
+        path: '/textile/yarns',
+      },
+      {
+        key: 'dyeing-finishing',
+        label: 'Dyeing & Finishing',
+        icon: BgColorsOutlined,
+        path: '/textile/dyeing',
+      },
+      {
+        key: 'design-patterns',
+        label: 'Design & Patterns',
+        icon: AppstoreOutlined,
+        path: '/textile/designs',
+      },
+    ],
+  },
+];
+
+/**
  * Food & Beverage industry-specific modules (placeholder for future)
  */
 export const FOOD_BEVERAGE_MODULES: MenuItem[] = [
@@ -275,7 +313,7 @@ export const getNavigationByIndustry = (industry: IndustryType): MenuItem[] => {
     // Enum values
     'TEXTILE_MANUFACTURING': TEXTILE_MODULES,
     'GARMENT_PRODUCTION': TEXTILE_MODULES,
-    'KNITTING_WEAVING': TEXTILE_MODULES,
+    'KNITTING_WEAVING': KNITTING_WEAVING_MODULES,
     'FABRIC_PROCESSING': TEXTILE_MODULES,
     'APPAREL_DESIGN': TEXTILE_MODULES,
     'FASHION_RETAIL': TEXTILE_MODULES,
@@ -286,7 +324,7 @@ export const getNavigationByIndustry = (industry: IndustryType): MenuItem[] => {
     // Display labels (backward compatibility)
     'Textile Manufacturing': TEXTILE_MODULES,
     'Garment Production': TEXTILE_MODULES,
-    'Knitting & Weaving': TEXTILE_MODULES,
+    'Knitting & Weaving': KNITTING_WEAVING_MODULES,
     'Fabric Processing': TEXTILE_MODULES,
     'Apparel Design': TEXTILE_MODULES,
     'Fashion Retail': TEXTILE_MODULES,

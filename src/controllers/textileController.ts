@@ -12,32 +12,38 @@ const createFabricSchema = Joi.object({
   weightGsm: Joi.number().positive().required(),
   widthInches: Joi.number().positive().required(),
   color: Joi.string().min(1).max(100).required(),
-  pattern: Joi.string().max(255).optional(),
-  finishType: Joi.string().max(255).optional(),
+  pattern: Joi.string().max(255).optional().allow('', null),
+  finishType: Joi.string().max(255).optional().allow('', null),
   quantityMeters: Joi.number().positive().required(),
   productionDate: Joi.date().required(),
   batchNumber: Joi.string().min(1).max(100).required(),
   qualityGrade: Joi.string().valid(...Object.values(QualityGrade)).required(),
   locationId: Joi.string().optional(),
-  notes: Joi.string().max(1000).optional(),
+  notes: Joi.string().max(1000).optional().allow('', null),
+  isActive: Joi.boolean().optional(),
 });
 
 const updateFabricSchema = createFabricSchema.fork(Object.keys(createFabricSchema.describe().keys), (schema) => schema.optional());
 
 const createYarnSchema = Joi.object({
+  yarnName: Joi.string().min(1).max(255).required(),
   yarnType: Joi.string().valid(...Object.values(YarnType)).required(),
-  yarnCount: Joi.string().min(1).max(50).required(),
+  yarnCount: Joi.alternatives().try(Joi.string(), Joi.number()).required(),
+  fiberContent: Joi.string().min(1).max(255).required(),
+  twistType: Joi.string().max(100).optional(),
   twistPerInch: Joi.number().positive().optional(),
-  ply: Joi.number().integer().positive().required(),
+  ply: Joi.number().integer().positive().optional(),
   color: Joi.string().min(1).max(100).required(),
   dyeLot: Joi.string().max(100).optional(),
   quantityKg: Joi.number().positive().required(),
   productionDate: Joi.date().required(),
   batchNumber: Joi.string().min(1).max(100).required(),
-  processType: Joi.string().valid(...Object.values(YarnProcess)).required(),
+  processType: Joi.string().valid(...Object.values(YarnProcess)).optional(),
   qualityGrade: Joi.string().valid(...Object.values(QualityGrade)).required(),
   locationId: Joi.string().optional(),
   notes: Joi.string().max(1000).optional(),
+  isActive: Joi.boolean().optional(),
+  imageUrl: Joi.string().uri().optional().allow(''),
 });
 
 const updateYarnSchema = createYarnSchema.fork(Object.keys(createYarnSchema.describe().keys), (schema) => schema.optional());
@@ -46,20 +52,21 @@ const createDyeingSchema = Joi.object({
   processType: Joi.string().valid(...Object.values(DyeingProcess)).required(),
   colorCode: Joi.string().min(1).max(50).required(),
   colorName: Joi.string().min(1).max(100).required(),
-  dyeMethod: Joi.string().max(255).optional(),
-  recipeCode: Joi.string().max(100).optional(),
+  dyeMethod: Joi.string().max(255).optional().allow('', null),
+  recipeCode: Joi.string().max(100).optional().allow('', null),
   quantityMeters: Joi.number().positive().required(),
   processDate: Joi.date().required(),
   batchNumber: Joi.string().min(1).max(100).required(),
-  machineNumber: Joi.string().max(50).optional(),
-  temperatureC: Joi.number().optional(),
-  durationMinutes: Joi.number().integer().positive().optional(),
+  machineNumber: Joi.string().max(50).optional().allow('', null),
+  temperatureC: Joi.number().optional().allow(null),
+  durationMinutes: Joi.number().integer().positive().optional().allow(null),
   qualityCheck: Joi.boolean().optional(),
-  colorFastness: Joi.string().max(100).optional(),
-  shrinkagePercent: Joi.number().optional(),
-  fabricId: Joi.string().optional(),
+  colorFastness: Joi.string().max(100).optional().allow('', null),
+  shrinkagePercent: Joi.number().optional().allow(null),
+  fabricId: Joi.string().optional().allow('', null),
   locationId: Joi.string().optional(),
-  notes: Joi.string().max(1000).optional(),
+  notes: Joi.string().max(1000).optional().allow('', null),
+  isActive: Joi.boolean().optional(),
 });
 
 const updateDyeingSchema = createDyeingSchema.fork(Object.keys(createDyeingSchema.describe().keys), (schema) => schema.optional());
@@ -69,45 +76,49 @@ const createGarmentSchema = Joi.object({
   styleNumber: Joi.string().min(1).max(100).required(),
   size: Joi.string().min(1).max(50).required(),
   color: Joi.string().min(1).max(100).required(),
-  fabricId: Joi.string().optional(),
+  fabricId: Joi.string().optional().allow('', null),
   quantity: Joi.number().integer().positive().required(),
   productionStage: Joi.string().valid(...Object.values(ProductionStage)).required(),
-  cutDate: Joi.date().optional(),
-  sewDate: Joi.date().optional(),
-  finishDate: Joi.date().optional(),
-  packDate: Joi.date().optional(),
-  operatorName: Joi.string().max(255).optional(),
-  lineNumber: Joi.string().max(50).optional(),
+  cutDate: Joi.date().optional().allow(null),
+  sewDate: Joi.date().optional().allow(null),
+  finishDate: Joi.date().optional().allow(null),
+  packDate: Joi.date().optional().allow(null),
+  operatorName: Joi.string().max(255).optional().allow('', null),
+  lineNumber: Joi.string().max(50).optional().allow('', null),
   qualityPassed: Joi.boolean().optional(),
-  defectCount: Joi.number().integer().min(0).optional(),
-  orderId: Joi.string().optional(),
+  defectCount: Joi.number().integer().min(0).optional().allow(null),
+  orderId: Joi.string().optional().allow('', null),
   locationId: Joi.string().optional(),
-  notes: Joi.string().max(1000).optional(),
+  notes: Joi.string().max(1000).optional().allow('', null),
+  isActive: Joi.boolean().optional(),
 });
 
 const updateGarmentSchema = createGarmentSchema.fork(Object.keys(createGarmentSchema.describe().keys), (schema) => schema.optional());
 
 const updateGarmentStageSchema = Joi.object({
   stage: Joi.string().valid(...Object.values(ProductionStage)).required(),
+  notes: Joi.string().max(1000).optional().allow('', null),
 });
 
 const createDesignSchema = Joi.object({
   designName: Joi.string().min(1).max(255).required(),
   designCategory: Joi.string().valid(...Object.values(DesignCategory)).required(),
-  designerName: Joi.string().max(255).optional(),
-  season: Joi.string().max(100).optional(),
+  designerName: Joi.string().max(255).optional().allow('', null),
+  season: Joi.string().max(100).optional().allow('', null),
   colorPalette: Joi.array().items(Joi.string()).optional(),
-  patternRepeat: Joi.string().max(255).optional(),
-  designFileUrl: Joi.string().uri().optional(),
-  sampleImageUrl: Joi.string().uri().optional(),
+  patternRepeat: Joi.string().max(255).optional().allow('', null),
+  designFileUrl: Joi.string().uri().optional().allow('', null),
+  sampleImageUrl: Joi.string().uri().optional().allow('', null),
   status: Joi.string().valid(...Object.values(DesignStatus)).required(),
-  notes: Joi.string().max(1000).optional(),
+  notes: Joi.string().max(1000).optional().allow('', null),
+  isActive: Joi.boolean().optional(),
 });
 
 const updateDesignSchema = createDesignSchema.fork(Object.keys(createDesignSchema.describe().keys), (schema) => schema.optional());
 
 const updateDesignStatusSchema = Joi.object({
   status: Joi.string().valid(...Object.values(DesignStatus)).required(),
+  notes: Joi.string().max(1000).optional().allow('', null),
 });
 
 // Fabric Production Controllers
@@ -117,7 +128,11 @@ export const createFabric = async (req: Request, res: Response) => {
     if (error) return res.status(400).json({ message: error.details[0].message });
     const tenantId = req.tenantId;
     if (!tenantId) return res.status(401).json({ message: 'Tenant ID not found' });
-    const fabric = await textileService.createFabric(tenantId, value);
+    
+    // Generate Code
+    const code = `FAB-${Date.now().toString().slice(-6)}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+    
+    const fabric = await textileService.createFabric(tenantId, { ...value, code });
     res.status(201).json({ message: 'Fabric created successfully', data: fabric });
   } catch (error: any) {
     logger.error('Error creating fabric:', error);
@@ -182,7 +197,17 @@ export const createYarn = async (req: Request, res: Response) => {
     if (error) return res.status(400).json({ message: error.details[0].message });
     const tenantId = req.tenantId;
     if (!tenantId) return res.status(401).json({ message: 'Tenant ID not found' });
-    const yarn = await textileService.createYarn(tenantId, value);
+    
+    // Generate Code
+    const code = `YRN-${Date.now().toString().slice(-6)}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+    
+    const yarnData = {
+      ...value,
+      yarnCount: String(value.yarnCount),
+      code
+    };
+    
+    const yarn = await textileService.createYarn(tenantId, yarnData);
     res.status(201).json({ message: 'Yarn created successfully', data: yarn });
   } catch (error: any) {
     logger.error('Error creating yarn:', error);
@@ -247,7 +272,11 @@ export const createDyeing = async (req: Request, res: Response) => {
     if (error) return res.status(400).json({ message: error.details[0].message });
     const tenantId = req.tenantId;
     if (!tenantId) return res.status(401).json({ message: 'Tenant ID not found' });
-    const dyeing = await textileService.createDyeing(tenantId, value);
+    
+    // Generate Code
+    const code = `DYE-${Date.now().toString().slice(-6)}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+    
+    const dyeing = await textileService.createDyeing(tenantId, { ...value, code });
     res.status(201).json({ message: 'Dyeing process created successfully', data: dyeing });
   } catch (error: any) {
     logger.error('Error creating dyeing process:', error);
@@ -312,7 +341,11 @@ export const createGarment = async (req: Request, res: Response) => {
     if (error) return res.status(400).json({ message: error.details[0].message });
     const tenantId = req.tenantId;
     if (!tenantId) return res.status(401).json({ message: 'Tenant ID not found' });
-    const garment = await textileService.createGarment(tenantId, value);
+    
+    // Generate Code
+    const code = `GAR-${Date.now().toString().slice(-6)}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+    
+    const garment = await textileService.createGarment(tenantId, { ...value, code });
     res.status(201).json({ message: 'Garment created successfully', data: garment });
   } catch (error: any) {
     logger.error('Error creating garment:', error);
@@ -364,7 +397,7 @@ export const updateGarmentStage = async (req: Request, res: Response) => {
     if (error) return res.status(400).json({ message: error.details[0].message });
     const tenantId = req.tenantId;
     if (!tenantId) return res.status(401).json({ message: 'Tenant ID not found' });
-    const garment = await textileService.updateGarmentStage(req.params.id, tenantId, value.stage);
+    const garment = await textileService.updateGarmentStage(req.params.id, tenantId, value.stage, value.notes);
     res.status(200).json({ message: 'Garment stage updated successfully', data: garment });
   } catch (error: any) {
     logger.error('Error updating garment stage:', error);
@@ -391,7 +424,11 @@ export const createDesign = async (req: Request, res: Response) => {
     if (error) return res.status(400).json({ message: error.details[0].message });
     const tenantId = req.tenantId;
     if (!tenantId) return res.status(401).json({ message: 'Tenant ID not found' });
-    const design = await textileService.createDesign(tenantId, value);
+    
+    // Generate Code
+    const code = `DES-${Date.now().toString().slice(-6)}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+    
+    const design = await textileService.createDesign(tenantId, { ...value, code });
     res.status(201).json({ message: 'Design created successfully', data: design });
   } catch (error: any) {
     logger.error('Error creating design:', error);
@@ -443,7 +480,7 @@ export const updateDesignStatus = async (req: Request, res: Response) => {
     if (error) return res.status(400).json({ message: error.details[0].message });
     const tenantId = req.tenantId;
     if (!tenantId) return res.status(401).json({ message: 'Tenant ID not found' });
-    const design = await textileService.updateDesignStatus(req.params.id, tenantId, value.status);
+    const design = await textileService.updateDesignStatus(req.params.id, tenantId, value.status, value.notes);
     res.status(200).json({ message: 'Design status updated successfully', data: design });
   } catch (error: any) {
     logger.error('Error updating design status:', error);

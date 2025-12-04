@@ -186,6 +186,11 @@ export const DesignPatternDrawer: React.FC<DesignPatternDrawerProps> = ({
               </Col>
               <Row gutter={12}>
                 <Col span={12}>
+                  <Form.Item label='Design Code' name='code'>
+                    <Input disabled placeholder='Auto-generated' className='ccd-input' />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
                   <Form.Item
                     label='Design Name'
                     name='designName'
@@ -199,6 +204,8 @@ export const DesignPatternDrawer: React.FC<DesignPatternDrawerProps> = ({
                     />
                   </Form.Item>
                 </Col>
+              </Row>
+              <Row gutter={12}>
                 <Col span={12}>
                   <Form.Item
                     label='Category'

@@ -198,6 +198,11 @@ export const GarmentManufacturingDrawer: React.FC<GarmentManufacturingDrawerProp
               </Col>
               <Row gutter={12}>
                 <Col span={12}>
+                  <Form.Item label='Garment Code' name='code'>
+                    <Input disabled placeholder='Auto-generated' className='ccd-input' />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
                   <Form.Item
                     label='Garment Type'
                     name='garmentType'
@@ -212,6 +217,8 @@ export const GarmentManufacturingDrawer: React.FC<GarmentManufacturingDrawerProp
                     </Select>
                   </Form.Item>
                 </Col>
+              </Row>
+              <Row gutter={12}>
                 <Col span={12}>
                   <Form.Item
                     label='Style Number'

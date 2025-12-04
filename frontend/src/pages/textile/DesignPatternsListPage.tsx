@@ -201,7 +201,7 @@ export default function DesignPatternsListPage() {
       key: 'isActive',
       width: 90,
       render: (isActive: boolean) => (
-        <Tag color={isActive ? 'green' : 'default'}>{isActive ? 'Active' : 'Inactive'}</Tag>
+        <Tag color={isActive ? 'green' : 'orange'}>{isActive ? 'Active' : 'Inactive'}</Tag>
       ),
     },
     {
@@ -328,7 +328,7 @@ export default function DesignPatternsListPage() {
       <DesignPatternDrawer
         visible={drawerOpen}
         mode={editingDesign ? 'edit' : 'create'}
-        designId={editingDesign?.id}
+        designId={editingDesign?.designId}
         onClose={() => handleDrawerClose(false)}
         onSuccess={() => handleDrawerClose(true)}
       />

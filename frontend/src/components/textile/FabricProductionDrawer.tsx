@@ -160,6 +160,11 @@ export const FabricProductionDrawer: React.FC<FabricProductionDrawerProps> = ({
               </Col>
               <Row gutter={12}>
                 <Col span={12}>
+                  <Form.Item label='Fabric Code' name='code'>
+                    <Input disabled placeholder='Auto-generated' className='ccd-input' />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
                   <Form.Item
                     label='Fabric Name'
                     name='fabricName'
@@ -173,6 +178,8 @@ export const FabricProductionDrawer: React.FC<FabricProductionDrawerProps> = ({
                     />
                   </Form.Item>
                 </Col>
+              </Row>
+              <Row gutter={12}>
                 <Col span={12}>
                   <Form.Item
                     label='Fabric Type'

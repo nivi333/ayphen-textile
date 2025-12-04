@@ -22,6 +22,8 @@ interface CreateFabricData {
   imageUrl?: string;
   locationId?: string;
   notes?: string;
+  code: string;
+  isActive?: boolean;
 }
 
 // ============================================
@@ -42,6 +44,11 @@ interface CreateYarnData {
   imageUrl?: string;
   locationId?: string;
   notes?: string;
+  code: string;
+  isActive?: boolean;
+  yarnName: string;
+  fiberContent: string;
+  twistType?: string;
 }
 
 // ============================================
@@ -66,6 +73,8 @@ interface CreateDyeingData {
   fabricId?: string;
   locationId?: string;
   notes?: string;
+  code: string;
+  isActive?: boolean;
 }
 
 // ============================================
@@ -91,6 +100,8 @@ interface CreateGarmentData {
   orderId?: string;
   locationId?: string;
   notes?: string;
+  code: string;
+  isActive?: boolean;
 }
 
 // ============================================
@@ -107,6 +118,8 @@ interface CreateDesignData {
   sampleImageUrl?: string;
   status: DesignStatus;
   notes?: string;
+  code: string;
+  isActive?: boolean;
 }
 
 export class TextileService {
@@ -159,6 +172,8 @@ export class TextileService {
         quality_grade: data.qualityGrade,
         image_url: data.imageUrl,
         notes: data.notes,
+        code: data.code,
+        is_active: data.isActive,
         updated_at: new Date(),
       },
     });
@@ -188,7 +203,7 @@ export class TextileService {
 
   async getFabricById(id: string, companyId: string) {
     const fabric = await this.prisma.fabric_production.findFirst({
-      where: { id, company_id: companyId },
+      where: { fabric_id: id, company_id: companyId },
     });
 
     if (!fabric) {
@@ -199,8 +214,20 @@ export class TextileService {
   }
 
   async updateFabric(id: string, companyId: string, data: Partial<CreateFabricData>) {
+    // Find fabric by fabric_id first
+    const existingFabric = await this.prisma.fabric_production.findFirst({
+      where: {
+        fabric_id: id,
+        company_id: companyId,
+      },
+    });
+
+    if (!existingFabric) {
+      throw new Error('Fabric not found');
+    }
+
     const fabric = await this.prisma.fabric_production.update({
-      where: { id },
+      where: { id: existingFabric.id },
       data: {
         fabric_type: data.fabricType,
         fabric_name: data.fabricName,
@@ -208,15 +235,16 @@ export class TextileService {
         weight_gsm: data.weightGsm,
         width_inches: data.widthInches,
         color: data.color,
-        pattern: data.pattern,
-        finish_type: data.finishType,
+        pattern: data.pattern || null,
+        finish_type: data.finishType || null,
         quantity_meters: data.quantityMeters,
         production_date: data.productionDate,
         batch_number: data.batchNumber,
         quality_grade: data.qualityGrade,
         image_url: data.imageUrl,
         location_id: data.locationId,
-        notes: data.notes,
+        notes: data.notes || null,
+        is_active: data.isActive,
         updated_at: new Date(),
       },
     });
@@ -225,8 +253,16 @@ export class TextileService {
   }
 
   async deleteFabric(id: string, companyId: string) {
+    const fabric = await this.prisma.fabric_production.findFirst({
+      where: { fabric_id: id, company_id: companyId },
+    });
+
+    if (!fabric) {
+      throw new Error('Fabric not found');
+    }
+
     await this.prisma.fabric_production.delete({
-      where: { id },
+      where: { id: fabric.id },
     });
 
     return { message: 'Fabric deleted successfully' };
@@ -300,6 +336,11 @@ export class TextileService {
         quality_grade: data.qualityGrade,
         image_url: data.imageUrl,
         notes: data.notes,
+        code: data.code,
+        is_active: data.isActive,
+        yarn_name: data.yarnName,
+        fiber_content: data.fiberContent,
+        twist_type: data.twistType,
         updated_at: new Date(),
       },
     });
@@ -324,7 +365,7 @@ export class TextileService {
 
   async getYarnById(id: string, companyId: string) {
     const yarn = await this.prisma.yarn_manufacturing.findFirst({
-      where: { id, company_id: companyId },
+      where: { yarn_id: id, company_id: companyId },
     });
 
     if (!yarn) {
@@ -335,15 +376,30 @@ export class TextileService {
   }
 
   async updateYarn(id: string, companyId: string, data: Partial<CreateYarnData>) {
+    // Find yarn by yarn_id first
+    const existingYarn = await this.prisma.yarn_manufacturing.findFirst({
+      where: {
+        yarn_id: id,
+        company_id: companyId,
+      },
+    });
+
+    if (!existingYarn) {
+      throw new Error('Yarn not found');
+    }
+
     const yarn = await this.prisma.yarn_manufacturing.update({
-      where: { id },
+      where: { id: existingYarn.id },
       data: {
+        yarn_name: data.yarnName,
+        fiber_content: data.fiberContent,
         yarn_type: data.yarnType,
         yarn_count: data.yarnCount,
+        twist_type: data.twistType || null,
         twist_per_inch: data.twistPerInch,
         ply: data.ply,
         color: data.color,
-        dye_lot: data.dyeLot,
+        dye_lot: data.dyeLot || null,
         quantity_kg: data.quantityKg,
         production_date: data.productionDate,
         batch_number: data.batchNumber,
@@ -351,7 +407,8 @@ export class TextileService {
         quality_grade: data.qualityGrade,
         image_url: data.imageUrl,
         location_id: data.locationId,
-        notes: data.notes,
+        notes: data.notes || null,
+        is_active: data.isActive,
         updated_at: new Date(),
       },
     });
@@ -360,8 +417,16 @@ export class TextileService {
   }
 
   async deleteYarn(id: string, companyId: string) {
+    const yarn = await this.prisma.yarn_manufacturing.findFirst({
+      where: { yarn_id: id, company_id: companyId },
+    });
+
+    if (!yarn) {
+      throw new Error('Yarn not found');
+    }
+
     await this.prisma.yarn_manufacturing.delete({
-      where: { id },
+      where: { id: yarn.id },
     });
 
     return { message: 'Yarn deleted successfully' };
@@ -373,8 +438,11 @@ export class TextileService {
       yarnId: yarn.yarn_id,
       companyId: yarn.company_id,
       locationId: yarn.location_id,
+      yarnName: yarn.yarn_name,
+      fiberContent: yarn.fiber_content,
       yarnType: yarn.yarn_type,
       yarnCount: yarn.yarn_count,
+      twistType: yarn.twist_type,
       twistPerInch: yarn.twist_per_inch ? parseFloat(yarn.twist_per_inch) : null,
       ply: yarn.ply,
       color: yarn.color,
@@ -438,6 +506,8 @@ export class TextileService {
         shrinkage_percent: data.shrinkagePercent,
         image_url: data.imageUrl,
         notes: data.notes,
+        code: data.code,
+        is_active: data.isActive,
         updated_at: new Date(),
       },
     });
@@ -466,7 +536,7 @@ export class TextileService {
 
   async getDyeingById(id: string, companyId: string) {
     const dyeing = await this.prisma.dyeing_finishing.findFirst({
-      where: { id, company_id: companyId },
+      where: { process_id: id, company_id: companyId },
     });
 
     if (!dyeing) {
@@ -477,27 +547,40 @@ export class TextileService {
   }
 
   async updateDyeing(id: string, companyId: string, data: Partial<CreateDyeingData>) {
+    // Find dyeing by process_id first
+    const existingDyeing = await this.prisma.dyeing_finishing.findFirst({
+      where: {
+        process_id: id,
+        company_id: companyId,
+      },
+    });
+
+    if (!existingDyeing) {
+      throw new Error('Dyeing process not found');
+    }
+
     const dyeing = await this.prisma.dyeing_finishing.update({
-      where: { id },
+      where: { id: existingDyeing.id },
       data: {
         process_type: data.processType,
         color_code: data.colorCode,
         color_name: data.colorName,
-        dye_method: data.dyeMethod,
-        recipe_code: data.recipeCode,
+        dye_method: data.dyeMethod || null,
+        recipe_code: data.recipeCode || null,
         quantity_meters: data.quantityMeters,
         process_date: data.processDate,
         batch_number: data.batchNumber,
-        machine_number: data.machineNumber,
+        machine_number: data.machineNumber || null,
         temperature_c: data.temperatureC,
         duration_minutes: data.durationMinutes,
         quality_check: data.qualityCheck,
-        color_fastness: data.colorFastness,
+        color_fastness: data.colorFastness || null,
         shrinkage_percent: data.shrinkagePercent,
         image_url: data.imageUrl,
-        fabric_id: data.fabricId,
+        fabric_id: data.fabricId || null,
         location_id: data.locationId,
-        notes: data.notes,
+        notes: data.notes || null,
+        is_active: data.isActive,
         updated_at: new Date(),
       },
     });
@@ -506,8 +589,16 @@ export class TextileService {
   }
 
   async deleteDyeing(id: string, companyId: string) {
+    const dyeing = await this.prisma.dyeing_finishing.findFirst({
+      where: { process_id: id, company_id: companyId },
+    });
+
+    if (!dyeing) {
+      throw new Error('Dyeing process not found');
+    }
+
     await this.prisma.dyeing_finishing.delete({
-      where: { id },
+      where: { id: dyeing.id },
     });
 
     return { message: 'Dyeing process deleted successfully' };
@@ -589,6 +680,8 @@ export class TextileService {
         defect_count: data.defectCount ?? 0,
         image_url: data.imageUrl,
         notes: data.notes,
+        code: data.code,
+        is_active: data.isActive,
         updated_at: new Date(),
       },
     });
@@ -613,7 +706,7 @@ export class TextileService {
 
   async getGarmentById(id: string, companyId: string) {
     const garment = await this.prisma.garment_manufacturing.findFirst({
-      where: { id, company_id: companyId },
+      where: { garment_id: id, company_id: companyId },
     });
 
     if (!garment) {
@@ -624,28 +717,41 @@ export class TextileService {
   }
 
   async updateGarment(id: string, companyId: string, data: Partial<CreateGarmentData>) {
+    // Find garment by garment_id first
+    const existingGarment = await this.prisma.garment_manufacturing.findFirst({
+      where: {
+        garment_id: id,
+        company_id: companyId,
+      },
+    });
+
+    if (!existingGarment) {
+      throw new Error('Garment not found');
+    }
+
     const garment = await this.prisma.garment_manufacturing.update({
-      where: { id },
+      where: { id: existingGarment.id },
       data: {
         garment_type: data.garmentType,
         style_number: data.styleNumber,
         size: data.size,
         color: data.color,
-        fabric_id: data.fabricId,
+        fabric_id: data.fabricId || null,
         quantity: data.quantity,
         production_stage: data.productionStage,
         cut_date: data.cutDate,
         sew_date: data.sewDate,
         finish_date: data.finishDate,
         pack_date: data.packDate,
-        operator_name: data.operatorName,
-        line_number: data.lineNumber,
+        operator_name: data.operatorName || null,
+        line_number: data.lineNumber || null,
         quality_passed: data.qualityPassed,
         defect_count: data.defectCount,
         image_url: data.imageUrl,
-        order_id: data.orderId,
+        order_id: data.orderId || null,
         location_id: data.locationId,
-        notes: data.notes,
+        notes: data.notes || null,
+        is_active: data.isActive,
         updated_at: new Date(),
       },
     });
@@ -653,11 +759,12 @@ export class TextileService {
     return this.mapGarmentToDTO(garment);
   }
 
-  async updateGarmentStage(id: string, companyId: string, stage: ProductionStage) {
+  async updateGarmentStage(id: string, companyId: string, stage: ProductionStage, notes?: string) {
     const garment = await this.prisma.garment_manufacturing.update({
       where: { id },
       data: {
         production_stage: stage,
+        notes: notes ? notes : undefined,
         updated_at: new Date(),
       },
     });
@@ -666,8 +773,16 @@ export class TextileService {
   }
 
   async deleteGarment(id: string, companyId: string) {
+    const garment = await this.prisma.garment_manufacturing.findFirst({
+      where: { garment_id: id, company_id: companyId },
+    });
+
+    if (!garment) {
+      throw new Error('Garment not found');
+    }
+
     await this.prisma.garment_manufacturing.delete({
-      where: { id },
+      where: { id: garment.id },
     });
 
     return { message: 'Garment deleted successfully' };
@@ -741,6 +856,8 @@ export class TextileService {
         sample_image_url: data.sampleImageUrl,
         status: data.status,
         notes: data.notes,
+        code: data.code,
+        is_active: data.isActive,
         updated_at: new Date(),
       },
     });
@@ -765,7 +882,7 @@ export class TextileService {
 
   async getDesignById(id: string, companyId: string) {
     const design = await this.prisma.design_patterns.findFirst({
-      where: { id, company_id: companyId },
+      where: { design_id: id, company_id: companyId },
     });
 
     if (!design) {
@@ -776,19 +893,32 @@ export class TextileService {
   }
 
   async updateDesign(id: string, companyId: string, data: Partial<CreateDesignData>) {
+    // Find design by design_id first
+    const existingDesign = await this.prisma.design_patterns.findFirst({
+      where: {
+        design_id: id,
+        company_id: companyId,
+      },
+    });
+
+    if (!existingDesign) {
+      throw new Error('Design not found');
+    }
+
     const design = await this.prisma.design_patterns.update({
-      where: { id },
+      where: { id: existingDesign.id },
       data: {
         design_name: data.designName,
         design_category: data.designCategory,
-        designer_name: data.designerName,
-        season: data.season,
+        designer_name: data.designerName || null,
+        season: data.season || null,
         color_palette: data.colorPalette,
-        pattern_repeat: data.patternRepeat,
-        design_file_url: data.designFileUrl,
-        sample_image_url: data.sampleImageUrl,
+        pattern_repeat: data.patternRepeat || null,
+        design_file_url: data.designFileUrl || null,
+        sample_image_url: data.sampleImageUrl || null,
         status: data.status,
-        notes: data.notes,
+        notes: data.notes || null,
+        is_active: data.isActive,
         updated_at: new Date(),
       },
     });
@@ -796,11 +926,12 @@ export class TextileService {
     return this.mapDesignToDTO(design);
   }
 
-  async updateDesignStatus(id: string, companyId: string, status: DesignStatus) {
+  async updateDesignStatus(id: string, companyId: string, status: DesignStatus, notes?: string) {
     const design = await this.prisma.design_patterns.update({
       where: { id },
       data: {
-        status,
+        status: status,
+        notes: notes ? notes : undefined,
         updated_at: new Date(),
       },
     });
@@ -809,8 +940,16 @@ export class TextileService {
   }
 
   async deleteDesign(id: string, companyId: string) {
+    const design = await this.prisma.design_patterns.findFirst({
+      where: { design_id: id, company_id: companyId },
+    });
+
+    if (!design) {
+      throw new Error('Design not found');
+    }
+
     await this.prisma.design_patterns.delete({
-      where: { id },
+      where: { id: design.id },
     });
 
     return { message: 'Design deleted successfully' };
@@ -831,6 +970,7 @@ export class TextileService {
       sampleImageUrl: design.sample_image_url,
       status: design.status,
       notes: design.notes,
+      isActive: design.is_active,
       createdAt: design.created_at,
       updatedAt: design.updated_at,
     };

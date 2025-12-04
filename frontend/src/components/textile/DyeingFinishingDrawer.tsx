@@ -12,6 +12,7 @@ import {
   Switch,
   Divider,
   App,
+  ColorPicker,
 } from 'antd';
 import { AppstoreOutlined } from '@ant-design/icons';
 import {
@@ -111,12 +112,13 @@ export const DyeingFinishingDrawer: React.FC<DyeingFinishingDrawerProps> = ({
         processDate: values.processDate?.toISOString(),
         temperature: values.temperature ? Number(values.temperature) : undefined,
         duration: values.duration ? Number(values.duration) : undefined,
+        quantityMeters: Number(values.quantityMeters),
         imageUrl: imageUrl || undefined,
         isActive,
       };
 
-      if (isEditing && processId) {
-        await dyeingFinishingService.updateDyeingFinishing(processId, processData);
+      if (isEditing && initialData?.processId) {
+        await dyeingFinishingService.updateDyeingFinishing(initialData.processId, processData);
         message.success('Process updated successfully');
       } else {
         await dyeingFinishingService.createDyeingFinishing(processData);
@@ -192,6 +194,11 @@ export const DyeingFinishingDrawer: React.FC<DyeingFinishingDrawerProps> = ({
               </Col>
               <Row gutter={12}>
                 <Col span={12}>
+                  <Form.Item label='Process Code' name='code'>
+                    <Input disabled placeholder='Auto-generated' className='ccd-input' />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
                   <Form.Item
                     label='Process Type'
                     name='processType'
@@ -206,6 +213,8 @@ export const DyeingFinishingDrawer: React.FC<DyeingFinishingDrawerProps> = ({
                     </Select>
                   </Form.Item>
                 </Col>
+              </Row>
+              <Row gutter={12}>
                 <Col span={12}>
                   <Form.Item
                     label='Batch Number'
@@ -245,15 +254,34 @@ export const DyeingFinishingDrawer: React.FC<DyeingFinishingDrawerProps> = ({
                     <Input
                       maxLength={32}
                       autoComplete='off'
-                      placeholder='Enter color code'
+                      placeholder='Enter color code (e.g., #FF0000)'
                       className='ccd-input'
+                      onChange={e => {
+                        const value = e.target.value;
+                        form.setFieldsValue({ colorCode: value });
+                      }}
+                      prefix={
+                        <ColorPicker
+                          value={form.getFieldValue('colorCode') || '#000000'}
+                          onChange={color => {
+                            const hexValue = color.toHexString();
+                            form.setFieldsValue({ colorCode: hexValue });
+                          }}
+                          showText={false}
+                          size='small'
+                        />
+                      }
                     />
                   </Form.Item>
                 </Col>
               </Row>
               <Row gutter={12}>
                 <Col span={12}>
-                  <Form.Item label='Color Name' name='colorName'>
+                  <Form.Item
+                    label='Color Name'
+                    name='colorName'
+                    rules={[{ required: true, message: 'Please enter color name' }]}
+                  >
                     <Input
                       maxLength={32}
                       autoComplete='off'
@@ -263,11 +291,16 @@ export const DyeingFinishingDrawer: React.FC<DyeingFinishingDrawerProps> = ({
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  <Form.Item label='Chemical Used' name='chemicalUsed'>
-                    <Input
-                      maxLength={64}
-                      autoComplete='off'
-                      placeholder='Enter chemicals used'
+                  <Form.Item
+                    label='Quantity (Meters)'
+                    name='quantityMeters'
+                    rules={[{ required: true, message: 'Please enter quantity' }]}
+                  >
+                    <InputNumber
+                      placeholder='Enter quantity in meters'
+                      min={0}
+                      step={0.1}
+                      style={{ width: '100%' }}
                       className='ccd-input'
                     />
                   </Form.Item>
@@ -340,7 +373,16 @@ export const DyeingFinishingDrawer: React.FC<DyeingFinishingDrawerProps> = ({
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  <Form.Item label='Quality Check' name='qualityCheck' valuePropName='checked'>
+                  <Form.Item
+                    label={
+                      <span>
+                        Quality Check <span style={{ color: '#999', fontSize: '12px' }}></span>
+                      </span>
+                    }
+                    name='qualityCheck'
+                    valuePropName='checked'
+                    tooltip='Enable to indicate this batch passed quality inspection. When ON: Batch meets quality standards. When OFF: Batch requires review or has quality issues.'
+                  >
                     <Switch />
                   </Form.Item>
                 </Col>

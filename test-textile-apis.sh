@@ -142,7 +142,7 @@ FABRIC_CREATE_RESPONSE=$(curl -s -X POST "$API_BASE/textile/fabrics" \
 
 echo "Create Fabric Response: $FABRIC_CREATE_RESPONSE"
 
-FABRIC_ID=$(echo $FABRIC_CREATE_RESPONSE | jq -r '.data.fabricId // empty')
+FABRIC_ID=$(echo $FABRIC_CREATE_RESPONSE | jq -r '.data.id // empty')
 
 if [ -z "$FABRIC_ID" ] || [ "$FABRIC_ID" = "null" ]; then
   echo "❌ Failed to create fabric production"
@@ -207,8 +207,10 @@ YARN_CREATE_RESPONSE=$(curl -s -X POST "$API_BASE/textile/yarns" \
   -H "Authorization: Bearer $TOKEN" \
   -H "$CONTENT_TYPE" \
   -d '{
+    "yarnName": "Premium Cotton Yarn",
     "yarnType": "COTTON",
     "yarnCount": "30s",
+    "fiberContent": "100% Cotton",
     "twistPerInch": 18.5,
     "ply": 1,
     "color": "Natural",
@@ -223,7 +225,7 @@ YARN_CREATE_RESPONSE=$(curl -s -X POST "$API_BASE/textile/yarns" \
 
 echo "Create Yarn Response: $YARN_CREATE_RESPONSE"
 
-YARN_ID=$(echo $YARN_CREATE_RESPONSE | jq -r '.data.yarnId // empty')
+YARN_ID=$(echo $YARN_CREATE_RESPONSE | jq -r '.data.id // empty')
 
 if [ -z "$YARN_ID" ] || [ "$YARN_ID" = "null" ]; then
   echo "❌ Failed to create yarn manufacturing"
@@ -280,7 +282,7 @@ DYEING_CREATE_RESPONSE=$(curl -s -X POST "$API_BASE/textile/dyeing" \
 
 echo "Create Dyeing Response: $DYEING_CREATE_RESPONSE"
 
-DYEING_ID=$(echo $DYEING_CREATE_RESPONSE | jq -r '.data.processId // empty')
+DYEING_ID=$(echo $DYEING_CREATE_RESPONSE | jq -r '.data.id // empty')
 
 if [ -z "$DYEING_ID" ] || [ "$DYEING_ID" = "null" ]; then
   echo "❌ Failed to create dyeing process"
@@ -333,7 +335,7 @@ GARMENT_CREATE_RESPONSE=$(curl -s -X POST "$API_BASE/textile/garments" \
 
 echo "Create Garment Response: $GARMENT_CREATE_RESPONSE"
 
-GARMENT_ID=$(echo $GARMENT_CREATE_RESPONSE | jq -r '.data.garmentId // empty')
+GARMENT_ID=$(echo $GARMENT_CREATE_RESPONSE | jq -r '.data.id // empty')
 
 if [ -z "$GARMENT_ID" ] || [ "$GARMENT_ID" = "null" ]; then
   echo "❌ Failed to create garment manufacturing"
@@ -402,7 +404,7 @@ DESIGN_CREATE_RESPONSE=$(curl -s -X POST "$API_BASE/textile/designs" \
 
 echo "Create Design Response: $DESIGN_CREATE_RESPONSE"
 
-DESIGN_ID=$(echo $DESIGN_CREATE_RESPONSE | jq -r '.data.designId // empty')
+DESIGN_ID=$(echo $DESIGN_CREATE_RESPONSE | jq -r '.data.id // empty')
 
 if [ -z "$DESIGN_ID" ] || [ "$DESIGN_ID" = "null" ]; then
   echo "❌ Failed to create design pattern"

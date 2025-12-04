@@ -1,30 +1,20 @@
 import { useState, useEffect, useRef } from 'react';
-import {
-  Table,
-  Button,
-  Tag,
-  Dropdown,
-  message,
-  Empty,
-  Spin,
-  Input,
-  Space,
-  Select,
-} from 'antd';
-import {
-  EditOutlined,
-  DeleteOutlined,
-  MoreOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
+import { Table, Button, Tag, Dropdown, message, Empty, Spin, Input, Space, Select } from 'antd';
+import { EditOutlined, DeleteOutlined, MoreOutlined, SearchOutlined } from '@ant-design/icons';
 import useAuth from '../../contexts/AuthContext';
 import { useHeader } from '../../contexts/HeaderContext';
-import { yarnManufacturingService, YarnManufacturing, YARN_TYPES, QUALITY_GRADES, YARN_PROCESSES } from '../../services/textileService';
+import {
+  yarnManufacturingService,
+  YarnManufacturing,
+  YARN_TYPES,
+  QUALITY_GRADES,
+  YARN_PROCESSES,
+} from '../../services/textileService';
 import { MainLayout } from '../../components/layout';
 import { Heading } from '../../components/Heading';
 import { GradientButton } from '../../components/ui';
-import { YarnManufacturingDrawer } from '../../components/textile/YarnManufacturingDrawer';
 import './TextileListPage.scss';
+import YarnManufacturingDrawer from '@/components/textile/YarnManufacturingDrawer';
 
 export default function YarnManufacturingListPage() {
   const { currentCompany } = useAuth();
@@ -42,11 +32,7 @@ export default function YarnManufacturingListPage() {
   useEffect(() => {
     const isEmployee = currentCompany?.role === 'EMPLOYEE';
     setHeaderActions(
-      <GradientButton
-        onClick={handleAddYarn}
-        size='small'
-        disabled={isEmployee}
-      >
+      <GradientButton onClick={handleAddYarn} size='small' disabled={isEmployee}>
         New Production
       </GradientButton>
     );
@@ -143,8 +129,12 @@ export default function YarnManufacturingListPage() {
       key: 'yarnType',
       render: (_: string, record: YarnManufacturing) => (
         <div>
-          <div className='primary-text'>{getYarnTypeLabel(record.yarnType)} - {record.yarnCount}</div>
-          <div className='secondary-text'>{record.ply} Ply • {record.color}</div>
+          <div className='primary-text'>
+            {getYarnTypeLabel(record.yarnType)} - {record.yarnCount}
+          </div>
+          <div className='secondary-text'>
+            {record.ply} Ply • {record.color}
+          </div>
         </div>
       ),
     },
@@ -175,7 +165,14 @@ export default function YarnManufacturingListPage() {
       key: 'qualityGrade',
       width: 100,
       render: (grade: string) => {
-        const color = grade === 'A_GRADE' ? 'green' : grade === 'B_GRADE' ? 'blue' : grade === 'C_GRADE' ? 'orange' : 'red';
+        const color =
+          grade === 'A_GRADE'
+            ? 'green'
+            : grade === 'B_GRADE'
+              ? 'blue'
+              : grade === 'C_GRADE'
+                ? 'orange'
+                : 'red';
         return <Tag color={color}>{getQualityGradeLabel(grade)}</Tag>;
       },
     },
@@ -184,7 +181,7 @@ export default function YarnManufacturingListPage() {
       dataIndex: 'productionDate',
       key: 'productionDate',
       width: 110,
-      render: (date: string) => date ? new Date(date).toLocaleDateString() : '—',
+      render: (date: string) => (date ? new Date(date).toLocaleDateString() : '—'),
     },
     {
       title: 'Status',
@@ -192,7 +189,7 @@ export default function YarnManufacturingListPage() {
       key: 'isActive',
       width: 90,
       render: (isActive: boolean) => (
-        <Tag color={isActive ? 'green' : 'default'}>{isActive ? 'Active' : 'Inactive'}</Tag>
+        <Tag color={isActive ? 'green' : 'orange'}>{isActive ? 'Active' : 'Inactive'}</Tag>
       ),
     },
     {
@@ -232,7 +229,9 @@ export default function YarnManufacturingListPage() {
   if (!currentCompany) {
     return (
       <MainLayout>
-        <div className='no-company-message'>Please select a company to manage yarn manufacturing.</div>
+        <div className='no-company-message'>
+          Please select a company to manage yarn manufacturing.
+        </div>
       </MainLayout>
     );
   }
@@ -308,7 +307,7 @@ export default function YarnManufacturingListPage() {
               loading={tableLoading}
               pagination={{
                 showSizeChanger: true,
-                showTotal: (total) => `Total ${total} records`,
+                showTotal: total => `Total ${total} records`,
               }}
               className='textile-table'
             />
