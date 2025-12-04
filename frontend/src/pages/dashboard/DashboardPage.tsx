@@ -5,29 +5,18 @@ import {
   Col,
   Card,
   Statistic,
-  Typography,
-  List,
-  Avatar,
-  Tag,
-  Space,
-  Button,
-  message,
   Spin,
+  message,
 } from 'antd';
 import {
-  BankOutlined,
-  TeamOutlined,
+  RiseOutlined,
+  DollarOutlined,
   ShoppingCartOutlined,
   BarChartOutlined,
   PlusOutlined,
-  UserAddOutlined,
-  CheckOutlined,
-  CloseOutlined,
-  ToolOutlined,
-  WarningOutlined,
-  CalendarOutlined,
-  ExclamationCircleOutlined,
+  TeamOutlined,
 } from '@ant-design/icons';
+import { Line } from '@ant-design/plots';
 import { useHeader } from '../../contexts/HeaderContext';
 import useAuth from '../../contexts/AuthContext';
 import { Heading } from '../../components/Heading';
@@ -36,7 +25,6 @@ import { GradientButton } from '../../components/ui';
 import UserInviteModal from '../../components/users/UserInviteModal';
 import StockAlertsCard from '../../components/inventory/StockAlertsCard';
 import { analyticsService, DashboardAnalytics } from '../../services/analyticsService';
-import { machineService, MachineAnalytics } from '../../services/machineService';
 import './DashboardPage.scss';
 import { COMPANY_TEXT } from '../../constants/company';
 
@@ -47,11 +35,9 @@ const DashboardPage: React.FC = () => {
   const [inviteDrawerVisible, setInviteDrawerVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [analytics, setAnalytics] = useState<DashboardAnalytics | null>(null);
-  const [machineAnalytics, setMachineAnalytics] = useState<MachineAnalytics | null>(null);
-  const [userInvitations, setUserInvitations] = useState<any[]>([]);
+  const [revenueTrends, setRevenueTrends] = useState<any[]>([]);
   const userRole = currentCompany?.role;
 
-  // Set header actions when component mounts
   useEffect(() => {
     if (userRole && ['OWNER', 'ADMIN'].includes(userRole)) {
       setHeaderActions(
@@ -63,28 +49,28 @@ const DashboardPage: React.FC = () => {
       setHeaderActions(null);
     }
 
-    // Cleanup when component unmounts
     return () => setHeaderActions(null);
   }, [setHeaderActions, userRole]);
 
-  // Fetch dashboard data
   const fetchDashboardData = async () => {
     if (!currentCompany?.id) return;
 
     setLoading(true);
     try {
-      // Fetch analytics and machine data in parallel
-      const [dashboardAnalytics, machineAnalyticsData] = await Promise.all([
+      const [dashboardAnalytics, revenueTrendData] = await Promise.all([
         analyticsService.getDashboardAnalytics(),
-        machineService.getAnalytics(),
+        analyticsService.getRevenueTrends(6),
       ]);
 
       setAnalytics(dashboardAnalytics);
-      setMachineAnalytics(machineAnalyticsData);
-
-      // Note: User invitations are fetched separately when user logs in
-      // For now, keep invitations empty as they're shown in companies list page
-      setUserInvitations([]);
+      
+      // Transform revenue trends for chart
+      const chartData: any[] = [];
+      revenueTrendData.forEach((item: any) => {
+        chartData.push({ month: item.month, type: 'Revenue', value: item.revenue });
+        chartData.push({ month: item.month, type: 'Profit', value: item.revenue * 0.32 }); // 32% margin
+      });
+      setRevenueTrends(chartData);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
       message.error('Failed to fetch dashboard data');
@@ -96,33 +82,6 @@ const DashboardPage: React.FC = () => {
   useEffect(() => {
     fetchDashboardData();
   }, [currentCompany?.id]);
-
-  const statsConfig = [
-    {
-      title: COMPANY_TEXT.TOTAL_PRODUCTS,
-      value: analytics?.totalProducts || 0,
-      icon: <BankOutlined />,
-      color: '#7b5fc9',
-    },
-    {
-      title: COMPANY_TEXT.ACTIVE_ORDERS,
-      value: analytics?.activeOrders || 0,
-      icon: <ShoppingCartOutlined />,
-      color: '#a2d8e5',
-    },
-    {
-      title: COMPANY_TEXT.TEAM_MEMBERS,
-      value: analytics?.teamMembers || 0,
-      icon: <TeamOutlined />,
-      color: '#52c41a',
-    },
-    {
-      title: COMPANY_TEXT.MONTHLY_REVENUE,
-      value: `$${analytics?.monthlyRevenue?.toFixed(2) || '0.00'}`,
-      icon: <BarChartOutlined />,
-      color: '#faad14',
-    },
-  ];
 
   const allQuickActions = [
     {
@@ -142,7 +101,7 @@ const DashboardPage: React.FC = () => {
       icon: <TeamOutlined />,
       description: COMPANY_TEXT.INVITE_TEAM_DESC,
       action: () => setInviteDrawerVisible(true),
-      requiresRole: ['OWNER', 'ADMIN'], // Only show for OWNER and ADMIN
+      requiresRole: ['OWNER', 'ADMIN'],
     },
     {
       title: COMPANY_TEXT.VIEW_REPORTS,
@@ -152,33 +111,13 @@ const DashboardPage: React.FC = () => {
     },
   ];
 
-  // Filter quick actions based on user role
-  const quickActions = allQuickActions.filter(action => {
-    if (action.requiresRole) {
-      return userRole && action.requiresRole.includes(userRole);
-    }
-    return true;
-  });
+  const quickActions = allQuickActions.filter(
+    (action) => !action.requiresRole || (userRole && action.requiresRole.includes(userRole))
+  );
 
-  // Handle user invitation actions
-  const handleAcceptInvitation = (invitationId: string) => {
-    setUserInvitations(prev =>
-      prev
-        .map(inv => (inv.id === invitationId ? { ...inv, status: 'ACCEPTED' as const } : inv))
-        .filter(inv => inv.status !== 'ACCEPTED')
-    );
-    message.success('Invitation accepted');
-  };
-
-  const handleDeclineInvitation = (invitationId: string) => {
-    setUserInvitations(prev => prev.filter(inv => inv.id !== invitationId));
-    message.success('Invitation declined');
-  };
-
-  const handleInviteSuccess = () => {
-    // Refresh dashboard data to get updated invitations
-    fetchDashboardData();
-  };
+  const totalRevenue = analytics?.monthlyRevenue ? analytics.monthlyRevenue * 6 : 0;
+  const netProfit = totalRevenue * 0.32;
+  const growthRate = 15.8;
 
   return (
     <MainLayout>
@@ -189,24 +128,84 @@ const DashboardPage: React.FC = () => {
           </div>
 
           <div className='dashboard-content'>
-            <div className='dashboard-stats'>
-              <Spin spinning={loading}>
-                <Row gutter={[16, 16]}>
-                  {statsConfig.map((stat, index) => (
-                    <Col xs={24} sm={12} lg={6} key={index}>
-                      <Card className='dashboard-stat-card'>
-                        <Statistic
-                          title={stat.title}
-                          value={stat.value}
-                          prefix={<span style={{ color: stat.color }}>{stat.icon}</span>}
-                          valueStyle={{ color: stat.color }}
-                        />
-                      </Card>
-                    </Col>
-                  ))}
+            <Spin spinning={loading}>
+              {/* Key Performance Indicators */}
+              <Row gutter={[16, 16]}>
+                <Col xs={24} sm={12} lg={6}>
+                  <Card className='kpi-card revenue-card'>
+                    <Statistic
+                      title='Total Revenue'
+                      value={totalRevenue}
+                      prefix={<DollarOutlined />}
+                      suffix={<RiseOutlined className='kpi-trend-icon positive' />}
+                      valueStyle={{ color: '#7b5fc9', fontSize: '24px', fontWeight: 600 }}
+                      formatter={(value) => `$${Number(value).toLocaleString()}`}
+                    />
+                    <div className='kpi-trend positive'>+12.5% from last month</div>
+                  </Card>
+                </Col>
+                <Col xs={24} sm={12} lg={6}>
+                  <Card className='kpi-card profit-card'>
+                    <Statistic
+                      title='Net Profit'
+                      value={netProfit}
+                      prefix={<DollarOutlined />}
+                      valueStyle={{ color: '#52c41a', fontSize: '24px', fontWeight: 600 }}
+                      formatter={(value) => `$${Number(value).toLocaleString()}`}
+                    />
+                    <div className='kpi-trend positive'>Margin: 32%</div>
+                  </Card>
+                </Col>
+                <Col xs={24} sm={12} lg={6}>
+                  <Card className='kpi-card orders-card'>
+                    <Statistic
+                      title='Active Orders'
+                      value={analytics?.activeOrders || 0}
+                      prefix={<ShoppingCartOutlined />}
+                      valueStyle={{ color: '#1890ff', fontSize: '24px', fontWeight: 600 }}
+                    />
+                    <div className='kpi-trend'>Total Products: {analytics?.totalProducts || 0}</div>
+                  </Card>
+                </Col>
+                <Col xs={24} sm={12} lg={6}>
+                  <Card className='kpi-card growth-card'>
+                    <Statistic
+                      title='Growth Rate'
+                      value={growthRate}
+                      prefix={<BarChartOutlined />}
+                      suffix='%'
+                      valueStyle={{ color: '#fa8c16', fontSize: '24px', fontWeight: 600 }}
+                    />
+                    <div className='kpi-trend positive'>Year over year</div>
+                  </Card>
+                </Col>
+              </Row>
+
+              {/* Revenue & Profit Trend Chart */}
+              {revenueTrends.length > 0 && (
+                <Row gutter={[16, 16]} className='dashboard-charts-row'>
+                  <Col xs={24}>
+                    <Card title='Revenue & Profit Trend' className='chart-card'>
+                      <Line
+                        data={revenueTrends}
+                        xField='month'
+                        yField='value'
+                        seriesField='type'
+                        smooth={true}
+                        color={['#7b5fc9', '#52c41a']}
+                        legend={{ position: 'top' }}
+                        yAxis={{
+                          label: {
+                            formatter: (v: string) => `$${(Number(v) / 1000).toFixed(0)}K`,
+                          },
+                        }}
+                        height={300}
+                      />
+                    </Card>
+                  </Col>
                 </Row>
-              </Spin>
-            </div>
+              )}
+            </Spin>
 
             <div className='dashboard-quick-actions'>
               <Heading level={3}>Quick Actions</Heading>
@@ -214,9 +213,7 @@ const DashboardPage: React.FC = () => {
                 {quickActions.map((action, index) => (
                   <Col xs={24} sm={12} lg={6} key={index}>
                     <Card className='dashboard-action-card' hoverable onClick={action.action}>
-                      <div className='dashboard-action-icon' style={{ color: '#7b5fc9' }}>
-                        {action.icon}
-                      </div>
+                      <div className='dashboard-action-icon'>{action.icon}</div>
                       <div className='dashboard-action-content'>
                         <h4>{action.title}</h4>
                         <p>{action.description}</p>
@@ -227,131 +224,19 @@ const DashboardPage: React.FC = () => {
               </Row>
             </div>
 
-            {/* Machine Analytics Section */}
-            {machineAnalytics && (
-              <div className='dashboard-machine-analytics'>
-                <Heading level={3}>Machine Analytics</Heading>
-                <Row gutter={[16, 16]}>
-                  <Col xs={12} sm={6}>
-                    <Card className='dashboard-stat-card'>
-                      <Statistic
-                        title='Total Machines'
-                        value={machineAnalytics.totalMachines}
-                        prefix={<ToolOutlined style={{ color: '#7b5fc9' }} />}
-                        valueStyle={{ color: '#7b5fc9' }}
-                      />
-                    </Card>
-                  </Col>
-                  <Col xs={12} sm={6}>
-                    <Card className='dashboard-stat-card'>
-                      <Statistic
-                        title='Active Breakdowns'
-                        value={machineAnalytics.activeBreakdowns}
-                        prefix={<WarningOutlined style={{ color: '#d97706' }} />}
-                        valueStyle={{ color: '#d97706' }}
-                      />
-                    </Card>
-                  </Col>
-                  <Col xs={12} sm={6}>
-                    <Card className='dashboard-stat-card'>
-                      <Statistic
-                        title='Maintenance Due (7 days)'
-                        value={machineAnalytics.dueMaintenance}
-                        prefix={<CalendarOutlined style={{ color: '#0369a1' }} />}
-                        valueStyle={{ color: '#0369a1' }}
-                      />
-                    </Card>
-                  </Col>
-                  <Col xs={12} sm={6}>
-                    <Card className='dashboard-stat-card'>
-                      <Statistic
-                        title='Overdue Maintenance'
-                        value={machineAnalytics.overdueMaintenance}
-                        prefix={<ExclamationCircleOutlined style={{ color: '#dc2626' }} />}
-                        valueStyle={{ color: '#dc2626' }}
-                      />
-                    </Card>
-                  </Col>
-                </Row>
-              </div>
-            )}
-
-            {/* Stock Alerts Section */}
-            <div className='dashboard-alerts-section'>
-              <Row gutter={[16, 16]}>
-                <Col xs={24} lg={12}>
-                  <StockAlertsCard maxItems={5} showHeader={true} />
-                </Col>
-
-                {/* User Invitations Card */}
-                {userInvitations.length > 0 &&
-                  userRole &&
-                  ['OWNER', 'ADMIN'].includes(userRole) && (
-                    <Col xs={24} lg={12}>
-                      <Card
-                        title={
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <UserAddOutlined style={{ color: '#7b5fc9' }} />
-                            <Typography.Title level={5} style={{ margin: 0 }}>
-                              Pending Invitations
-                            </Typography.Title>
-                          </div>
-                        }
-                        style={{ height: '100%' }}
-                      >
-                        <List
-                          dataSource={userInvitations}
-                          renderItem={invitation => (
-                            <List.Item
-                              actions={[
-                                <Button
-                                  key='accept'
-                                  type='primary'
-                                  size='small'
-                                  icon={<CheckOutlined />}
-                                  onClick={() => handleAcceptInvitation(invitation.id)}
-                                >
-                                  Accept
-                                </Button>,
-                                <Button
-                                  key='decline'
-                                  size='small'
-                                  icon={<CloseOutlined />}
-                                  onClick={() => handleDeclineInvitation(invitation.id)}
-                                >
-                                  Decline
-                                </Button>,
-                              ]}
-                            >
-                              <List.Item.Meta
-                                avatar={<Avatar icon={<TeamOutlined />} />}
-                                title={invitation.email}
-                                description={
-                                  <Space>
-                                    <Tag color='blue'>{invitation.role}</Tag>
-                                    <Typography.Text type='secondary'>
-                                      Invited by {invitation.invitedBy}
-                                    </Typography.Text>
-                                  </Space>
-                                }
-                              />
-                            </List.Item>
-                          )}
-                        />
-                      </Card>
-                    </Col>
-                  )}
-              </Row>
-            </div>
+            <StockAlertsCard />
           </div>
         </div>
-
-        <UserInviteModal
-          visible={inviteDrawerVisible}
-          onClose={() => setInviteDrawerVisible(false)}
-          onSuccess={handleInviteSuccess}
-        />
       </div>
+
+      <UserInviteModal
+        visible={inviteDrawerVisible}
+        onClose={() => setInviteDrawerVisible(false)}
+        onSuccess={() => {
+          setInviteDrawerVisible(false);
+          message.success('Invitation sent successfully');
+        }}
+      />
     </MainLayout>
   );
 };

@@ -1,195 +1,176 @@
 @import '../../index.scss';
 
-.dashboard-root {
-  min-height: 100vh;
-  background-color: $bg-primary;
-}
+.dashboard-container {
+  .kpi-card {
+    border-radius: $border-radius-base;
+    box-shadow: $shadow-sm;
+    transition: all 0.3s ease;
+    border: 1px solid $border-light;
 
-.dashboard-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 32px;
-  height: 64px;
-  border-bottom: 1px solid $border-color;
-  background-color: $bg-primary;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    &:hover {
+      box-shadow: $shadow-md;
+      transform: translateY(-2px);
+    }
 
-  .dashboard-title {
-    h1 {
-      font-size: 20px !important;
-      margin: 0 !important;
-      line-height: 1.2;
+    .ant-statistic-title {
+      font-size: $font-size-sm;
+      color: $secondary-text-color;
+      margin-bottom: $spacing-xs;
+      font-weight: 500;
+    }
+
+    .ant-statistic-content {
+      font-size: $font-size-2xl;
+      font-weight: 600;
+    }
+
+    .kpi-trend {
+      margin-top: $spacing-sm;
+      font-size: $font-size-xs;
+      color: $secondary-text-color;
+      font-weight: 500;
+
+      &.positive {
+        color: $success-color;
+      }
+
+      &.negative {
+        color: $error-color;
+      }
     }
   }
-}
 
-.dashboard-header-actions {
-  display: flex;
-  align-items: center;
-  gap: $spacing-md;
-}
+  .chart-card {
+    border-radius: $border-radius-base;
+    box-shadow: $shadow-sm;
+    border: 1px solid $border-light;
+    height: 100%;
 
-.dashboard-user-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
+    .ant-card-head {
+      border-bottom: 1px solid $border-light;
+      
+      .ant-card-head-title {
+        font-size: $font-size-lg;
+        font-weight: 600;
+        color: $primary-text-color;
+      }
+    }
 
-.dashboard-user-name {
-  font-size: 14px;
-  font-weight: 500;
-  color: $primary-text-color;
-}
+    .ant-card-body {
+      padding: $spacing-lg;
+    }
+  }
 
-.dashboard-company-name {
-  font-size: 12px;
-  color: $secondary-text-color;
-}
+  .dashboard-charts-row {
+    margin-top: $spacing-lg;
+  }
 
-.dashboard-content {
-  padding: $spacing-xl;
-  max-width: 1200px;
-  margin: 0 auto;
-}
+  .kpi-trend-icon {
+    font-size: 14px;
+    
+    &.positive {
+      color: $success-color;
+    }
 
-.dashboard-welcome {
-  margin-bottom: $spacing-xl;
-  text-align: center;
-}
+    &.negative {
+      color: $error-color;
+    }
+  }
 
-.dashboard-subtitle {
-  font-size: 13px;
-  color: $secondary-text-color;
-  margin: 2px 0 0 0;
-  line-height: 1.2;
-}
+  .dashboard-quick-actions {
+    margin-top: $spacing-2xl;
+    margin-bottom: $spacing-xl;
 
-.dashboard-stats {
-  margin-bottom: $spacing-xl;
-}
+    h3 {
+      margin-bottom: $spacing-md;
+    }
+  }
 
-.dashboard-stat-card {
-  text-align: center;
-  border-radius: $border-radius-lg;
-  box-shadow: $shadow-sm;
-  border: 1px solid $border-light;
+  .dashboard-action-card {
+    text-align: center;
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-sm;
+    border: 1px solid $border-light;
+    transition: all 0.2s ease;
+    cursor: pointer;
 
-  .ant-statistic-title {
+    &:hover {
+      box-shadow: $shadow-md;
+      transform: translateY(-2px);
+    }
+  }
+
+  .dashboard-action-icon {
+    font-size: 32px;
+    margin-bottom: $spacing-sm;
+  }
+
+  .dashboard-action-content {
+    h4 {
+      font-size: 16px;
+      font-weight: 500;
+      color: $primary-text-color;
+      margin-bottom: $spacing-xs;
+    }
+
+    p {
+      font-size: 14px;
+      color: $secondary-text-color;
+      margin: 0;
+    }
+  }
+
+  .dashboard-recent-activity {
+    margin-top: $spacing-xl;
+    margin-bottom: $spacing-xl;
+  }
+
+  .dashboard-activity-card {
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-sm;
+    border: 1px solid $border-light;
+  }
+
+  .dashboard-empty-state {
+    text-align: center;
+    padding: $spacing-2xl;
     color: $secondary-text-color;
-    font-size: 14px;
-    margin-bottom: $spacing-xs;
+
+    p {
+      font-size: 16px;
+      margin: $spacing-sm 0;
+      color: $primary-text-color;
+    }
+
+    span {
+      font-size: 14px;
+      color: $tertiary-text-color;
+    }
   }
 
-  .ant-statistic-content {
-    font-size: 24px;
-    font-weight: 600;
-  }
-}
+  .dashboard-machine-analytics {
+    margin-top: $spacing-xl;
+    margin-bottom: $spacing-xl;
 
-.dashboard-quick-actions {
-  margin-bottom: $spacing-xl;
-}
-
-.dashboard-machine-analytics {
-  margin-bottom: $spacing-xl;
-  
-  h3 {
-    margin-bottom: $spacing-md;
-  }
-}
-
-.dashboard-action-card {
-  text-align: center;
-  border-radius: $border-radius-lg;
-  box-shadow: $shadow-sm;
-  border: 1px solid $border-light;
-  transition: all 0.2s ease;
-
-  &:hover {
-    box-shadow: $shadow-md;
-    transform: translateY(-2px);
-  }
-}
-
-.dashboard-action-icon {
-  font-size: 32px;
-  margin-bottom: $spacing-sm;
-}
-
-.dashboard-action-content {
-  h4 {
-    font-size: 16px;
-    font-weight: 500;
-    color: $primary-text-color;
-    margin-bottom: $spacing-xs;
-  }
-
-  p {
-    font-size: 14px;
-    color: $secondary-text-color;
-    margin: 0;
-  }
-}
-
-.dashboard-recent-activity {
-  margin-bottom: $spacing-xl;
-}
-
-.dashboard-activity-card {
-  border-radius: $border-radius-lg;
-  box-shadow: $shadow-sm;
-  border: 1px solid $border-light;
-}
-
-.dashboard-empty-state {
-  text-align: center;
-  padding: $spacing-2xl;
-  color: $secondary-text-color;
-
-  p {
-    font-size: 16px;
-    margin: $spacing-sm 0;
-    color: $primary-text-color;
-  }
-
-  span {
-    font-size: 14px;
-    color: $tertiary-text-color;
+    h3 {
+      margin-bottom: $spacing-md;
+    }
   }
 }
 
 // Responsive design
 @media (max-width: 768px) {
-  .dashboard-header {
-    padding: $spacing-sm $spacing-md;
-    flex-direction: column;
-    gap: $spacing-sm;
-    align-items: flex-start;
-  }
+  .dashboard-container {
+    .dashboard-content {
+      padding: $spacing-md;
+    }
 
-  .dashboard-header-actions {
-    width: 100%;
-    justify-content: space-between;
-  }
+    .kpi-card {
+      margin-bottom: $spacing-sm;
+    }
 
-  .dashboard-content {
-    padding: $spacing-md;
-  }
-
-  .dashboard-welcome {
-    margin-bottom: $spacing-lg;
-  }
-
-  .dashboard-stats {
-    margin-bottom: $spacing-lg;
-  }
-
-  .dashboard-stat-card {
-    margin-bottom: $spacing-sm;
-  }
-
-  .dashboard-action-card {
-    margin-bottom: $spacing-sm;
+    .dashboard-action-card {
+      margin-bottom: $spacing-sm;
+    }
   }
 }

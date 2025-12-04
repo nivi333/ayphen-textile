@@ -87,7 +87,6 @@ if [ "$MAIN_USER_TOKEN" != "null" ] && [ -n "$MAIN_USER_TOKEN" ]; then
     print_status 0 "User $MAIN_USER_EMAIL created"
 else
     print_status 1 "Failed to create user $MAIN_USER_EMAIL"
-    echo "Response: $REGISTER_RESPONSE"
     echo "Exiting: Cannot proceed without main user"
     exit 1
 fi
@@ -142,11 +141,9 @@ for i in {1..5}; do
             print_status 0 "Company ${COMPANY_NAMES[$i-1]} created (${INDUSTRIES[$i-1]})"
         else
             print_status 1 "Company ${COMPANY_NAMES[$i-1]} created but failed to get token"
-            echo "Switch Response: $SWITCH_RESPONSE"
         fi
     else
         print_status 1 "Failed to create company ${COMPANY_NAMES[$i-1]}"
-        echo "Response: $COMPANY_RESPONSE"
     fi
 done
 
@@ -429,11 +426,9 @@ for i in {1..15}; do
             print_status 0 "Invitation accepted by ${INVITE_USER_EMAILS[$i]}"
         else
             print_status 1 "Failed to accept invitation for ${INVITE_USER_EMAILS[$i]}"
-            echo "Response: $ACCEPT_RESPONSE"
         fi
     else
         print_status 1 "Failed to send invitation to ${INVITE_USER_EMAILS[$i]}"
-        echo "Response: $INVITE_RESPONSE"
     fi
 done
 

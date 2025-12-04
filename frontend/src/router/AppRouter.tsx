@@ -33,6 +33,7 @@ import {
   DyeingFinishingListPage,
   GarmentManufacturingListPage,
   DesignPatternsListPage,
+  FinanceOverviewPage,
 } from '../pages';
 import GoogleAuthCallback from '../components/auth/GoogleAuthCallback';
 
@@ -321,6 +322,15 @@ export default function AppRouter() {
               element={
                 <ProtectedRoute requireCompany={true}>
                   <UserProfilePage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/finance'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <FinanceOverviewPage />
                 </ProtectedRoute>
               }
             />

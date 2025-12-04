@@ -1,0 +1,91 @@
+@import '../../index.scss';
+
+.finance-overview-page {
+  .finance-metrics-row {
+    margin-bottom: $spacing-lg;
+  }
+
+  .finance-metric-card {
+    border-radius: $border-radius-base;
+    box-shadow: $shadow-sm;
+    border: 1px solid $border-light;
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: $shadow-md;
+      transform: translateY(-2px);
+    }
+
+    .ant-statistic-title {
+      font-size: $font-size-sm;
+      color: $secondary-text-color;
+      margin-bottom: $spacing-xs;
+      font-weight: 500;
+    }
+
+    .ant-statistic-content {
+      font-size: $font-size-2xl;
+      font-weight: 600;
+    }
+  }
+
+  .finance-chart-card {
+    border-radius: $border-radius-base;
+    box-shadow: $shadow-sm;
+    border: 1px solid $border-light;
+    margin-bottom: $spacing-lg;
+
+    .ant-card-head {
+      border-bottom: 1px solid $border-light;
+
+      .ant-card-head-title {
+        font-size: $font-size-lg;
+        font-weight: 600;
+        color: $primary-text-color;
+      }
+    }
+
+    .ant-card-body {
+      padding: $spacing-lg;
+    }
+  }
+
+  .finance-table-card {
+    border-radius: $border-radius-base;
+    box-shadow: $shadow-sm;
+    border: 1px solid $border-light;
+
+    .ant-card-head {
+      border-bottom: 1px solid $border-light;
+
+      .ant-card-head-title {
+        font-size: $font-size-lg;
+        font-weight: 600;
+        color: $primary-text-color;
+      }
+    }
+
+    .ant-card-body {
+      padding: $spacing-md;
+    }
+  }
+
+  .finance-filters {
+    margin-bottom: $spacing-lg;
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .finance-overview-page {
+    .finance-metric-card {
+      margin-bottom: $spacing-sm;
+    }
+
+    .finance-filters {
+      justify-content: flex-start;
+    }
+  }
+}

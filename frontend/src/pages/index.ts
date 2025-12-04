@@ -50,6 +50,9 @@ export { default as InspectionDetailsPage } from './quality/InspectionDetailsPag
 export { default as UserProfilePage } from './users/UserProfilePage';
 export { default as UsersListPage } from './users/UsersListPage';
 
+// Finance
+export { default as FinanceOverviewPage } from './finance/FinanceOverviewPage';
+
 // Textile Operations
 export { default as FabricProductionListPage } from './textile/FabricProductionListPage';
 export { default as YarnManufacturingListPage } from './textile/YarnManufacturingListPage';
