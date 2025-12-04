@@ -24,22 +24,32 @@ Phone: +919876543210
 Password: Test@123
 ```
 
-### Company Owners (After Seeding)
+### Main User (Owns All 5 Companies)
 ```
-test1@lavoro.com → Premium Textiles Ltd (Textile Manufacturing)
-test2@lavoro.com → Fashion Garments Co (Garment Production)
-test3@lavoro.com → Quality Fabrics Inc (Fabric Processing)
-test4@lavoro.com → ColorTech Dyeing (Dyeing & Finishing)
-test5@lavoro.com → Design Studio Pro (Apparel Design)
+test{TIMESTAMP}@lavoro.com → Owns all 5 companies:
+  1. Premium Textiles Ltd (Textile Manufacturing)
+  2. Fashion Garments Co (Garment Production)
+  3. Quality Fabrics Inc (Fabric Processing)
+  4. ColorTech Dyeing (Dyeing & Finishing)
+  5. Design Studio Pro (Apparel Design)
 
-Password: Test@123 (for all)
+Password: Test@123
+
+Note: Email is generated using timestamp (e.g., test1764833405@lavoro.com)
+Check script output for the actual email after running seed-test-data.sh
 ```
 
 ### Employee Users (After Seeding)
 ```
-employee1@lavoro.com through employee15@lavoro.com
+employee{N}_{TIMESTAMP}@lavoro.com (N = 1 to 15)
 Password: Test@123
-Can access Company 1 with different roles
+All invited to Company 1 (Premium Textiles Ltd) with roles:
+  - ADMIN: employees 1, 4, 7, 10, 13
+  - MANAGER: employees 2, 5, 8, 11, 14
+  - EMPLOYEE: employees 3, 6, 9, 12, 15
+
+Example: employee1_1764833405@lavoro.com
+Check script output for actual emails
 ```
 
 ---
@@ -48,13 +58,14 @@ Can access Company 1 with different roles
 
 | Item | Count | Notes |
 |------|-------|-------|
-| Companies | 5 | Different industries |
+| Main User | 1 | test1@lavoro.com (owns all companies) |
+| Companies | 5 | Different industries, all owned by test1 |
 | Locations | 6 extra | 3 each for Companies 1 & 2 |
 | Products | 50 | 35 (Co. 1), 15 (Co. 2) |
 | Customers | 50 | 10 per company |
 | Suppliers | 50 | 10 per company |
-| Users | 20 | 5 owners + 15 employees |
-| Invitations | 25 | All accepted in Company 1 |
+| Employee Users | 15 | employee1-15@lavoro.com |
+| Invitations | 15 | All accepted in Company 1 (one per employee) |
 | Quality Items | 45 | 3 each type × 5 companies |
 | Textile Ops | 125 | 5 each type × 5 companies |
 
@@ -101,11 +112,12 @@ GET/POST /textile/designs
 
 ## 🧪 Testing Scenarios
 
-### Test Multi-Tenant Isolation
+### Test Multi-Company Access (Same Owner)
 1. Login as `test1@lavoro.com`
 2. View Company 1 data
-3. Login as `test2@lavoro.com`
+3. Switch to Company 2 using company switcher
 4. Verify Company 2 data is separate
+5. Test switching between all 5 companies
 
 ### Test Role-Based Access
 1. Login as `employee1@lavoro.com`
@@ -163,7 +175,8 @@ chmod +x test-textile-operations.sh
 
 - All test users use password: `Test@123`
 - Seeding script takes 2-3 minutes
-- Safe to run seeding multiple times
+- **No need to clear database between runs** - uses timestamp-based unique emails
+- Each run creates completely new users and companies
 - API test script creates temporary users
 - Frontend runs on: `http://localhost:5173`
 - Backend runs on: `http://localhost:3000`

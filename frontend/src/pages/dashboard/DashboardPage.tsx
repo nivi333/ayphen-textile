@@ -35,17 +35,10 @@ import { MainLayout } from '../../components/layout';
 import { GradientButton } from '../../components/ui';
 import UserInviteModal from '../../components/users/UserInviteModal';
 import StockAlertsCard from '../../components/inventory/StockAlertsCard';
-import { productService } from '../../services/productService';
+import { analyticsService, DashboardAnalytics } from '../../services/analyticsService';
 import { machineService, MachineAnalytics } from '../../services/machineService';
 import './DashboardPage.scss';
 import { COMPANY_TEXT } from '../../constants/company';
-
-interface DashboardStats {
-  totalProducts: number;
-  activeOrders: number;
-  teamMembers: number;
-  monthlyRevenue: number;
-}
 
 const DashboardPage: React.FC = () => {
   const { currentCompany } = useAuth();
@@ -53,12 +46,7 @@ const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const [inviteDrawerVisible, setInviteDrawerVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [stats, setStats] = useState<DashboardStats>({
-    totalProducts: 0,
-    activeOrders: 0,
-    teamMembers: 0,
-    monthlyRevenue: 0,
-  });
+  const [analytics, setAnalytics] = useState<DashboardAnalytics | null>(null);
   const [machineAnalytics, setMachineAnalytics] = useState<MachineAnalytics | null>(null);
   const [userInvitations, setUserInvitations] = useState<any[]>([]);
   const userRole = currentCompany?.role;
@@ -85,19 +73,13 @@ const DashboardPage: React.FC = () => {
 
     setLoading(true);
     try {
-      // Fetch products count and machine analytics in parallel
-      const [productsResponse, machineAnalyticsData] = await Promise.all([
-        productService.getProducts(),
+      // Fetch analytics and machine data in parallel
+      const [dashboardAnalytics, machineAnalyticsData] = await Promise.all([
+        analyticsService.getDashboardAnalytics(),
         machineService.getAnalytics(),
       ]);
 
-      setStats({
-        totalProducts: productsResponse.data?.length || 0,
-        activeOrders: 0, // TODO: Implement orders count
-        teamMembers: 0, // TODO: Implement team members count
-        monthlyRevenue: 0, // TODO: Implement revenue calculation
-      });
-
+      setAnalytics(dashboardAnalytics);
       setMachineAnalytics(machineAnalyticsData);
       
       // Note: User invitations are fetched separately when user logs in
@@ -105,6 +87,7 @@ const DashboardPage: React.FC = () => {
       setUserInvitations([]);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+      message.error('Failed to fetch dashboard data');
     } finally {
       setLoading(false);
     }
@@ -117,25 +100,25 @@ const DashboardPage: React.FC = () => {
   const statsConfig = [
     {
       title: COMPANY_TEXT.TOTAL_PRODUCTS,
-      value: stats.totalProducts,
+      value: analytics?.totalProducts || 0,
       icon: <BankOutlined />,
       color: '#7b5fc9',
     },
     {
       title: COMPANY_TEXT.ACTIVE_ORDERS,
-      value: stats.activeOrders,
+      value: analytics?.activeOrders || 0,
       icon: <ShoppingCartOutlined />,
       color: '#a2d8e5',
     },
     {
       title: COMPANY_TEXT.TEAM_MEMBERS,
-      value: stats.teamMembers,
+      value: analytics?.teamMembers || 0,
       icon: <TeamOutlined />,
       color: '#52c41a',
     },
     {
       title: COMPANY_TEXT.MONTHLY_REVENUE,
-      value: `$${stats.monthlyRevenue}`,
+      value: `$${analytics?.monthlyRevenue?.toFixed(2) || '0.00'}`,
       icon: <BarChartOutlined />,
       color: '#faad14',
     },
@@ -264,8 +247,8 @@ const DashboardPage: React.FC = () => {
                       <Statistic
                         title='Active Breakdowns'
                         value={machineAnalytics.activeBreakdowns}
-                        prefix={<WarningOutlined style={{ color: machineAnalytics.activeBreakdowns > 0 ? '#ff4d4f' : '#52c41a' }} />}
-                        valueStyle={{ color: machineAnalytics.activeBreakdowns > 0 ? '#ff4d4f' : '#52c41a' }}
+                        prefix={<WarningOutlined style={{ color: '#d97706' }} />}
+                        valueStyle={{ color: '#d97706' }}
                       />
                     </Card>
                   </Col>
@@ -274,8 +257,8 @@ const DashboardPage: React.FC = () => {
                       <Statistic
                         title='Maintenance Due (7 days)'
                         value={machineAnalytics.dueMaintenance}
-                        prefix={<CalendarOutlined style={{ color: machineAnalytics.dueMaintenance > 0 ? '#faad14' : '#52c41a' }} />}
-                        valueStyle={{ color: machineAnalytics.dueMaintenance > 0 ? '#faad14' : '#52c41a' }}
+                        prefix={<CalendarOutlined style={{ color: '#0369a1' }} />}
+                        valueStyle={{ color: '#0369a1' }}
                       />
                     </Card>
                   </Col>
@@ -284,8 +267,8 @@ const DashboardPage: React.FC = () => {
                       <Statistic
                         title='Overdue Maintenance'
                         value={machineAnalytics.overdueMaintenance}
-                        prefix={<ExclamationCircleOutlined style={{ color: machineAnalytics.overdueMaintenance > 0 ? '#ff4d4f' : '#52c41a' }} />}
-                        valueStyle={{ color: machineAnalytics.overdueMaintenance > 0 ? '#ff4d4f' : '#52c41a' }}
+                        prefix={<ExclamationCircleOutlined style={{ color: '#dc2626' }} />}
+                        valueStyle={{ color: '#dc2626' }}
                       />
                     </Card>
                   </Col>

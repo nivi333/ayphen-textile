@@ -806,13 +806,14 @@ class CompanyService {
       }
 
       // Create invitation (not direct membership)
-      const invitation = await globalPrisma.$executeRaw`
+      const invitationId = uuidv4();
+      await globalPrisma.$executeRaw`
         INSERT INTO user_invitations (id, user_id, company_id, invited_by, role, location_id, status, created_at, updated_at)
-        VALUES (${uuidv4()}, ${userToInvite.id}, ${companyId}, ${userId}, ${role}, ${locationId || null}, 'PENDING', NOW(), NOW())
+        VALUES (${invitationId}, ${userToInvite.id}, ${companyId}, ${userId}, ${role}, ${locationId || null}, 'PENDING', NOW(), NOW())
       `;
 
       return {
-        id: uuidv4(),
+        id: invitationId,
         userId: userToInvite.id,
         companyId: companyId,
         role: role,
@@ -861,7 +862,7 @@ class CompanyService {
       }
 
       // Create user_companies entry and update invitation status in transaction
-      await globalPrisma.$transaction(async (prisma) => {
+      await globalPrisma.$transaction(async prisma => {
         // Add user to company
         await prisma.$executeRaw`
           INSERT INTO user_companies (id, user_id, company_id, role, is_active, created_at, updated_at)

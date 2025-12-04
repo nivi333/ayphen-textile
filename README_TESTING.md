@@ -24,33 +24,37 @@ npm run dev
 ```
 
 This creates:
-- ✅ 5 companies (different industries)
+- ✅ 1 main user (test1@lavoro.com)
+- ✅ 5 companies owned by main user (different industries)
 - ✅ 6 additional locations
 - ✅ 50 products
 - ✅ 50 customers
 - ✅ 50 suppliers
-- ✅ 20 users (5 owners + 15 employees)
-- ✅ 25 user invitations (accepted)
+- ✅ 15 employee users
+- ✅ 15 user invitations to Company 1 (accepted)
 - ✅ 45 quality control items
 - ✅ 125 textile operations records
 
 ### Step 3: Login & Test
 ```
 URL: http://localhost:5173/login
-Email: test1@lavoro.com
+Email: [Check script output for generated email - test{TIMESTAMP}@lavoro.com]
 Password: Test@123
+
+Note: Each run generates unique emails using timestamps,
+so you don't need to clear the database between runs!
 ```
 
 ---
 
 ## 🎯 What You Requested
 
-### ✅ 5 Companies Created
-1. **Premium Textiles Ltd** (Textile Manufacturing) - `test1@lavoro.com`
-2. **Fashion Garments Co** (Garment Production) - `test2@lavoro.com`
-3. **Quality Fabrics Inc** (Fabric Processing) - `test3@lavoro.com`
-4. **ColorTech Dyeing** (Dyeing & Finishing) - `test4@lavoro.com`
-5. **Design Studio Pro** (Apparel Design) - `test5@lavoro.com`
+### ✅ 5 Companies Created (All owned by test1@lavoro.com)
+1. **Premium Textiles Ltd** (Textile Manufacturing)
+2. **Fashion Garments Co** (Garment Production)
+3. **Quality Fabrics Inc** (Fabric Processing)
+4. **ColorTech Dyeing** (Dyeing & Finishing)
+5. **Design Studio Pro** (Apparel Design)
 
 ### ✅ Locations
 - **Company 1**: 3 additional locations (Branch, Warehouse, Factory)
@@ -74,9 +78,12 @@ Password: Test@123
 - **10 Suppliers per company** (50 total)
 
 ### ✅ User Invitations
-- **15 users registered** (`employee1@lavoro.com` through `employee15@lavoro.com`)
-- **25 invitations sent** from Company 1
-- **All invitations accepted** with different roles (ADMIN, MANAGER, EMPLOYEE)
+- **15 employee users registered** (`employee1@lavoro.com` through `employee15@lavoro.com`)
+- **15 invitations sent** from Company 1 (one per employee)
+- **All invitations accepted** with rotating roles:
+  - Employees 1, 4, 7, 10, 13: ADMIN
+  - Employees 2, 5, 8, 11, 14: MANAGER
+  - Employees 3, 6, 9, 12, 15: EMPLOYEE
 
 ### ✅ Quality Control
 **3 items each type per company:**
@@ -104,14 +111,14 @@ Locations: 4 (1 HQ + 3 additional)
 Products: 35 (Cotton, Silk, Wool, Polyester, Blend)
 Customers: 10
 Suppliers: 10
-Employees: 25 (via invitations)
+Employees: 15 (via invitations - ADMIN, MANAGER, EMPLOYEE roles)
 Quality Items: 9 (3 checkpoints, 3 defects, 3 reports)
 Textile Ops: 25 (5 each type)
 ```
 
 ### Company 2 (Fashion Garments Co)
 ```
-Owner: test2@lavoro.com
+Owner: test1@lavoro.com
 Industry: Garment Production
 Locations: 4 (1 HQ + 3 additional)
 Products: 15 (T-Shirts, Shirts, Pants, Dresses, Jackets)
@@ -123,6 +130,7 @@ Textile Ops: 25
 
 ### Companies 3, 4, 5
 ```
+Owner: test1@lavoro.com (all companies)
 Similar structure with:
 - 1 location each (HQ)
 - Industry-specific products
@@ -136,12 +144,12 @@ Similar structure with:
 
 ## 🧪 Testing Workflows
 
-### Workflow 1: Multi-Company Access
+### Workflow 1: Multi-Company Access (Same Owner)
 1. Login as `test1@lavoro.com`
 2. View Company 1 data
-3. Logout
-4. Login as `test2@lavoro.com`
-5. Verify Company 2 data is completely separate
+3. Switch to Company 2 using company switcher
+4. Verify Company 2 data is completely separate
+5. Test switching between all 5 companies
 
 ### Workflow 2: Role-Based Access
 1. Login as `employee1@lavoro.com`
@@ -180,7 +188,7 @@ Similar structure with:
 
 ## 🔄 Re-running the Script
 
-The script is **idempotent** - you can run it multiple times:
+The script uses **timestamp-based unique identifiers** - you can run it multiple times without clearing the database:
 
 ```bash
 # Run again to create more test data
@@ -188,11 +196,12 @@ The script is **idempotent** - you can run it multiple times:
 ```
 
 Each run creates:
-- New users (test1@lavoro.com, test2@lavoro.com, etc.)
-- New companies with unique slugs
-- Fresh test data
+- New unique user (test{TIMESTAMP}@lavoro.com)
+- 5 new companies with unique slugs
+- 15 new employee users (employee{N}_{TIMESTAMP}@lavoro.com)
+- Fresh test data for each company
 
-**Note:** If users already exist, the script will skip them and continue.
+**Advantage:** No need to clear database between test runs!
 
 ---
 
