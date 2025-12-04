@@ -63,7 +63,7 @@ model companies {
 
 model company_locations {
   id                    String                  @id
-  location_id           String                  @unique
+  location_id           String
   company_id            String
   name                  String
   is_default            Boolean                 @default(false)
@@ -99,6 +99,9 @@ model company_locations {
   purchase_orders       purchase_orders[]       @relation("LocationPurchaseOrders")
   invoices              invoices[]              @relation("LocationInvoices")
   bills                 bills[]                 @relation("LocationBills")
+
+  @@unique([company_id, location_id])
+  @@index([company_id])
 }
 
 model sessions {
@@ -207,7 +210,7 @@ enum DocumentType {
 
 model orders {
   id                     String        @id
-  order_id               String        @unique
+  order_id               String
   company_id             String
   customer_name          String
   customer_code          String?
@@ -249,6 +252,10 @@ model orders {
   quality_checkpoints   quality_checkpoints[]
   garment_manufacturing garment_manufacturing[]
   invoices              invoices[]              @relation("OrderInvoices")
+
+  @@unique([company_id, order_id])
+  @@index([company_id])
+  @@index([customer_id])
 }
 
 model order_items {
@@ -1779,7 +1786,7 @@ model bill_items {
 
 model purchase_orders {
   id                     String        @id
-  po_id                  String        @unique
+  po_id                  String
   company_id             String
   supplier_name          String
   supplier_code          String?
@@ -1818,6 +1825,10 @@ model purchase_orders {
   supplier              suppliers?              @relation(fields: [supplier_id], references: [id])
   purchase_order_items  purchase_order_items[]
   bills                 bills[]                 @relation("PurchaseOrderBills")
+
+  @@unique([company_id, po_id])
+  @@index([company_id])
+  @@index([supplier_id])
 }
 
 model purchase_order_items {

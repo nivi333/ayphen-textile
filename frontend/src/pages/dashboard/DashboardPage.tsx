@@ -81,7 +81,7 @@ const DashboardPage: React.FC = () => {
 
       setAnalytics(dashboardAnalytics);
       setMachineAnalytics(machineAnalyticsData);
-      
+
       // Note: User invitations are fetched separately when user logs in
       // For now, keep invitations empty as they're shown in companies list page
       setUserInvitations([]);
@@ -273,32 +273,6 @@ const DashboardPage: React.FC = () => {
                     </Card>
                   </Col>
                 </Row>
-                {/* Machine Status Breakdown */}
-                {machineAnalytics.machinesByStatus && Object.keys(machineAnalytics.machinesByStatus).length > 0 && (
-                  <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
-                    <Col xs={24}>
-                      <Card title='Machine Status Overview' size='small'>
-                        <Space wrap>
-                          {Object.entries(machineAnalytics.machinesByStatus).map(([status, count]) => (
-                            <Tag
-                              key={status}
-                              color={
-                                status === 'IN_USE' ? 'green' :
-                                status === 'IDLE' ? 'default' :
-                                status === 'UNDER_MAINTENANCE' ? 'orange' :
-                                status === 'UNDER_REPAIR' ? 'red' :
-                                status === 'NEW' ? 'blue' :
-                                status === 'DECOMMISSIONED' ? 'volcano' : 'default'
-                              }
-                            >
-                              {status.replace(/_/g, ' ')}: {count}
-                            </Tag>
-                          ))}
-                        </Space>
-                      </Card>
-                    </Col>
-                  </Row>
-                )}
               </div>
             )}
 
@@ -310,61 +284,63 @@ const DashboardPage: React.FC = () => {
                 </Col>
 
                 {/* User Invitations Card */}
-                {userInvitations.length > 0 && userRole && ['OWNER', 'ADMIN'].includes(userRole) && (
-                  <Col xs={24} lg={12}>
-                    <Card
-                      title={
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <UserAddOutlined style={{ color: '#7b5fc9' }} />
-                          <Typography.Title level={5} style={{ margin: 0 }}>
-                            Pending Invitations
-                          </Typography.Title>
-                        </div>
-                      }
-                      style={{ height: '100%' }}
-                    >
-                      <List
-                        dataSource={userInvitations}
-                        renderItem={invitation => (
-                          <List.Item
-                            actions={[
-                              <Button
-                                key='accept'
-                                type='primary'
-                                size='small'
-                                icon={<CheckOutlined />}
-                                onClick={() => handleAcceptInvitation(invitation.id)}
-                              >
-                                Accept
-                              </Button>,
-                              <Button
-                                key='decline'
-                                size='small'
-                                icon={<CloseOutlined />}
-                                onClick={() => handleDeclineInvitation(invitation.id)}
-                              >
-                                Decline
-                              </Button>,
-                            ]}
-                          >
-                            <List.Item.Meta
-                              avatar={<Avatar icon={<TeamOutlined />} />}
-                              title={invitation.email}
-                              description={
-                                <Space>
-                                  <Tag color='blue'>{invitation.role}</Tag>
-                                  <Typography.Text type='secondary'>
-                                    Invited by {invitation.invitedBy}
-                                  </Typography.Text>
-                                </Space>
-                              }
-                            />
-                          </List.Item>
-                        )}
-                      />
-                    </Card>
-                  </Col>
-                )}
+                {userInvitations.length > 0 &&
+                  userRole &&
+                  ['OWNER', 'ADMIN'].includes(userRole) && (
+                    <Col xs={24} lg={12}>
+                      <Card
+                        title={
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <UserAddOutlined style={{ color: '#7b5fc9' }} />
+                            <Typography.Title level={5} style={{ margin: 0 }}>
+                              Pending Invitations
+                            </Typography.Title>
+                          </div>
+                        }
+                        style={{ height: '100%' }}
+                      >
+                        <List
+                          dataSource={userInvitations}
+                          renderItem={invitation => (
+                            <List.Item
+                              actions={[
+                                <Button
+                                  key='accept'
+                                  type='primary'
+                                  size='small'
+                                  icon={<CheckOutlined />}
+                                  onClick={() => handleAcceptInvitation(invitation.id)}
+                                >
+                                  Accept
+                                </Button>,
+                                <Button
+                                  key='decline'
+                                  size='small'
+                                  icon={<CloseOutlined />}
+                                  onClick={() => handleDeclineInvitation(invitation.id)}
+                                >
+                                  Decline
+                                </Button>,
+                              ]}
+                            >
+                              <List.Item.Meta
+                                avatar={<Avatar icon={<TeamOutlined />} />}
+                                title={invitation.email}
+                                description={
+                                  <Space>
+                                    <Tag color='blue'>{invitation.role}</Tag>
+                                    <Typography.Text type='secondary'>
+                                      Invited by {invitation.invitedBy}
+                                    </Typography.Text>
+                                  </Space>
+                                }
+                              />
+                            </List.Item>
+                          )}
+                        />
+                      </Card>
+                    </Col>
+                  )}
               </Row>
             </div>
           </div>

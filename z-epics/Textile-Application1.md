@@ -997,7 +997,7 @@
 - [✅] Delete: Soft delete with confirmation modal (decommissions machine)
 
 **Machine Analytics (Integrated in Main Dashboard)** ✅
-- [✅] Machine Status Overview: Count by status
+ 
 - [✅] Maintenance Due: Upcoming maintenance in next 7 days
 - [✅] Active Breakdowns: Open and in-progress tickets
 - [✅] Overdue Maintenance: Past due maintenance count
