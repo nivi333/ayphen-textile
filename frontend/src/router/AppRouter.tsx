@@ -34,6 +34,9 @@ import {
   GarmentManufacturingListPage,
   DesignPatternsListPage,
   FinanceOverviewPage,
+  AccountsReceivablePage,
+  AccountsPayablePage,
+  ExpensesPage,
 } from '../pages';
 import GoogleAuthCallback from '../components/auth/GoogleAuthCallback';
 
@@ -331,6 +334,33 @@ export default function AppRouter() {
               element={
                 <ProtectedRoute requireCompany={true}>
                   <FinanceOverviewPage />
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path='/finance/accounts-receivable'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <AccountsReceivablePage />
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path='/finance/accounts-payable'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <AccountsPayablePage />
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path='/finance/expenses'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <ExpensesPage />
                 </ProtectedRoute>
               }
             />

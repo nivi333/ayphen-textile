@@ -1,6 +1,23 @@
 @import '../../index.scss';
 
 .finance-overview-page {
+  .page-header-section {
+    margin-bottom: $spacing-lg;
+    
+    .header-with-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: $spacing-md;
+      
+      .header-actions {
+        display: flex;
+        gap: $spacing-xs;
+      }
+    }
+  }
+  
   .finance-metrics-row {
     margin-bottom: $spacing-lg;
   }
@@ -50,6 +67,10 @@
     }
   }
 
+  .finance-table-row {
+    margin-bottom: $spacing-lg;
+  }
+
   .finance-table-card {
     border-radius: $border-radius-base;
     box-shadow: $shadow-sm;
@@ -63,10 +84,39 @@
         font-weight: 600;
         color: $primary-text-color;
       }
+
+      .ant-card-extra {
+        .table-tabs {
+          display: flex;
+          gap: 8px;
+        }
+      }
     }
 
     .ant-card-body {
       padding: $spacing-md;
+    }
+
+    .finance-table {
+      .ant-table-thead > tr > th {
+        font-weight: 600;
+        background-color: $bg-tertiary;
+      }
+
+      .ant-table-tbody > tr > td {
+        padding: 8px 16px;
+      }
+
+      a {
+        color: $primary-color;
+        font-weight: 500;
+      }
+    }
+
+    .table-footer {
+      margin-top: 16px;
+      display: flex;
+      justify-content: center;
     }
   }
 
@@ -109,6 +159,52 @@
 
         .page-header-section {
           border-bottom-color: $dark-border;
+        }
+
+        .finance-metric-card,
+        .finance-chart-card,
+        .finance-table-card {
+          background: $dark-bg-surface;
+          border-color: $dark-border;
+
+          .ant-card-head {
+            border-bottom-color: $dark-border;
+
+            .ant-card-head-title {
+              color: $dark-text-primary;
+            }
+          }
+
+          .ant-statistic-title {
+            color: $dark-text-secondary;
+          }
+
+          .ant-statistic-content {
+            color: $dark-text-primary;
+          }
+        }
+
+        .finance-table {
+          .ant-table-thead > tr > th {
+            background: $dark-bg-tertiary;
+            border-bottom-color: $dark-border;
+            color: $dark-text-primary;
+          }
+
+          .ant-table-tbody > tr {
+            &:hover > td {
+              background: $dark-bg-tertiary;
+            }
+
+            > td {
+              border-bottom-color: $dark-border;
+              color: $dark-text-secondary;
+            }
+          }
+
+          a {
+            color: $primary-color;
+          }
         }
 
         .table-container {

@@ -52,6 +52,9 @@ export { default as UsersListPage } from './users/UsersListPage';
 
 // Finance
 export { default as FinanceOverviewPage } from './finance/FinanceOverviewPage';
+export { default as AccountsReceivablePage } from './finance/AccountsReceivablePage';
+export { default as AccountsPayablePage } from './finance/AccountsPayablePage';
+export { default as ExpensesPage } from './finance/ExpensesPage';
 
 // Textile Operations
 export { default as FabricProductionListPage } from './textile/FabricProductionListPage';

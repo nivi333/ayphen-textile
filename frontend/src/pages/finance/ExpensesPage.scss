@@ -1,0 +1,135 @@
+@import '../../index.scss';
+
+.expenses-page {
+  .stats-row {
+    margin-bottom: $spacing-lg;
+  }
+
+  .stat-card {
+    border-radius: $border-radius-base;
+    box-shadow: $shadow-sm;
+    border: 1px solid $border-light;
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: $shadow-md;
+      transform: translateY(-2px);
+    }
+
+    .ant-statistic-title {
+      font-size: $font-size-sm;
+      color: $secondary-text-color;
+      margin-bottom: $spacing-xs;
+      font-weight: 500;
+    }
+
+    .ant-statistic-content {
+      font-size: $font-size-2xl;
+      font-weight: 600;
+    }
+  }
+
+  .expenses-table {
+    .expense-id {
+      font-weight: 500;
+      color: $primary-text-color;
+    }
+
+    .expense-title {
+      font-weight: 500;
+      color: $primary-text-color;
+    }
+
+    .expense-employee {
+      font-size: 12px;
+      color: $secondary-text-color;
+      margin-top: 2px;
+    }
+
+    .expense-amount {
+      font-weight: 600;
+    }
+
+    .status-tag {
+      text-transform: capitalize;
+    }
+  }
+
+  .expense-form {
+    .ant-form-item {
+      margin-bottom: 16px;
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .expenses-page {
+    .stat-card {
+      margin-bottom: $spacing-sm;
+    }
+  }
+}
+
+// Dark mode support
+[data-theme='dark'] {
+  .expenses-page {
+    background: $dark-bg-primary;
+
+    .page-header {
+      background: $dark-bg-surface;
+      border-bottom-color: $dark-border;
+    }
+
+    .page-content {
+      background: $dark-bg-primary;
+
+      .page-container {
+        background: $dark-bg-surface;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+
+        .page-header-section {
+          border-bottom-color: $dark-border;
+        }
+
+        .stat-card {
+          background: $dark-bg-surface;
+          border-color: $dark-border;
+
+          .ant-statistic-title {
+            color: $dark-text-secondary;
+          }
+
+          .ant-statistic-content {
+            color: $dark-text-primary;
+          }
+        }
+
+        .table-container {
+          .ant-table {
+            .ant-table-thead > tr > th {
+              background: $dark-bg-tertiary;
+              border-bottom-color: $dark-border;
+            }
+
+            .ant-table-tbody > tr {
+              &:hover > td {
+                background: $dark-bg-tertiary;
+              }
+
+              > td {
+                border-bottom-color: $dark-border;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .expense-form {
+    .ant-form-item-label > label {
+      color: $dark-text-primary;
+    }
+  }
+}

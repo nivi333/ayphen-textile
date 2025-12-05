@@ -1545,14 +1545,37 @@ Comprehensive financial management for accounts receivable, accounts payable, ex
 - [ ] Vendor Aging Reports
 - [ ] Vendor Performance Tracking
 
-### **4.7 Expenses**
+### **4.7 Finance Module**
+
+**Finance Overview**
+- [x] Financial Metrics Dashboard
+- [x] Revenue vs Expenses Trend Chart
+- [x] Recent Financial Transactions Table
+- [x] Navigation to Finance Sub-modules
 
 **Expense Management**
-- [ ] Expense Categories (Rent, Utilities, Salaries, etc.)
-- [ ] Expense Entry Form
-- [ ] Expense Approval Workflow
+- [x] Expense Categories (Rent, Utilities, Salaries, etc.)
+- [x] Expense Entry Form
+- [x] Expense Approval Workflow
+- [x] Expense Status Tracking
 - [ ] Recurring Expenses
 - [ ] Expense Attachments (receipts, bills)
+
+**Accounts Receivable**
+- [x] Invoice Tracking
+- [x] Payment Status Monitoring
+- [x] Overdue Invoice Tracking
+- [x] Financial Statistics Dashboard
+- [ ] Customer Payment History
+- [ ] Payment Receipt Generation
+
+**Accounts Payable**
+- [x] Bill Tracking
+- [x] Payment Status Monitoring
+- [x] Overdue Bill Tracking
+- [x] Financial Statistics Dashboard
+- [ ] Supplier Payment History
+- [ ] Payment Voucher Generation
 
 **Petty Cash**
 - [ ] Petty Cash Register
