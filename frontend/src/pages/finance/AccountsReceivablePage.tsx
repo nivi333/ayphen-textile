@@ -13,13 +13,13 @@ import {
   Col,
   Statistic,
 } from 'antd';
-import { MoreOutlined, DollarOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { MoreOutlined, DollarOutlined, ClockCircleOutlined, HomeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../../contexts/AuthContext';
 import { useHeader } from '../../contexts/HeaderContext';
 import { MainLayout } from '../../components/layout';
 import { Heading } from '../../components/Heading';
-import { GradientButton } from '../../components/ui';
+import { GradientButton, PageBreadcrumb } from '../../components/ui';
 import { invoiceService, InvoiceSummary, InvoiceStatus } from '../../services/invoiceService';
 import './AccountsReceivablePage.scss';
 
@@ -285,6 +285,18 @@ export default function AccountsReceivablePage() {
       <div className='accounts-receivable-page'>
         <div className='page-container'>
           <div className='page-header-section'>
+            <PageBreadcrumb
+              items={[
+                {
+                  title: 'Finance Overview',
+                  path: '/finance',
+                  icon: <HomeOutlined />,
+                },
+                {
+                  title: 'Receivables',
+                },
+              ]}
+            />
             <Heading level={2} className='page-title'>
               Accounts Receivable
             </Heading>
@@ -300,7 +312,7 @@ export default function AccountsReceivablePage() {
                   precision={2}
                   valueStyle={{ color: '#7b5fc9' }}
                   prefix={<DollarOutlined />}
-                  suffix="USD"
+                  suffix='USD'
                 />
               </Card>
             </Col>
@@ -312,7 +324,7 @@ export default function AccountsReceivablePage() {
                   precision={2}
                   valueStyle={{ color: '#ff4d4f' }}
                   prefix={<ClockCircleOutlined />}
-                  suffix="USD"
+                  suffix='USD'
                 />
               </Card>
             </Col>
@@ -324,7 +336,7 @@ export default function AccountsReceivablePage() {
                   precision={2}
                   valueStyle={{ color: '#faad14' }}
                   prefix={<ClockCircleOutlined />}
-                  suffix="USD"
+                  suffix='USD'
                 />
               </Card>
             </Col>
@@ -336,7 +348,7 @@ export default function AccountsReceivablePage() {
                   precision={2}
                   valueStyle={{ color: '#52c41a' }}
                   prefix={<DollarOutlined />}
-                  suffix="USD"
+                  suffix='USD'
                 />
               </Card>
             </Col>

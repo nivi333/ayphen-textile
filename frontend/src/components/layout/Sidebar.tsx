@@ -97,18 +97,24 @@ export default function Sidebar() {
 
   const handleMenuClick = ({ key }: { key: string }) => {
     if (key.startsWith('/')) {
-      // Redirect placeholder routes to dashboard
-      const placeholderRoutes = ['/reports', '/analytics'];
-      if (placeholderRoutes.includes(key)) {
-        navigate('/dashboard');
-      } else {
-        navigate(key);
-      }
+      navigate(key);
     }
   };
 
   const getSelectedKeys = () => {
     const path = location.pathname;
+
+    // Special handling for Finance sub-pages
+    // Keep Finance selected when on /finance/accounts-receivable, /finance/accounts-payable, or /finance/expenses
+    if (path.startsWith('/finance')) {
+      return ['/finance'];
+    }
+
+    // Special handling for Reports pages
+    // Keep Reports selected when on any /reports/* page
+    if (path.startsWith('/reports')) {
+      return ['/reports'];
+    }
 
     // Find the exact matching menu item
     for (const item of menuItems) {
@@ -133,6 +139,11 @@ export default function Sidebar() {
 
   const getOpenKeys = () => {
     const path = location.pathname;
+
+    // Open Finance submenu if on finance pages
+    if (path.startsWith('/finance')) {
+      return ['/finance'];
+    }
 
     // Open Quality Control submenu if on quality or inspection pages
     if (path.includes('/quality') || path.includes('/inspections')) {

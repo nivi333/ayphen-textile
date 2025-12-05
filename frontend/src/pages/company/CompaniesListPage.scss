@@ -78,7 +78,7 @@
   background: $bg-primary;
   margin-bottom: $spacing-xs;
   border-bottom: 1px solid $border-color;
-  padding: $spacing-xs 0;
+  padding: $spacing-xs;
   display: flex;
   align-items: center;
   flex-direction: row;
@@ -230,6 +230,7 @@
     }
   }
 }
+
 // Dark mode support
 [data-theme='dark'] {
   .companies-root {
@@ -253,17 +254,17 @@
 
         .table-container {
           .companies-table {
-            .ant-table-thead > tr > th {
+            .ant-table-thead>tr>th {
               background: $dark-bg-tertiary;
               border-bottom-color: $dark-border;
             }
 
-            .ant-table-tbody > tr {
-              &:hover > td {
+            .ant-table-tbody>tr {
+              &:hover>td {
                 background: $dark-bg-tertiary;
               }
 
-              > td {
+              >td {
                 border-bottom-color: $dark-border;
               }
             }
@@ -271,8 +272,9 @@
         }
       }
     }
+
     .companies-card {
-      background: $dark-bg-surface;
+      background: $dark-bg-primary;
       border-bottom-color: $dark-border;
 
       .companies-card-title {

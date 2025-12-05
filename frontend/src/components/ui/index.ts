@@ -8,3 +8,5 @@ export { UserAvatar } from './UserAvatar';
 export { CountrySelect } from './CountrySelect';
 export { ImageUpload } from './ImageUpload';
 export { ThemeToggle } from './ThemeToggle';
+export { PageBreadcrumb } from './PageBreadcrumb';
+export type { BreadcrumbItem } from './PageBreadcrumb';

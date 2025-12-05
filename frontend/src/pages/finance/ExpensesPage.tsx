@@ -19,13 +19,13 @@ import {
   DatePicker,
   InputNumber,
 } from 'antd';
-import { MoreOutlined, DollarOutlined } from '@ant-design/icons';
+import { MoreOutlined, DollarOutlined, HomeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../../contexts/AuthContext';
 import { useHeader } from '../../contexts/HeaderContext';
 import { MainLayout } from '../../components/layout';
 import { Heading } from '../../components/Heading';
-import { GradientButton } from '../../components/ui';
+import { GradientButton, PageBreadcrumb } from '../../components/ui';
 import {
   expenseService,
   ExpenseSummary,
@@ -309,7 +309,7 @@ export default function ExpensesPage() {
             }
           );
         }
-        
+
         if (record.status === 'APPROVED') {
           menuItems.push({
             key: 'paid',
@@ -342,6 +342,18 @@ export default function ExpensesPage() {
       <div className='expenses-page'>
         <div className='page-container'>
           <div className='page-header-section'>
+            <PageBreadcrumb
+              items={[
+                {
+                  title: 'Finance Overview',
+                  path: '/finance',
+                  icon: <HomeOutlined />,
+                },
+                {
+                  title: 'Expenses',
+                },
+              ]}
+            />
             <Heading level={2} className='page-title'>
               Expenses
             </Heading>

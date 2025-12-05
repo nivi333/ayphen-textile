@@ -37,6 +37,12 @@ import {
   AccountsReceivablePage,
   AccountsPayablePage,
   ExpensesPage,
+  ReportsPage,
+  FinancialReportsPage,
+  InventoryReportsPage,
+  SalesReportsPage,
+  ProductionReportsPage,
+  QualityReportsPageReport,
 } from '../pages';
 import GoogleAuthCallback from '../components/auth/GoogleAuthCallback';
 
@@ -337,7 +343,7 @@ export default function AppRouter() {
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
               path='/finance/accounts-receivable'
               element={
@@ -346,7 +352,7 @@ export default function AppRouter() {
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
               path='/finance/accounts-payable'
               element={
@@ -355,12 +361,67 @@ export default function AppRouter() {
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
               path='/finance/expenses'
               element={
                 <ProtectedRoute requireCompany={true}>
                   <ExpensesPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Reports */}
+            <Route
+              path='/reports'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <ReportsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/reports/financial'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <FinancialReportsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/reports/inventory'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <InventoryReportsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/reports/sales'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <SalesReportsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/reports/production'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <ProductionReportsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/reports/quality'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <QualityReportsPageReport />
                 </ProtectedRoute>
               }
             />

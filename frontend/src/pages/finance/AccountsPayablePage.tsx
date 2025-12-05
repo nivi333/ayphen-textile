@@ -1,12 +1,25 @@
 import { useEffect, useState } from 'react';
-import { Table, Tag, Space, Button, Dropdown, Empty, Spin, message, Card, Row, Col, Statistic } from 'antd';
-import { MoreOutlined, DollarOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import {
+  Table,
+  Tag,
+  Space,
+  Button,
+  Dropdown,
+  Empty,
+  Spin,
+  message,
+  Card,
+  Row,
+  Col,
+  Statistic,
+} from 'antd';
+import { MoreOutlined, DollarOutlined, ClockCircleOutlined, HomeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../../contexts/AuthContext';
 import { useHeader } from '../../contexts/HeaderContext';
 import { MainLayout } from '../../components/layout';
 import { Heading } from '../../components/Heading';
-import { GradientButton } from '../../components/ui';
+import { GradientButton, PageBreadcrumb } from '../../components/ui';
 import { billService, BillSummary, BillStatus } from '../../services/billService';
 import './AccountsPayablePage.scss';
 
@@ -73,38 +86,42 @@ export default function AccountsPayablePage() {
       setLoading(true);
       const billsData = await billService.getBills();
       setBills(billsData);
-      
+
       // Calculate statistics
       const totalPayable = billsData
         .filter(bill => bill.status !== 'PAID' && bill.status !== 'CANCELLED')
         .reduce((sum, bill) => sum + bill.balanceDue, 0);
-      
+
       const overdueAmount = billsData
         .filter(bill => bill.status === 'OVERDUE')
         .reduce((sum, bill) => sum + bill.balanceDue, 0);
-      
+
       const now = new Date();
       const in30Days = new Date();
       in30Days.setDate(now.getDate() + 30);
-      
+
       const dueIn30Days = billsData
         .filter(bill => {
           const dueDate = new Date(bill.dueDate);
-          return bill.status !== 'PAID' && bill.status !== 'CANCELLED' && 
-                 dueDate > now && dueDate <= in30Days;
+          return (
+            bill.status !== 'PAID' &&
+            bill.status !== 'CANCELLED' &&
+            dueDate > now &&
+            dueDate <= in30Days
+          );
         })
         .reduce((sum, bill) => sum + bill.balanceDue, 0);
-      
+
       const lastMonth = new Date();
       lastMonth.setMonth(now.getMonth() - 1);
-      
+
       const paidLastMonth = billsData
         .filter(bill => {
           const updatedAt = new Date(bill.updatedAt);
           return bill.status === 'PAID' && updatedAt >= lastMonth && updatedAt <= now;
         })
         .reduce((sum, bill) => sum + (bill.totalAmount - bill.balanceDue), 0);
-      
+
       setStats({
         totalPayable,
         overdueAmount,
@@ -242,7 +259,9 @@ export default function AccountsPayablePage() {
   if (!currentCompany) {
     return (
       <MainLayout>
-        <div className='no-company-message'>Please select a company to manage accounts payable.</div>
+        <div className='no-company-message'>
+          Please select a company to manage accounts payable.
+        </div>
       </MainLayout>
     );
   }
@@ -252,6 +271,18 @@ export default function AccountsPayablePage() {
       <div className='accounts-payable-page'>
         <div className='page-container'>
           <div className='page-header-section'>
+            <PageBreadcrumb
+              items={[
+                {
+                  title: 'Finance Overview',
+                  path: '/finance',
+                  icon: <HomeOutlined />,
+                },
+                {
+                  title: 'Payables',
+                },
+              ]}
+            />
             <Heading level={2} className='page-title'>
               Accounts Payable
             </Heading>
@@ -267,7 +298,7 @@ export default function AccountsPayablePage() {
                   precision={2}
                   valueStyle={{ color: '#7b5fc9' }}
                   prefix={<DollarOutlined />}
-                  suffix="USD"
+                  suffix='USD'
                 />
               </Card>
             </Col>
@@ -279,7 +310,7 @@ export default function AccountsPayablePage() {
                   precision={2}
                   valueStyle={{ color: '#ff4d4f' }}
                   prefix={<ClockCircleOutlined />}
-                  suffix="USD"
+                  suffix='USD'
                 />
               </Card>
             </Col>
@@ -291,7 +322,7 @@ export default function AccountsPayablePage() {
                   precision={2}
                   valueStyle={{ color: '#faad14' }}
                   prefix={<ClockCircleOutlined />}
-                  suffix="USD"
+                  suffix='USD'
                 />
               </Card>
             </Col>
@@ -303,7 +334,7 @@ export default function AccountsPayablePage() {
                   precision={2}
                   valueStyle={{ color: '#52c41a' }}
                   prefix={<DollarOutlined />}
-                  suffix="USD"
+                  suffix='USD'
                 />
               </Card>
             </Col>

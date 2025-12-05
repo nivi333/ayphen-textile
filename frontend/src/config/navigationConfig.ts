@@ -183,12 +183,6 @@ export const CORE_MODULES: MenuItem[] = [
     icon: FileTextOutlined,
     path: '/reports',
   },
-  {
-    key: 'analytics',
-    label: 'Analytics',
-    icon: BarChartOutlined,
-    path: '/analytics',
-  },
 ];
 
 /**
@@ -311,16 +305,16 @@ export const getNavigationByIndustry = (industry: IndustryType): MenuItem[] => {
   // Support both enum values and display labels for backward compatibility
   const industryModules: Record<string, MenuItem[]> = {
     // Enum values
-    'TEXTILE_MANUFACTURING': TEXTILE_MODULES,
-    'GARMENT_PRODUCTION': TEXTILE_MODULES,
-    'KNITTING_WEAVING': KNITTING_WEAVING_MODULES,
-    'FABRIC_PROCESSING': TEXTILE_MODULES,
-    'APPAREL_DESIGN': TEXTILE_MODULES,
-    'FASHION_RETAIL': TEXTILE_MODULES,
-    'YARN_PRODUCTION': TEXTILE_MODULES,
-    'DYEING_FINISHING': TEXTILE_MODULES,
-    'HOME_TEXTILES': TEXTILE_MODULES,
-    'TECHNICAL_TEXTILES': TEXTILE_MODULES,
+    TEXTILE_MANUFACTURING: TEXTILE_MODULES,
+    GARMENT_PRODUCTION: TEXTILE_MODULES,
+    KNITTING_WEAVING: KNITTING_WEAVING_MODULES,
+    FABRIC_PROCESSING: TEXTILE_MODULES,
+    APPAREL_DESIGN: TEXTILE_MODULES,
+    FASHION_RETAIL: TEXTILE_MODULES,
+    YARN_PRODUCTION: TEXTILE_MODULES,
+    DYEING_FINISHING: TEXTILE_MODULES,
+    HOME_TEXTILES: TEXTILE_MODULES,
+    TECHNICAL_TEXTILES: TEXTILE_MODULES,
     // Display labels (backward compatibility)
     'Textile Manufacturing': TEXTILE_MODULES,
     'Garment Production': TEXTILE_MODULES,
@@ -383,14 +377,14 @@ export const INDUSTRY_LABEL_TO_ENUM: Record<string, string> = {
  * Map enum value to display label
  */
 export const INDUSTRY_ENUM_TO_LABEL: Record<string, string> = {
-  'TEXTILE_MANUFACTURING': 'Textile Manufacturing',
-  'GARMENT_PRODUCTION': 'Garment Production',
-  'KNITTING_WEAVING': 'Knitting & Weaving',
-  'FABRIC_PROCESSING': 'Fabric Processing',
-  'APPAREL_DESIGN': 'Apparel Design',
-  'FASHION_RETAIL': 'Fashion Retail',
-  'YARN_PRODUCTION': 'Yarn Production',
-  'DYEING_FINISHING': 'Dyeing & Finishing',
-  'HOME_TEXTILES': 'Home Textiles',
-  'TECHNICAL_TEXTILES': 'Technical Textiles',
+  TEXTILE_MANUFACTURING: 'Textile Manufacturing',
+  GARMENT_PRODUCTION: 'Garment Production',
+  KNITTING_WEAVING: 'Knitting & Weaving',
+  FABRIC_PROCESSING: 'Fabric Processing',
+  APPAREL_DESIGN: 'Apparel Design',
+  FASHION_RETAIL: 'Fashion Retail',
+  YARN_PRODUCTION: 'Yarn Production',
+  DYEING_FINISHING: 'Dyeing & Finishing',
+  HOME_TEXTILES: 'Home Textiles',
+  TECHNICAL_TEXTILES: 'Technical Textiles',
 };

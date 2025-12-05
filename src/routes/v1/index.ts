@@ -19,6 +19,7 @@ import customerRoutes from './customerRoutes';
 import supplierRoutes from './supplierRoutes';
 import userRoutes from '../userRoutes';
 import analyticsRoutes from './analyticsRoutes';
+import reportRoutes from '../reportRoutes';
 // import productionRoutes from './productionRoutes';
 import { tenantIsolationMiddleware } from '../../middleware/tenantIsolation';
 import { userRateLimit } from '../../middleware/rateLimiter';
@@ -50,8 +51,8 @@ router.get('/', (req, res) => {
       inventory: '/inventory',
       machines: '/machines',
       analytics: '/analytics',
+      reports: '/reports',
       production: '/production (coming soon)',
-      reports: '/reports (coming soon)',
     },
     documentation: '/docs',
   });
@@ -84,8 +85,8 @@ router.use('/inventory', inventoryRoutes);
 router.use('/machines', machineRoutes);
 router.use('/users', userRoutes);
 router.use('/analytics', analyticsRoutes);
+router.use('/reports', reportRoutes);
 router.use('/companies/:tenantId/customers', customerRoutes);
 // router.use('/production', productionRoutes);
-// router.use('/reports', reportRoutes);
 
 export default router;
