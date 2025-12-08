@@ -1,5 +1,5 @@
 @import '../../index.scss';
-@import '../shared/ReportStyles.scss';
+@import './shared/ReportStyles.scss';
 
 .reports-categories-section {
   margin-top: $spacing-lg;
@@ -20,7 +20,7 @@
     align-items: center;
     height: 120px;
     background: linear-gradient(135deg, $primary-color, lighten($primary-color, 15%));
-    
+
     .anticon {
       font-size: 48px;
       color: $bg-primary;

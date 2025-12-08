@@ -13,6 +13,7 @@ import {
   Col,
   Spin,
   Input,
+  message,
 } from 'antd';
 import { DownloadOutlined, SaveOutlined, SearchOutlined } from '@ant-design/icons';
 import MainLayout from '../../../components/layout/MainLayout';
@@ -57,117 +58,31 @@ const ProductionEfficiencyReportPage: React.FC = () => {
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
   const [selectedProductionLine, setSelectedProductionLine] = useState<string | null>(null);
 
-  // Sample data - in a real app, this would come from an API call
-  const productionData: ProductionData[] = [
-    {
-      id: '1',
-      date: '2025-12-01',
-      department: 'Spinning',
-      productionLine: 'Line A',
-      plannedOutput: 1000,
-      actualOutput: 950,
-      efficiency: 95,
-      downtime: 45,
-      qualityRate: 98.5,
-      oee: 93.2,
-    },
-    {
-      id: '2',
-      date: '2025-12-02',
-      department: 'Spinning',
-      productionLine: 'Line A',
-      plannedOutput: 1000,
-      actualOutput: 980,
-      efficiency: 98,
-      downtime: 20,
-      qualityRate: 99.0,
-      oee: 97.0,
-    },
-    {
-      id: '3',
-      date: '2025-12-03',
-      department: 'Spinning',
-      productionLine: 'Line A',
-      plannedOutput: 1000,
-      actualOutput: 920,
-      efficiency: 92,
-      downtime: 60,
-      qualityRate: 97.8,
-      oee: 90.0,
-    },
-    {
-      id: '4',
-      date: '2025-12-01',
-      department: 'Weaving',
-      productionLine: 'Line B',
-      plannedOutput: 800,
-      actualOutput: 760,
-      efficiency: 95,
-      downtime: 30,
-      qualityRate: 98.0,
-      oee: 93.1,
-    },
-    {
-      id: '5',
-      date: '2025-12-02',
-      department: 'Weaving',
-      productionLine: 'Line B',
-      plannedOutput: 800,
-      actualOutput: 790,
-      efficiency: 98.8,
-      downtime: 15,
-      qualityRate: 99.2,
-      oee: 98.0,
-    },
-    {
-      id: '6',
-      date: '2025-12-03',
-      department: 'Weaving',
-      productionLine: 'Line B',
-      plannedOutput: 800,
-      actualOutput: 740,
-      efficiency: 92.5,
-      downtime: 50,
-      qualityRate: 97.5,
-      oee: 90.1,
-    },
-    {
-      id: '7',
-      date: '2025-12-01',
-      department: 'Dyeing',
-      productionLine: 'Line C',
-      plannedOutput: 600,
-      actualOutput: 580,
-      efficiency: 96.7,
-      downtime: 25,
-      qualityRate: 98.3,
-      oee: 95.0,
-    },
-    {
-      id: '8',
-      date: '2025-12-02',
-      department: 'Dyeing',
-      productionLine: 'Line C',
-      plannedOutput: 600,
-      actualOutput: 570,
-      efficiency: 95.0,
-      downtime: 35,
-      qualityRate: 97.9,
-      oee: 93.0,
-    },
-    {
-      id: '9',
-      date: '2025-12-03',
-      department: 'Dyeing',
-      productionLine: 'Line C',
-      plannedOutput: 600,
-      actualOutput: 590,
-      efficiency: 98.3,
-      downtime: 20,
-      qualityRate: 99.1,
-      oee: 97.4,
-    },
-  ];
+  // State for production data that will come from API
+  const [productionData, setProductionData] = useState<ProductionData[]>([]);
+  
+  // Function to fetch production data from API
+  const fetchProductionData = async () => {
+    setLoading(true);
+    try {
+      // In a real implementation, this would be an API call
+      // const response = await reportService.getProductionEfficiencyReport(dateRange[0].format('YYYY-MM-DD'), dateRange[1].format('YYYY-MM-DD'));
+      // setProductionData(response.data);
+      
+      // For now, we're just setting an empty array until the API is implemented
+      setProductionData([]);
+    } catch (error) {
+      console.error('Error fetching production data:', error);
+      message.error('Failed to fetch production data');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Fetch data on component mount and when date range changes
+  useEffect(() => {
+    fetchProductionData();
+  }, [dateRange]);
 
   // Filter data based on selections
   const filteredData = productionData.filter(item => {

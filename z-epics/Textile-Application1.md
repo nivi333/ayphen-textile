@@ -1898,4 +1898,19 @@ Comprehensive reporting system for financial, operational, and analytical report
 
 ---
 
+## Reports UI Refactoring - In Progress
+
+### Current Status
+- [x] Applied consistent card styling across all report screens
+- [x] Created shared SCSS file for consistent styling
+- [x] Fixed dark theme table background colors
+- [x] Removed dummy data from some report pages
+- [x] Created ProfitLossReportPage.tsx with API integration
+- [ ] Complete API integration for all report pages
+- [ ] Create remaining report detail pages
+
+**Detailed Implementation Plan**: See [REPORTS-UI-REFACTORING.md](./REPORTS-UI-REFACTORING.md) for the complete task list, API integration details, and implementation timeline.
+
+---
+
 **Note**: This document focuses on functional specifications and design guidelines. Implementation details, code examples, and technical architecture are maintained in separate technical documentation. All analytics and dashboards are integrated into the single unified dashboard - no separate dashboards for individual modules.
