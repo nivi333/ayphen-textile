@@ -411,6 +411,90 @@ export class ReportController {
   }
 
   /**
+   * GET /api/reports/low-stock
+   * Generate Low Stock Report
+   */
+  async getLowStockReport(req: Request, res: Response): Promise<void> {
+    try {
+      const { tenantId } = req;
+      if (!tenantId) {
+        res.status(401).json({ success: false, message: 'Unauthorized: No tenant context' });
+        return;
+      }
+
+      const { error, value } = locationSchema.validate(req.query);
+      if (error) {
+        res.status(400).json({
+          success: false,
+          message: 'Validation error',
+          details: error.details.map(d => d.message),
+        });
+        return;
+      }
+
+      const report = await reportService.generateLowStockReport(tenantId, value.locationId);
+
+      res.status(200).json({
+        success: true,
+        data: report,
+      });
+    } catch (error: any) {
+      console.error('Error generating low stock report:', error);
+      res.status(500).json({
+        success: false,
+        message: error?.message || 'Failed to generate low stock report',
+      });
+    }
+  }
+
+  /**
+   * GET /api/reports/stock-valuation
+   * Generate Stock Valuation Report
+   */
+  async getStockValuationReport(req: Request, res: Response): Promise<void> {
+    try {
+      const { tenantId } = req;
+      if (!tenantId) {
+        res.status(401).json({ success: false, message: 'Unauthorized: No tenant context' });
+        return;
+      }
+
+      const stockValuationSchema = Joi.object({
+        locationId: Joi.string().optional(),
+        asOfDate: Joi.date().optional(),
+      });
+
+      const { error, value } = stockValuationSchema.validate(req.query);
+      if (error) {
+        res.status(400).json({
+          success: false,
+          message: 'Validation error',
+          details: error.details.map(d => d.message),
+        });
+        return;
+      }
+
+      const asOfDate = value.asOfDate ? new Date(value.asOfDate) : new Date();
+      const report = await reportService.generateStockValuationReport(
+        tenantId,
+        value.locationId,
+        asOfDate
+      );
+
+      res.status(200).json({
+        success: true,
+        data: report,
+      });
+    } catch (error: any) {
+      console.error('Error generating stock valuation report:', error);
+      res.status(500).json({
+        success: false,
+        message: error?.message || 'Failed to generate stock valuation report',
+      });
+    }
+  }
+
+  /**
    * GET /api/reports/production-efficiency
    * Generate Production Efficiency Report
    */
@@ -708,8 +792,7 @@ export class ReportController {
       const report = await reportService.generateProductPerformanceReport(
         tenantId,
         new Date(value.startDate),
-        new Date(value.endDate),
-        value.limit
+        new Date(value.endDate)
       );
 
       res.status(200).json({
@@ -838,8 +921,7 @@ export class ReportController {
       const report = await reportService.generateTextileAnalyticsReport(
         tenantId,
         new Date(value.startDate),
-        new Date(value.endDate),
-        value.category
+        new Date(value.endDate)
       );
 
       res.status(200).json({

@@ -935,6 +935,7 @@ model location_inventory {
   max_stock_level    Decimal? @db.Decimal(12, 3)
   last_updated       DateTime @default(now())
   updated_by         String?
+  is_active          Boolean  @default(true)
 
   product  products          @relation(fields: [product_id], references: [id], onDelete: Cascade)
   location company_locations @relation(fields: [location_id], references: [id], onDelete: Cascade)

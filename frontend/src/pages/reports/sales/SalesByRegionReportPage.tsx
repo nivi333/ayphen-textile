@@ -8,6 +8,7 @@ import {
   Breadcrumb,
   Input,
   Button,
+  Select,
   DatePicker,
   Table,
   Space,
@@ -20,22 +21,24 @@ import '../shared/ReportStyles.scss';
 import dayjs from 'dayjs';
 
 const { Title } = Typography;
+const { Option } = Select;
 const { RangePicker } = DatePicker;
 
-interface TopProductData {
+interface SalesByRegionData {
   key: string;
-  rank: number;
-  productCode: string;
-  productName: string;
-  quantitySold: number;
-  revenue: number;
-  averagePrice: number;
+  locationCode: string;
+  locationName: string;
+  totalOrders: number;
+  totalRevenue: number;
+  averageOrderValue: number;
+  topProduct: string;
 }
 
-const TopSellingProductsReportPage: React.FC = () => {
+const SalesByRegionReportPage: React.FC = () => {
   const { setHeaderActions } = useHeader();
   const [searchText, setSearchText] = useState('');
   const [loading, setLoading] = useState(false);
+  const [locationId, setLocationId] = useState<string>('all');
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs]>([
     dayjs().subtract(30, 'days'),
     dayjs(),
@@ -52,12 +55,12 @@ const TopSellingProductsReportPage: React.FC = () => {
     try {
       // TODO: Implement API call when backend endpoint is ready
       await new Promise(resolve => setTimeout(resolve, 1000));
-      message.info('Top Selling Products Report API endpoint not yet implemented');
+      message.info('Sales by Region Report API endpoint not yet implemented');
       setReportData({
         summary: {
-          totalProducts: 0,
+          totalLocations: 0,
           totalRevenue: 0,
-          totalQuantity: 0,
+          totalOrders: 0,
         },
         items: [],
       });
@@ -71,43 +74,42 @@ const TopSellingProductsReportPage: React.FC = () => {
 
   const columns = [
     {
-      title: 'Rank',
-      dataIndex: 'rank',
-      key: 'rank',
-      width: 80,
+      title: 'Location Code',
+      dataIndex: 'locationCode',
+      key: 'locationCode',
     },
     {
-      title: 'Product Code',
-      dataIndex: 'productCode',
-      key: 'productCode',
-    },
-    {
-      title: 'Product Name',
-      dataIndex: 'productName',
-      key: 'productName',
+      title: 'Location Name',
+      dataIndex: 'locationName',
+      key: 'locationName',
       filteredValue: searchText ? [searchText] : null,
-      onFilter: (value: any, record: TopProductData) =>
-        record.productName.toLowerCase().includes(String(value).toLowerCase()) ||
-        record.productCode.toLowerCase().includes(String(value).toLowerCase()),
+      onFilter: (value: any, record: SalesByRegionData) =>
+        record.locationName.toLowerCase().includes(String(value).toLowerCase()) ||
+        record.locationCode.toLowerCase().includes(String(value).toLowerCase()),
     },
     {
-      title: 'Quantity Sold',
-      dataIndex: 'quantitySold',
-      key: 'quantitySold',
-      sorter: (a: TopProductData, b: TopProductData) => a.quantitySold - b.quantitySold,
+      title: 'Total Orders',
+      dataIndex: 'totalOrders',
+      key: 'totalOrders',
+      sorter: (a: SalesByRegionData, b: SalesByRegionData) => a.totalOrders - b.totalOrders,
     },
     {
-      title: 'Revenue',
-      dataIndex: 'revenue',
-      key: 'revenue',
-      sorter: (a: TopProductData, b: TopProductData) => a.revenue - b.revenue,
+      title: 'Total Revenue',
+      dataIndex: 'totalRevenue',
+      key: 'totalRevenue',
+      sorter: (a: SalesByRegionData, b: SalesByRegionData) => a.totalRevenue - b.totalRevenue,
       render: (value: number) => `₹${value.toFixed(2)}`,
     },
     {
-      title: 'Avg Price',
-      dataIndex: 'averagePrice',
-      key: 'averagePrice',
+      title: 'Avg Order Value',
+      dataIndex: 'averageOrderValue',
+      key: 'averageOrderValue',
       render: (value: number) => `₹${value.toFixed(2)}`,
+    },
+    {
+      title: 'Top Product',
+      dataIndex: 'topProduct',
+      key: 'topProduct',
     },
   ] as any;
 
@@ -120,23 +122,31 @@ const TopSellingProductsReportPage: React.FC = () => {
               { title: 'Home', href: '/' },
               { title: 'Reports', href: '/reports' },
               { title: 'Sales Reports', href: '/reports/sales' },
-              { title: 'Top Selling Products' },
+              { title: 'Sales by Region/Location' },
             ]}
             className='breadcrumb-navigation'
           />
-          <Title level={2}>Top Selling Products</Title>
+          <Title level={2}>Sales by Region/Location</Title>
         </div>
 
         <div className='filters-section'>
           <div>
             <Space size='middle'>
+              <Select
+                value={locationId}
+                onChange={setLocationId}
+                style={{ width: 200 }}
+                placeholder='Select Location'
+              >
+                <Option value='all'>All Locations</Option>
+              </Select>
               <RangePicker
                 value={dateRange}
                 onChange={(dates: any) => setDateRange(dates)}
                 format='YYYY-MM-DD'
               />
               <Input
-                placeholder='Search products'
+                placeholder='Search locations'
                 prefix={<SearchOutlined />}
                 value={searchText}
                 onChange={e => setSearchText(e.target.value)}
@@ -161,8 +171,8 @@ const TopSellingProductsReportPage: React.FC = () => {
             <Row gutter={[16, 16]}>
               <Col xs={24} sm={12} md={8}>
                 <Card className='summary-card'>
-                  <div className='summary-title'>Total Products</div>
-                  <div className='summary-value'>{reportData.summary?.totalProducts || 0}</div>
+                  <div className='summary-title'>Total Locations</div>
+                  <div className='summary-value'>{reportData.summary?.totalLocations || 0}</div>
                 </Card>
               </Col>
               <Col xs={24} sm={12} md={8}>
@@ -175,8 +185,8 @@ const TopSellingProductsReportPage: React.FC = () => {
               </Col>
               <Col xs={24} sm={12} md={8}>
                 <Card className='summary-card'>
-                  <div className='summary-title'>Total Quantity Sold</div>
-                  <div className='summary-value'>{reportData.summary?.totalQuantity || 0}</div>
+                  <div className='summary-title'>Total Orders</div>
+                  <div className='summary-value'>{reportData.summary?.totalOrders || 0}</div>
                 </Card>
               </Col>
             </Row>
@@ -198,7 +208,7 @@ const TopSellingProductsReportPage: React.FC = () => {
               />
             ) : (
               <div className='empty-report'>
-                <p>Click "Generate Report" to view the Top Selling Products.</p>
+                <p>Click "Generate Report" to view Sales by Region/Location.</p>
               </div>
             )}
           </div>
@@ -208,4 +218,4 @@ const TopSellingProductsReportPage: React.FC = () => {
   );
 };
 
-export default TopSellingProductsReportPage;
+export default SalesByRegionReportPage;

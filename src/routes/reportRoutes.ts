@@ -41,11 +41,7 @@ router.get(
 
 // GST Report (OWNER, ADMIN, MANAGER can view)
 // Query params: period (required)
-router.get(
-  '/gst',
-  requireRole(['OWNER', 'ADMIN', 'MANAGER']),
-  reportController.getGSTReport
-);
+router.get('/gst', requireRole(['OWNER', 'ADMIN', 'MANAGER']), reportController.getGSTReport);
 
 // Sales Summary Report (OWNER, ADMIN, MANAGER can view)
 // Query params: startDate, endDate (required)
@@ -85,6 +81,22 @@ router.get(
   '/expense-summary',
   requireRole(['OWNER', 'ADMIN', 'MANAGER']),
   reportController.getExpenseSummary
+);
+
+// Low Stock Report (OWNER, ADMIN, MANAGER can view)
+// Query params: locationId (optional)
+router.get(
+  '/low-stock',
+  requireRole(['OWNER', 'ADMIN', 'MANAGER']),
+  reportController.getLowStockReport
+);
+
+// Stock Valuation Report (OWNER, ADMIN, MANAGER can view)
+// Query params: locationId (optional), asOfDate (optional)
+router.get(
+  '/stock-valuation',
+  requireRole(['OWNER', 'ADMIN', 'MANAGER']),
+  reportController.getStockValuationReport
 );
 
 // Production Efficiency Report (OWNER, ADMIN, MANAGER can view)

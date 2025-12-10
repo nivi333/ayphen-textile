@@ -18,7 +18,7 @@ import {
   ProductPerformanceReport,
   CustomerInsightsReport,
   BusinessPerformanceReport,
-  TextileAnalyticsReport
+  TextileAnalyticsReport,
 } from './reportTypes';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';
@@ -27,7 +27,7 @@ class ReportService {
   private getAuthHeaders(): HeadersInit {
     const tokensStr = localStorage.getItem('auth_tokens');
     let token = null;
-    
+
     if (tokensStr) {
       try {
         const tokens = JSON.parse(tokensStr);
@@ -36,7 +36,7 @@ class ReportService {
         console.error('Failed to parse auth tokens:', e);
       }
     }
-    
+
     return {
       'Content-Type': 'application/json',
       ...(token && { Authorization: `Bearer ${token}` }),
@@ -46,10 +46,13 @@ class ReportService {
   // Financial Reports
   async getProfitLossReport(startDate: string, endDate: string): Promise<ProfitLossReport> {
     try {
-      const response = await fetch(`${API_BASE_URL}/reports/profit-loss?startDate=${startDate}&endDate=${endDate}`, {
-        method: 'GET',
-        headers: this.getAuthHeaders(),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/reports/profit-loss?startDate=${startDate}&endDate=${endDate}`,
+        {
+          method: 'GET',
+          headers: this.getAuthHeaders(),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to fetch profit & loss report');
@@ -65,7 +68,9 @@ class ReportService {
 
   async getBalanceSheet(asOfDate?: string): Promise<BalanceSheetReport> {
     try {
-      const url = asOfDate ? `${API_BASE_URL}/reports/balance-sheet?asOfDate=${asOfDate}` : `${API_BASE_URL}/reports/balance-sheet`;
+      const url = asOfDate
+        ? `${API_BASE_URL}/reports/balance-sheet?asOfDate=${asOfDate}`
+        : `${API_BASE_URL}/reports/balance-sheet`;
       const response = await fetch(url, {
         method: 'GET',
         headers: this.getAuthHeaders(),
@@ -85,10 +90,13 @@ class ReportService {
 
   async getCashFlowStatement(startDate: string, endDate: string): Promise<CashFlowReport> {
     try {
-      const response = await fetch(`${API_BASE_URL}/reports/cash-flow?startDate=${startDate}&endDate=${endDate}`, {
-        method: 'GET',
-        headers: this.getAuthHeaders(),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/reports/cash-flow?startDate=${startDate}&endDate=${endDate}`,
+        {
+          method: 'GET',
+          headers: this.getAuthHeaders(),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to fetch cash flow statement');
@@ -104,7 +112,9 @@ class ReportService {
 
   async getTrialBalance(asOfDate?: string): Promise<TrialBalanceReport> {
     try {
-      const url = asOfDate ? `${API_BASE_URL}/reports/trial-balance?asOfDate=${asOfDate}` : `${API_BASE_URL}/reports/trial-balance`;
+      const url = asOfDate
+        ? `${API_BASE_URL}/reports/trial-balance?asOfDate=${asOfDate}`
+        : `${API_BASE_URL}/reports/trial-balance`;
       const response = await fetch(url, {
         method: 'GET',
         headers: this.getAuthHeaders(),
@@ -144,7 +154,9 @@ class ReportService {
   // Existing Reports
   async getARAgingReport(asOfDate?: string): Promise<ARAgingReport> {
     try {
-      const url = asOfDate ? `${API_BASE_URL}/reports/ar-aging?asOfDate=${asOfDate}` : `${API_BASE_URL}/reports/ar-aging`;
+      const url = asOfDate
+        ? `${API_BASE_URL}/reports/ar-aging?asOfDate=${asOfDate}`
+        : `${API_BASE_URL}/reports/ar-aging`;
       const response = await fetch(url, {
         method: 'GET',
         headers: this.getAuthHeaders(),
@@ -164,7 +176,9 @@ class ReportService {
 
   async getAPAgingReport(asOfDate?: string): Promise<APAgingReport> {
     try {
-      const url = asOfDate ? `${API_BASE_URL}/reports/ap-aging?asOfDate=${asOfDate}` : `${API_BASE_URL}/reports/ap-aging`;
+      const url = asOfDate
+        ? `${API_BASE_URL}/reports/ap-aging?asOfDate=${asOfDate}`
+        : `${API_BASE_URL}/reports/ap-aging`;
       const response = await fetch(url, {
         method: 'GET',
         headers: this.getAuthHeaders(),
@@ -184,10 +198,13 @@ class ReportService {
 
   async getExpenseSummary(startDate: string, endDate: string): Promise<ExpenseSummaryReport> {
     try {
-      const response = await fetch(`${API_BASE_URL}/reports/expense-summary?startDate=${startDate}&endDate=${endDate}`, {
-        method: 'GET',
-        headers: this.getAuthHeaders(),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/reports/expense-summary?startDate=${startDate}&endDate=${endDate}`,
+        {
+          method: 'GET',
+          headers: this.getAuthHeaders(),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to fetch expense summary');
@@ -203,10 +220,13 @@ class ReportService {
 
   async getSalesSummary(startDate: string, endDate: string): Promise<SalesSummaryReport> {
     try {
-      const response = await fetch(`${API_BASE_URL}/reports/sales-summary?startDate=${startDate}&endDate=${endDate}`, {
-        method: 'GET',
-        headers: this.getAuthHeaders(),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/reports/sales-summary?startDate=${startDate}&endDate=${endDate}`,
+        {
+          method: 'GET',
+          headers: this.getAuthHeaders(),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to fetch sales summary');
@@ -222,7 +242,9 @@ class ReportService {
 
   async getInventorySummary(locationId?: string): Promise<InventorySummaryReport> {
     try {
-      const url = locationId ? `${API_BASE_URL}/reports/inventory-summary?locationId=${locationId}` : `${API_BASE_URL}/reports/inventory-summary`;
+      const url = locationId
+        ? `${API_BASE_URL}/reports/inventory-summary?locationId=${locationId}`
+        : `${API_BASE_URL}/reports/inventory-summary`;
       const response = await fetch(url, {
         method: 'GET',
         headers: this.getAuthHeaders(),
@@ -240,13 +262,71 @@ class ReportService {
     }
   }
 
-  // Operational Reports
-  async getProductionEfficiencyReport(startDate: string, endDate: string): Promise<ProductionEfficiencyReport> {
+  async getLowStockReport(locationId?: string): Promise<any> {
     try {
-      const response = await fetch(`${API_BASE_URL}/reports/production-efficiency?startDate=${startDate}&endDate=${endDate}`, {
+      const url = locationId
+        ? `${API_BASE_URL}/reports/low-stock?locationId=${locationId}`
+        : `${API_BASE_URL}/reports/low-stock`;
+      const response = await fetch(url, {
         method: 'GET',
         headers: this.getAuthHeaders(),
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch low stock report');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching low stock report:', error);
+      throw error;
+    }
+  }
+
+  async getStockValuationReport(locationId?: string, asOfDate?: string): Promise<any> {
+    try {
+      let url = `${API_BASE_URL}/reports/stock-valuation`;
+      const params = [];
+      if (locationId) params.push(`locationId=${locationId}`);
+      if (asOfDate) params.push(`asOfDate=${asOfDate}`);
+      if (params.length > 0) url += `?${params.join('&')}`;
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch stock valuation report');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching stock valuation report:', error);
+      throw error;
+    }
+  }
+
+  // Alias for getStockValuationReport
+  async getStockValuation(locationId?: string, asOfDate?: string): Promise<any> {
+    return this.getStockValuationReport(locationId, asOfDate);
+  }
+
+  // Operational Reports
+  async getProductionEfficiencyReport(
+    startDate: string,
+    endDate: string
+  ): Promise<ProductionEfficiencyReport> {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/reports/production-efficiency?startDate=${startDate}&endDate=${endDate}`,
+        {
+          method: 'GET',
+          headers: this.getAuthHeaders(),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to fetch production efficiency report');
@@ -260,13 +340,17 @@ class ReportService {
     }
   }
 
-  async getMachineUtilizationReport(startDate: string, endDate: string, locationId?: string): Promise<MachineUtilizationReport> {
+  async getMachineUtilizationReport(
+    startDate: string,
+    endDate: string,
+    locationId?: string
+  ): Promise<MachineUtilizationReport> {
     try {
       let url = `${API_BASE_URL}/reports/machine-utilization?startDate=${startDate}&endDate=${endDate}`;
       if (locationId && locationId !== 'all') {
         url += `&locationId=${locationId}`;
       }
-      
+
       const response = await fetch(url, {
         method: 'GET',
         headers: this.getAuthHeaders(),
@@ -286,10 +370,13 @@ class ReportService {
 
   async getQualityMetricsReport(startDate: string, endDate: string): Promise<QualityMetricsReport> {
     try {
-      const response = await fetch(`${API_BASE_URL}/reports/quality-metrics?startDate=${startDate}&endDate=${endDate}`, {
-        method: 'GET',
-        headers: this.getAuthHeaders(),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/reports/quality-metrics?startDate=${startDate}&endDate=${endDate}`,
+        {
+          method: 'GET',
+          headers: this.getAuthHeaders(),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to fetch quality metrics report');
@@ -303,13 +390,17 @@ class ReportService {
     }
   }
 
-  async getInventoryMovementReport(startDate: string, endDate: string, locationId?: string): Promise<InventoryMovementReport> {
+  async getInventoryMovementReport(
+    startDate: string,
+    endDate: string,
+    locationId?: string
+  ): Promise<InventoryMovementReport> {
     try {
       let url = `${API_BASE_URL}/reports/inventory-movement?startDate=${startDate}&endDate=${endDate}`;
       if (locationId && locationId !== 'all') {
         url += `&locationId=${locationId}`;
       }
-      
+
       const response = await fetch(url, {
         method: 'GET',
         headers: this.getAuthHeaders(),
@@ -327,12 +418,18 @@ class ReportService {
     }
   }
 
-  async getProductionPlanningReport(startDate: string, endDate: string): Promise<ProductionPlanningReport> {
+  async getProductionPlanningReport(
+    startDate: string,
+    endDate: string
+  ): Promise<ProductionPlanningReport> {
     try {
-      const response = await fetch(`${API_BASE_URL}/reports/production-planning?startDate=${startDate}&endDate=${endDate}`, {
-        method: 'GET',
-        headers: this.getAuthHeaders(),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/reports/production-planning?startDate=${startDate}&endDate=${endDate}`,
+        {
+          method: 'GET',
+          headers: this.getAuthHeaders(),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to fetch production planning report');
@@ -347,12 +444,19 @@ class ReportService {
   }
 
   // Analytics Reports
-  async getSalesTrendsReport(startDate: string, endDate: string, groupBy: string): Promise<SalesTrendsReport> {
+  async getSalesTrendsReport(
+    startDate: string,
+    endDate: string,
+    groupBy: string
+  ): Promise<SalesTrendsReport> {
     try {
-      const response = await fetch(`${API_BASE_URL}/reports/sales-trends?startDate=${startDate}&endDate=${endDate}&groupBy=${groupBy}`, {
-        method: 'GET',
-        headers: this.getAuthHeaders(),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/reports/sales-trends?startDate=${startDate}&endDate=${endDate}&groupBy=${groupBy}`,
+        {
+          method: 'GET',
+          headers: this.getAuthHeaders(),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to fetch sales trends report');
@@ -366,12 +470,19 @@ class ReportService {
     }
   }
 
-  async getProductPerformanceReport(startDate: string, endDate: string, limit: number): Promise<ProductPerformanceReport> {
+  async getProductPerformanceReport(
+    startDate: string,
+    endDate: string,
+    limit: number
+  ): Promise<ProductPerformanceReport> {
     try {
-      const response = await fetch(`${API_BASE_URL}/reports/product-performance?startDate=${startDate}&endDate=${endDate}&limit=${limit}`, {
-        method: 'GET',
-        headers: this.getAuthHeaders(),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/reports/product-performance?startDate=${startDate}&endDate=${endDate}&limit=${limit}`,
+        {
+          method: 'GET',
+          headers: this.getAuthHeaders(),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to fetch product performance report');
@@ -385,12 +496,18 @@ class ReportService {
     }
   }
 
-  async getCustomerInsightsReport(startDate: string, endDate: string): Promise<CustomerInsightsReport> {
+  async getCustomerInsightsReport(
+    startDate: string,
+    endDate: string
+  ): Promise<CustomerInsightsReport> {
     try {
-      const response = await fetch(`${API_BASE_URL}/reports/customer-insights?startDate=${startDate}&endDate=${endDate}`, {
-        method: 'GET',
-        headers: this.getAuthHeaders(),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/reports/customer-insights?startDate=${startDate}&endDate=${endDate}`,
+        {
+          method: 'GET',
+          headers: this.getAuthHeaders(),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to fetch customer insights report');
@@ -404,12 +521,18 @@ class ReportService {
     }
   }
 
-  async getBusinessPerformanceReport(startDate: string, endDate: string): Promise<BusinessPerformanceReport> {
+  async getBusinessPerformanceReport(
+    startDate: string,
+    endDate: string
+  ): Promise<BusinessPerformanceReport> {
     try {
-      const response = await fetch(`${API_BASE_URL}/reports/business-performance?startDate=${startDate}&endDate=${endDate}`, {
-        method: 'GET',
-        headers: this.getAuthHeaders(),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/reports/business-performance?startDate=${startDate}&endDate=${endDate}`,
+        {
+          method: 'GET',
+          headers: this.getAuthHeaders(),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to fetch business performance report');
@@ -423,13 +546,17 @@ class ReportService {
     }
   }
 
-  async getTextileAnalyticsReport(startDate: string, endDate: string, category?: string): Promise<TextileAnalyticsReport> {
+  async getTextileAnalyticsReport(
+    startDate: string,
+    endDate: string,
+    category?: string
+  ): Promise<TextileAnalyticsReport> {
     try {
       let url = `${API_BASE_URL}/reports/textile-analytics?startDate=${startDate}&endDate=${endDate}`;
       if (category && category !== 'all') {
         url += `&category=${category}`;
       }
-      
+
       const response = await fetch(url, {
         method: 'GET',
         headers: this.getAuthHeaders(),

@@ -59,9 +59,14 @@ import {
   StockSummaryReportPage,
   StockMovementReportPage,
   LowStockReportPage,
+  StockAgingReportPage,
+  StockValuationReportPage,
   // Sales Report Detail Pages
   SalesSummaryReportPage,
   SalesTrendReportPage,
+  TopSellingProductsReportPage,
+  CustomerPurchaseHistoryReportPage,
+  SalesByRegionReportPage,
 } from '../pages';
 import GoogleAuthCallback from '../components/auth/GoogleAuthCallback';
 
@@ -573,6 +578,24 @@ export default function AppRouter() {
               }
             />
 
+            <Route
+              path='/reports/inventory/stock-aging'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <StockAgingReportPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/reports/inventory/inventory-valuation'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <StockValuationReportPage />
+                </ProtectedRoute>
+              }
+            />
+
             {/* Sales Report Detail Pages */}
             <Route
               path='/reports/sales/sales-summary'
@@ -588,6 +611,33 @@ export default function AppRouter() {
               element={
                 <ProtectedRoute requireCompany={true}>
                   <SalesTrendReportPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/reports/sales/top-products'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <TopSellingProductsReportPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/reports/sales/customer-analysis'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <CustomerPurchaseHistoryReportPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/reports/sales/sales-by-region'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <SalesByRegionReportPage />
                 </ProtectedRoute>
               }
             />

@@ -966,7 +966,7 @@
 - [✅] **Notes**: Text area for internal notes (optional, max 500 chars)
 - [✅] **Customer Notes**: Text area for customer-facing notes (optional)
 - [✅] **Reference Number**: Text input (optional, e.g., customer PO number)
-- [✅] **Attachments**: File upload (PDF, images, max 5MB per file)
+- [✅] **Attachments**: File upload (PDF, images, max 2MB per file)
 
 **Table Display Columns**:
 - [✅] Order Code | Customer Name | Order Date | Delivery Date | Status | Total Amount | Active Status | Actions
@@ -1014,7 +1014,7 @@
 - [✅] **Notes**: Text area (optional, max 500 chars)
 - [✅] **Terms & Conditions**: Text area (optional)
 - [✅] **Reference Number**: Text input (optional)
-- [✅] **Attachments**: File upload (PDF, images, max 5MB)
+- [✅] **Attachments**: File upload (PDF, images, max 2MB)
 
 **Table Display Columns**:
 - [✅] PO Code | Supplier Name | PO Date | Delivery Date | Status | Total Amount | Active Status | Actions
@@ -1068,7 +1068,7 @@
 - [✅] **Notes**: Text area (optional, max 500 chars)
 - [✅] **Terms & Conditions**: Text area (optional)
 - [✅] **Bank Details**: Text area (for payment instructions)
-- [ ] **Attachments**: File upload (PDF, images, max 5MB)
+- [ ] **Attachments**: File upload (PDF, images, max 2MB)
 
 **Deletion Rules (Industry Standard)** ✅:
 - [✅] **DRAFT Status**: Can be deleted (soft delete, sets is_active = false)
@@ -1127,7 +1127,7 @@
 **Additional Fields** ✅:
 - [✅] **Notes**: Text area (optional, max 500 chars)
 - [✅] **Supplier Invoice Number**: Text input (supplier's reference)
-- [ ] **Attachments**: File upload (PDF, images, max 5MB)
+- [ ] **Attachments**: File upload (PDF, images, max 2MB)
 
 **Deletion Rules (Industry Standard)** ✅:
 - [✅] **DRAFT Status**: Can be deleted (soft delete, sets is_active = false)

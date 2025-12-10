@@ -276,6 +276,247 @@ export class ReportService {
   }
 
   /**
+   * Generate Low Stock Report
+   * Shows products that are at or below their reorder level
+   */
+  async generateLowStockReport(companyId: string, locationId?: string) {
+    if (!companyId || !companyId.trim()) {
+      throw new Error('Missing required field: companyId');
+    }
+
+    const where: any = {
+      company_id: companyId,
+      is_active: true,
+    };
+
+    if (locationId) {
+      where.location_id = locationId;
+    }
+
+    // Get all inventory items where stock is at or below reorder level
+    const inventory = await this.prisma.location_inventory.findMany({
+      where,
+      include: {
+        product: {
+          select: {
+            id: true,
+            product_code: true,
+            name: true,
+            unit_of_measure: true,
+            selling_price: true,
+            cost_price: true,
+          },
+        },
+        location: {
+          select: {
+            id: true,
+            name: true,
+            location_id: true,
+          },
+        },
+      },
+    });
+
+    // Filter for low stock items
+    const lowStockItems = inventory
+      .filter(
+        item => item.reorder_level && Number(item.stock_quantity) <= Number(item.reorder_level)
+      )
+      .map(item => ({
+        productId: item.product_id,
+        productCode: item.product?.product_code,
+        productName: item.product?.name,
+        locationId: item.location_id,
+        locationName: item.location?.name,
+        currentStock: Number(item.stock_quantity),
+        reorderLevel: Number(item.reorder_level),
+        shortfall: Number(item.reorder_level) - Number(item.stock_quantity),
+        unitOfMeasure: item.product?.unit_of_measure,
+        unitPrice: Number(item.product?.cost_price || 0),
+        estimatedReorderCost:
+          (Number(item.reorder_level) - Number(item.stock_quantity)) *
+          Number(item.product?.cost_price || 0),
+      }))
+      .sort((a, b) => b.shortfall - a.shortfall);
+
+    // Calculate summary
+    const totalLowStockItems = lowStockItems.length;
+    const totalShortfall = lowStockItems.reduce((sum, item) => sum + item.shortfall, 0);
+    const estimatedReorderCost = lowStockItems.reduce(
+      (sum, item) => sum + item.estimatedReorderCost,
+      0
+    );
+
+    // Group by location
+    const lowStockByLocation = lowStockItems.reduce(
+      (acc, item) => {
+        const locId = item.locationId;
+        const locName = item.locationName || 'Unknown';
+
+        if (!acc[locId]) {
+          acc[locId] = {
+            locationId: locId,
+            locationName: locName,
+            itemCount: 0,
+            totalShortfall: 0,
+            estimatedCost: 0,
+          };
+        }
+
+        acc[locId].itemCount += 1;
+        acc[locId].totalShortfall += item.shortfall;
+        acc[locId].estimatedCost += item.estimatedReorderCost;
+
+        return acc;
+      },
+      {} as Record<string, any>
+    );
+
+    return {
+      summary: {
+        totalLowStockItems,
+        totalShortfall,
+        estimatedReorderCost,
+      },
+      lowStockItems,
+      lowStockByLocation: Object.values(lowStockByLocation),
+    };
+  }
+
+  /**
+   * Generate Stock Valuation Report
+   * Shows total inventory value by location and product
+   */
+  async generateStockValuationReport(
+    companyId: string,
+    locationId?: string,
+    asOfDate: Date = new Date()
+  ) {
+    if (!companyId || !companyId.trim()) {
+      throw new Error('Missing required field: companyId');
+    }
+
+    const where: any = {
+      company_id: companyId,
+      is_active: true,
+    };
+
+    if (locationId) {
+      where.location_id = locationId;
+    }
+
+    const inventory = await this.prisma.location_inventory.findMany({
+      where,
+      include: {
+        product: {
+          select: {
+            id: true,
+            product_code: true,
+            name: true,
+            unit_of_measure: true,
+            selling_price: true,
+            cost_price: true,
+            category_id: true,
+          },
+        },
+        location: {
+          select: {
+            id: true,
+            name: true,
+            location_id: true,
+          },
+        },
+      },
+    });
+
+    // Calculate valuation for each item
+    const valuationItems = inventory.map(item => {
+      const quantity = Number(item.stock_quantity);
+      const costPrice = Number(item.product?.cost_price || 0);
+      const sellingPrice = Number(item.product?.selling_price || 0);
+      const costValue = quantity * costPrice;
+      const retailValue = quantity * sellingPrice;
+      const potentialProfit = retailValue - costValue;
+
+      return {
+        productId: item.product_id,
+        productCode: item.product?.product_code,
+        productName: item.product?.name,
+        locationId: item.location_id,
+        locationName: item.location?.name,
+        quantity,
+        unitOfMeasure: item.product?.unit_of_measure,
+        costPrice,
+        sellingPrice,
+        costValue,
+        retailValue,
+        potentialProfit,
+      };
+    });
+
+    // Calculate summary
+    const totalItems = valuationItems.length;
+    const totalQuantity = valuationItems.reduce((sum, item) => sum + item.quantity, 0);
+    const totalCostValue = valuationItems.reduce((sum, item) => sum + item.costValue, 0);
+    const totalRetailValue = valuationItems.reduce((sum, item) => sum + item.retailValue, 0);
+    const totalPotentialProfit = valuationItems.reduce(
+      (sum, item) => sum + item.potentialProfit,
+      0
+    );
+    const averageMarkup =
+      totalCostValue > 0 ? ((totalRetailValue - totalCostValue) / totalCostValue) * 100 : 0;
+
+    // Group by location
+    const valuationByLocation = valuationItems.reduce(
+      (acc, item) => {
+        const locId = item.locationId;
+        const locName = item.locationName || 'Unknown';
+
+        if (!acc[locId]) {
+          acc[locId] = {
+            locationId: locId,
+            locationName: locName,
+            itemCount: 0,
+            totalQuantity: 0,
+            costValue: 0,
+            retailValue: 0,
+            potentialProfit: 0,
+          };
+        }
+
+        acc[locId].itemCount += 1;
+        acc[locId].totalQuantity += item.quantity;
+        acc[locId].costValue += item.costValue;
+        acc[locId].retailValue += item.retailValue;
+        acc[locId].potentialProfit += item.potentialProfit;
+
+        return acc;
+      },
+      {} as Record<string, any>
+    );
+
+    // Top products by value
+    const topProductsByValue = valuationItems
+      .sort((a, b) => b.costValue - a.costValue)
+      .slice(0, 20);
+
+    return {
+      summary: {
+        totalItems,
+        totalQuantity,
+        totalCostValue,
+        totalRetailValue,
+        totalPotentialProfit,
+        averageMarkup,
+        asOfDate,
+      },
+      valuationByLocation: Object.values(valuationByLocation),
+      topProductsByValue,
+      allItems: valuationItems.sort((a, b) => b.costValue - a.costValue),
+    };
+  }
+
+  /**
    * Generate Accounts Receivable Aging Report
    * Shows outstanding invoices grouped by age
    */
@@ -692,7 +933,9 @@ export class ReportService {
           period: `${month.year}-${String(month.month + 1).padStart(2, '0')}`,
           revenue: Number(monthRevenue._sum.total_amount || 0),
           expenses: Number(monthExpenses._sum.total_amount || 0),
-          profit: Number(monthRevenue._sum.total_amount || 0) - Number(monthExpenses._sum.total_amount || 0),
+          profit:
+            Number(monthRevenue._sum.total_amount || 0) -
+            Number(monthExpenses._sum.total_amount || 0),
         };
       })
     );
@@ -768,14 +1011,10 @@ export class ReportService {
     });
 
     // Calculate current assets
-    const accountsReceivable = invoices.reduce(
-      (sum, inv) => sum + Number(inv.balance_due),
-      0
-    );
+    const accountsReceivable = invoices.reduce((sum, inv) => sum + Number(inv.balance_due), 0);
 
     const inventoryValue = inventory.reduce(
-      (sum, item) =>
-        sum + Number(item.stock_quantity) * Number(item.product?.cost_price || 0),
+      (sum, item) => sum + Number(item.stock_quantity) * Number(item.product?.cost_price || 0),
       0
     );
 
@@ -824,7 +1063,7 @@ export class ReportService {
     const totalEquity = totalAssets - totalLiabilities;
 
     const equity = [
-      { category: 'Owner\'s Capital', amount: 100000 }, // Placeholder
+      { category: "Owner's Capital", amount: 100000 }, // Placeholder
       { category: 'Retained Earnings', amount: totalEquity - 100000 }, // Calculated
     ];
 
@@ -887,15 +1126,9 @@ export class ReportService {
     });
 
     // Calculate operating cash flow
-    const cashFromCustomers = paidInvoices.reduce(
-      (sum, inv) => sum + Number(inv.total_amount),
-      0
-    );
+    const cashFromCustomers = paidInvoices.reduce((sum, inv) => sum + Number(inv.total_amount), 0);
 
-    const cashToSuppliers = paidBills.reduce(
-      (sum, bill) => sum + Number(bill.total_amount),
-      0
-    );
+    const cashToSuppliers = paidBills.reduce((sum, bill) => sum + Number(bill.total_amount), 0);
 
     const operatingCashFlow = cashFromCustomers - cashToSuppliers;
 
@@ -970,7 +1203,7 @@ export class ReportService {
       { accountCode: '2000', accountName: 'Accounts Payable', debit: 0, credit: 85000 },
       { accountCode: '2100', accountName: 'Accrued Expenses', debit: 0, credit: 25000 },
       { accountCode: '2500', accountName: 'Long-term Loans', debit: 0, credit: 200000 },
-      { accountCode: '3000', accountName: 'Owner\'s Capital', debit: 0, credit: 100000 },
+      { accountCode: '3000', accountName: "Owner's Capital", debit: 0, credit: 100000 },
       { accountCode: '3100', accountName: 'Retained Earnings', debit: 0, credit: 485000 },
       { accountCode: '4000', accountName: 'Sales Revenue', debit: 0, credit: 750000 },
       { accountCode: '5000', accountName: 'Cost of Goods Sold', debit: 450000, credit: 0 },
@@ -1273,11 +1506,7 @@ export class ReportService {
    * @param endDate - End date
    * @returns Production Efficiency Report
    */
-  async generateProductionEfficiencyReport(
-    companyId: string,
-    startDate: Date,
-    endDate: Date
-  ) {
+  async generateProductionEfficiencyReport(companyId: string, startDate: Date, endDate: Date) {
     // Fetch fabric production data to get production dates
     const fabricProduction = await this.prisma.fabric_production.findMany({
       where: {
@@ -1301,16 +1530,16 @@ export class ReportService {
     // Generate efficiency by day data
     const efficiencyByDay: any[] = [];
     const dayCount = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24));
-    
+
     for (let i = 0; i <= dayCount; i++) {
       const currentDate = new Date(startDate);
       currentDate.setDate(startDate.getDate() + i);
       const dateKey = currentDate.toISOString().split('T')[0];
-      
+
       const planned = Math.floor(Math.random() * 100) + 50; // 50-150
       const actual = Math.floor(planned * (Math.random() * 0.4 + 0.6)); // 60-100% of planned
       const efficiency = (actual / planned) * 100;
-      
+
       efficiencyByDay.push({
         date: dateKey,
         planned,
@@ -1336,7 +1565,7 @@ export class ReportService {
       const downtime = Math.floor(Math.random() * 50) + 10; // 10-60 hours
       const totalTime = runtime + downtime;
       const efficiency = (runtime / totalTime) * 100;
-      
+
       return {
         machineId: machine.machine_id,
         machineName: machine.name,
@@ -1357,9 +1586,7 @@ export class ReportService {
         actualProduction: totalActual,
         downtime: Math.round(totalDowntime / 60), // Convert minutes to hours
       },
-      efficiencyByDay: efficiencyByDay.sort((a, b) => 
-        a.date.localeCompare(b.date)
-      ),
+      efficiencyByDay: efficiencyByDay.sort((a, b) => a.date.localeCompare(b.date)),
       efficiencyByMachine: efficiencyByMachine.sort((a, b) => b.efficiency - a.efficiency),
       dateRange: {
         startDate,
@@ -1392,7 +1619,7 @@ export class ReportService {
 
     // For simplicity, we'll create sample data since the actual schema might not match
     // In a real implementation, you would use the actual schema and relationships
-    
+
     // Calculate utilization metrics
     let totalRuntime = 0;
     let totalDowntime = 0;
@@ -1406,17 +1633,17 @@ export class ReportService {
       const downtime = Math.floor(Math.random() * 30) + 5; // 5-35 hours
       const maintenance = Math.floor(Math.random() * 20) + 2; // 2-22 hours
       const breakdown = Math.floor(Math.random() * 15); // 0-15 hours
-      
+
       // Calculate total time and utilization
       const totalTime = runtime + downtime;
       const utilization = totalTime > 0 ? (runtime / totalTime) * 100 : 0;
-      
+
       // Add to totals
       totalRuntime += runtime;
       totalDowntime += downtime;
       totalMaintenanceHours += maintenance;
       totalBreakdownHours += breakdown;
-      
+
       return {
         machineId: machine.machine_id || machine.id,
         machineName: machine.name,
@@ -1431,17 +1658,17 @@ export class ReportService {
     // Generate sample utilization by day data
     const utilizationByDay: any[] = [];
     const dayCount = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24));
-    
+
     for (let i = 0; i <= dayCount; i++) {
       const currentDate = new Date(startDate);
       currentDate.setDate(startDate.getDate() + i);
       const dateKey = currentDate.toISOString().split('T')[0];
-      
+
       const runtime = Math.floor(Math.random() * 24) + 4; // 4-28 hours
       const downtime = Math.floor(Math.random() * 8); // 0-8 hours
       const totalTime = runtime + downtime;
       const utilization = totalTime > 0 ? (runtime / totalTime) * 100 : 0;
-      
+
       utilizationByDay.push({
         date: dateKey,
         runtime,
@@ -1464,7 +1691,7 @@ export class ReportService {
           company_id: companyId,
         },
       });
-      
+
       if (location) {
         locationInfo = {
           locationId,
@@ -1482,9 +1709,7 @@ export class ReportService {
         breakdownHours: totalBreakdownHours,
       },
       utilizationByMachine: utilizationByMachine.sort((a, b) => b.utilization - a.utilization),
-      utilizationByDay: utilizationByDay.sort((a, b) => 
-        a.date.localeCompare(b.date)
-      ),
+      utilizationByDay: utilizationByDay.sort((a, b) => a.date.localeCompare(b.date)),
       dateRange: {
         startDate,
         endDate,
@@ -1492,7 +1717,7 @@ export class ReportService {
       ...(locationInfo && { location: locationInfo }),
     };
   }
-  
+
   /**
    * Generate Quality Metrics Report
    * @param companyId - Company ID
@@ -1500,11 +1725,7 @@ export class ReportService {
    * @param endDate - End date
    * @returns Quality Metrics Report
    */
-  async generateQualityMetricsReport(
-    companyId: string,
-    startDate: Date,
-    endDate: Date
-  ) {
+  async generateQualityMetricsReport(companyId: string, startDate: Date, endDate: Date) {
     // Fetch quality inspections to get count
     const inspections = await this.prisma.quality_inspections.findMany({
       where: {
@@ -1540,15 +1761,15 @@ export class ReportService {
     // Calculate summary metrics
     const totalInspections = inspections.length;
     const totalDefects = defects.length;
-    
+
     // Calculate pass rate (using 'PASSED' status only since 'PASSED_WITH_NOTES' might not exist)
-    const passedInspections = inspections.filter(inspection => 
-      inspection.status === 'PASSED'
+    const passedInspections = inspections.filter(
+      inspection => inspection.status === 'PASSED'
     ).length;
-    
+
     const passRate = totalInspections > 0 ? (passedInspections / totalInspections) * 100 : 0;
     const defectRate = totalInspections > 0 ? (totalDefects / totalInspections) * 100 : 0;
-    
+
     // Generate average quality score (random since we don't have actual scores)
     const averageQualityScore = Math.floor(Math.random() * 20) + 80; // 80-100
 
@@ -1559,7 +1780,7 @@ export class ReportService {
       const averageScore = Math.floor(Math.random() * 20) + 80; // 80-100
       const inspectionCount = Math.floor(Math.random() * 10) + 5; // 5-15
       const defectCount = Math.floor(Math.random() * 5); // 0-5
-      
+
       qualityByProduct.push({
         productId,
         productName: `Product ${i + 1}`,
@@ -1572,11 +1793,11 @@ export class ReportService {
     // Generate defects by type data
     const defectTypes = ['Color', 'Size', 'Texture', 'Strength', 'Finish'];
     const defectsByType = [];
-    
+
     for (let i = 0; i < defectTypes.length; i++) {
       const count = Math.floor(Math.random() * 10) + 1; // 1-11
       const percentage = (count / totalDefects) * 100;
-      
+
       defectsByType.push({
         defectType: defectTypes[i],
         count,
@@ -1587,16 +1808,16 @@ export class ReportService {
     // Generate quality trend by date data
     const qualityTrend = [];
     const dayCount = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24));
-    
+
     for (let i = 0; i <= dayCount; i++) {
       const currentDate = new Date(startDate);
       currentDate.setDate(startDate.getDate() + i);
       const dateKey = currentDate.toISOString().split('T')[0];
-      
+
       const averageScore = Math.floor(Math.random() * 20) + 80; // 80-100
       const inspectionCount = Math.floor(Math.random() * 5) + 1; // 1-6
       const passRate = Math.floor(Math.random() * 20) + 80; // 80-100
-      
+
       qualityTrend.push({
         date: dateKey,
         averageScore,
@@ -1622,7 +1843,7 @@ export class ReportService {
       },
     };
   }
-  
+
   /**
    * Generate Inventory Movement Report
    * @param companyId - Company ID
@@ -1637,92 +1858,205 @@ export class ReportService {
     endDate: Date,
     locationId?: string
   ) {
-    // Fetch products to use as inventory items
-    const products = await this.prisma.products.findMany({
-      where: {
-        company_id: companyId,
-      },
-      select: {
-        id: true,
-      },
-      take: 10, // Limit to 10 items for sample data
-    });
-
-    // Generate sample movement data
-    const totalMovements = Math.floor(Math.random() * 50) + 50; // 50-100
-    const incoming = Math.floor(Math.random() * 500) + 500; // 500-1000
-    const outgoing = Math.floor(Math.random() * 400) + 100; // 100-500
-    const netChange = incoming - outgoing;
-    const valueChange = Math.floor(Math.random() * 10000) + 5000; // 5000-15000
-
-    // Generate movements by type
-    const movementTypes = ['PURCHASE', 'SALE', 'TRANSFER_IN', 'TRANSFER_OUT', 'ADJUSTMENT', 'PRODUCTION'];
-    const movementsByType = [];
-    
-    for (let i = 0; i < movementTypes.length; i++) {
-      const movementType = movementTypes[i];
-      const count = Math.floor(Math.random() * 20) + 5; // 5-25
-      const quantity = Math.floor(Math.random() * 100) + 50; // 50-150
-      const value = Math.floor(Math.random() * 5000) + 1000; // 1000-6000
-      
-      movementsByType.push({
-        movementType,
-        count,
-        quantity,
-        value,
-      });
+    if (!companyId || !companyId.trim()) {
+      throw new Error('Missing required field: companyId');
     }
 
-    // Generate movements by product
-    const movementsByProduct = [];
-    
-    for (const product of products) {
-      const productId = product.id;
-      const incoming = Math.floor(Math.random() * 100) + 50; // 50-150
-      const outgoing = Math.floor(Math.random() * 50) + 10; // 10-60
-      const netChange = incoming - outgoing;
-      
-      movementsByProduct.push({
-        productId,
-        productName: `Product ${productId.substring(0, 8)}`,
-        incoming,
-        outgoing,
-        netChange,
+    // Build where clause for stock movements
+    const where: any = {
+      company_id: companyId,
+      created_at: {
+        gte: startDate,
+        lte: endDate,
+      },
+    };
+
+    // Add location filter if provided
+    if (locationId) {
+      where.OR = [{ from_location_id: locationId }, { to_location_id: locationId }];
+    }
+
+    // Fetch all stock movements in date range
+    const movements = await this.prisma.stock_movements.findMany({
+      where,
+      include: {
+        from_location: {
+          select: {
+            id: true,
+            name: true,
+            location_id: true,
+          },
+        },
+        to_location: {
+          select: {
+            id: true,
+            name: true,
+            location_id: true,
+          },
+        },
+      },
+      orderBy: { created_at: 'asc' },
+    });
+
+    // Calculate summary metrics
+    const totalMovements = movements.length;
+
+    // Calculate incoming (movements TO the location or PURCHASE/PRODUCTION_IN types)
+    const incoming = movements
+      .filter(m => {
+        if (locationId) {
+          return m.to_location_id === locationId;
+        }
+        return ['PURCHASE', 'TRANSFER_IN', 'ADJUSTMENT_IN', 'PRODUCTION_IN', 'RETURN_IN'].includes(
+          m.movement_type
+        );
+      })
+      .reduce((sum, m) => sum + Number(m.quantity), 0);
+
+    // Calculate outgoing (movements FROM the location or SALE/PRODUCTION_OUT types)
+    const outgoing = movements
+      .filter(m => {
+        if (locationId) {
+          return m.from_location_id === locationId;
+        }
+        return [
+          'SALE',
+          'TRANSFER_OUT',
+          'ADJUSTMENT_OUT',
+          'PRODUCTION_OUT',
+          'RETURN_OUT',
+          'DAMAGE',
+        ].includes(m.movement_type);
+      })
+      .reduce((sum, m) => sum + Number(m.quantity), 0);
+
+    const netChange = incoming - outgoing;
+
+    // Calculate value change
+    const valueChange = movements.reduce((sum, m) => sum + Number(m.total_cost || 0), 0);
+
+    // Group movements by type
+    const movementsByType = movements.reduce(
+      (acc, movement) => {
+        const type = movement.movement_type;
+
+        if (!acc[type]) {
+          acc[type] = {
+            movementType: type,
+            count: 0,
+            quantity: 0,
+            value: 0,
+          };
+        }
+
+        acc[type].count += 1;
+        acc[type].quantity += Number(movement.quantity);
+        acc[type].value += Number(movement.total_cost || 0);
+
+        return acc;
+      },
+      {} as Record<string, any>
+    );
+
+    // Group movements by product
+    const movementsByProduct = movements.reduce(
+      (acc, movement) => {
+        const productId = movement.product_id;
+
+        if (!acc[productId]) {
+          acc[productId] = {
+            productId,
+            productName: `Product ${productId.substring(0, 8)}`, // Will be enriched with actual product data
+            incoming: 0,
+            outgoing: 0,
+            netChange: 0,
+          };
+        }
+
+        // Determine if this is incoming or outgoing
+        const isIncoming = locationId
+          ? movement.to_location_id === locationId
+          : ['PURCHASE', 'TRANSFER_IN', 'ADJUSTMENT_IN', 'PRODUCTION_IN', 'RETURN_IN'].includes(
+              movement.movement_type
+            );
+
+        if (isIncoming) {
+          acc[productId].incoming += Number(movement.quantity);
+        } else {
+          acc[productId].outgoing += Number(movement.quantity);
+        }
+
+        acc[productId].netChange = acc[productId].incoming - acc[productId].outgoing;
+
+        return acc;
+      },
+      {} as Record<string, any>
+    );
+
+    // Enrich product data with actual product names
+    const productIds = Object.keys(movementsByProduct);
+    if (productIds.length > 0) {
+      const products = await this.prisma.products.findMany({
+        where: {
+          id: { in: productIds },
+          company_id: companyId,
+        },
+        select: {
+          id: true,
+          name: true,
+          product_code: true,
+        },
+      });
+
+      products.forEach(product => {
+        if (movementsByProduct[product.id]) {
+          movementsByProduct[product.id].productName = product.name;
+          movementsByProduct[product.id].productCode = product.product_code;
+        }
       });
     }
 
     // Generate movement trend by date
-    const movementTrend = [];
-    const dayCount = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24));
-    
-    for (let i = 0; i <= dayCount; i++) {
-      const currentDate = new Date(startDate);
-      currentDate.setDate(startDate.getDate() + i);
-      const dateKey = currentDate.toISOString().split('T')[0];
-      
-      const incoming = Math.floor(Math.random() * 50) + 10; // 10-60
-      const outgoing = Math.floor(Math.random() * 40) + 5; // 5-45
-      const netChange = incoming - outgoing;
-      
-      movementTrend.push({
-        date: dateKey,
-        incoming,
-        outgoing,
-        netChange,
-      });
-    }
+    const movementTrend: Record<string, any> = {};
+
+    movements.forEach(movement => {
+      const dateKey = movement.created_at.toISOString().split('T')[0];
+
+      if (!movementTrend[dateKey]) {
+        movementTrend[dateKey] = {
+          date: dateKey,
+          incoming: 0,
+          outgoing: 0,
+          netChange: 0,
+        };
+      }
+
+      const isIncoming = locationId
+        ? movement.to_location_id === locationId
+        : ['PURCHASE', 'TRANSFER_IN', 'ADJUSTMENT_IN', 'PRODUCTION_IN', 'RETURN_IN'].includes(
+            movement.movement_type
+          );
+
+      if (isIncoming) {
+        movementTrend[dateKey].incoming += Number(movement.quantity);
+      } else {
+        movementTrend[dateKey].outgoing += Number(movement.quantity);
+      }
+
+      movementTrend[dateKey].netChange =
+        movementTrend[dateKey].incoming - movementTrend[dateKey].outgoing;
+    });
 
     // Prepare location info if specified
     let locationInfo;
     if (locationId) {
-      // Fetch location name
       const location = await this.prisma.company_locations.findFirst({
         where: {
           id: locationId,
           company_id: companyId,
         },
       });
-      
+
       if (location) {
         locationInfo = {
           locationId,
@@ -1739,11 +2073,11 @@ export class ReportService {
         netChange,
         valueChange,
       },
-      movementsByType: movementsByType,
-      movementsByProduct: movementsByProduct.sort((a, b) => 
-        Math.abs(b.netChange) - Math.abs(a.netChange)
+      movementsByType: Object.values(movementsByType),
+      movementsByProduct: Object.values(movementsByProduct).sort(
+        (a, b) => Math.abs(b.netChange) - Math.abs(a.netChange)
       ),
-      movementTrend: movementTrend.sort((a, b) => 
+      movementTrend: Object.values(movementTrend).sort((a: any, b: any) =>
         a.date.localeCompare(b.date)
       ),
       dateRange: {
@@ -1753,7 +2087,7 @@ export class ReportService {
       ...(locationInfo && { location: locationInfo }),
     };
   }
-  
+
   /**
    * Generate Production Planning Report
    * @param companyId - Company ID
@@ -1761,11 +2095,7 @@ export class ReportService {
    * @param endDate - End date
    * @returns Production Planning Report
    */
-  async generateProductionPlanningReport(
-    companyId: string,
-    startDate: Date,
-    endDate: Date
-  ) {
+  async generateProductionPlanningReport(companyId: string, startDate: Date, endDate: Date) {
     // Fetch orders data (just count)
     const orderCount = await this.prisma.orders.count({
       where: {
@@ -1782,16 +2112,24 @@ export class ReportService {
     const completedOrders = Math.floor(totalOrders * 0.6); // 60% completed
     const inProgressOrders = Math.floor(totalOrders * 0.3); // 30% in progress
     const pendingOrders = totalOrders - completedOrders - inProgressOrders; // Remaining are pending
-    
+
     // Calculate on-time completion rate
     const onTimeDeliveries = Math.floor(completedOrders * 0.8); // 80% on time
-    const onTimeCompletionRate = completedOrders > 0 ? 
-      (onTimeDeliveries / completedOrders) * 100 : 0;
+    const onTimeCompletionRate =
+      completedOrders > 0 ? (onTimeDeliveries / completedOrders) * 100 : 0;
 
     // Generate orders by status
-    const statuses = ['DRAFT', 'CONFIRMED', 'IN_PRODUCTION', 'READY_TO_SHIP', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
+    const statuses = [
+      'DRAFT',
+      'CONFIRMED',
+      'IN_PRODUCTION',
+      'READY_TO_SHIP',
+      'SHIPPED',
+      'DELIVERED',
+      'CANCELLED',
+    ];
     const ordersByStatus = [];
-    
+
     for (const status of statuses) {
       let count;
       switch (status) {
@@ -1807,9 +2145,9 @@ export class ReportService {
         default:
           count = Math.floor(inProgressOrders / 4); // Distribute in-progress orders
       }
-      
+
       const percentage = totalOrders > 0 ? (count / totalOrders) * 100 : 0;
-      
+
       ordersByStatus.push({
         status,
         count,
@@ -1830,12 +2168,12 @@ export class ReportService {
 
     // Generate orders by product
     const ordersByProduct = [];
-    
+
     for (const product of products) {
       const productId = product.id;
       const orderCount = Math.floor(Math.random() * 10) + 1; // 1-11
       const quantity = Math.floor(Math.random() * 100) + 10; // 10-110
-      
+
       ordersByProduct.push({
         productId,
         productName: `Product ${productId.substring(0, 8)}`,
@@ -1847,18 +2185,18 @@ export class ReportService {
     // Generate capacity utilization data
     const capacityUtilization = [];
     const dayCount = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24));
-    
+
     for (let i = 0; i <= dayCount; i++) {
       const currentDate = new Date(startDate);
       currentDate.setDate(startDate.getDate() + i);
       const dateKey = currentDate.toISOString().split('T')[0];
-      
+
       // Generate sample data
       const capacity = 100; // Theoretical max capacity
       const planned = Math.floor(Math.random() * 40) + 60; // 60-100
       const actual = Math.floor(planned * (Math.random() * 0.3 + 0.7)); // 70-100% of planned
       const utilization = (actual / capacity) * 100;
-      
+
       capacityUtilization.push({
         date: dateKey,
         capacity,
@@ -1878,16 +2216,14 @@ export class ReportService {
       },
       ordersByStatus,
       ordersByProduct: ordersByProduct.sort((a, b) => b.quantity - a.quantity),
-      capacityUtilization: capacityUtilization.sort((a, b) => 
-        a.date.localeCompare(b.date)
-      ),
+      capacityUtilization: capacityUtilization.sort((a, b) => a.date.localeCompare(b.date)),
       dateRange: {
         startDate,
         endDate,
       },
     };
   }
-  
+
   /**
    * Generate Sales Trends Report
    * @param companyId - Company ID
@@ -1902,124 +2238,146 @@ export class ReportService {
     endDate: Date,
     groupBy: string = 'month'
   ) {
-    // Fetch invoices count
-    const invoiceCount = await this.prisma.financial_documents.count({
+    if (!companyId || !companyId.trim()) {
+      throw new Error('Missing required field: companyId');
+    }
+
+    // Fetch all invoices in date range
+    const invoices = await this.prisma.invoices.findMany({
       where: {
         company_id: companyId,
-        document_type: 'INVOICE',
-        created_at: {
+        is_active: true,
+        invoice_date: {
           gte: startDate,
           lte: endDate,
         },
       },
+      include: {
+        invoice_items: true,
+      },
+      orderBy: { invoice_date: 'asc' },
     });
 
-    // Generate sample data for sales trends
-    const totalOrders = invoiceCount || Math.floor(Math.random() * 50) + 30; // Use real count or generate 30-80
-    const totalRevenue = totalOrders * (Math.floor(Math.random() * 500) + 500); // $500-1000 per order
+    // Calculate summary metrics
+    const totalOrders = invoices.length;
+    const totalRevenue = invoices.reduce((sum, inv) => sum + Number(inv.total_amount), 0);
     const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
-    
-    // Calculate growth rate
-    const growthRate = Math.floor(Math.random() * 30) - 5; // -5% to +25%
-    
-    // Generate period keys based on date range and groupBy
+
+    // Calculate growth rate (compare first half vs second half of period)
+    const midpoint = new Date((startDate.getTime() + endDate.getTime()) / 2);
+    const firstHalfRevenue = invoices
+      .filter(inv => inv.invoice_date < midpoint)
+      .reduce((sum, inv) => sum + Number(inv.total_amount), 0);
+    const secondHalfRevenue = invoices
+      .filter(inv => inv.invoice_date >= midpoint)
+      .reduce((sum, inv) => sum + Number(inv.total_amount), 0);
+    const growthRate =
+      firstHalfRevenue > 0 ? ((secondHalfRevenue - firstHalfRevenue) / firstHalfRevenue) * 100 : 0;
+
+    // Helper function to get period key based on date and groupBy
     const getPeriodKey = (date: Date) => {
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       const day = date.getDate();
-      
+
       switch (groupBy) {
         case 'day':
           return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-        case 'week':
+        case 'week': {
           // Get ISO week number
           const d = new Date(date);
           d.setHours(0, 0, 0, 0);
-          d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
-          const week = Math.floor((d.getTime() - new Date(d.getFullYear(), 0, 4).getTime()) / 86400000 / 7) + 1;
+          d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
+          const week =
+            Math.floor((d.getTime() - new Date(d.getFullYear(), 0, 4).getTime()) / 86400000 / 7) +
+            1;
           return `${year}-W${week.toString().padStart(2, '0')}`;
-        case 'quarter':
-          const quarter = Math.floor((date.getMonth() / 3)) + 1;
+        }
+        case 'quarter': {
+          const quarter = Math.floor(date.getMonth() / 3) + 1;
           return `${year}-Q${quarter}`;
+        }
         case 'month':
         default:
           return `${year}-${month.toString().padStart(2, '0')}`;
       }
     };
-    
-    // Generate trends by period data
-    const trendsByPeriod = [];
-    let periodCount;
-    
-    switch (groupBy) {
-      case 'day':
-        periodCount = Math.min(30, Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)));
-        break;
-      case 'week':
-        periodCount = Math.min(12, Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24 * 7)));
-        break;
-      case 'quarter':
-        periodCount = Math.min(4, Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24 * 90)));
-        break;
-      case 'month':
-      default:
-        periodCount = Math.min(12, Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24 * 30)));
-    }
-    
-    periodCount = Math.max(periodCount, 1); // Ensure at least 1 period
-    
-    // Generate data for each period
-    for (let i = 0; i < periodCount; i++) {
-      const currentDate = new Date(startDate);
-      
-      switch (groupBy) {
-        case 'day':
-          currentDate.setDate(startDate.getDate() + i);
-          break;
-        case 'week':
-          currentDate.setDate(startDate.getDate() + (i * 7));
-          break;
-        case 'quarter':
-          currentDate.setMonth(startDate.getMonth() + (i * 3));
-          break;
-        case 'month':
-        default:
-          currentDate.setMonth(startDate.getMonth() + i);
+
+    // Group invoices by period
+    const periodData: Record<string, any> = {};
+
+    invoices.forEach(invoice => {
+      const periodKey = getPeriodKey(invoice.invoice_date);
+
+      if (!periodData[periodKey]) {
+        periodData[periodKey] = {
+          period: periodKey,
+          revenue: 0,
+          orders: 0,
+          growth: 0,
+        };
       }
-      
-      const periodKey = getPeriodKey(currentDate);
-      const revenue = Math.floor(Math.random() * 10000) + 5000; // $5000-15000
-      const orders = Math.floor(Math.random() * 20) + 5; // 5-25
-      const growth = i === 0 ? 0 : Math.floor(Math.random() * 40) - 10; // -10% to +30%
-      
-      trendsByPeriod.push({
-        period: periodKey,
-        revenue,
-        orders,
-        growth,
-      });
+
+      periodData[periodKey].revenue += Number(invoice.total_amount);
+      periodData[periodKey].orders += 1;
+    });
+
+    // Convert to array and sort
+    const trendsByPeriod = Object.values(periodData).sort((a: any, b: any) =>
+      a.period.localeCompare(b.period)
+    );
+
+    // Calculate growth for each period (compared to previous period)
+    for (let i = 1; i < trendsByPeriod.length; i++) {
+      const current = trendsByPeriod[i];
+      const previous = trendsByPeriod[i - 1];
+      current.growth =
+        previous.revenue > 0 ? ((current.revenue - previous.revenue) / previous.revenue) * 100 : 0;
     }
-    
-    // Sort periods chronologically
-    trendsByPeriod.sort((a, b) => a.period.localeCompare(b.period));
-    
+
     // Find peak period
     let peakPeriod = 'N/A';
     if (trendsByPeriod.length > 0) {
-      const maxRevenuePeriod = trendsByPeriod.reduce((max, period) => 
-        period.revenue > max.revenue ? period : max
-      , trendsByPeriod[0]);
-      
+      const maxRevenuePeriod = trendsByPeriod.reduce(
+        (max: any, period: any) => (period.revenue > max.revenue ? period : max),
+        trendsByPeriod[0]
+      );
+
       peakPeriod = maxRevenuePeriod.period;
     }
-    
-    // Generate product categories for revenue breakdown
-    const trendsByCategory = [
-      { category: 'Fabric', revenue: totalRevenue * 0.4, percentage: 40, growth: 15 },
-      { category: 'Garments', revenue: totalRevenue * 0.3, percentage: 30, growth: 8 },
-      { category: 'Yarn', revenue: totalRevenue * 0.2, percentage: 20, growth: -5 },
-      { category: 'Accessories', revenue: totalRevenue * 0.1, percentage: 10, growth: 20 },
-    ];
+
+    // Revenue breakdown by category (based on invoice items)
+    const categoryRevenue: Record<string, number> = {};
+    let totalCategoryRevenue = 0;
+
+    invoices.forEach(invoice => {
+      invoice.invoice_items.forEach(item => {
+        // For now, we'll use a simple categorization based on description
+        // In a real implementation, this would use product categories
+        const category = item.description?.includes('Fabric')
+          ? 'Fabric'
+          : item.description?.includes('Garment')
+            ? 'Garments'
+            : item.description?.includes('Yarn')
+              ? 'Yarn'
+              : 'Other';
+
+        if (!categoryRevenue[category]) {
+          categoryRevenue[category] = 0;
+        }
+
+        categoryRevenue[category] += Number(item.line_amount);
+        totalCategoryRevenue += Number(item.line_amount);
+      });
+    });
+
+    // Convert to array with percentages
+    const trendsByCategory = Object.entries(categoryRevenue).map(([category, revenue]) => ({
+      category,
+      revenue,
+      percentage: totalCategoryRevenue > 0 ? (revenue / totalCategoryRevenue) * 100 : 0,
+      growth: 0, // Could be calculated by comparing periods
+    }));
 
     return {
       summary: {
@@ -2046,11 +2404,7 @@ export class ReportService {
    * @param endDate - End date
    * @returns Product Performance Report
    */
-  async generateProductPerformanceReport(
-    companyId: string,
-    startDate: Date,
-    endDate: Date
-  ) {
+  async generateProductPerformanceReport(companyId: string, startDate: Date, endDate: Date) {
     // Delegate to analyticsReportService
     return analyticsReportService.generateProductPerformanceReport(companyId, startDate, endDate);
   }
@@ -2062,11 +2416,7 @@ export class ReportService {
    * @param endDate - End date
    * @returns Customer Insights Report
    */
-  async generateCustomerInsightsReport(
-    companyId: string,
-    startDate: Date,
-    endDate: Date
-  ) {
+  async generateCustomerInsightsReport(companyId: string, startDate: Date, endDate: Date) {
     // Delegate to analyticsReportService
     return analyticsReportService.generateCustomerInsightsReport(companyId, startDate, endDate);
   }
@@ -2078,11 +2428,7 @@ export class ReportService {
    * @param endDate - End date
    * @returns Business Performance Report
    */
-  async generateBusinessPerformanceReport(
-    companyId: string,
-    startDate: Date,
-    endDate: Date
-  ) {
+  async generateBusinessPerformanceReport(companyId: string, startDate: Date, endDate: Date) {
     // Delegate to analyticsReportService
     return analyticsReportService.generateBusinessPerformanceReport(companyId, startDate, endDate);
   }
@@ -2094,11 +2440,7 @@ export class ReportService {
    * @param endDate - End date
    * @returns Textile Analytics Report
    */
-  async generateTextileAnalyticsReport(
-    companyId: string,
-    startDate: Date,
-    endDate: Date
-  ) {
+  async generateTextileAnalyticsReport(companyId: string, startDate: Date, endDate: Date) {
     // Delegate to analyticsReportService
     return analyticsReportService.generateTextileAnalyticsReport(companyId, startDate, endDate);
   }

@@ -13,9 +13,8 @@ import {
   Space,
   Spin,
   message,
-  Tag,
 } from 'antd';
-import { SearchOutlined, FileTextOutlined, SaveOutlined, WarningOutlined } from '@ant-design/icons';
+import { SearchOutlined, FileTextOutlined, SaveOutlined } from '@ant-design/icons';
 import MainLayout from '../../../components/layout/MainLayout';
 import { reportService } from '../../../services/reportService';
 import '../shared/ReportStyles.scss';
@@ -23,16 +22,19 @@ import '../shared/ReportStyles.scss';
 const { Title } = Typography;
 const { Option } = Select;
 
-interface LowStockData {
+interface ValuationData {
   key: string;
   product: string;
-  currentStock: number;
-  reorderLevel: number;
   location: string;
-  status: string;
+  quantity: number;
+  costPrice: number;
+  sellingPrice: number;
+  costValue: number;
+  retailValue: number;
+  potentialProfit: number;
 }
 
-const LowStockReportPage: React.FC = () => {
+const InventoryValuationReportPage: React.FC = () => {
   const { setHeaderActions } = useHeader();
   const [searchText, setSearchText] = useState('');
   const [loading, setLoading] = useState(false);
@@ -41,8 +43,6 @@ const LowStockReportPage: React.FC = () => {
 
   useEffect(() => {
     setHeaderActions(null);
-    // Auto-load report on mount
-    handleGenerateReport();
     return () => setHeaderActions(null);
   }, [setHeaderActions]);
 
@@ -50,7 +50,7 @@ const LowStockReportPage: React.FC = () => {
     setLoading(true);
     try {
       const locId = locationId === 'all' ? undefined : locationId;
-      const data = await reportService.getLowStockReport(locId);
+      const data = await reportService.getStockValuation(locId);
       setReportData(data);
     } catch (error) {
       console.error('Error generating report:', error);
@@ -65,27 +65,10 @@ const LowStockReportPage: React.FC = () => {
       title: 'Product',
       dataIndex: 'product',
       key: 'product',
-      sorter: (a: LowStockData, b: LowStockData) => {
-        const aVal = a.product || '';
-        const bVal = b.product || '';
-        return aVal.localeCompare(bVal);
-      },
+      sorter: (a: ValuationData, b: ValuationData) => a.product.localeCompare(b.product),
       filteredValue: searchText ? [searchText] : null,
-      onFilter: (value: any, record: LowStockData) =>
-        (record.product || '').toLowerCase().includes(String(value).toLowerCase()) ||
-        (record.location || '').toLowerCase().includes(String(value).toLowerCase()),
-    },
-    {
-      title: 'Current Stock',
-      dataIndex: 'currentStock',
-      key: 'currentStock',
-      sorter: (a: LowStockData, b: LowStockData) => (a.currentStock || 0) - (b.currentStock || 0),
-    },
-    {
-      title: 'Reorder Level',
-      dataIndex: 'reorderLevel',
-      key: 'reorderLevel',
-      sorter: (a: LowStockData, b: LowStockData) => (a.reorderLevel || 0) - (b.reorderLevel || 0),
+      onFilter: (value: any, record: ValuationData) =>
+        record.product.toLowerCase().includes(String(value).toLowerCase()),
     },
     {
       title: 'Location',
@@ -93,41 +76,62 @@ const LowStockReportPage: React.FC = () => {
       key: 'location',
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status: string) => {
-        const color = status === 'Critical' ? 'red' : status === 'Low' ? 'orange' : 'yellow';
-        return (
-          <Tag color={color} icon={<WarningOutlined />}>
-            {status}
-          </Tag>
-        );
-      },
+      title: 'Quantity',
+      dataIndex: 'quantity',
+      key: 'quantity',
+      sorter: (a: ValuationData, b: ValuationData) => a.quantity - b.quantity,
+    },
+    {
+      title: 'Cost Price',
+      dataIndex: 'costPrice',
+      key: 'costPrice',
+      render: (value: number) => `₹${value.toFixed(2)}`,
+    },
+    {
+      title: 'Selling Price',
+      dataIndex: 'sellingPrice',
+      key: 'sellingPrice',
+      render: (value: number) => `₹${value.toFixed(2)}`,
+    },
+    {
+      title: 'Cost Value',
+      dataIndex: 'costValue',
+      key: 'costValue',
+      sorter: (a: ValuationData, b: ValuationData) => a.costValue - b.costValue,
+      render: (value: number) => `₹${value.toFixed(2)}`,
+    },
+    {
+      title: 'Retail Value',
+      dataIndex: 'retailValue',
+      key: 'retailValue',
+      sorter: (a: ValuationData, b: ValuationData) => a.retailValue - b.retailValue,
+      render: (value: number) => `₹${value.toFixed(2)}`,
+    },
+    {
+      title: 'Potential Profit',
+      dataIndex: 'potentialProfit',
+      key: 'potentialProfit',
+      sorter: (a: ValuationData, b: ValuationData) => a.potentialProfit - b.potentialProfit,
+      render: (value: number) => (
+        <span style={{ color: value >= 0 ? '#52c41a' : '#ff4d4f' }}>₹{value.toFixed(2)}</span>
+      ),
     },
   ] as any;
 
   const getTableData = () => {
-    if (!reportData || !reportData.lowStockItems) return [];
+    if (!reportData || !reportData.allItems) return [];
 
-    return reportData.lowStockItems.map((item: any, index: number) => {
-      const currentStock = item.currentStock || 0;
-      const reorderLevel = item.reorderLevel || 0;
-      const shortfall = item.shortfall || 0;
-
-      let status = 'Low';
-      if (currentStock === 0) status = 'Out of Stock';
-      else if (shortfall > reorderLevel * 0.5) status = 'Critical';
-
-      return {
-        key: `low-stock-${index}`,
-        product: item.productName || item.product || item.name || 'Unknown',
-        currentStock,
-        reorderLevel,
-        location: item.locationName || item.location || 'N/A',
-        status,
-      };
-    });
+    return reportData.allItems.map((item: any, index: number) => ({
+      key: `item-${index}`,
+      product: item.productName || item.product,
+      location: item.locationName || item.location || 'All Locations',
+      quantity: item.quantity || 0,
+      costPrice: item.costPrice || 0,
+      sellingPrice: item.sellingPrice || 0,
+      costValue: item.costValue || 0,
+      retailValue: item.retailValue || 0,
+      potentialProfit: item.potentialProfit || 0,
+    }));
   };
 
   return (
@@ -139,11 +143,11 @@ const LowStockReportPage: React.FC = () => {
               { title: 'Home', href: '/' },
               { title: 'Reports', href: '/reports' },
               { title: 'Inventory Reports', href: '/reports/inventory' },
-              { title: 'Low Stock Alert' },
+              { title: 'Inventory Valuation' },
             ]}
             className='breadcrumb-navigation'
           />
-          <Title level={2}>Low Stock Alert Report</Title>
+          <Title level={2}>Inventory Valuation</Title>
         </div>
 
         <div className='filters-section'>
@@ -183,32 +187,32 @@ const LowStockReportPage: React.FC = () => {
             <Row gutter={[16, 16]}>
               <Col xs={24} sm={12} md={6}>
                 <Card className='summary-card'>
-                  <div className='summary-title'>Total Low Stock Items</div>
-                  <div className='summary-value' style={{ color: '#ff4d4f' }}>
-                    {reportData.summary?.totalLowStockItems || 0}
+                  <div className='summary-title'>Total Items</div>
+                  <div className='summary-value'>{reportData.summary?.totalItems || 0}</div>
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} md={6}>
+                <Card className='summary-card'>
+                  <div className='summary-title'>Total Cost Value</div>
+                  <div className='summary-value'>
+                    ₹{reportData.summary?.totalCostValue?.toFixed(2) || '0.00'}
                   </div>
                 </Card>
               </Col>
               <Col xs={24} sm={12} md={6}>
                 <Card className='summary-card'>
-                  <div className='summary-title'>Total Shortfall</div>
-                  <div className='summary-value' style={{ color: '#ff4d4f' }}>
-                    {reportData.summary?.totalShortfall || 0}
+                  <div className='summary-title'>Total Retail Value</div>
+                  <div className='summary-value'>
+                    ₹{reportData.summary?.totalRetailValue?.toFixed(2) || '0.00'}
                   </div>
                 </Card>
               </Col>
               <Col xs={24} sm={12} md={6}>
                 <Card className='summary-card'>
-                  <div className='summary-title'>Estimated Reorder Cost</div>
-                  <div className='summary-value' style={{ color: '#faad14' }}>
-                    ₹{reportData.summary?.estimatedReorderCost?.toFixed(2) || '0.00'}
+                  <div className='summary-title'>Potential Profit</div>
+                  <div className='summary-value' style={{ color: '#52c41a' }}>
+                    ₹{reportData.summary?.totalPotentialProfit?.toFixed(2) || '0.00'}
                   </div>
-                </Card>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Card className='summary-card'>
-                  <div className='summary-title'>Locations Affected</div>
-                  <div className='summary-value'>{reportData.lowStockByLocation?.length || 0}</div>
                 </Card>
               </Col>
             </Row>
@@ -226,7 +230,7 @@ const LowStockReportPage: React.FC = () => {
               <Table columns={columns} dataSource={getTableData()} pagination={{ pageSize: 10 }} />
             ) : (
               <div className='empty-report'>
-                <p>Click "Generate Report" to view Low Stock items.</p>
+                <p>Click "Generate Report" to view the Inventory Valuation.</p>
               </div>
             )}
           </div>
@@ -236,4 +240,4 @@ const LowStockReportPage: React.FC = () => {
   );
 };
 
-export default LowStockReportPage;
+export default InventoryValuationReportPage;

@@ -82,10 +82,15 @@ export { default as ExpenseSummaryReportPage } from './reports/financial/Expense
 export { default as StockSummaryReportPage } from './reports/inventory/StockSummaryReportPage';
 export { default as StockMovementReportPage } from './reports/inventory/StockMovementReportPage';
 export { default as LowStockReportPage } from './reports/inventory/LowStockReportPage';
+export { default as StockAgingReportPage } from './reports/inventory/StockAgingReportPage';
+export { default as StockValuationReportPage } from './reports/inventory/StockValuationReportPage';
 
 // Sales Report Detail Pages
 export { default as SalesSummaryReportPage } from './reports/sales/SalesSummaryReportPage';
 export { default as SalesTrendReportPage } from './reports/sales/SalesTrendReportPage';
+export { default as TopSellingProductsReportPage } from './reports/sales/TopSellingProductsReportPage';
+export { default as CustomerPurchaseHistoryReportPage } from './reports/sales/CustomerPurchaseHistoryReportPage';
+export { default as SalesByRegionReportPage } from './reports/sales/SalesByRegionReportPage';
 
 // Textile Operations
 export { default as FabricProductionListPage } from './textile/FabricProductionListPage';

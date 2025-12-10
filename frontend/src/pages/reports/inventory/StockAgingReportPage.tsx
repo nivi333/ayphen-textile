@@ -15,24 +15,24 @@ import {
   message,
   Tag,
 } from 'antd';
-import { SearchOutlined, FileTextOutlined, SaveOutlined, WarningOutlined } from '@ant-design/icons';
+import { SearchOutlined, FileTextOutlined, SaveOutlined } from '@ant-design/icons';
 import MainLayout from '../../../components/layout/MainLayout';
-import { reportService } from '../../../services/reportService';
 import '../shared/ReportStyles.scss';
 
 const { Title } = Typography;
 const { Option } = Select;
 
-interface LowStockData {
+interface StockAgingData {
   key: string;
   product: string;
-  currentStock: number;
-  reorderLevel: number;
   location: string;
+  stockQuantity: number;
+  lastMovementDate: string;
+  ageDays: number;
   status: string;
 }
 
-const LowStockReportPage: React.FC = () => {
+const StockAgingReportPage: React.FC = () => {
   const { setHeaderActions } = useHeader();
   const [searchText, setSearchText] = useState('');
   const [loading, setLoading] = useState(false);
@@ -41,17 +41,23 @@ const LowStockReportPage: React.FC = () => {
 
   useEffect(() => {
     setHeaderActions(null);
-    // Auto-load report on mount
-    handleGenerateReport();
     return () => setHeaderActions(null);
   }, [setHeaderActions]);
 
   const handleGenerateReport = async () => {
     setLoading(true);
     try {
-      const locId = locationId === 'all' ? undefined : locationId;
-      const data = await reportService.getLowStockReport(locId);
-      setReportData(data);
+      // TODO: Implement API call when backend endpoint is ready
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      message.info('Stock Aging Report API endpoint not yet implemented');
+      setReportData({
+        summary: {
+          totalProducts: 0,
+          slowMovingItems: 0,
+          averageAge: 0,
+        },
+        items: [],
+      });
     } catch (error) {
       console.error('Error generating report:', error);
       message.error('Failed to generate report. Please try again.');
@@ -65,27 +71,10 @@ const LowStockReportPage: React.FC = () => {
       title: 'Product',
       dataIndex: 'product',
       key: 'product',
-      sorter: (a: LowStockData, b: LowStockData) => {
-        const aVal = a.product || '';
-        const bVal = b.product || '';
-        return aVal.localeCompare(bVal);
-      },
+      sorter: (a: StockAgingData, b: StockAgingData) => a.product.localeCompare(b.product),
       filteredValue: searchText ? [searchText] : null,
-      onFilter: (value: any, record: LowStockData) =>
-        (record.product || '').toLowerCase().includes(String(value).toLowerCase()) ||
-        (record.location || '').toLowerCase().includes(String(value).toLowerCase()),
-    },
-    {
-      title: 'Current Stock',
-      dataIndex: 'currentStock',
-      key: 'currentStock',
-      sorter: (a: LowStockData, b: LowStockData) => (a.currentStock || 0) - (b.currentStock || 0),
-    },
-    {
-      title: 'Reorder Level',
-      dataIndex: 'reorderLevel',
-      key: 'reorderLevel',
-      sorter: (a: LowStockData, b: LowStockData) => (a.reorderLevel || 0) - (b.reorderLevel || 0),
+      onFilter: (value: any, record: StockAgingData) =>
+        record.product.toLowerCase().includes(String(value).toLowerCase()),
     },
     {
       title: 'Location',
@@ -93,42 +82,33 @@ const LowStockReportPage: React.FC = () => {
       key: 'location',
     },
     {
+      title: 'Stock Qty',
+      dataIndex: 'stockQuantity',
+      key: 'stockQuantity',
+      sorter: (a: StockAgingData, b: StockAgingData) => a.stockQuantity - b.stockQuantity,
+    },
+    {
+      title: 'Last Movement',
+      dataIndex: 'lastMovementDate',
+      key: 'lastMovementDate',
+    },
+    {
+      title: 'Age (Days)',
+      dataIndex: 'ageDays',
+      key: 'ageDays',
+      sorter: (a: StockAgingData, b: StockAgingData) => a.ageDays - b.ageDays,
+    },
+    {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
       render: (status: string) => {
-        const color = status === 'Critical' ? 'red' : status === 'Low' ? 'orange' : 'yellow';
-        return (
-          <Tag color={color} icon={<WarningOutlined />}>
-            {status}
-          </Tag>
-        );
+        const color =
+          status === 'Slow Moving' ? 'warning' : status === 'Dead Stock' ? 'error' : 'success';
+        return <Tag color={color}>{status}</Tag>;
       },
     },
   ] as any;
-
-  const getTableData = () => {
-    if (!reportData || !reportData.lowStockItems) return [];
-
-    return reportData.lowStockItems.map((item: any, index: number) => {
-      const currentStock = item.currentStock || 0;
-      const reorderLevel = item.reorderLevel || 0;
-      const shortfall = item.shortfall || 0;
-
-      let status = 'Low';
-      if (currentStock === 0) status = 'Out of Stock';
-      else if (shortfall > reorderLevel * 0.5) status = 'Critical';
-
-      return {
-        key: `low-stock-${index}`,
-        product: item.productName || item.product || item.name || 'Unknown',
-        currentStock,
-        reorderLevel,
-        location: item.locationName || item.location || 'N/A',
-        status,
-      };
-    });
-  };
 
   return (
     <MainLayout>
@@ -139,11 +119,11 @@ const LowStockReportPage: React.FC = () => {
               { title: 'Home', href: '/' },
               { title: 'Reports', href: '/reports' },
               { title: 'Inventory Reports', href: '/reports/inventory' },
-              { title: 'Low Stock Alert' },
+              { title: 'Stock Aging' },
             ]}
             className='breadcrumb-navigation'
           />
-          <Title level={2}>Low Stock Alert Report</Title>
+          <Title level={2}>Stock Aging Report</Title>
         </div>
 
         <div className='filters-section'>
@@ -181,34 +161,24 @@ const LowStockReportPage: React.FC = () => {
         {reportData && (
           <div className='report-summary-section'>
             <Row gutter={[16, 16]}>
-              <Col xs={24} sm={12} md={6}>
+              <Col xs={24} sm={12} md={8}>
                 <Card className='summary-card'>
-                  <div className='summary-title'>Total Low Stock Items</div>
-                  <div className='summary-value' style={{ color: '#ff4d4f' }}>
-                    {reportData.summary?.totalLowStockItems || 0}
-                  </div>
+                  <div className='summary-title'>Total Products</div>
+                  <div className='summary-value'>{reportData.summary?.totalProducts || 0}</div>
                 </Card>
               </Col>
-              <Col xs={24} sm={12} md={6}>
+              <Col xs={24} sm={12} md={8}>
                 <Card className='summary-card'>
-                  <div className='summary-title'>Total Shortfall</div>
-                  <div className='summary-value' style={{ color: '#ff4d4f' }}>
-                    {reportData.summary?.totalShortfall || 0}
-                  </div>
-                </Card>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Card className='summary-card'>
-                  <div className='summary-title'>Estimated Reorder Cost</div>
+                  <div className='summary-title'>Slow Moving Items</div>
                   <div className='summary-value' style={{ color: '#faad14' }}>
-                    ₹{reportData.summary?.estimatedReorderCost?.toFixed(2) || '0.00'}
+                    {reportData.summary?.slowMovingItems || 0}
                   </div>
                 </Card>
               </Col>
-              <Col xs={24} sm={12} md={6}>
+              <Col xs={24} sm={12} md={8}>
                 <Card className='summary-card'>
-                  <div className='summary-title'>Locations Affected</div>
-                  <div className='summary-value'>{reportData.lowStockByLocation?.length || 0}</div>
+                  <div className='summary-title'>Average Age (Days)</div>
+                  <div className='summary-value'>{reportData.summary?.averageAge || 0}</div>
                 </Card>
               </Col>
             </Row>
@@ -223,10 +193,14 @@ const LowStockReportPage: React.FC = () => {
                 <p>Generating report...</p>
               </div>
             ) : reportData ? (
-              <Table columns={columns} dataSource={getTableData()} pagination={{ pageSize: 10 }} />
+              <Table
+                columns={columns}
+                dataSource={reportData.items}
+                pagination={{ pageSize: 10 }}
+              />
             ) : (
               <div className='empty-report'>
-                <p>Click "Generate Report" to view Low Stock items.</p>
+                <p>Click "Generate Report" to view the Stock Aging Report.</p>
               </div>
             )}
           </div>
@@ -236,4 +210,4 @@ const LowStockReportPage: React.FC = () => {
   );
 };
 
-export default LowStockReportPage;
+export default StockAgingReportPage;
