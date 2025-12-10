@@ -57,7 +57,7 @@ const InspectionSummaryReportPage: React.FC = () => {
       try {
         const startDate = firstDay.toISOString().split('T')[0];
         const endDate = lastDay.toISOString().split('T')[0];
-        const data = await reportService.getQualityMetrics(startDate, endDate);
+        const data = await reportService.getProductionEfficiencyReport(startDate, endDate);
         setReportData(data);
       } catch (error) {
         console.error('Error generating report:', error);
@@ -80,7 +80,7 @@ const InspectionSummaryReportPage: React.FC = () => {
     try {
       const startDate = dateRange[0].toISOString().split('T')[0];
       const endDate = dateRange[1].toISOString().split('T')[0];
-      const data = await reportService.getQualityMetrics(startDate, endDate);
+      const data = await reportService.getProductionEfficiencyReport(startDate, endDate);
       setReportData(data);
     } catch (error) {
       console.error('Error generating report:', error);
