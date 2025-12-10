@@ -86,31 +86,45 @@ const BalanceSheetReportPage: React.FC = () => {
   const getTableData = () => {
     if (!reportData) return [];
 
-    const assetsData =
-      reportData.assets?.map((item: any, index: number) => ({
-        key: `asset-${index}`,
-        account: item.name || item.account,
-        category: 'Assets',
-        amount: item.amount || item.balance,
-      })) || [];
+    const tableData: BalanceSheetData[] = [];
 
-    const liabilitiesData =
-      reportData.liabilities?.map((item: any, index: number) => ({
-        key: `liability-${index}`,
-        account: item.name || item.account,
-        category: 'Liabilities',
-        amount: item.amount || item.balance,
-      })) || [];
+    // Handle assets
+    if (reportData.assets && Array.isArray(reportData.assets)) {
+      reportData.assets.forEach((item: any, index: number) => {
+        tableData.push({
+          key: `asset-${index}`,
+          account: item.name || item.account || item.accountName || 'Unknown',
+          category: 'Assets',
+          amount: item.amount || item.balance || 0,
+        });
+      });
+    }
 
-    const equityData =
-      reportData.equity?.map((item: any, index: number) => ({
-        key: `equity-${index}`,
-        account: item.name || item.account,
-        category: 'Equity',
-        amount: item.amount || item.balance,
-      })) || [];
+    // Handle liabilities
+    if (reportData.liabilities && Array.isArray(reportData.liabilities)) {
+      reportData.liabilities.forEach((item: any, index: number) => {
+        tableData.push({
+          key: `liability-${index}`,
+          account: item.name || item.account || item.accountName || 'Unknown',
+          category: 'Liabilities',
+          amount: item.amount || item.balance || 0,
+        });
+      });
+    }
 
-    return [...assetsData, ...liabilitiesData, ...equityData];
+    // Handle equity
+    if (reportData.equity && Array.isArray(reportData.equity)) {
+      reportData.equity.forEach((item: any, index: number) => {
+        tableData.push({
+          key: `equity-${index}`,
+          account: item.name || item.account || item.accountName || 'Unknown',
+          category: 'Equity',
+          amount: item.amount || item.balance || 0,
+        });
+      });
+    }
+
+    return tableData;
   };
 
   return (
