@@ -89,24 +89,32 @@ const CashFlowReportPage: React.FC = () => {
       title: 'Activity',
       dataIndex: 'activity',
       key: 'activity',
-      sorter: (a: CashFlowData, b: CashFlowData) => a.activity.localeCompare(b.activity),
+      sorter: (a: CashFlowData, b: CashFlowData) => {
+        const aVal = a.activity || '';
+        const bVal = b.activity || '';
+        return aVal.localeCompare(bVal);
+      },
       filteredValue: searchText ? [searchText] : null,
       onFilter: (value: any, record: CashFlowData) =>
-        record.activity.toLowerCase().includes(String(value).toLowerCase()) ||
-        record.category.toLowerCase().includes(String(value).toLowerCase()),
+        (record.activity || '').toLowerCase().includes(String(value).toLowerCase()) ||
+        (record.category || '').toLowerCase().includes(String(value).toLowerCase()),
     },
     {
       title: 'Category',
       dataIndex: 'category',
       key: 'category',
-      sorter: (a: CashFlowData, b: CashFlowData) => a.category.localeCompare(b.category),
+      sorter: (a: CashFlowData, b: CashFlowData) => {
+        const aVal = a.category || '';
+        const bVal = b.category || '';
+        return aVal.localeCompare(bVal);
+      },
     },
     {
       title: 'Amount (₹)',
       dataIndex: 'amount',
       key: 'amount',
-      render: (amount: number) => amount.toFixed(2),
-      sorter: (a: CashFlowData, b: CashFlowData) => a.amount - b.amount,
+      render: (amount: number) => (amount || 0).toFixed(2),
+      sorter: (a: CashFlowData, b: CashFlowData) => (a.amount || 0) - (b.amount || 0),
     },
   ] as any;
 
