@@ -8,40 +8,40 @@ This document outlines the detailed implementation plan for refactoring the Repo
 ### 1. Remove All Dummy Data
 - [x] Updated FinancialReportsPage.tsx to use API integration instead of dummy data
 - [x] Updated ProductionEfficiencyReportPage.tsx to use API integration instead of dummy data
-- [ ] Update InventoryReportsPage.tsx to use API integration instead of dummy data
-- [ ] Update SalesReportsPage.tsx to use API integration instead of dummy data
-- [ ] Update QualityReportsPage.tsx to use API integration instead of dummy data
-- [ ] Update AnalyticsReportsPage.tsx to use API integration instead of dummy data
+- [x] Update InventoryReportsPage.tsx to use API integration instead of dummy data
+- [x] Update SalesReportsPage.tsx to use API integration instead of dummy data
+- [x] Update QualityReportsPage.tsx to use API integration instead of dummy data
+- [x] Update AnalyticsReportsPage.tsx to use API integration instead of dummy data
 
 ### 2. Implement API Integration for Financial Reports
 - [x] Created ProfitLossReportPage.tsx with API integration
-- [ ] Create BalanceSheetReportPage.tsx with API integration
+- [x] Create BalanceSheetReportPage.tsx with API integration
   - Path: `/frontend/src/pages/reports/financial/BalanceSheetReportPage.tsx`
   - API: `reportService.getBalanceSheetReport(asOfDate)`
-- [ ] Create CashFlowReportPage.tsx with API integration
+- [x] Create CashFlowReportPage.tsx with API integration
   - Path: `/frontend/src/pages/reports/financial/CashFlowReportPage.tsx`
   - API: `reportService.getCashFlowReport(startDate, endDate)`
-- [ ] Create TrialBalanceReportPage.tsx with API integration
+- [x] Create TrialBalanceReportPage.tsx with API integration
   - Path: `/frontend/src/pages/reports/financial/TrialBalanceReportPage.tsx`
   - API: `reportService.getTrialBalanceReport(asOfDate)`
-- [ ] Create GSTReportPage.tsx with API integration
+- [x] Create GSTReportPage.tsx with API integration
   - Path: `/frontend/src/pages/reports/financial/GSTReportPage.tsx`
   - API: `reportService.getGSTReport(period)`
-- [ ] Create AccountsReceivableReportPage.tsx with API integration
+- [x] Create AccountsReceivableReportPage.tsx with API integration
   - Path: `/frontend/src/pages/reports/financial/AccountsReceivableReportPage.tsx`
   - API: `reportService.getARAgingReport(asOfDate)`
-- [ ] Create AccountsPayableReportPage.tsx with API integration
+- [x] Create AccountsPayableReportPage.tsx with API integration
   - Path: `/frontend/src/pages/reports/financial/AccountsPayableReportPage.tsx`
   - API: `reportService.getAPAgingReport(asOfDate)`
-- [ ] Create ExpenseSummaryReportPage.tsx with API integration
+- [x] Create ExpenseSummaryReportPage.tsx with API integration
   - Path: `/frontend/src/pages/reports/financial/ExpenseSummaryReportPage.tsx`
   - API: `reportService.getExpenseSummaryReport(startDate, endDate)`
 
 ### 3. Implement API Integration for Inventory Reports
-- [ ] Create StockSummaryReportPage.tsx with API integration
+- [x] Create StockSummaryReportPage.tsx with API integration
   - Path: `/frontend/src/pages/reports/inventory/StockSummaryReportPage.tsx`
   - API: `reportService.getStockSummaryReport()`
-- [ ] Create StockMovementReportPage.tsx with API integration
+- [/] Create StockMovementReportPage.tsx with API integration
   - Path: `/frontend/src/pages/reports/inventory/StockMovementReportPage.tsx`
   - API: `reportService.getStockMovementReport(startDate, endDate)`
 - [ ] Create LowStockReportPage.tsx with API integration
@@ -77,6 +77,8 @@ This document outlines the detailed implementation plan for refactoring the Repo
 - [x] Created shared SCSS file for consistent styling
 - [x] Fixed dark theme table background colors
 - [x] Fixed SCSS import paths in all report pages
+- [x] Added routes for all created report pages
+- [x] Removed all dummy data from category pages
 
 ## Backend Tasks
 

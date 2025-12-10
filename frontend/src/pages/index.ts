@@ -68,6 +68,23 @@ export { default as OperationalReportsPage } from './reports/operational/Operati
 export { default as ProductionEfficiencyReportPage } from './reports/operational/ProductionEfficiencyReportPage';
 export { default as AnalyticsReportsPage } from './reports/AnalyticsReportsPage';
 
+// Financial Report Detail Pages
+export { default as ProfitLossReportPage } from './reports/financial/ProfitLossReportPage';
+export { default as BalanceSheetReportPage } from './reports/financial/BalanceSheetReportPage';
+export { default as CashFlowReportPage } from './reports/financial/CashFlowReportPage';
+export { default as TrialBalanceReportPage } from './reports/financial/TrialBalanceReportPage';
+export { default as GSTReportPage } from './reports/financial/GSTReportPage';
+export { default as AccountsReceivableReportPage } from './reports/financial/AccountsReceivableReportPage';
+export { default as AccountsPayableReportPage } from './reports/financial/AccountsPayableReportPage';
+export { default as ExpenseSummaryReportPage } from './reports/financial/ExpenseSummaryReportPage';
+
+// Inventory Report Detail Pages
+export { default as StockSummaryReportPage } from './reports/inventory/StockSummaryReportPage';
+export { default as StockMovementReportPage } from './reports/inventory/StockMovementReportPage';
+
+// Sales Report Detail Pages
+export { default as SalesSummaryReportPage } from './reports/sales/SalesSummaryReportPage';
+
 // Textile Operations
 export { default as FabricProductionListPage } from './textile/FabricProductionListPage';
 export { default as YarnManufacturingListPage } from './textile/YarnManufacturingListPage';

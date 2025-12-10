@@ -46,6 +46,20 @@ import {
   OperationalReportsPage,
   ProductionEfficiencyReportPage,
   AnalyticsReportsPage,
+  // Financial Report Detail Pages
+  ProfitLossReportPage,
+  BalanceSheetReportPage,
+  CashFlowReportPage,
+  TrialBalanceReportPage,
+  GSTReportPage,
+  AccountsReceivableReportPage,
+  AccountsPayableReportPage,
+  ExpenseSummaryReportPage,
+  // Inventory Report Detail Pages
+  StockSummaryReportPage,
+  StockMovementReportPage,
+  // Sales Report Detail Pages
+  SalesSummaryReportPage,
 } from '../pages';
 import GoogleAuthCallback from '../components/auth/GoogleAuthCallback';
 
@@ -452,6 +466,108 @@ export default function AppRouter() {
               element={
                 <ProtectedRoute requireCompany={true}>
                   <AnalyticsReportsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Financial Report Detail Pages */}
+            <Route
+              path='/reports/financial/profit-loss'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <ProfitLossReportPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/reports/financial/balance-sheet'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <BalanceSheetReportPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/reports/financial/cash-flow'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <CashFlowReportPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/reports/financial/trial-balance'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <TrialBalanceReportPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/reports/financial/gst-reports'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <GSTReportPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/reports/financial/accounts-receivable'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <AccountsReceivableReportPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/reports/financial/accounts-payable'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <AccountsPayableReportPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/reports/financial/expense-summary'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <ExpenseSummaryReportPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Inventory Report Detail Pages */}
+            <Route
+              path='/reports/inventory/stock-summary'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <StockSummaryReportPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/reports/inventory/stock-movement'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <StockMovementReportPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Sales Report Detail Pages */}
+            <Route
+              path='/reports/sales/sales-summary'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <SalesSummaryReportPage />
                 </ProtectedRoute>
               }
             />

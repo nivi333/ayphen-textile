@@ -92,4 +92,105 @@ export ACCESS_TOKEN="$ACCESS_TOKEN"
 export COMPANY_ID="$COMPANY_ID"
 export API_BASE_URL="$API_BASE_URL"
 
-./test-all-apis.sh
+# Define date ranges for testing
+START_DATE="2024-01-01"
+END_DATE="2024-12-31"
+AS_OF_DATE="2024-12-31"
+
+echo "Testing Financial Report APIs..."
+
+echo "  - Testing Profit & Loss Report..."
+curl -s -X GET "$API_BASE_URL/reports/profit-loss?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" > /dev/null && echo "    ✓ Profit & Loss API working" || echo "    ✗ Profit & Loss API failed"
+
+echo "  - Testing Balance Sheet..."
+curl -s -X GET "$API_BASE_URL/reports/balance-sheet?asOfDate=$AS_OF_DATE" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" > /dev/null && echo "    ✓ Balance Sheet API working" || echo "    ✗ Balance Sheet API failed"
+
+echo "  - Testing Cash Flow Statement..."
+curl -s -X GET "$API_BASE_URL/reports/cash-flow?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" > /dev/null && echo "    ✓ Cash Flow API working" || echo "    ✗ Cash Flow API failed"
+
+echo "  - Testing Trial Balance..."
+curl -s -X GET "$API_BASE_URL/reports/trial-balance?asOfDate=$AS_OF_DATE" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" > /dev/null && echo "    ✓ Trial Balance API working" || echo "    ✗ Trial Balance API failed"
+
+echo "  - Testing GST Report..."
+curl -s -X GET "$API_BASE_URL/reports/gst?period=current-month" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" > /dev/null && echo "    ✓ GST Report API working" || echo "    ✗ GST Report API failed"
+
+echo "  - Testing Accounts Receivable Aging..."
+curl -s -X GET "$API_BASE_URL/reports/ar-aging?asOfDate=$AS_OF_DATE" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" > /dev/null && echo "    ✓ AR Aging API working" || echo "    ✗ AR Aging API failed"
+
+echo "  - Testing Accounts Payable Aging..."
+curl -s -X GET "$API_BASE_URL/reports/ap-aging?asOfDate=$AS_OF_DATE" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" > /dev/null && echo "    ✓ AP Aging API working" || echo "    ✗ AP Aging API failed"
+
+echo "  - Testing Expense Summary..."
+curl -s -X GET "$API_BASE_URL/reports/expense-summary?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" > /dev/null && echo "    ✓ Expense Summary API working" || echo "    ✗ Expense Summary API failed"
+
+echo ""
+echo "Testing Inventory Report APIs..."
+
+echo "  - Testing Inventory Summary..."
+curl -s -X GET "$API_BASE_URL/reports/inventory-summary" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" > /dev/null && echo "    ✓ Inventory Summary API working" || echo "    ✗ Inventory Summary API failed"
+
+echo "  - Testing Inventory Movement..."
+curl -s -X GET "$API_BASE_URL/reports/inventory-movement?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" > /dev/null && echo "    ✓ Inventory Movement API working" || echo "    ✗ Inventory Movement API failed"
+
+echo ""
+echo "Testing Sales Report APIs..."
+
+echo "  - Testing Sales Summary..."
+curl -s -X GET "$API_BASE_URL/reports/sales-summary?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" > /dev/null && echo "    ✓ Sales Summary API working" || echo "    ✗ Sales Summary API failed"
+
+echo "  - Testing Sales Trends..."
+curl -s -X GET "$API_BASE_URL/reports/sales-trends?startDate=$START_DATE&endDate=$END_DATE&groupBy=month" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" > /dev/null && echo "    ✓ Sales Trends API working" || echo "    ✗ Sales Trends API failed"
+
+echo "  - Testing Product Performance..."
+curl -s -X GET "$API_BASE_URL/reports/product-performance?startDate=$START_DATE&endDate=$END_DATE&limit=10" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" > /dev/null && echo "    ✓ Product Performance API working" || echo "    ✗ Product Performance API failed"
+
+echo "  - Testing Customer Insights..."
+curl -s -X GET "$API_BASE_URL/reports/customer-insights?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" > /dev/null && echo "    ✓ Customer Insights API working" || echo "    ✗ Customer Insights API failed"
+
+echo ""
+echo "Testing Production Report APIs..."
+
+echo "  - Testing Production Efficiency..."
+curl -s -X GET "$API_BASE_URL/reports/production-efficiency?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" > /dev/null && echo "    ✓ Production Efficiency API working" || echo "    ✗ Production Efficiency API failed"
+
+echo "  - Testing Machine Utilization..."
+curl -s -X GET "$API_BASE_URL/reports/machine-utilization?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" > /dev/null && echo "    ✓ Machine Utilization API working" || echo "    ✗ Machine Utilization API failed"
+
+echo "  - Testing Quality Metrics..."
+curl -s -X GET "$API_BASE_URL/reports/quality-metrics?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" > /dev/null && echo "    ✓ Quality Metrics API working" || echo "    ✗ Quality Metrics API failed"
+
+echo "  - Testing Production Planning..."
+curl -s -X GET "$API_BASE_URL/reports/production-planning?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" > /dev/null && echo "    ✓ Production Planning API working" || echo "    ✗ Production Planning API failed"
+
+echo ""
+echo "Testing Analytics Report APIs..."
+
+echo "  - Testing Business Performance..."
+curl -s -X GET "$API_BASE_URL/reports/business-performance?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" > /dev/null && echo "    ✓ Business Performance API working" || echo "    ✗ Business Performance API failed"
+
+echo "  - Testing Textile Analytics..."
+curl -s -X GET "$API_BASE_URL/reports/textile-analytics?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" > /dev/null && echo "    ✓ Textile Analytics API working" || echo "    ✗ Textile Analytics API failed"
+
+echo ""
+echo "✅ All Report API Tests Completed!"
+
