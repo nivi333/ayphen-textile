@@ -187,14 +187,27 @@ const ProfitLossReportPage: React.FC = () => {
         <div className='filters-section'>
           <div>
             <Space size='middle'>
-              <RangePicker
-                onChange={dates => {
-                  if (dates) {
-                    setDateRange([dates[0]?.toDate() as Date, dates[1]?.toDate() as Date]);
+              <DatePicker
+                value={startDate ? dayjs(startDate) : null}
+                onChange={date => {
+                  if (date) {
+                    setStartDate(date.toDate());
                   } else {
-                    setDateRange(null);
+                    setStartDate(null);
                   }
                 }}
+                placeholder='Start date'
+              />
+              <DatePicker
+                value={endDate ? dayjs(endDate) : null}
+                onChange={date => {
+                  if (date) {
+                    setEndDate(date.toDate());
+                  } else {
+                    setEndDate(null);
+                  }
+                }}
+                placeholder='End date'
               />
               <Input
                 placeholder='Search accounts'
