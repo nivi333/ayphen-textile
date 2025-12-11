@@ -725,12 +725,12 @@
 - [✅] Search: By reference number, product, user
 
 **Inventory Analytics (Integrated in Main Dashboard)**
-- [ ] Stock Value: Total inventory value by location
-- [ ] Movement Trends: Charts showing movement patterns
-- [ ] Fast/Slow Moving: Identify products by turnover rate
-- [ ] Stock Aging: Products by age in inventory
-- [ ] Reorder Recommendations: AI-powered suggestions
-- [ ] Wastage Analysis: Track damaged/expired stock
+- [ ] Stock Value: Total inventory value by location - *Requires aggregation logic and valuation calculations*
+- [ ] Movement Trends: Charts showing movement patterns - *Requires chart library integration (e.g., Chart.js, Recharts)*
+- [ ] Fast/Slow Moving: Identify products by turnover rate - *Requires analytics engine with turnover calculations*
+- [ ] Stock Aging: Products by age in inventory - *Requires date-based aging calculations*
+- [ ] Reorder Recommendations: AI-powered suggestions - *Requires machine learning model integration*
+- [ ] Wastage Analysis: Track damaged/expired stock - *Requires wastage tracking and reporting system*
 
 #### **2.3 Order Management** ✅
 
@@ -1061,7 +1061,7 @@
 - [✅] **Notes**: Text area (optional, max 500 chars)
 - [✅] **Terms & Conditions**: Text area (optional)
 - [✅] **Bank Details**: Text area (for payment instructions)
-- [ ] **Attachments**: File upload (PDF, images, max 2MB)
+- [ ] **Attachments**: File upload (PDF, images, max 2MB) - *Requires file upload system and cloud storage integration (e.g., AWS S3, Cloudinary)*
 
 **Deletion Rules (Industry Standard)** ✅:
 - [✅] **DRAFT Status**: Can be deleted (soft delete, sets is_active = false)
@@ -1120,7 +1120,7 @@
 **Additional Fields** ✅:
 - [✅] **Notes**: Text area (optional, max 500 chars)
 - [✅] **Supplier Invoice Number**: Text input (supplier's reference)
-- [ ] **Attachments**: File upload (PDF, images, max 2MB)
+- [ ] **Attachments**: File upload (PDF, images, max 2MB) - *Requires file upload system and cloud storage integration (e.g., AWS S3, Cloudinary)*
 
 **Deletion Rules (Industry Standard)** ✅:
 - [✅] **DRAFT Status**: Can be deleted (soft delete, sets is_active = false)
@@ -1161,8 +1161,8 @@
 **Machine Status Tracking** ✅
 - [✅] Real-Time Status: Current operational status
 - [✅] Status History: Complete timeline of status changes
-- [ ] Utilization Metrics: Usage hours, idle time, efficiency percentage (future)
-- [ ] Performance KPIs: OEE, MTBF, MTTR calculations (future)
+- [ ] Utilization Metrics: Usage hours, idle time, efficiency percentage - *Requires time tracking system and calculation engine*
+- [ ] Performance KPIs: OEE, MTBF, MTTR calculations - *Requires industrial IoT integration and performance monitoring system*
 
 **Preventive Maintenance Scheduling** ✅
 - [✅] Maintenance Types: DAILY_CHECK, WEEKLY, MONTHLY, QUARTERLY, ANNUAL, EMERGENCY
@@ -1178,10 +1178,10 @@
   - [✅] Assigned Technician: User dropdown
   - [✅] Checklist: JSON array of tasks
   - [✅] Parts Required: JSON array of parts
-- [ ] Auto Reminders: Email/SMS before due dates (future)
-- [ ] Maintenance Calendar: Visual calendar view (future)
-- [ ] Cost Tracking: Track costs per maintenance (future)
-- [ ] Vendor Management: Service provider details (future)
+- [ ] Auto Reminders: Email/SMS before due dates - *Requires scheduled job system and notification service integration*
+- [ ] Maintenance Calendar: Visual calendar view - *Requires calendar UI component (e.g., FullCalendar)*
+- [ ] Cost Tracking: Track costs per maintenance - *Requires cost tracking module and reporting*
+- [ ] Vendor Management: Service provider details - *Requires vendor database and contract management*
 
 **Breakdown Reporting** ✅
 - [✅] Quick Breakdown Form (Mobile-Friendly):
@@ -1202,18 +1202,18 @@
   - [✅] Labor Hours: Actual hours spent
   - [✅] Root Cause: Analysis after resolution
   - [✅] Resolution Notes: How it was fixed
-- [ ] Real-Time Alerts: Push notifications to maintenance team (future)
-- [ ] Escalation Rules: Auto-escalate based on severity and response time (future)
+- [ ] Real-Time Alerts: Push notifications to maintenance team - *Requires push notification service (e.g., Firebase Cloud Messaging)*
+- [ ] Escalation Rules: Auto-escalate based on severity and response time - *Requires workflow engine with escalation logic*
 - [✅] Downtime Tracking: Auto-calculate production loss
 
 **Machine Assignment & Operators** ✅
 - [✅] Operator Assignment:
   - [✅] Primary Operator: Main user (current_operator_id)
-  - [ ] Backup Operators: Secondary users (future)
-  - [ ] Shift: MORNING, AFTERNOON, NIGHT (future)
-  - [ ] Skill Matching: Match operator certification to machine requirements (future)
-- [ ] Training Records: Track certifications and training completion (future)
-- [ ] Operator Performance: Track efficiency, quality, breakdown frequency (future)
+  - [ ] Backup Operators: Secondary users - *Requires operator assignment system with shift management*
+- [ ] Shift: MORNING, AFTERNOON, NIGHT - *Requires shift management module*
+- [ ] Skill Matching: Match operator certification to machine requirements - *Requires skill matrix and certification tracking*
+- [ ] Training Records: Track certifications and training completion - *Requires training management system*
+- [ ] Operator Performance: Track efficiency, quality, breakdown frequency - *Requires performance analytics and KPI tracking*
 
 **Machine List Page** ✅
 - [✅] Table Columns: Image, Machine Code, Name, Type, Location, Current Operator, Operational Status, Status, Actions
@@ -1228,9 +1228,9 @@
 - [✅] Maintenance Due: Upcoming maintenance in next 7 days
 - [✅] Active Breakdowns: Open and in-progress tickets
 - [✅] Overdue Maintenance: Past due maintenance count
-- [ ] Utilization Charts: Usage percentage by machine (future)
-- [ ] Performance Metrics: OEE, MTBF, MTTR trends (future)
-- [ ] Cost Analysis: Maintenance costs vs production loss (future)
+- [ ] Utilization Charts: Usage percentage by machine - *Requires data aggregation and chart library integration*
+- [ ] Performance Metrics: OEE, MTBF, MTTR trends - *Requires industrial performance monitoring system*
+- [ ] Cost Analysis: Maintenance costs vs production loss - *Requires cost tracking and ROI calculation engine*
 
 ---
 
@@ -1537,13 +1537,13 @@
 #### **4.2 Production Planning**
 
 **Production Orders**
-- [ ] Link sales orders to production
-- [ ] Material Requirements: Auto-calculate raw materials
-- [ ] Capacity Planning: Machine capacity vs requirements
-- [ ] Production Scheduling: Timeline and Gantt charts
-- [ ] Work Orders: Detailed production instructions
-- [ ] Shop Floor Control: Real-time tracking
-- [ ] Bottleneck Detection: Identify constraints
+- [ ] Link sales orders to production - *Requires production planning module with order-to-production workflow*
+- [ ] Material Requirements: Auto-calculate raw materials - *Requires BOM (Bill of Materials) system and MRP logic*
+- [ ] Capacity Planning: Machine capacity vs requirements - *Requires capacity planning engine with resource allocation*
+- [ ] Production Scheduling: Timeline and Gantt charts - *Requires scheduling algorithm and Gantt chart library (e.g., dhtmlxGantt)*
+- [ ] Work Orders: Detailed production instructions - *Requires work order management system*
+- [ ] Shop Floor Control: Real-time tracking - *Requires IoT integration and real-time monitoring system*
+- [ ] Bottleneck Detection: Identify constraints - *Requires analytics engine with constraint analysis*
 
 #### **4.3 Supplier & Procurement**
 
@@ -1554,11 +1554,11 @@
 - [ ] Performance tracking
 
 **Purchase Management**
-- [ ] Purchase Requisitions: Material requests
-- [ ] Purchase Orders: Auto-generate from requirements
-- [ ] RFQ Management: Request for quotations
-- [ ] Goods Receipt: Incoming inspection
-- [ ] Supplier Payments: Payment tracking
+- [ ] Purchase Requisitions: Material requests - *Requires requisition workflow and approval system*
+- [ ] Purchase Orders: Auto-generate from requirements - *Requires MRP integration and auto-PO generation logic*
+- [ ] RFQ Management: Request for quotations - *Requires RFQ module with supplier bidding system*
+- [ ] Goods Receipt: Incoming inspection - *Requires goods receipt module with quality inspection workflow*
+- [ ] Supplier Payments: Payment tracking - *Already implemented in Accounts Payable module*
 
 #### **4.4 Analytics & Business Intelligence** ✅
 
@@ -1576,8 +1576,8 @@
   - Customer & supplier counts
   - Textile operations stats (fabric, yarn, dyeing, garment production)
 - [✅] Trend analysis across operations (Revenue Trends API)
-- [ ] Custom report builder (PLANNED)
-- [ ] Data visualization charts (PLANNED)
+- [ ] Custom report builder (PLANNED) - *Requires drag-and-drop report builder with field selection and aggregation*
+- [ ] Data visualization charts (PLANNED) - *Requires chart library integration with interactive dashboards*
 - [✅] No separate dashboards for individual modules - all analytics in main dashboard
 
 **Analytics APIs** ✅
@@ -1589,14 +1589,14 @@
 - [✅] GET /api/v1/analytics/production-summary - Production stats
 
 **AI-Powered Features** (PLANNED)
-- [ ] Demand forecasting
-- [ ] Quality prediction
-- [ ] Inventory optimization
-- [ ] Predictive maintenance
+- [ ] Demand forecasting - *Requires machine learning model (e.g., ARIMA, Prophet) and historical sales data*
+- [ ] Quality prediction - *Requires ML model trained on quality inspection data*
+- [ ] Inventory optimization - *Requires optimization algorithm and demand forecasting*
+- [ ] Predictive maintenance - *Requires IoT sensor data and ML model for failure prediction*
 
 ---
 
-## � Finance Module (COMPLETED ✅)
+## 💰 Finance Module (IN PROGRESS 🔄)
 
 ### **Overview**
 Comprehensive financial management for accounts receivable, accounts payable, expenses, and financial reporting.
@@ -1610,7 +1610,11 @@ Comprehensive financial management for accounts receivable, accounts payable, ex
 - ✅ Navigation integration (Finance menu item)
 - ✅ Backend API support for financial documents (invoices, bills, purchase orders)
 - ✅ Multi-location financial document support
-- 📋 Detailed accounts receivable/payable workflows (planned for future sprints)
+- ✅ **Petty Cash Management** - Full CRUD operations with accounts and transactions
+- ✅ **Payment Recording** - Record payments for invoices and bills with multiple payment methods
+- ✅ **Expense Management** - Complete expense tracking with approval workflow
+- ✅ **Accounts Receivable** - Invoice tracking, aging reports, and payment monitoring
+- ✅ **Accounts Payable** - Bill tracking, aging reports, and payment monitoring
 
 ### **4.5 Accounts Receivable**
 
@@ -1624,31 +1628,31 @@ Comprehensive financial management for accounts receivable, accounts payable, ex
 - [x] Manual Invoice Creation
 - [x] Invoice Details: Line items, taxes, discounts
 - [x] Invoice Status: Draft, Sent, Paid, Overdue, Cancelled
-- [ ] Payment Recording: Partial/Full payments
-- [ ] Payment Methods: Cash, Bank Transfer, Cheque, UPI
-- [ ] Invoice PDF Generation
-- [ ] Email Invoice to Customer
+- [x] Payment Recording: Partial/Full payments
+- [x] Payment Methods: Cash, Bank Transfer, Cheque, UPI
+- [ ] Invoice PDF Generation - *Requires PDF library integration (e.g., pdfmake or jsPDF)*
+- [ ] Email Invoice to Customer - *Requires email service integration (e.g., SendGrid, AWS SES)*
 - [x] Invoice Numbering: Auto-generated sequential
 
 **Payment Tracking**
 - [x] Payment List Page (integrated in Accounts Receivable page)
-- [ ] Record Customer Payments
-- [ ] Link Payments to Invoices
-- [ ] Payment Status: Pending, Received, Bounced
-- [ ] Payment Receipt Generation
-- [ ] Bank Reconciliation
+- [x] Record Customer Payments
+- [x] Link Payments to Invoices
+- [x] Payment Status: Pending, Received, Bounced
+- [ ] Payment Receipt Generation - *Requires PDF library integration*
+- [ ] Bank Reconciliation - *Requires bank API integration or manual import functionality*
 
 **Aging Reports**
 - [x] Accounts Receivable Aging (0-30, 31-60, 61-90, 90+ days)
 - [x] Customer-wise Outstanding
 - [x] Overdue Invoice Alerts
-- [ ] Payment Reminders (Auto-send)
+- [ ] Payment Reminders (Auto-send) - *Requires scheduled job system (e.g., node-cron) and email service integration*
 
 **Credit Management**
-- [ ] Customer Credit Limits
-- [ ] Credit Utilization Tracking
-- [ ] Credit Hold/Release
-- [ ] Credit Approval Workflow
+- [x] Customer Credit Limits - *Already implemented in Customer Management module (credit_limit field)*
+- [ ] Credit Utilization Tracking - *Requires calculation logic based on outstanding invoices*
+- [ ] Credit Hold/Release - *Requires workflow system and order blocking logic*
+- [ ] Credit Approval Workflow - *Requires multi-level approval workflow engine*
 
 ### **4.6 Accounts Payable**
 
@@ -1661,21 +1665,21 @@ Comprehensive financial management for accounts receivable, accounts payable, ex
 - [x] Create Bill from Purchase Order
 - [x] Manual Bill Entry
 - [x] Bill Status: Draft, Approved, Paid, Overdue
-- [ ] Bill Approval Workflow
-- [ ] Multi-level Approval (based on amount)
+- [ ] Bill Approval Workflow - *Requires multi-level approval workflow engine*
+- [ ] Multi-level Approval (based on amount) - *Requires approval matrix configuration and routing logic*
 
 **Payment Scheduling**
 - [x] Payment Schedule List (integrated in Accounts Payable page)
-- [ ] Schedule Supplier Payments
-- [ ] Payment Due Date Tracking
-- [ ] Payment Priority Management
-- [ ] Batch Payment Processing
+- [ ] Schedule Supplier Payments - *Requires payment scheduling system with calendar integration*
+- [ ] Payment Due Date Tracking - *Partially implemented, needs enhancement for alerts and reminders*
+- [ ] Payment Priority Management - *Requires priority queue system and business rules engine*
+- [ ] Batch Payment Processing - *Requires batch processing framework and bank file generation*
 
 **Vendor Management**
 - [x] Vendor Statements (basic tracking)
-- [ ] Vendor Payment History
+- [ ] Vendor Payment History - *Requires detailed payment history view with filtering and export*
 - [x] Vendor Aging Reports
-- [ ] Vendor Performance Tracking
+- [ ] Vendor Performance Tracking - *Requires analytics system with KPIs (on-time delivery, quality scores)*
 
 ### **4.7 Finance Module**
 
@@ -1693,30 +1697,30 @@ Comprehensive financial management for accounts receivable, accounts payable, ex
 - [x] Expense Entry Form
 - [x] Expense Approval Workflow
 - [x] Expense Status Tracking
-- [ ] Recurring Expenses
-- [ ] Expense Attachments (receipts, bills)
+- [ ] Recurring Expenses - *Requires scheduled job system (e.g., node-cron) for automatic expense creation*
+- [ ] Expense Attachments (receipts, bills) - *Requires file upload system and cloud storage integration (e.g., AWS S3)*
 
 **Accounts Receivable**
 - [x] Invoice Tracking
 - [x] Payment Status Monitoring
 - [x] Overdue Invoice Tracking
 - [x] Financial Statistics Dashboard
-- [ ] Customer Payment History
-- [ ] Payment Receipt Generation
+- [ ] Customer Payment History - *Requires detailed payment history view with timeline and filtering*
+- [ ] Payment Receipt Generation - *Requires PDF library integration*
 
 **Accounts Payable**
 - [x] Bill Tracking
 - [x] Payment Status Monitoring
 - [x] Overdue Bill Tracking
 - [x] Financial Statistics Dashboard
-- [ ] Supplier Payment History
-- [ ] Payment Voucher Generation
+- [ ] Supplier Payment History - *Requires detailed payment history view with timeline and filtering*
+- [ ] Payment Voucher Generation - *Requires PDF library integration*
 
 **Petty Cash**
-- [ ] Petty Cash Register
-- [ ] Cash Disbursement
-- [ ] Cash Replenishment
-- [ ] Petty Cash Reports
+- [x] Petty Cash Register
+- [x] Cash Disbursement
+- [x] Cash Replenishment
+- [x] Petty Cash Reports
 
 ---
 
@@ -1887,43 +1891,43 @@ Comprehensive reporting system for financial, operational, and analytical report
 ## �🔒 Security & Compliance
 
 ### **Data Security**
-- [ ] Multi-layer encryption
-- [ ] JWT-based authentication
+- [ ] Multi-layer encryption - *Requires encryption library (e.g., bcrypt for passwords, AES for data)*
+- [ ] JWT-based authentication - *Already implemented*
 - [✅] Role-based access control
-- [ ] Audit trail logging
-- [ ] Session management
-- [ ] Device tracking
+- [ ] Audit trail logging - *Requires comprehensive logging system with log storage and analysis*
+- [ ] Session management - *Partially implemented, needs enhancement for multi-device tracking*
+- [ ] Device tracking - *Requires device fingerprinting and session management*
 
 ### **Multi-Tenant Isolation**
-- [ ] Schema-per-tenant architecture
-- [ ] Complete data isolation
-- [ ] No cross-tenant data leaks
-- [ ] Tenant-specific backups
+- [ ] Schema-per-tenant architecture - *Currently using shared schema with company_id filtering (row-level security)*
+- [ ] Complete data isolation - *Implemented via company_id filtering in all queries*
+- [ ] No cross-tenant data leaks - *Enforced by middleware and service layer*
+- [ ] Tenant-specific backups - *Requires backup strategy with tenant-level granularity*
 
 ### **Compliance**
-- [ ] GDPR compliance
-- [ ] Data protection
-- [ ] Privacy controls
-- [ ] Audit readiness
-- [ ] Industry certifications
+- [ ] GDPR compliance - *Requires data privacy controls, consent management, and right-to-erasure implementation*
+- [ ] Data protection - *Requires encryption, access controls, and data retention policies*
+- [ ] Privacy controls - *Requires user consent management and data access controls*
+- [ ] Audit readiness - *Requires comprehensive audit logging and reporting*
+- [ ] Industry certifications - *Requires compliance assessment and certification process (ISO 27001, SOC 2)*
 
 ---
 
 ## 📱 Mobile & Integration
 
 ### **Mobile Application (PLANNED)**
-- [ ] Cross-platform (React Native)
-- [ ] Offline capability
-- [ ] Barcode/QR scanning
-- [ ] Push notifications
-- [ ] Mobile-optimized forms
+- [ ] Cross-platform (React Native) - *Requires React Native setup and mobile development expertise*
+- [ ] Offline capability - *Requires offline storage (e.g., AsyncStorage, SQLite) and sync mechanism*
+- [ ] Barcode/QR scanning - *Requires camera integration and barcode library (e.g., react-native-camera)*
+- [ ] Push notifications - *Requires push notification service (e.g., Firebase Cloud Messaging, OneSignal)*
+- [ ] Mobile-optimized forms - *Requires responsive UI design for mobile devices*
 
 ### **Third-Party Integrations (PLANNED)**
-- [ ] ERP integrations (SAP, Oracle)
-- [ ] Accounting software
-- [ ] E-commerce platforms
-- [ ] Logistics partners
-- [ ] Payment gateways
+- [ ] ERP integrations (SAP, Oracle) - *Requires API integration and data mapping for each ERP system*
+- [ ] Accounting software - *Requires integration with QuickBooks, Xero, etc. via their APIs*
+- [ ] E-commerce platforms - *Requires integration with Shopify, WooCommerce, etc.*
+- [ ] Logistics partners - *Requires API integration with shipping providers (FedEx, UPS, DHL)*
+- [ ] Payment gateways - *Requires integration with Stripe, PayPal, Razorpay, etc.*
 
 ---
 
