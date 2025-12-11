@@ -53,27 +53,99 @@ This document outlines the refactoring of the Reports UI to use a **Tabbed Inter
 
 ## Implementation Tasks
 
-### 1. Refactor Category Pages
-*   [x] **FinancialReportsPage.tsx**: Convert to Tabbed View. Import existing report *Components* (need to refactor Pages into Components).
-*   [x] **InventoryReportsPage.tsx**: Convert to Tabbed View.
-*   [x] **SalesReportsPage.tsx**: Convert to Tabbed View.
-*   [x] **OperationsReportsPage.tsx**: Create new page, consolidate Production/Operational/Quality tabs.
+### 1. Refactor Category Pages ✅ COMPLETED
+*   [x] **FinancialReportsPage.tsx**: Converted to Tabbed View with filters and summary cards above tabs.
+*   [x] **InventoryReportsPage.tsx**: Converted to Tabbed View with filters and summary cards above tabs.
+*   [x] **SalesReportsPage.tsx**: Already implemented with proper tabbed interface.
+*   [x] **OperationalReportsPage.tsx**: Converted to Tabbed View with filters and summary cards above tabs.
 
-### 2. Refactor Report Pages into Components
-*   *Currently, logic is in `*Page.tsx` files. We should extract the content (Filters + Table) into `*Report.tsx` components to be rendered inside Tabs.*
-*   [x] Extract `ProfitLossReport` from `ProfitLossReportPage`.
-*   [x] Extract `StockSummaryReport` from `StockSummaryReportPage`.
-*   [x] ...repeat for all reports.
+### 2. Refactor Report Pages into Components ✅ COMPLETED
+*   [x] All report components extracted and organized under `/components/reports/`
+*   [x] Financial reports: ProfitLossReport, BalanceSheetReport, CashFlowReport, etc.
+*   [x] Inventory reports: StockSummaryReport, StockMovementReport, LowStockReport, etc.
+*   [x] Sales reports: SalesSummaryReport, SalesTrendReport, TopSellingProductsReport, etc.
+*   [x] Operational reports: ProductionEfficiencyReport, MachineUtilizationReport, etc.
 
-### 3. Route Updates
-*   [x] Update `frontend/src/router/AppRouter.tsx` to point `/reports/financial` to the new Tabbed page.
-*   [x] Remove individual routes for report sub-pages.
+### 3. Route Updates ✅ COMPLETED
+*   [x] Updated `frontend/src/router/AppRouter.tsx` with consolidated report routes.
+*   [x] Removed individual routes for report sub-pages.
+*   [x] Main routes: `/reports/financial`, `/reports/inventory`, `/reports/sales`, `/reports/operational`
 
-### 4. Sidebar Updates
-*   [x] Update `navigationConfig.ts` to show only the 4 main categories.
-*   [x] Remove "Analytics", "Quality", "Production" from top-level sidebar if merged.
+### 4. Sidebar Updates ✅ COMPLETED
+*   [x] Updated `navigationConfig.ts` to show only the 4 main categories.
+*   [x] Consolidated navigation structure for better UX.
 
-## Timeline
-*   **Phase 1**: Extract Report Logic into Reusable Components.
-*   **Phase 2**: Create Tabbed Container Pages.
-*   **Phase 3**: Clean up Router and Sidebar.
+## UI Improvements Implemented
+
+### Consistent Layout Pattern (Following Sales Reports)
+1. **Search Bar & Filters Row**: Positioned above tabs
+   - Date range picker
+   - Search input
+   - Generate Report button
+   - Save Configuration & PDF export buttons
+
+2. **Summary Cards Row**: Positioned between filters and tabs
+   - Dynamic summary metrics based on active tab
+   - Color-coded values (green for positive, red for negative)
+   - Responsive grid layout (4 cards per row on desktop)
+
+3. **Tabbed Interface**: Clean tab navigation
+   - Card-style tabs
+   - Destroys inactive tab panes for performance
+   - Each tab contains its specific report component
+
+### Report Components Structure
+- **Shared Components**: `ReportFilters.tsx`, `ReportSummaryCards.tsx`
+- **Shared Styles**: `ReportStyles.scss` for consistent styling
+- **Data Flow**: Parent page fetches data → Passes to child components
+- **Loading States**: Proper loading indicators and empty states
+
+## Timeline ✅ COMPLETED
+*   **Phase 1**: Extract Report Logic into Reusable Components. ✅
+*   **Phase 2**: Create Tabbed Container Pages. ✅
+*   **Phase 3**: Clean up Router and Sidebar. ✅
+*   **Phase 4**: Implement consistent UI pattern across all report pages. ✅
+
+## Changes Summary
+
+### Files Modified:
+1. `/frontend/src/pages/reports/FinancialReportsPage.tsx` - Added filters and summary cards above tabs
+2. `/frontend/src/pages/reports/InventoryReportsPage.tsx` - Added filters and summary cards above tabs
+3. `/frontend/src/pages/reports/OperationalReportsPage.tsx` - Added filters and summary cards above tabs
+4. `/frontend/src/pages/reports/SalesReportsPage.tsx` - Already implemented (reference pattern)
+5. `/frontend/src/components/reports/inventory/StockSummaryReport.tsx` - Updated to accept props
+
+### Dec 11, 2025 – Completion Notes (API wiring + parity)
+- Ensured all report pages strictly follow the Sales layout pattern (Filters → Summary Cards → Tabs with `destroyInactiveTabPane`).
+- FinancialReportsPage: corrected service calls to existing methods
+  - `getBalanceSheet()` (was getBalanceSheetReport)
+  - `getCashFlowStatement()` (was getCashFlowReport)
+  - `getTrialBalance()` (was getTrialBalanceReport)
+  - `getExpenseSummary()` (was getExpenseSummaryReport)
+  - Unified Tabs to `destroyInactiveTabPane={true}` to match Sales.
+- SalesReportsPage: Sales Trend tab now uses `reportService.getSalesTrendsReport(start, end, groupBy)`.
+- InventoryReportsPage: fixed method names/params to match implemented APIs
+  - `getInventorySummary()` (no date range)
+  - `getInventoryMovementReport(start, end)`
+  - `getLowStockReport(locationId?)`
+  - `getStockValuationReport(locationId?, asOfDate?)` using endDate as asOfDate
+  - `getStockAgingReport(asOfDate)` using endDate as asOfDate
+- OperationalReportsPage already aligned with the pattern; no API changes required.
+
+Outcome: All Reports screens (Financial, Inventory, Operational) now match the Sales Reports layout and are wired to live endpoints.
+
+### Key Features:
+- ✅ Consolidated 4 main report categories
+- ✅ Tabbed interface for related reports
+- ✅ Consistent UI pattern across all report pages
+- ✅ Filters and summary cards positioned above tabs
+- ✅ Live data integration (no dummy data)
+- ✅ Responsive design
+- ✅ Loading states and error handling
+- ✅ Export functionality (PDF, Excel, CSV)
+
+### Removed/Consolidated:
+- ❌ Removed separate "Analytics" category (moved to Dashboard)
+- ❌ Removed individual report pages (consolidated into tabs)
+- ❌ Removed card navigation pattern (direct tab access)
+- ❌ Removed unnecessary report categories

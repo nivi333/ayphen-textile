@@ -1723,15 +1723,69 @@ Comprehensive financial management for accounts receivable, accounts payable, ex
 ## 📊 Reports Module ✅ **COMPLETED**
 
 ### **Overview**
-Comprehensive reporting system for financial, operational, and analytical reports.
+Comprehensive reporting system for financial, operational, and analytical reports with consolidated tabbed interface.
 
 ### **Implementation Status**
 - ✅ Reports Overview Page with category cards
 - ✅ Navigation structure (sidebar submenu)
-- ✅ Report category pages (Financial, Inventory, Sales, Production, Quality, Operational, Analytics)
+- ✅ **UI Refactoring Completed** - Consolidated tabbed interface
+- ✅ Report category pages (Financial, Inventory, Sales, Operational)
 - ✅ Routing configuration
 - ✅ Individual report implementations
 - ✅ Invoice and Bill data for companies 1 & 2 for testing reports
+- ✅ **Consistent UI Pattern** - Filters and summary cards above tabs
+- ✅ **Live Data Integration** - No dummy data used
+
+### **UI Improvements Implemented (Dec 2024)**
+
+**Consolidated Report Categories:**
+1. **Financial Reports** (`/reports/financial`)
+   - Tabs: Profit & Loss, Balance Sheet, Cash Flow, Trial Balance, GST Reports, Accounts Receivable, Accounts Payable, Expense Summary
+   - Filters: Date range picker (single date for AR/AP/Balance Sheet/Trial Balance, range for others), search, period selector for GST
+   - Summary Cards: Dynamic metrics based on active tab (Revenue, Profit, Expenses, etc.)
+
+2. **Inventory Reports** (`/reports/inventory`)
+   - Tabs: Stock Summary, Stock Movement, Low Stock Alerts, Stock Valuation, Stock Aging
+   - Filters: Date range picker, search input, location selector
+   - Summary Cards: Total Products, Stock Value, Low Stock Items, Out of Stock
+
+3. **Sales Reports** (`/reports/sales`)
+   - Tabs: Sales Summary, Sales Trend Analysis, Top Selling Products, Customer Purchase History, Sales by Region
+   - Filters: Date range picker, search input, generate report button
+   - Summary Cards: Total Sales, Total Orders, Average Order Value, Top Customer/Growth
+
+4. **Operational Reports** (`/reports/operational`)
+   - Tabs: Production Efficiency, Machine Utilization, Production Planning, Quality Metrics
+   - Filters: Date range picker, search input
+   - Summary Cards: Planned/Actual Output, Efficiency %, Downtime, Utilization
+
+**Layout Pattern (Consistent Across All Reports):**
+```
+┌─────────────────────────────────────────────────────┐
+│ Page Header (Breadcrumb + Title)                    │
+├─────────────────────────────────────────────────────┤
+│ Filters Row (Date Range + Search + Generate Button) │
+├─────────────────────────────────────────────────────┤
+│ Summary Cards Row (4 cards with dynamic metrics)    │
+├─────────────────────────────────────────────────────┤
+│ Tab Navigation (Card-style tabs)                    │
+├─────────────────────────────────────────────────────┤
+│ Report Content (Table/Chart with data)              │
+└─────────────────────────────────────────────────────┘
+```
+
+**Removed/Consolidated:**
+- ❌ Removed separate "Analytics" category (moved to Dashboard)
+- ❌ Removed "Production" and "Quality" categories (merged into Operational)
+- ❌ Removed individual report pages (consolidated into tabs)
+- ❌ Removed card navigation pattern (direct tab access)
+
+**Technical Implementation:**
+- Shared components: `ReportFilters.tsx`, `ReportSummaryCards.tsx`
+- Shared styles: `ReportStyles.scss`
+- Data flow: Parent page fetches data → Passes to child report components
+- Loading states: Proper spinners and empty states
+- Export functionality: PDF, Excel, CSV buttons
 
 ### **4.8 Financial Reports** ✅ **COMPLETED**
 
@@ -1891,16 +1945,16 @@ Comprehensive reporting system for financial, operational, and analytical report
 
 ---
 
-## Reports UI Refactoring - In Progress
+## Reports UI Refactoring - Completed
 
 ### Current Status
 - [x] Applied consistent card styling across all report screens
 - [x] Created shared SCSS file for consistent styling
 - [x] Fixed dark theme table background colors
-- [x] Removed dummy data from some report pages
-- [x] Created ProfitLossReportPage.tsx with API integration
-- [ ] Complete API integration for all report pages
-- [ ] Create remaining report detail pages
+- [x] Removed dummy data from report pages (all categories)
+- [x] Financial, Sales, Inventory, Operational report containers using unified layout (Filters → Summary Cards → Tabs)
+- [x] Complete API integration for all report pages
+- [x] All report detail components wired to live endpoints
 
 **Detailed Implementation Plan**: See [REPORTS-UI-REFACTORING.md](./REPORTS-UI-REFACTORING.md) for the complete task list, API integration details, and implementation timeline.
 

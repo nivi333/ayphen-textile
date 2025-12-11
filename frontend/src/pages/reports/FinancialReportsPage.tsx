@@ -81,38 +81,23 @@ const FinancialReportsPage: React.FC = () => {
           break;
         case 'accounts-payable':
           // @ts-ignore
-          if (reportService.getAPAgingReport) {
-            // @ts-ignore
-            data = await reportService.getAPAgingReport(singleDateStr);
-          }
+          data = await reportService.getAPAgingReport(singleDateStr);
           break;
         case 'balance-sheet':
           // @ts-ignore
-          if (reportService.getBalanceSheetReport) {
-            // @ts-ignore
-            data = await reportService.getBalanceSheetReport(singleDateStr);
-          }
+          data = await reportService.getBalanceSheet(singleDateStr);
           break;
         case 'cash-flow':
           // @ts-ignore
-          if (reportService.getCashFlowReport) {
-            // @ts-ignore
-            data = await reportService.getCashFlowReport(startDateStr, endDateStr);
-          }
+          data = await reportService.getCashFlowStatement(startDateStr, endDateStr);
           break;
         case 'trial-balance':
           // @ts-ignore
-          if (reportService.getTrialBalanceReport) {
-            // @ts-ignore
-            data = await reportService.getTrialBalanceReport(singleDateStr);
-          }
+          data = await reportService.getTrialBalance(singleDateStr);
           break;
         case 'expense-summary':
           // @ts-ignore
-          if (reportService.getExpenseSummaryReport) {
-            // @ts-ignore
-            data = await reportService.getExpenseSummaryReport(startDateStr, endDateStr);
-          }
+          data = await reportService.getExpenseSummary(startDateStr, endDateStr);
           break;
         case 'gst-reports':
           // @ts-ignore
@@ -326,7 +311,7 @@ const FinancialReportsPage: React.FC = () => {
             onChange={handleTabChange}
             type='card'
             className='reports-tabs'
-            destroyOnHidden={true}
+            destroyInactiveTabPane={true}
             items={[
               {
                 key: 'profit-loss',

@@ -82,7 +82,7 @@ const SalesReportsPage: React.FC = () => {
           // If the API supported groupBy, we'd pass it like: getSalesSummary(start, end, trendGroupBy).
           // Since I can't verify API signature, I'll pass it if possible, else just call basic.
           // However, if the user changes groupBy, we should probably refetch if the backed supports it.
-          data = await reportService.getSalesSummary(startDate, endDate);
+          data = await reportService.getSalesTrendsReport(startDate, endDate, trendGroupBy);
           break;
         case 'top-products':
           try {
