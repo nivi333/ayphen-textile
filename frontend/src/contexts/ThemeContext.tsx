@@ -30,15 +30,18 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
 
   const setTheme = (newTheme: AppTheme) => {
     if (newTheme === theme) return;
+    // Show blur and loader immediately on click
     setIsThemeSwitching(true);
-    // Small delay to show the loader before theme change
-    setTimeout(() => {
-      setThemeState(newTheme);
-      // Keep loader visible during transition
-      setTimeout(() => {
-        setIsThemeSwitching(false);
-      }, 400);
-    }, 100);
+    // Use requestAnimationFrame to ensure the overlay is rendered before theme change
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setThemeState(newTheme);
+        // Keep loader visible during transition
+        setTimeout(() => {
+          setIsThemeSwitching(false);
+        }, 500);
+      });
+    });
   };
 
   const toggle = () => setTheme(theme === 'light' ? 'dark' : 'light');

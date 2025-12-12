@@ -194,10 +194,12 @@ export const PurchaseOrderDrawer: React.FC<PurchaseOrderDrawerProps> = ({
 
   const populateForm = (po: PurchaseOrderDetail) => {
     setIsActive(po.isActive ?? true);
+    // Use supplier.id if available, otherwise fall back to supplierId
+    const supplierIdValue = po.supplier?.id || po.supplierId;
     form.setFieldsValue({
       poCode: po.poId,
-      supplierId: po.supplierId,
-      supplierName: po.supplierName,
+      supplierId: supplierIdValue,
+      supplierName: po.supplierName || po.supplier?.name,
       supplierCode: po.supplierCode,
       poDate: dayjs(po.poDate),
       expectedDeliveryDate: po.expectedDeliveryDate ? dayjs(po.expectedDeliveryDate) : undefined,

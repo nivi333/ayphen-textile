@@ -198,10 +198,12 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
 
   const populateForm = (order: OrderDetail) => {
     setIsActive(order.isActive ?? true);
+    // Use customer.id if available, otherwise fall back to customerId
+    const customerIdValue = order.customer?.id || order.customerId;
     form.setFieldsValue({
       orderCode: order.orderId,
-      customerId: order.customerId,
-      customerName: order.customerName,
+      customerId: customerIdValue,
+      customerName: order.customerName || order.customer?.name,
       customerCode: order.customerCode,
       orderDate: dayjs(order.orderDate),
       deliveryDate: order.deliveryDate ? dayjs(order.deliveryDate) : undefined,
@@ -285,8 +287,8 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
     }
   };
 
-  const drawerTitle = isEditing ? 'Edit Order' : 'Create Order';
-  const submitLabel = isEditing ? 'Update Order' : 'Create Order';
+  const drawerTitle = isEditing ? 'Edit Sales Order' : 'Create Sales Order';
+  const submitLabel = isEditing ? 'Update Sales Order' : 'Create Sales Order';
 
   return (
     <Drawer

@@ -40,6 +40,7 @@ const updateProductSchema = Joi.object({
   costPrice: Joi.number().min(0).optional().allow(null),
   sellingPrice: Joi.number().min(0).optional().allow(null),
   markupPercent: Joi.number().min(0).max(1000).optional().allow(null),
+  stockQuantity: Joi.number().min(0).optional().allow(null),
   reorderLevel: Joi.number().min(0).optional().allow(null),
   barcode: Joi.string().max(100).optional().allow('', null),
   imageUrl: Joi.string().max(500).optional().allow('', null),
