@@ -25,9 +25,18 @@ const createCheckpointSchema = Joi.object({
 });
 
 const updateCheckpointSchema = Joi.object({
+  checkpointType: Joi.string().valid(...Object.values(CheckpointType)).optional(),
   checkpointName: Joi.string().min(1).max(255).optional(),
   inspectorName: Joi.string().min(1).max(255).optional().allow('', null),
   inspectionDate: Joi.date().optional().allow(null),
+  orderId: Joi.string().optional().allow('', null),
+  locationId: Joi.string().optional().allow('', null),
+  productId: Joi.string().optional().allow('', null),
+  batchNumber: Joi.string().optional().allow('', null),
+  totalBatch: Joi.number().integer().min(1).optional().allow(null),
+  lotNumber: Joi.string().optional().allow('', null),
+  sampleSize: Joi.number().integer().min(1).optional().allow(null),
+  testedQuantity: Joi.number().integer().min(1).optional().allow(null),
   status: Joi.string().valid(...Object.values(QCStatus)).optional().allow(null),
   overallScore: Joi.number().min(0).max(100).optional().allow(null),
   notes: Joi.string().max(1000).optional().allow('', null),
@@ -47,6 +56,24 @@ const createDefectSchema = Joi.object({
   description: Joi.string().max(1000).optional().allow('', null),
   imageUrl: Joi.string().uri().optional().allow('', null),
   isActive: Joi.boolean().optional().default(true),
+});
+
+const updateDefectSchema = Joi.object({
+  checkpointId: Joi.string().optional(),
+  productId: Joi.string().optional().allow('', null),
+  defectCategory: Joi.string().valid(...Object.values(DefectCategory)).optional(),
+  defectType: Joi.string().min(1).max(255).optional(),
+  severity: Joi.string().valid(...Object.values(DefectSeverity)).optional(),
+  quantity: Joi.number().integer().min(1).optional(),
+  affectedItems: Joi.number().integer().min(1).optional().allow(null),
+  batchNumber: Joi.string().optional().allow('', null),
+  lotNumber: Joi.string().optional().allow('', null),
+  description: Joi.string().max(1000).optional().allow('', null),
+  imageUrl: Joi.string().uri().optional().allow('', null),
+  resolutionStatus: Joi.string().valid(...Object.values(ResolutionStatus)).optional(),
+  resolvedBy: Joi.string().min(1).max(255).optional().allow('', null),
+  resolutionNotes: Joi.string().max(1000).optional().allow('', null),
+  isActive: Joi.boolean().optional(),
 });
 
 const resolveDefectSchema = Joi.object({
