@@ -99,7 +99,9 @@ export const config: Config = {
     user: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || 'password',
     ssl: process.env.DB_SSL === 'true',
-    url: process.env.DATABASE_URL,
+    url:
+      process.env.DATABASE_URL ||
+      `postgresql://${process.env.DB_USER || 'postgres'}:${process.env.DB_PASSWORD || 'password'}@${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || '5432'}/${process.env.DB_NAME || 'lavoro_ai_ferri'}`,
     maxConnections: parseInt(process.env.DB_MAX_CONNECTIONS || '20', 10),
     idleTimeout: parseInt(process.env.DB_IDLE_TIMEOUT || '30000', 10),
     connectionTimeout: parseInt(process.env.DB_CONNECTION_TIMEOUT || '5000', 10),
