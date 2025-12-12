@@ -225,11 +225,11 @@ export default function RegistrationWizard() {
         >
           <Checkbox style={{ color: '#374151', fontSize: '14px' }}>
             I agree to the{' '}
-            <LinkButton href='#' target='_blank'>
+            <LinkButton href='/legal/terms' target='_blank'>
               Terms and Conditions
             </LinkButton>{' '}
             and{' '}
-            <LinkButton href='#' target='_blank'>
+            <LinkButton href='/legal/privacy' target='_blank'>
               Privacy Policy
             </LinkButton>
           </Checkbox>

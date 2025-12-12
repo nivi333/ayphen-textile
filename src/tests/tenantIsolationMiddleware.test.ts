@@ -9,7 +9,7 @@ jest.mock('../database/connection', () => {
   return {
     ...actual,
     globalPrisma: {
-      userTenant: {
+      user_companies: {
         findFirst: jest.fn(),
       },
     },
@@ -22,7 +22,7 @@ jest.mock('../database/connection', () => {
 
 const mockedJwt = jwt as jest.Mocked<typeof jwt>;
 const mockedGlobalPrisma = globalPrisma as unknown as {
-  userTenant: { findFirst: jest.Mock };
+  user_companies: { findFirst: jest.Mock };
 };
 
 describe('tenantIsolationMiddleware', () => {
@@ -59,11 +59,11 @@ describe('tenantIsolationMiddleware', () => {
       tenantId: 'tenant-1',
     } as any);
 
-    mockedGlobalPrisma.userTenant.findFirst.mockResolvedValue({
-      userId: 'user-1',
-      tenantId: 'tenant-1',
-      isActive: true,
-      tenant: { isActive: true },
+    mockedGlobalPrisma.user_companies.findFirst.mockResolvedValue({
+      user_id: 'user-1',
+      company_id: 'tenant-1',
+      is_active: true,
+      companies: { is_active: true },
     });
 
     await tenantIsolationMiddleware(req, res, next);
@@ -84,13 +84,11 @@ describe('tenantIsolationMiddleware', () => {
       tenantId: 'tenant-x',
     } as any);
 
-    mockedGlobalPrisma.userTenant.findFirst.mockResolvedValue(null);
+    mockedGlobalPrisma.user_companies.findFirst.mockResolvedValue(null);
 
     await tenantIsolationMiddleware(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(403);
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ success: false })
-    );
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: false }));
   });
 });

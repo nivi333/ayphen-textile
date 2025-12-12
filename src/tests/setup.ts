@@ -20,31 +20,54 @@ jest.mock('../database/connection', () => ({
   globalPrisma: {
     $queryRaw: jest.fn(() => Promise.resolve([{ '1': 1 }])),
     $disconnect: jest.fn(() => Promise.resolve()),
+    users: {
+      findFirst: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+    },
+    sessions: {
+      create: jest.fn(),
+      findFirst: jest.fn(),
+      delete: jest.fn(),
+    },
+    user_companies: {
+      findFirst: jest.fn(),
+    },
+    customers: {
+      findFirst: jest.fn(),
+    },
+    products: {
+      findFirst: jest.fn(),
+    },
   },
 }));
 
 // Mock AuthService to avoid database calls
 jest.mock('../services/authService', () => ({
   AuthService: {
-    register: jest.fn((data) => Promise.resolve({
-      user: {
-        id: 'test-user-id',
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        phone: data.phone,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      tokens: {
-        accessToken: 'mock-access-token',
-        refreshToken: 'mock-refresh-token',
-      },
-    })),
-    login: jest.fn(() => Promise.resolve({
-      user: { id: 'test-user-id', email: 'test@example.com' },
-      tokens: { accessToken: 'mock-token', refreshToken: 'mock-refresh' },
-    })),
+    register: jest.fn(data =>
+      Promise.resolve({
+        user: {
+          id: 'test-user-id',
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phone: data.phone,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        tokens: {
+          accessToken: 'mock-access-token',
+          refreshToken: 'mock-refresh-token',
+        },
+      })
+    ),
+    login: jest.fn(() =>
+      Promise.resolve({
+        user: { id: 'test-user-id', email: 'test@example.com' },
+        tokens: { accessToken: 'mock-token', refreshToken: 'mock-refresh' },
+      })
+    ),
   },
 }));
 
@@ -65,6 +88,7 @@ beforeAll(async () => {
   process.env.JWT_SECRET = 'test-jwt-secret';
   process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test_db';
   process.env.REDIS_URL = 'redis://localhost:6379';
+  process.env.STRIPE_SECRET_KEY = 'sk_test_mock';
 });
 
 afterAll(async () => {

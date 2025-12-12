@@ -157,6 +157,8 @@ model users {
   templates_created    inspection_templates[] @relation("TemplateCreator")
   defect_comments      defect_comments[]      @relation("DefectCommentUser")
   operating_machines   machines[]             @relation("MachineOperator")
+  auditLogs            AuditLog[]
+  userConsents         UserConsent[]
 }
 
 model user_invitations {
@@ -2197,4 +2199,43 @@ enum SubscriptionStatus {
   INCOMPLETE
   INCOMPLETE_EXPIRED
   PAUSED
+}
+
+model AuditLog {
+  id           String   @id @default(uuid())
+  action       String
+  entity       String
+  entity_id    String?
+  details      Json?
+  performed_by String
+  user_id      String?
+  ip_address   String?
+  user_agent   String?
+  created_at   DateTime @default(now())
+
+  user users? @relation(fields: [user_id], references: [id], onDelete: SetNull)
+
+  @@index([action])
+  @@index([entity])
+  @@index([entity_id])
+  @@index([user_id])
+  @@index([created_at])
+}
+
+model UserConsent {
+  id         String   @id @default(uuid())
+  user_id    String
+  type       String // TERMS_OF_SERVICE, PRIVACY_POLICY, COOKIE_POLICY, MARKETING
+  version    String // v1.0, v1.1 etc.
+  ip_address String?
+  user_agent String?
+  granted    Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, type, version])
+  @@index([user_id])
+  @@index([type])
 }

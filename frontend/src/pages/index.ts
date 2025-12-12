@@ -73,3 +73,4 @@ export { default as YarnManufacturingListPage } from './textile/YarnManufacturin
 export { default as DyeingFinishingListPage } from './textile/DyeingFinishingListPage';
 export { default as GarmentManufacturingListPage } from './textile/GarmentManufacturingListPage';
 export { default as DesignPatternsListPage } from './textile/DesignPatternsListPage';
+export { default as LegalPage } from './legal/LegalPage';

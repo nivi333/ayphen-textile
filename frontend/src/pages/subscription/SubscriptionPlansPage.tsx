@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Button, Typography, Row, Col, List, Tag, Spin, message, Alert } from 'antd';
+import { Card, Button, Typography, Row, Col, List, Spin, message, Alert } from 'antd';
 import { CheckCircleOutlined } from '@ant-design/icons';
 import { subscriptionService, SubscriptionPlan } from '../../services/subscriptionService';
 import MainLayout from '../../components/layout/MainLayout';

@@ -44,6 +44,7 @@ import {
   SalesReportsPage,
   OperationalReportsPage,
   SubscriptionPlansPage,
+  LegalPage,
 } from '../pages';
 import GoogleAuthCallback from '../components/auth/GoogleAuthCallback';
 
@@ -432,6 +433,32 @@ export default function AppRouter() {
               element={
                 <ProtectedRoute>
                   <SubscriptionPlansPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Legal Pages */}
+            <Route
+              path='/legal/terms'
+              element={
+                <ProtectedRoute>
+                  <LegalPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path='/legal/privacy'
+              element={
+                <ProtectedRoute>
+                  <LegalPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path='/legal/cookie-policy'
+              element={
+                <ProtectedRoute>
+                  <LegalPage />
                 </ProtectedRoute>
               }
             />
