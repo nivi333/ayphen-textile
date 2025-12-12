@@ -115,8 +115,15 @@ export class BillService {
 
     // Validate purchase order if provided
     if (data.purchaseOrderId) {
+      // Try to find by po_id first (e.g., "PO002"), then by id (UUID)
       const po = await this.prisma.purchase_orders.findFirst({
-        where: { id: data.purchaseOrderId, company_id: companyId },
+        where: {
+          company_id: companyId,
+          OR: [
+            { po_id: data.purchaseOrderId },
+            { id: data.purchaseOrderId },
+          ],
+        },
       });
       if (!po) {
         throw new Error('Invalid purchase order');

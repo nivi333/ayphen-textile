@@ -76,8 +76,8 @@ class CompanyService {
     }
 
     // Input validation
-    if (!companyData.name || !companyData.industry) {
-      throw new Error('Missing required fields: name and industry are required');
+    if (!companyData.name) {
+      throw new Error('Missing required field: name is required');
     }
 
     // Validate business rules

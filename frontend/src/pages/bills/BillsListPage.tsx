@@ -202,7 +202,7 @@ export default function BillsListPage() {
 
     return allowedNext.map(status => ({
       key: status,
-      label: getStatusLabel(status),
+      label: `Mark as ${getStatusLabel(status)}`,
       onClick: () => handleChangeStatus(bill, status),
     }));
   };
@@ -212,6 +212,7 @@ export default function BillsListPage() {
       title: 'Bill ID',
       dataIndex: 'billId',
       key: 'billId',
+      sorter: (a: BillSummary, b: BillSummary) => (a.billId || '').localeCompare(b.billId || ''),
       render: (value: string, record: BillSummary) => (
         <div>
           <div className='bill-id'>{value}</div>
@@ -223,6 +224,7 @@ export default function BillsListPage() {
       title: 'Supplier',
       dataIndex: 'supplierName',
       key: 'supplierName',
+      sorter: (a: BillSummary, b: BillSummary) => (a.supplierName || '').localeCompare(b.supplierName || ''),
       render: (value: string, record: BillSummary) => (
         <div>
           <div className='supplier-name'>{value}</div>
@@ -234,6 +236,7 @@ export default function BillsListPage() {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      sorter: (a: BillSummary, b: BillSummary) => (a.status || '').localeCompare(b.status || ''),
       render: (status: BillStatus) => (
         <Tag color={STATUS_COLORS[status]} className='status-tag'>
           {getStatusLabel(status)}
@@ -244,12 +247,14 @@ export default function BillsListPage() {
       title: 'Bill Date',
       dataIndex: 'billDate',
       key: 'billDate',
+      sorter: (a: BillSummary, b: BillSummary) => new Date(a.billDate).getTime() - new Date(b.billDate).getTime(),
       render: (value: string) => new Date(value).toLocaleDateString(),
     },
     {
       title: 'Due Date',
       dataIndex: 'dueDate',
       key: 'dueDate',
+      sorter: (a: BillSummary, b: BillSummary) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime(),
       render: (value: string, record: BillSummary) => {
         const dueDate = new Date(value);
         const isOverdue =
@@ -272,6 +277,7 @@ export default function BillsListPage() {
       dataIndex: 'totalAmount',
       key: 'totalAmount',
       align: 'right' as const,
+      sorter: (a: BillSummary, b: BillSummary) => Number(a.totalAmount || 0) - Number(b.totalAmount || 0),
       render: (value: number, record: BillSummary) => {
         const amount = typeof value === 'number' ? value : parseFloat(value || '0');
         return (
@@ -286,6 +292,7 @@ export default function BillsListPage() {
       dataIndex: 'balanceDue',
       key: 'balanceDue',
       align: 'right' as const,
+      sorter: (a: BillSummary, b: BillSummary) => Number(a.balanceDue || 0) - Number(b.balanceDue || 0),
       render: (value: number, record: BillSummary) => {
         const amount = typeof value === 'number' ? value : parseFloat(value || '0');
         const isOverdue =

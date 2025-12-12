@@ -176,12 +176,28 @@ export default function CompanyDetailPage() {
 
   const isActive = extendedCompany.isActive !== false;
 
-  const contactInfo = extendedCompany.contactInfo || '';
+  // Parse contactInfo - it could be email, phone, or JSON string
+  const rawContactInfo = extendedCompany.contactInfo || '';
+  let parsedContactInfo: { email?: string; phone?: string } = {};
+  
+  // Try to parse as JSON first (in case it was stored as JSON)
+  try {
+    if (rawContactInfo.startsWith('{')) {
+      parsedContactInfo = JSON.parse(rawContactInfo);
+    }
+  } catch {
+    // Not JSON, treat as plain string
+  }
+  
+  // Determine email and phone from various sources
   const inferredEmail =
     extendedCompany.documentsEmailRecipient ||
-    (contactInfo.includes('@') ? contactInfo : undefined);
+    parsedContactInfo.email ||
+    (rawContactInfo.includes('@') && !rawContactInfo.startsWith('{') ? rawContactInfo : undefined);
   const inferredPhone =
-    extendedCompany.phone || (!contactInfo.includes('@') && contactInfo ? contactInfo : undefined);
+    extendedCompany.phone ||
+    parsedContactInfo.phone ||
+    (!rawContactInfo.includes('@') && !rawContactInfo.startsWith('{') && rawContactInfo ? rawContactInfo : undefined);
   const website = extendedCompany.website;
   const websiteNode = website ? (
     <a

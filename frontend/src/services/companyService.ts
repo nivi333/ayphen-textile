@@ -61,8 +61,8 @@ export interface UpdateCompanyRequest {
   logoUrl?: string;
   country?: string;
   defaultLocation?: string;
-  address1?: string;
-  address2?: string;
+  addressLine1?: string;
+  addressLine2?: string;
   city?: string;
   state?: string;
   pincode?: string;

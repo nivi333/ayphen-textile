@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Layout, Menu, Dropdown, Avatar } from 'antd';
 import {
@@ -20,6 +20,7 @@ export default function Sidebar() {
   const location = useLocation();
   const { currentCompany, logout } = useAuth();
   const [companyDropdownOpen, setCompanyDropdownOpen] = useState(false);
+  const [openKeys, setOpenKeys] = useState<string[]>([]);
 
   // Get navigation menu items based on company industry
   const menuItems = useMemo(() => {
@@ -137,7 +138,7 @@ export default function Sidebar() {
     return ['/dashboard'];
   };
 
-  const getOpenKeys = () => {
+  const getInitialOpenKeys = () => {
     const path = location.pathname;
 
     // Open Finance submenu if on finance pages
@@ -160,7 +161,35 @@ export default function Sidebar() {
       return ['/reports'];
     }
 
+    // Open Sales submenu if on sales pages
+    if (path.includes('/sales') || path.includes('/customers') || path.includes('/invoices')) {
+      return ['/sales'];
+    }
+
+    // Open Purchase submenu if on purchase pages
+    if (path.includes('/purchase') || path.includes('/suppliers') || path.includes('/bills')) {
+      return ['/purchase'];
+    }
+
+    // Open Stock submenu if on stock pages
+    if (path.includes('/stock') || path.includes('/inventory') || path.includes('/products')) {
+      return ['/stock'];
+    }
+
     return [];
+  };
+
+  // Initialize open keys on mount and when location changes
+  useEffect(() => {
+    const initialKeys = getInitialOpenKeys();
+    if (initialKeys.length > 0 && openKeys.length === 0) {
+      setOpenKeys(initialKeys);
+    }
+  }, [location.pathname]);
+
+  // Handle submenu open/close - keep submenu open until user explicitly closes it
+  const handleOpenChange = (keys: string[]) => {
+    setOpenKeys(keys);
   };
 
   return (
@@ -196,7 +225,8 @@ export default function Sidebar() {
         <Menu
           mode='inline'
           selectedKeys={getSelectedKeys()}
-          defaultOpenKeys={getOpenKeys()}
+          openKeys={openKeys}
+          onOpenChange={handleOpenChange}
           items={menuItems}
           onClick={handleMenuClick}
           className='navigation-menu'

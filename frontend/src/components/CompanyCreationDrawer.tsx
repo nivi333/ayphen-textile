@@ -208,8 +208,8 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
           ...(logoUrl ? { logoUrl } : {}),
           country: values.country,
           defaultLocation: values.defaultLocation,
-          address1: values.addressLine1,
-          address2: values.addressLine2,
+          addressLine1: values.addressLine1,
+          addressLine2: values.addressLine2,
           city: values.city,
           state: values.state,
           pincode: values.pincode,
@@ -484,9 +484,8 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
                   <Form.Item
                     label='Industry'
                     name='industry'
-                    rules={[{ required: true, message: 'Please select industry' }]}
                   >
-                    <Select placeholder='Select industry' className='ccd-select'>
+                    <Select placeholder='Select industry (optional)' className='ccd-select' allowClear>
                       <Option value='TEXTILE_MANUFACTURING'>Textile Manufacturing</Option>
                       <Option value='GARMENT_PRODUCTION'>Garment Production</Option>
                       <Option value='KNITTING_WEAVING'>Knitting & Weaving</Option>
@@ -497,6 +496,7 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
                       <Option value='DYEING_FINISHING'>Dyeing & Finishing</Option>
                       <Option value='HOME_TEXTILES'>Home Textiles</Option>
                       <Option value='TECHNICAL_TEXTILES'>Technical Textiles</Option>
+                      <Option value='OTHER'>Other</Option>
                     </Select>
                   </Form.Item>
                 </Col>

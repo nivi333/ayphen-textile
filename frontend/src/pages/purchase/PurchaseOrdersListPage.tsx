@@ -167,7 +167,7 @@ export default function PurchaseOrdersListPage() {
 
     return allowedNext.map(status => ({
       key: status,
-      label: getStatusLabel(status),
+      label: `Mark as ${getStatusLabel(status)}`,
       onClick: () => handleChangeStatus(po, status),
     }));
   };
@@ -177,18 +177,21 @@ export default function PurchaseOrdersListPage() {
       title: 'PO ID',
       dataIndex: 'poId',
       key: 'poId',
+      sorter: (a: PurchaseOrderSummary, b: PurchaseOrderSummary) => (a.poId || '').localeCompare(b.poId || ''),
       render: (value: string) => <div className='po-id'>{value}</div>,
     },
     {
       title: 'Supplier',
       dataIndex: 'supplierName',
       key: 'supplierName',
+      sorter: (a: PurchaseOrderSummary, b: PurchaseOrderSummary) => (a.supplierName || '').localeCompare(b.supplierName || ''),
       render: (value: string) => <div className='supplier-name'>{value}</div>,
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      sorter: (a: PurchaseOrderSummary, b: PurchaseOrderSummary) => (a.status || '').localeCompare(b.status || ''),
       render: (status: POStatus) => (
         <Tag color={STATUS_COLORS[status]} className='status-tag'>
           {getStatusLabel(status)}
@@ -199,6 +202,7 @@ export default function PurchaseOrdersListPage() {
       title: 'PO Date',
       dataIndex: 'poDate',
       key: 'poDate',
+      sorter: (a: PurchaseOrderSummary, b: PurchaseOrderSummary) => new Date(a.poDate).getTime() - new Date(b.poDate).getTime(),
       render: (value: string) => (
         <div className='po-date'>{new Date(value).toLocaleDateString()}</div>
       ),
@@ -207,6 +211,7 @@ export default function PurchaseOrdersListPage() {
       title: 'Expected Delivery',
       dataIndex: 'expectedDeliveryDate',
       key: 'expectedDeliveryDate',
+      sorter: (a: PurchaseOrderSummary, b: PurchaseOrderSummary) => new Date(a.expectedDeliveryDate || 0).getTime() - new Date(b.expectedDeliveryDate || 0).getTime(),
       render: (value?: string) => (
         <div className='delivery-date'>{value ? new Date(value).toLocaleDateString() : '—'}</div>
       ),
@@ -222,6 +227,7 @@ export default function PurchaseOrdersListPage() {
       dataIndex: 'totalAmount',
       key: 'totalAmount',
       align: 'right' as const,
+      sorter: (a: PurchaseOrderSummary, b: PurchaseOrderSummary) => Number(a.totalAmount || 0) - Number(b.totalAmount || 0),
       render: (value: number, record: PurchaseOrderSummary) => {
         const amount = typeof value === 'number' ? value : parseFloat(value || '0');
         return (

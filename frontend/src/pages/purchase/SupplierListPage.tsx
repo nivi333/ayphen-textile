@@ -206,6 +206,7 @@ export default function SupplierListPage() {
       dataIndex: 'code',
       key: 'code',
       width: 120,
+      sorter: (a: Supplier, b: Supplier) => (a.code || '').localeCompare(b.code || ''),
       render: (code: string) => (
         <span className='table-cell-secondary' style={{ fontFamily: 'monospace' }}>
           {code}
@@ -217,6 +218,7 @@ export default function SupplierListPage() {
       dataIndex: 'name',
       key: 'name',
       width: 200,
+      sorter: (a: Supplier, b: Supplier) => (a.name || '').localeCompare(b.name || ''),
       render: (name: string, record: Supplier) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Avatar icon={<UserOutlined />} style={{ flexShrink: 0, backgroundColor: '#7b5fc9' }}>
@@ -240,6 +242,7 @@ export default function SupplierListPage() {
       dataIndex: 'email',
       key: 'email',
       width: 200,
+      sorter: (a: Supplier, b: Supplier) => (a.email || '').localeCompare(b.email || ''),
       render: (email: string) => email || '—',
     },
     {
@@ -247,6 +250,7 @@ export default function SupplierListPage() {
       dataIndex: 'phone',
       key: 'phone',
       width: 120,
+      sorter: (a: Supplier, b: Supplier) => (a.phone || '').localeCompare(b.phone || ''),
       render: (phone: string) => phone || '—',
     },
     {
@@ -254,6 +258,7 @@ export default function SupplierListPage() {
       dataIndex: 'supplierType',
       key: 'supplierType',
       width: 120,
+      sorter: (a: Supplier, b: Supplier) => (a.supplierType || '').localeCompare(b.supplierType || ''),
       render: (type: string) => {
         const colorMap: Record<string, string> = {
           MANUFACTURER: 'blue',
@@ -271,6 +276,7 @@ export default function SupplierListPage() {
       dataIndex: 'leadTimeDays',
       key: 'leadTimeDays',
       width: 100,
+      sorter: (a: Supplier, b: Supplier) => (a.leadTimeDays || 0) - (b.leadTimeDays || 0),
       render: (leadTime?: number) => {
         if (!leadTime) return '—';
         return `${leadTime} days`;
@@ -280,6 +286,7 @@ export default function SupplierListPage() {
       title: 'Status',
       key: 'status',
       width: 80,
+      sorter: (a: Supplier, b: Supplier) => (a.isActive ? 1 : 0) - (b.isActive ? 1 : 0),
       render: (record: Supplier) => (
         <Tag color={record.isActive ? 'success' : 'default'}>
           {record.isActive ? 'Active' : 'Inactive'}

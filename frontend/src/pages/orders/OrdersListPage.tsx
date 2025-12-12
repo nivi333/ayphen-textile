@@ -167,7 +167,7 @@ export default function OrdersListPage() {
 
     return allowedNext.map(status => ({
       key: status,
-      label: getStatusLabel(status),
+      label: `Mark as ${getStatusLabel(status)}`,
       onClick: () => handleChangeStatus(order, status),
     }));
   };
@@ -177,18 +177,21 @@ export default function OrdersListPage() {
       title: 'Order ID',
       dataIndex: 'orderId',
       key: 'orderId',
+      sorter: (a: OrderSummary, b: OrderSummary) => (a.orderId || '').localeCompare(b.orderId || ''),
       render: (value: string) => <div className='order-id'>{value}</div>,
     },
     {
       title: 'Customer',
       dataIndex: 'customerName',
       key: 'customerName',
+      sorter: (a: OrderSummary, b: OrderSummary) => (a.customerName || '').localeCompare(b.customerName || ''),
       render: (value: string) => <div className='customer-name'>{value}</div>,
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      sorter: (a: OrderSummary, b: OrderSummary) => (a.status || '').localeCompare(b.status || ''),
       render: (status: OrderStatus) => (
         <Tag color={STATUS_COLORS[status]} className='status-tag'>
           {getStatusLabel(status)}
@@ -199,6 +202,7 @@ export default function OrdersListPage() {
       title: 'Order Date',
       dataIndex: 'orderDate',
       key: 'orderDate',
+      sorter: (a: OrderSummary, b: OrderSummary) => new Date(a.orderDate).getTime() - new Date(b.orderDate).getTime(),
       render: (value: string) => (
         <div className='order-date'>{new Date(value).toLocaleDateString()}</div>
       ),
@@ -207,6 +211,7 @@ export default function OrdersListPage() {
       title: 'Delivery Date',
       dataIndex: 'deliveryDate',
       key: 'deliveryDate',
+      sorter: (a: OrderSummary, b: OrderSummary) => new Date(a.deliveryDate || 0).getTime() - new Date(b.deliveryDate || 0).getTime(),
       render: (value?: string) => (
         <div className='delivery-date'>{value ? new Date(value).toLocaleDateString() : '—'}</div>
       ),
@@ -222,6 +227,7 @@ export default function OrdersListPage() {
       dataIndex: 'totalAmount',
       key: 'totalAmount',
       align: 'right' as const,
+      sorter: (a: OrderSummary, b: OrderSummary) => Number(a.totalAmount || 0) - Number(b.totalAmount || 0),
       render: (value: number, record: OrderSummary) => {
         const amount = typeof value === 'number' ? value : parseFloat(value || '0');
         return (

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { ConfigProvider, theme as antdTheme, ThemeConfig } from 'antd';
+import { ConfigProvider, theme as antdTheme, ThemeConfig, Spin } from 'antd';
 
 export type AppTheme = 'light' | 'dark';
 
@@ -7,6 +7,7 @@ interface ThemeContextValue {
   theme: AppTheme;
   setTheme: (t: AppTheme) => void;
   toggle: () => void;
+  isThemeSwitching: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
@@ -24,7 +25,23 @@ function getInitialTheme(): AppTheme {
 }
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<AppTheme>(getInitialTheme);
+  const [theme, setThemeState] = useState<AppTheme>(getInitialTheme);
+  const [isThemeSwitching, setIsThemeSwitching] = useState(false);
+
+  const setTheme = (newTheme: AppTheme) => {
+    if (newTheme === theme) return;
+    setIsThemeSwitching(true);
+    // Small delay to show the loader before theme change
+    setTimeout(() => {
+      setThemeState(newTheme);
+      // Keep loader visible during transition
+      setTimeout(() => {
+        setIsThemeSwitching(false);
+      }, 400);
+    }, 100);
+  };
+
+  const toggle = () => setTheme(theme === 'light' ? 'dark' : 'light');
 
   useEffect(() => {
     localStorage.setItem('theme', theme);
@@ -36,8 +53,6 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
       root.classList.remove('dark');
     }
   }, [theme]);
-
-  const toggle = () => setTheme((t) => (t === 'light' ? 'dark' : 'light'));
 
   const antdConfig: ThemeConfig = useMemo(() => ({
     algorithm: theme === 'dark' ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
@@ -51,11 +66,19 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
     },
   }), [theme]);
 
-  const ctx: ThemeContextValue = useMemo(() => ({ theme, setTheme, toggle }), [theme]);
+  const ctx: ThemeContextValue = useMemo(() => ({ theme, setTheme, toggle, isThemeSwitching }), [theme, isThemeSwitching]);
 
   return (
     <ThemeContext.Provider value={ctx}>
-      <ConfigProvider theme={antdConfig}>{children}</ConfigProvider>
+      <ConfigProvider theme={antdConfig}>
+        {children}
+        {/* Theme switching overlay with blur effect */}
+        {isThemeSwitching && (
+          <div className="theme-switching-overlay">
+            <Spin size="large" />
+          </div>
+        )}
+      </ConfigProvider>
     </ThemeContext.Provider>
   );
 }

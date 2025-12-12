@@ -205,6 +205,7 @@ export default function CustomerListPage() {
       dataIndex: 'code',
       key: 'code',
       width: 120,
+      sorter: (a: Customer, b: Customer) => (a.code || '').localeCompare(b.code || ''),
       render: (code: string) => (
         <span className='table-cell-secondary' style={{ fontFamily: 'monospace' }}>
           {code}
@@ -216,6 +217,7 @@ export default function CustomerListPage() {
       dataIndex: 'name',
       key: 'name',
       width: 200,
+      sorter: (a: Customer, b: Customer) => (a.name || '').localeCompare(b.name || ''),
       render: (name: string, record: Customer) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Avatar icon={<UserOutlined />} style={{ flexShrink: 0, backgroundColor: '#7b5fc9' }}>
@@ -239,6 +241,7 @@ export default function CustomerListPage() {
       dataIndex: 'email',
       key: 'email',
       width: 200,
+      sorter: (a: Customer, b: Customer) => (a.email || '').localeCompare(b.email || ''),
       render: (email: string) => email || '—',
     },
     {
@@ -246,6 +249,7 @@ export default function CustomerListPage() {
       dataIndex: 'phone',
       key: 'phone',
       width: 120,
+      sorter: (a: Customer, b: Customer) => (a.phone || '').localeCompare(b.phone || ''),
       render: (phone: string) => phone || '—',
     },
     {
@@ -253,6 +257,7 @@ export default function CustomerListPage() {
       dataIndex: 'customerType',
       key: 'customerType',
       width: 100,
+      sorter: (a: Customer, b: Customer) => (a.customerType || '').localeCompare(b.customerType || ''),
       render: (type: string) => {
         const colorMap: Record<string, string> = {
           INDIVIDUAL: 'blue',
@@ -270,6 +275,7 @@ export default function CustomerListPage() {
       dataIndex: 'creditLimit',
       key: 'creditLimit',
       width: 120,
+      sorter: (a: Customer, b: Customer) => (a.creditLimit || 0) - (b.creditLimit || 0),
       render: (creditLimit?: number) => {
         if (!creditLimit) return '—';
         return new Intl.NumberFormat('en-IN', {
@@ -283,6 +289,7 @@ export default function CustomerListPage() {
       title: 'Status',
       key: 'status',
       width: 80,
+      sorter: (a: Customer, b: Customer) => (a.isActive ? 1 : 0) - (b.isActive ? 1 : 0),
       render: (record: Customer) => (
         <Tag color={record.isActive ? 'success' : 'default'}>
           {record.isActive ? 'Active' : 'Inactive'}
