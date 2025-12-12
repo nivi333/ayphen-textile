@@ -19,14 +19,14 @@ class GdprController {
       const ipAddress = req.ip;
       const userAgent = req.headers['user-agent'];
 
-      const result = await gdprService.recordConsent(
+      const result = await gdprService.recordConsent({
         userId,
-        type,
-        version,
-        granted,
+        consentType: type,
+        hasConsented: granted,
         ipAddress,
-        userAgent
-      );
+        userAgent,
+        version,
+      });
 
       res.status(200).json({
         success: true,

@@ -1,8 +1,7 @@
-import { PrismaClient } from '@prisma/client';
-import { v4 as uuidv4 } from 'uuid';
+import { globalPrisma } from '@/database/connection';
 import auditService from './auditService';
 
-const prisma = new PrismaClient();
+const prisma = globalPrisma;
 
 class GdprService {
   /**
@@ -93,14 +92,19 @@ class GdprService {
   /**
    * Record user consent
    */
-  async recordConsent(
-    userId: string,
-    type: string,
-    version: string,
-    granted: boolean,
-    ipAddress?: string,
-    userAgent?: string
-  ) {
+  async recordConsent(params: {
+    userId: string;
+    consentType: string;
+    hasConsented: boolean;
+    ipAddress?: string;
+    userAgent?: string;
+    version?: string;
+  }) {
+    const { userId, consentType, hasConsented, ipAddress, userAgent, version = '1.0' } = params;
+    // Map params to method logic
+    const granted = hasConsented;
+    const type = consentType;
+
     try {
       const consent = await prisma.userConsent.upsert({
         where: {

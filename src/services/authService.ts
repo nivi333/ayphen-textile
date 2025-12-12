@@ -6,6 +6,7 @@ import { config } from '@/config/config';
 import { logger } from '@/utils/logger';
 import { redisClient } from '@/utils/redis';
 import { globalPrisma } from '@/database/connection';
+import gdprService from '@/services/gdprService';
 
 export interface AuthTokens {
   accessToken: string;
@@ -38,6 +39,9 @@ export interface RegisterData {
   deviceInfo?: string;
   userAgent?: string;
   ipAddress?: string;
+  hasConsentedToTerms?: boolean;
+  hasConsentedToPrivacy?: boolean;
+  hasConsentedToCookies?: boolean;
 }
 
 export class AuthService {
@@ -59,7 +63,10 @@ export class AuthService {
   /**
    * Generate JWT token (access or refresh)
    */
-  private static generateToken(payload: Omit<JWTPayload, 'type'>, type: 'access' | 'refresh'): string {
+  private static generateToken(
+    payload: Omit<JWTPayload, 'type'>,
+    type: 'access' | 'refresh'
+  ): string {
     const tokenPayload: JWTPayload = { ...payload, type };
     const secret = type === 'access' ? config.jwt.secret : config.jwt.refreshSecret;
     const expiresIn = type === 'access' ? config.jwt.expiresIn : config.jwt.refreshExpiresIn;
@@ -143,6 +150,44 @@ export class AuthService {
       ipAddress: userData.ipAddress,
     });
 
+    // Record GDPR consents if provided
+    if (
+      userData.hasConsentedToTerms ||
+      userData.hasConsentedToPrivacy ||
+      userData.hasConsentedToCookies
+    ) {
+      try {
+        await gdprService.recordConsent({
+          userId: user.id,
+          consentType: 'TERMS_AND_CONDITIONS',
+          hasConsented: userData.hasConsentedToTerms || false,
+          ipAddress: userData.ipAddress,
+          userAgent: userData.userAgent,
+        });
+
+        await gdprService.recordConsent({
+          userId: user.id,
+          consentType: 'PRIVACY_POLICY',
+          hasConsented: userData.hasConsentedToPrivacy || false,
+          ipAddress: userData.ipAddress,
+          userAgent: userData.userAgent,
+        });
+
+        if (userData.hasConsentedToCookies) {
+          await gdprService.recordConsent({
+            userId: user.id,
+            consentType: 'COOKIE_POLICY',
+            hasConsented: true,
+            ipAddress: userData.ipAddress,
+            userAgent: userData.userAgent,
+          });
+        }
+      } catch (gdprError) {
+        logger.error('Failed to record GDPR consent during registration:', gdprError);
+        // Continue registration even if consent recording fails (non-blocking)
+      }
+    }
+
     logger.info(`User registered: ${user.id}`);
     return { user, tokens };
   }
@@ -153,10 +198,7 @@ export class AuthService {
   static async login(credentials: LoginCredentials): Promise<{ user: any; tokens: AuthTokens }> {
     const user = await globalPrisma.users.findFirst({
       where: {
-        OR: [
-          { email: credentials.emailOrPhone },
-          { phone: credentials.emailOrPhone },
-        ],
+        OR: [{ email: credentials.emailOrPhone }, { phone: credentials.emailOrPhone }],
         is_active: true,
       },
     });

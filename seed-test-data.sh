@@ -70,14 +70,17 @@ MAIN_USER_EMAIL="test${TIMESTAMP}@lavoro.com"
 
 print_info "Creating user $MAIN_USER_EMAIL..."
 
-REGISTER_RESPONSE=$(curl -s -X POST "$BASE_URL/auth/register" \
+REGISTER_RESPONSE=$(curl -v -X POST "$BASE_URL/auth/register" \
   -H "$CONTENT_TYPE" \
   -d "{
     \"email\": \"$MAIN_USER_EMAIL\",
     \"phone\": \"+91${TIMESTAMP}\",
     \"password\": \"Test@123\",
     \"firstName\": \"Test\",
-    \"lastName\": \"User1\"
+    \"lastName\": \"User1\",
+    \"hasConsentedToTerms\": true,
+    \"hasConsentedToPrivacy\": true,
+    \"hasConsentedToCookies\": true
   }")
 
 MAIN_USER_TOKEN=$(echo $REGISTER_RESPONSE | jq -r '.tokens.accessToken')
@@ -87,6 +90,7 @@ if [ "$MAIN_USER_TOKEN" != "null" ] && [ -n "$MAIN_USER_TOKEN" ]; then
     print_status 0 "User $MAIN_USER_EMAIL created"
 else
     print_status 1 "Failed to create user $MAIN_USER_EMAIL"
+    echo "Response: $REGISTER_RESPONSE"
     echo "Exiting: Cannot proceed without main user"
     exit 1
 fi
@@ -155,7 +159,7 @@ print_section "STEP 3: Creating Additional Locations"
 # Wait for tenant schemas to be fully ready
 sleep 5
 
-for company_idx in 1 2; do
+for company_idx in {1..5}; do
     print_info "Creating 3 locations for Company $company_idx..."
     
     # Check if company token exists
@@ -260,6 +264,9 @@ create_products() {
 
 create_products 1 35
 create_products 2 15
+create_products 3 10
+create_products 4 10
+create_products 5 10
 
 # =========================================
 # STEP 5: CREATE CUSTOMERS (10 per company)
@@ -375,7 +382,10 @@ for i in {1..15}; do
         \"phone\": \"+91${TIMESTAMP}$i\",
         \"password\": \"Test@123\",
         \"firstName\": \"Employee\",
-        \"lastName\": \"User$i\"
+        \"lastName\": \"User$i\",
+        \"hasConsentedToTerms\": true,
+        \"hasConsentedToPrivacy\": true,
+        \"hasConsentedToCookies\": true
       }")
     
     TOKEN=$(echo $REGISTER_RESPONSE | jq -r '.tokens.accessToken')
@@ -925,14 +935,14 @@ create_invoices() {
             unit_price=$((RANDOM % 1000 + 100))
             
             if [ $j -eq 1 ]; then
-                line_items="[{\"productId\":\"$product_id\",\"description\":\"Product Line Item $j\",\"quantity\":$quantity,\"unitPrice\":$unit_price}]"
+                line_items="[{\"productId\":\"$product_id\",\"itemCode\":\"ITEM-${product_idx}\",\"description\":\"Product Line Item $j\",\"quantity\":$quantity,\"unitPrice\":$unit_price,\"unitOfMeasure\":\"PCS\"}]"
             else
-                line_items=$(echo $line_items | jq '. += [{"productId":"'$product_id'","description":"Product Line Item '$j'","quantity":'$quantity',"unitPrice":'$unit_price'}]')
+                line_items=$(echo $line_items | jq '. += [{"productId":"'$product_id'","itemCode":"ITEM-'${product_idx}'","description":"Product Line Item '$j'","quantity":'$quantity',"unitPrice":'$unit_price',"unitOfMeasure":"PCS"}]')
             fi
         done
         
         # Create invoice payload
-        INVOICE_PAYLOAD='{"customerId":"'$customer_id'","locationId":"'$LOCATION_ID'","issueDate":"'$issue_date'","dueDate":"'$due_date'","lineItems":'$line_items',"notes":"Test invoice created by seed script"}'
+        INVOICE_PAYLOAD='{"customerId":"'$customer_id'","locationId":"'$LOCATION_ID'","invoiceDate":"'$issue_date'","dueDate":"'$due_date'","lineItems":'$line_items',"notes":"Test invoice created by seed script"}'
         
         # Create invoice
         INVOICE_RESPONSE=$(curl -s -X POST "$BASE_URL/invoices" \
@@ -955,6 +965,10 @@ create_invoices() {
 # Create invoices for Companies 1 & 2
 create_invoices 1 10
 create_invoices 2 10
+create_invoices 3 10
+create_invoices 4 10
+create_invoices 5 10
+
 
 # =========================================
 # STEP 16: BILLS
@@ -1029,14 +1043,14 @@ create_bills() {
             unit_price=$((RANDOM % 500 + 50))
             
             if [ $j -eq 1 ]; then
-                line_items="[{\"productId\":\"$product_id\",\"description\":\"Product Line Item $j\",\"quantity\":$quantity,\"unitPrice\":$unit_price}]"
+                line_items="[{\"productId\":\"$product_id\",\"itemCode\":\"ITEM-${product_idx}\",\"description\":\"Product Line Item $j\",\"quantity\":$quantity,\"unitCost\":$unit_price,\"unitOfMeasure\":\"PCS\"}]"
             else
-                line_items=$(echo $line_items | jq '. += [{"productId":"'$product_id'","description":"Product Line Item '$j'","quantity":'$quantity',"unitPrice":'$unit_price'}]')
+                line_items=$(echo $line_items | jq '. += [{"productId":"'$product_id'","itemCode":"ITEM-'${product_idx}'","description":"Product Line Item '$j'","quantity":'$quantity',"unitCost":'$unit_price',"unitOfMeasure":"PCS"}]')
             fi
         done
         
         # Create bill payload
-        BILL_PAYLOAD='{"supplierId":"'$supplier_id'","locationId":"'$LOCATION_ID'","issueDate":"'$issue_date'","dueDate":"'$due_date'","lineItems":'$line_items',"notes":"Test bill created by seed script"}'
+        BILL_PAYLOAD='{"supplierId":"'$supplier_id'","locationId":"'$LOCATION_ID'","billDate":"'$issue_date'","dueDate":"'$due_date'","lineItems":'$line_items',"notes":"Test bill created by seed script"}'
         
         # Create bill
         BILL_RESPONSE=$(curl -s -X POST "$BASE_URL/bills" \
@@ -1059,6 +1073,9 @@ create_bills() {
 # Create bills for Companies 1 & 2
 create_bills 1 10
 create_bills 2 10
+create_bills 3 10
+create_bills 4 10
+create_bills 5 10
 
 # =========================================
 # STEP 16.5: GENERATE FINANCIAL REPORTS
@@ -1264,9 +1281,9 @@ generate_inventory_reports() {
         print_status 1 "Failed to generate Stock Aging Report"
     fi
     
-    # Generate Inventory Valuation Report
-    print_info "Generating Inventory Valuation Report..."
-    VALUATION_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/inventory-valuation?asOfDate=$AS_OF_DATE" \
+    # Generate Stock Valuation Report (instead of Inventory Valuation)
+    print_info "Generating Stock Valuation Report..."
+    VALUATION_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/stock-valuation?locationId=$LOCATION_ID&asOfDate=$END_DATE" \
       -H "$CONTENT_TYPE" \
       -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
     

@@ -504,7 +504,7 @@ class AnalyticsService {
         }),
         // @ts-ignore
         globalPrisma.compliance_reports.groupBy({
-          by: ['compliance_status'],
+          by: ['status'],
           where: { company_id: companyId, is_active: true },
           _count: true,
         }),

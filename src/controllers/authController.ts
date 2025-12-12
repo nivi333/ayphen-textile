@@ -8,10 +8,20 @@ const registerSchema = Joi.object({
   firstName: Joi.string().min(2).max(50).required(),
   lastName: Joi.string().min(2).max(50).required(),
   email: Joi.string().email().optional(),
-  phone: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/).optional(),
-  password: Joi.string().min(8).max(128).required()
+  phone: Joi.string()
+    .pattern(/^\+?[1-9]\d{1,14}$/)
+    .optional(),
+  password: Joi.string()
+    .min(8)
+    .max(128)
+    .required()
     .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
-    .message('Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character'),
+    .message(
+      'Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character'
+    ),
+  hasConsentedToTerms: Joi.boolean().optional(),
+  hasConsentedToPrivacy: Joi.boolean().optional(),
+  hasConsentedToCookies: Joi.boolean().optional(),
 }).custom((value, helpers) => {
   if (!value.email && !value.phone) {
     return helpers.error('any.custom', { message: 'Either email or phone is required' });
@@ -96,8 +106,11 @@ export class AuthController {
       });
     } catch (error: any) {
       logger.error('Login error:', error);
-      const status = error.message?.includes('Invalid credentials') ? 401 :
-                    error.message?.includes('User not registered') ? 404 : 500;
+      const status = error.message?.includes('Invalid credentials')
+        ? 401
+        : error.message?.includes('User not registered')
+          ? 404
+          : 500;
       res.status(status).json({
         success: false,
         message: error.message || 'Login failed',

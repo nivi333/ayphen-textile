@@ -4,7 +4,7 @@ import { logger } from '../utils/logger';
 import { globalPrisma as prisma } from '../database/connection';
 
 // Initialize Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', {
   apiVersion: '2025-11-17.clover' as Stripe.LatestApiVersion, // Using latest version with type assertion
   typescript: true,
 });
