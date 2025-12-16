@@ -484,8 +484,9 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
                   <Form.Item
                     label='Industry'
                     name='industry'
+                    rules={[{ required: true, message: 'Please select industry' }]}
                   >
-                    <Select placeholder='Select industry (optional)' className='ccd-select' allowClear>
+                    <Select placeholder='Select industry' className='ccd-select'>
                       <Option value='TEXTILE_MANUFACTURING'>Textile Manufacturing</Option>
                       <Option value='GARMENT_PRODUCTION'>Garment Production</Option>
                       <Option value='KNITTING_WEAVING'>Knitting & Weaving</Option>

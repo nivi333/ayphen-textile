@@ -23,6 +23,7 @@
       align-items: center;
       justify-content: space-between;
       height: 100%;
+      width: 100%;
       gap: 24px;
 
       .header-center {
@@ -63,6 +64,9 @@
             background: $primary-color;
             color: $bg-primary;
             font-weight: 600;
+            img {
+              border-radius: 50%;
+            }
           }
 
           .header-user-info {

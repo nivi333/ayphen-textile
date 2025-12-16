@@ -356,7 +356,7 @@ const UsersListPage: React.FC = () => {
           <Avatar 
             size={40} 
             src={record.avatarUrl} 
-            style={{ backgroundColor: record.avatarUrl ? 'transparent' : '#7b5fc9', flexShrink: 0 }}
+            style={{ backgroundColor: record.avatarUrl ? 'transparent' : '#df005c', flexShrink: 0 }}
           >
             {!record.avatarUrl && getInitials(record.firstName, record.lastName)}
           </Avatar>
