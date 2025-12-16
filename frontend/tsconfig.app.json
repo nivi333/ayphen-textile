@@ -32,7 +32,8 @@
       "@pages/*": ["./src/pages/*"],
       "@hooks/*": ["./src/hooks/*"],
       "@utils/*": ["./src/utils/*"],
-      "@types/*": ["./src/types/*"]
+      "@types/*": ["./src/types/*"],
+      "@ayphen-web/theme": ["./theme/src/index.ts"]
     }
   },
   "include": ["src"]

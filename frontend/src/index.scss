@@ -1,37 +1,52 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@600&display=swap');
 
 // ============================================================================
-// COLOR VARIABLES
+// MINIMAL SCSS VARIABLES FOR BACKWARD COMPATIBILITY
 // ============================================================================
+// Note: Theme is now managed by @ayphen-web/theme package
+// These variables are kept only for existing component SCSS files
 
-// Light mode colors
-$primary-color: #7b5fc9;
+// Colors
+$primary-color: #df005c;
 $secondary-color: #a2d8e5;
 $success-color: #52c41a;
 $error-color: #ff4d4f;
 $warning-color: #faad14;
 $info-color: #1890ff;
 
-// Light mode text colors
+// Text colors
 $primary-text-color: #213547;
 $secondary-text-color: #64748b;
 $tertiary-text-color: #94a3b8;
 $muted-text-color: #cbd5e1;
-$disabled-text-color: #e2e8f0;
 
-// Light mode background colors
+// State text colors
+$success-text-color: #166534;
+$error-text-color: #dc2626;
+$warning-text-color: #d97706;
+$info-text-color: #0369a1;
+
+// Text color aliases
+$text-primary: $primary-text-color;
+$text-secondary: $secondary-text-color;
+
+// Backgrounds
+$border-color: #d9d9d9;
 $bg-primary: #ffffff;
 $bg-secondary: #f8fafc;
+$bg-surface: #f8fafc;
 $bg-tertiary: #f1f5f9;
-$bg-muted: #e2e8f0;
-$bg-surface: #f8fafc; // Alias for bg-secondary
 
-// Light mode border colors
-$border-color: #e2e8f0;
-$border-light: #f1f5f9;
-$border-dark: #cbd5e1;
+// Font families
+$font-family-heading: 'Poppins', 'Inter', system-ui, sans-serif;
+$font-family-body:
+  'Inter',
+  -apple-system,
+  BlinkMacSystemFont,
+  'Segoe UI',
+  sans-serif;
 
-// Font size variables
+// Font sizes
 $font-size-xs: 12px;
 $font-size-sm: 14px;
 $font-size-base: 15px;
@@ -40,23 +55,15 @@ $font-size-xl: 18px;
 $font-size-2xl: 20px;
 $font-size-3xl: 24px;
 
-// Text color aliases for consistency
-$text-primary: $primary-text-color;
-$text-secondary: $secondary-text-color;
-$text-tertiary: $tertiary-text-color;
-$text-placeholder: $muted-text-color;
+// Spacing
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-2xl: 48px;
 
-// Light mode state colors
-$success-text-color: #166534;
-$success-bg-color: #dcfce7;
-$error-text-color: #dc2626;
-$error-bg-color: #fef2f2;
-$warning-text-color: #d97706;
-$warning-bg-color: #fef3c7;
-$info-text-color: #0369a1;
-$info-bg-color: #dbeafe;
-
-// Dark mode colors - Enhanced for better contrast
+// Dark mode variables (for backward compatibility - theme managed by @ayphen-web/theme)
 $dark-bg-primary: #0f0f0f;
 $dark-bg-secondary: #1a1a1a;
 $dark-bg-tertiary: #262626;
@@ -68,53 +75,27 @@ $dark-text-tertiary: #9ca3af;
 $dark-text-muted: #6b7280;
 $dark-text-disabled: #4b5563;
 $dark-border: #333333;
-$dark-border-light: #2a2a2a;
-$dark-border-dark: #404040;
 
 // Dark mode state colors
-$dark-success-color: #22c55e;
-$dark-success-bg: #14532d;
 $dark-success-text: #86efac;
-$dark-error-color: #ef4444;
-$dark-error-bg: #7f1d1d;
+$dark-success-color: #22c55e;
 $dark-error-text: #fca5a5;
-$dark-warning-color: #f59e0b;
-$dark-warning-bg: #78350f;
+$dark-error-color: #ef4444;
 $dark-warning-text: #fcd34d;
-$dark-info-color: #3b82f6;
-$dark-info-bg: #1e3a8a;
+$dark-warning-color: #f59e0b;
 $dark-info-text: #93c5fd;
+$dark-info-color: #3b82f6;
 
-// ============================================================================
-// OTHER DESIGN SYSTEM VARIABLES
-// ============================================================================
+// Additional variables
+$border-light: #f1f5f9;
+$border-dark: #cbd5e1;
 
-$font-family-heading: 'Poppins', 'Inter', system-ui, sans-serif;
-$font-family-body:
-  'Inter',
-  -apple-system,
-  BlinkMacSystemFont,
-  'Segoe UI',
-  'Roboto',
-  'Oxygen',
-  'Ubuntu',
-  'Cantarell',
-  'Fira Sans',
-  'Droid Sans',
-  'Helvetica Neue',
-  sans-serif;
-
+// Border radius
 $border-radius-base: 8px;
 $border-radius-lg: 12px;
 $border-radius-xl: 16px;
 
-$spacing-xs: 4px;
-$spacing-sm: 8px;
-$spacing-md: 16px;
-$spacing-lg: 24px;
-$spacing-xl: 32px;
-$spacing-2xl: 48px;
-
+// Shadows
 $shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 $shadow-md:
   0 4px 6px -1px rgba(0, 0, 0, 0.1),
@@ -125,6 +106,35 @@ $shadow-lg:
 $shadow-xl:
   0 20px 25px -5px rgba(0, 0, 0, 0.1),
   0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+// ============================================================================
+// TABLE CELL UTILITY CLASSES
+// ============================================================================
+
+.table-cell-primary {
+  font-weight: 500;
+  color: $primary-text-color;
+}
+
+.table-cell-secondary {
+  color: $secondary-text-color;
+}
+
+.table-cell-success {
+  color: $success-color;
+  font-weight: 500;
+}
+
+// Dark mode for table cells
+[data-theme='dark'] {
+  .table-cell-primary {
+    color: $dark-text-primary;
+  }
+
+  .table-cell-secondary {
+    color: $dark-text-secondary;
+  }
+}
 
 // ============================================================================
 // SMOOTH THEME TRANSITIONS
@@ -154,6 +164,10 @@ $shadow-xl:
     box-shadow 0.3s ease !important;
 }
 
+// ============================================================================
+// UTILITY CLASSES
+// ============================================================================
+
 .no-border-link:hover,
 .no-border-link:focus {
   border: none !important;
@@ -161,7 +175,10 @@ $shadow-xl:
   text-decoration: underline !important;
 }
 
-/* Form styling adjustments */
+// ============================================================================
+// FORM STYLING
+// ============================================================================
+
 .ant-form-item {
   margin-bottom: 12px !important;
 }
@@ -170,9 +187,7 @@ $shadow-xl:
   margin: 5px 0 !important;
 }
 
-/* Auth form field styles */
 .auth-form-label {
-  color: $primary-text-color !important;
   font-weight: 600 !important;
   font-size: 14px !important;
   display: block !important;
@@ -182,8 +197,6 @@ $shadow-xl:
 .auth-form-input {
   height: 40px !important;
   border-radius: 6px !important;
-  border: 1px solid $border-color !important;
-  background-color: $bg-secondary !important;
   font-size: 14px !important;
 }
 
@@ -195,17 +208,16 @@ $shadow-xl:
   font-size: 12px !important;
 }
 
+// ============================================================================
+// CUSTOM BUTTON STYLES
+// ============================================================================
+
 /* Animated gradient primary button */
 .gradient-primary-btn {
-  background: linear-gradient(
-    135deg,
-    $primary-color 0%,
-    darken($primary-color, 10%) 50%,
-    darken($primary-color, 20%) 100%
-  ) !important;
+  background: linear-gradient(135deg, #df005c 0%, #c10351 50%, #980743 100%) !important;
   border: none !important;
-  box-shadow: 0 4px 6px -1px rgba($primary-color, 0.3) !important;
-  color: $bg-primary !important;
+  box-shadow: 0 4px 6px -1px rgba(223, 0, 92, 0.3) !important;
+  color: #ffffff !important;
   font-weight: 600 !important;
   transition: all 0.3s ease !important;
   position: relative !important;
@@ -219,18 +231,13 @@ $shadow-xl:
   left: -100% !important;
   width: 100% !important;
   height: 100% !important;
-  background: linear-gradient(90deg, transparent, rgba($bg-primary, 0.2), transparent) !important;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent) !important;
   transition: left 0.5s ease !important;
 }
 
 .gradient-primary-btn:hover {
-  background: linear-gradient(
-    135deg,
-    lighten($primary-color, 10%) 0%,
-    $primary-color 50%,
-    darken($primary-color, 10%) 100%
-  ) !important;
-  box-shadow: 0 6px 8px -1px rgba($primary-color, 0.4) !important;
+  background: linear-gradient(135deg, #eb2671 0%, #df005c 50%, #c10351 100%) !important;
+  box-shadow: 0 6px 8px -1px rgba(223, 0, 92, 0.4) !important;
   transform: translateY(-1px) !important;
 }
 
@@ -240,25 +247,20 @@ $shadow-xl:
 
 .gradient-primary-btn:active {
   transform: translateY(0) !important;
-  box-shadow: 0 3px 4px -1px rgba($primary-color, 0.3) !important;
+  box-shadow: 0 3px 4px -1px rgba(223, 0, 92, 0.3) !important;
 }
 
 .gradient-primary-btn:focus {
   outline: none !important;
-  box-shadow: 0 0 0 3px rgba($primary-color, 0.3) !important;
+  box-shadow: 0 0 0 3px rgba(223, 0, 92, 0.3) !important;
 }
 
 /* Animated gradient secondary button */
 .gradient-secondary-btn {
-  background: linear-gradient(
-    135deg,
-    lighten($warning-color, 10%) 0%,
-    $warning-color 50%,
-    $warning-color 100%
-  ) !important;
+  background: linear-gradient(135deg, #ffc53d 0%, #faad14 50%, #faad14 100%) !important;
   border: none !important;
-  box-shadow: 0 4px 6px -1px rgba($warning-color, 0.3) !important;
-  color: $bg-primary !important;
+  box-shadow: 0 4px 6px -1px rgba(250, 173, 20, 0.3) !important;
+  color: #ffffff !important;
   font-weight: 600 !important;
   transition: all 0.3s ease !important;
   position: relative !important;
@@ -272,18 +274,13 @@ $shadow-xl:
   left: -100% !important;
   width: 100% !important;
   height: 100% !important;
-  background: linear-gradient(90deg, transparent, rgba($bg-primary, 0.2), transparent) !important;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent) !important;
   transition: left 0.5s ease !important;
 }
 
 .gradient-secondary-btn:hover {
-  background: linear-gradient(
-    135deg,
-    lighten($warning-color, 15%) 0%,
-    lighten($warning-color, 5%) 50%,
-    lighten($warning-color, 5%) 100%
-  ) !important;
-  box-shadow: 0 6px 8px -1px rgba($warning-color, 0.4) !important;
+  background: linear-gradient(135deg, #ffd666 0%, #ffc53d 50%, #ffc53d 100%) !important;
+  box-shadow: 0 6px 8px -1px rgba(250, 173, 20, 0.4) !important;
   transform: translateY(-1px) !important;
 }
 
@@ -293,1648 +290,87 @@ $shadow-xl:
 
 .gradient-secondary-btn:active {
   transform: translateY(0) !important;
-  box-shadow: 0 3px 4px -1px rgba($warning-color, 0.3) !important;
+  box-shadow: 0 3px 4px -1px rgba(250, 173, 20, 0.3) !important;
 }
 
 .gradient-secondary-btn:focus {
   outline: none !important;
-  box-shadow: 0 0 0 3px rgba($warning-color, 0.3) !important;
-}
-
-/* Auth heading improvements */
-[data-theme='dark'] {
-  .ant-card h3 {
-    color: $dark-text-primary !important;
-  }
-}
-
-[data-theme='dark'] {
-  // Input fields
-  .ant-input {
-    background-color: $dark-bg-primary !important;
-    border-color: $dark-border !important;
-    color: $dark-text-primary !important;
-
-    &::placeholder {
-      color: $dark-text-muted !important;
-    }
-
-    &:hover {
-      border-color: $dark-border-dark !important;
-    }
-
-    &:focus,
-    &.ant-input-focused {
-      border-color: $primary-color !important;
-      box-shadow: 0 0 0 2px rgba($primary-color, 0.2) !important;
-      background-color: $dark-bg-primary !important;
-    }
-
-    &:disabled {
-      background-color: $dark-bg-secondary !important;
-      color: $dark-text-disabled !important;
-      border-color: $dark-border-light !important;
-    }
-  }
-
-  .ant-input-password {
-    background-color: $dark-bg-tertiary !important;
-    border-color: $dark-border !important;
-
-    .ant-input {
-      background-color: transparent !important;
-      border-color: transparent !important;
-    }
-
-    &:hover {
-      border-color: $dark-border-dark !important;
-    }
-
-    &:focus,
-    &.ant-input-password-focused {
-      border-color: $primary-color !important;
-      box-shadow: 0 0 0 2px rgba($primary-color, 0.2) !important;
-    }
-  }
-
-  .ant-input-number {
-    background-color: $dark-bg-tertiary !important;
-    border-color: $dark-border !important;
-
-    .ant-input-number-input {
-      background-color: transparent !important;
-      color: $dark-text-primary !important;
-    }
-
-    &:hover {
-      border-color: $dark-border-dark !important;
-    }
-
-    &:focus,
-    &.ant-input-number-focused {
-      border-color: $primary-color !important;
-      box-shadow: 0 0 0 2px rgba($primary-color, 0.2) !important;
-    }
-  }
-
-  .ant-input-textarea {
-    background-color: $dark-bg-tertiary !important;
-    border-color: $dark-border !important;
-
-    textarea {
-      background-color: transparent !important;
-      color: $dark-text-primary !important;
-
-      &::placeholder {
-        color: $dark-text-muted !important;
-      }
-    }
-
-    &:hover {
-      border-color: $dark-border-dark !important;
-    }
-
-    &:focus,
-    &.ant-input-textarea-focused {
-      border-color: $primary-color !important;
-      box-shadow: 0 0 0 2px rgba($primary-color, 0.2) !important;
-    }
-  }
-
-  // Select dropdowns
-  .ant-select {
-    .ant-select-selector {
-      background-color: $dark-bg-tertiary !important;
-      border-color: $dark-border !important;
-      color: $dark-text-primary !important;
-    }
-
-    .ant-select-arrow {
-      color: $dark-text-tertiary !important;
-    }
-
-    &:hover .ant-select-selector {
-      border-color: $dark-border-dark !important;
-    }
-
-    &.ant-select-focused .ant-select-selector {
-      border-color: $primary-color !important;
-      box-shadow: 0 0 0 2px rgba($primary-color, 0.2) !important;
-    }
-
-    .ant-select-selection-placeholder {
-      color: $dark-text-muted !important;
-    }
-
-    .ant-select-selection-item {
-      color: $dark-text-primary !important;
-    }
-  }
-
-  .ant-select-dropdown {
-    background-color: $dark-bg-elevated !important;
-    border-color: $dark-border !important;
-
-    .ant-select-item {
-      color: $dark-text-primary !important;
-
-      &:hover {
-        background-color: $dark-bg-tertiary !important;
-      }
-
-      &.ant-select-item-option-selected {
-        background-color: rgba($primary-color, 0.2) !important;
-        color: $primary-color !important;
-      }
-
-      &.ant-select-item-option-active {
-        background-color: $dark-bg-tertiary !important;
-      }
-    }
-  }
-
-  // Date picker
-  .ant-picker {
-    background-color: $dark-bg-tertiary !important;
-    border-color: $dark-border !important;
-
-    input {
-      color: $dark-text-primary !important;
-
-      &::placeholder {
-        color: $dark-text-muted !important;
-      }
-    }
-
-    .ant-picker-suffix {
-      color: $dark-text-tertiary !important;
-    }
-
-    &:hover {
-      border-color: $dark-border-dark !important;
-    }
-
-    &.ant-picker-focused {
-      border-color: $primary-color !important;
-      box-shadow: 0 0 0 2px rgba($primary-color, 0.2) !important;
-    }
-  }
-
-  .ant-picker-dropdown {
-    .ant-picker-panel-container {
-      background-color: $dark-bg-elevated !important;
-      border-color: $dark-border !important;
-    }
-
-    .ant-picker-header {
-      color: $dark-text-primary !important;
-      border-bottom-color: $dark-border !important;
-    }
-
-    .ant-picker-content th {
-      color: $dark-text-secondary !important;
-    }
-
-    .ant-picker-cell {
-      color: $dark-text-primary !important;
-
-      &:hover .ant-picker-cell-inner {
-        background-color: $dark-bg-tertiary !important;
-      }
-
-      &.ant-picker-cell-selected .ant-picker-cell-inner {
-        background-color: $primary-color !important;
-      }
-
-      &.ant-picker-cell-today .ant-picker-cell-inner {
-        border-color: $primary-color !important;
-      }
-    }
-  }
-
-  // Form labels and items
-  .ant-form-item-label > label {
-    color: $dark-text-secondary !important;
-
-    &.ant-form-item-required::before {
-      color: $dark-error-color !important;
-    }
-  }
-
-  .ant-form-item-explain-error {
-    color: $dark-error-text !important;
-  }
-
-  // Typography
-  .ant-typography {
-    color: $dark-text-secondary !important;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    color: $dark-text-primary !important;
-  }
-
-  // Cards
-  .ant-card {
-    background-color: $dark-bg-surface !important;
-    border-color: $dark-border !important;
-
-    .ant-card-head {
-      background-color: $dark-bg-secondary !important;
-      border-bottom-color: $dark-border !important;
-      color: $dark-text-primary !important;
-
-      .ant-card-head-title {
-        color: $dark-text-primary !important;
-      }
-    }
-
-    .ant-card-body {
-      color: $dark-text-secondary !important;
-    }
-  }
-
-  // Tables
-  .ant-table {
-    background-color: $dark-bg-surface !important;
-    color: $dark-text-primary !important;
-
-    .ant-table-thead > tr > th {
-      background-color: $dark-bg-tertiary !important;
-      border-bottom-color: $dark-border !important;
-      color: $dark-text-primary !important;
-    }
-
-    .ant-table-tbody > tr > td {
-      border-bottom-color: $dark-border-light !important;
-      color: $dark-text-secondary !important;
-    }
-
-    .ant-table-tbody > tr:hover > td {
-      background-color: $dark-bg-tertiary !important;
-    }
-
-    .ant-table-row-selected > td {
-      background-color: rgba($primary-color, 0.15) !important;
-    }
-  }
-
-  .ant-table-wrapper {
-    .ant-table-container {
-      border-color: $dark-border !important;
-    }
-  }
-
-  // Pagination
-  .ant-pagination {
-    .ant-pagination-item {
-      background-color: $dark-bg-tertiary !important;
-      border-color: $dark-border !important;
-
-      a {
-        color: $dark-text-primary !important;
-      }
-
-      &:hover {
-        border-color: $primary-color !important;
-
-        a {
-          color: $primary-color !important;
-        }
-      }
-
-      &.ant-pagination-item-active {
-        background-color: $primary-color !important;
-        border-color: $primary-color !important;
-
-        a {
-          color: #ffffff !important;
-        }
-      }
-    }
-
-    .ant-pagination-prev,
-    .ant-pagination-next {
-      .ant-pagination-item-link {
-        background-color: $dark-bg-tertiary !important;
-        border-color: $dark-border !important;
-        color: $dark-text-primary !important;
-
-        &:hover {
-          border-color: $primary-color !important;
-          color: $primary-color !important;
-        }
-      }
-    }
-  }
-
-  // Buttons
-  .ant-btn {
-    &.ant-btn-default {
-      background-color: $dark-bg-tertiary !important;
-      border-color: $dark-border !important;
-      color: $dark-text-primary !important;
-
-      &:hover {
-        background-color: $dark-bg-elevated !important;
-        border-color: $dark-border-dark !important;
-        color: $primary-color !important;
-      }
-    }
-
-    &.ant-btn-text {
-      color: $dark-text-secondary !important;
-
-      &:hover {
-        background-color: $dark-bg-tertiary !important;
-        color: $dark-text-primary !important;
-      }
-    }
-
-    &.ant-btn-link {
-      color: $primary-color !important;
-
-      &:hover {
-        color: lighten($primary-color, 10%) !important;
-      }
-    }
-  }
-
-  // Modals and Drawers
-  .ant-modal-content {
-    background-color: $dark-bg-surface !important;
-    color: $dark-text-primary !important;
-
-    .ant-modal-header {
-      background-color: $dark-bg-secondary !important;
-      border-bottom-color: $dark-border !important;
-
-      .ant-modal-title {
-        color: $dark-text-primary !important;
-      }
-    }
-
-    .ant-modal-footer {
-      border-top-color: $dark-border !important;
-    }
-
-    .ant-modal-close {
-      color: $dark-text-tertiary !important;
-
-      &:hover {
-        color: $dark-text-primary !important;
-      }
-    }
-  }
-
-  .ant-drawer {
-    .ant-drawer-content {
-      background-color: $dark-bg-surface !important;
-    }
-
-    .ant-drawer-header {
-      background-color: $dark-bg-secondary !important;
-      border-bottom-color: $dark-border !important;
-
-      .ant-drawer-title {
-        color: $dark-text-primary !important;
-      }
-    }
-
-    .ant-drawer-body {
-      background-color: $dark-bg-surface !important;
-      color: $dark-text-secondary !important;
-    }
-
-    .ant-drawer-close {
-      color: $dark-text-tertiary !important;
-
-      &:hover {
-        color: $dark-text-primary !important;
-      }
-    }
-  }
-
-  // Dividers
-  .ant-divider {
-    border-top-color: $dark-border !important;
-    border-left-color: $dark-border !important;
-  }
-
-  // Tabs
-  .ant-tabs {
-    .ant-tabs-nav {
-      &::before {
-        border-bottom-color: $dark-border !important;
-      }
-    }
-
-    .ant-tabs-tab {
-      color: $dark-text-tertiary !important;
-
-      &:hover {
-        color: $dark-text-primary !important;
-      }
-
-      &.ant-tabs-tab-active {
-        .ant-tabs-tab-btn {
-          color: $primary-color !important;
-        }
-      }
-    }
-
-    .ant-tabs-ink-bar {
-      background-color: $primary-color !important;
-    }
-  }
-
-  // Checkbox and Radio
-  .ant-checkbox-wrapper {
-    color: $dark-text-secondary !important;
-
-    .ant-checkbox {
-      .ant-checkbox-inner {
-        background-color: $dark-bg-tertiary !important;
-        border-color: $dark-border !important;
-      }
-
-      &.ant-checkbox-checked .ant-checkbox-inner {
-        background-color: $primary-color !important;
-        border-color: $primary-color !important;
-      }
-    }
-  }
-
-  .ant-radio-wrapper {
-    color: $dark-text-secondary !important;
-
-    .ant-radio {
-      .ant-radio-inner {
-        background-color: $dark-bg-tertiary !important;
-        border-color: $dark-border !important;
-      }
-
-      &.ant-radio-checked .ant-radio-inner {
-        border-color: $primary-color !important;
-
-        &::after {
-          background-color: $primary-color !important;
-        }
-      }
-    }
-  }
-
-  // Switch
-  .ant-switch {
-    background-color: $dark-bg-tertiary !important;
-
-    &.ant-switch-checked {
-      background-color: $primary-color !important;
-    }
-  }
-
-  // Upload
-  .ant-upload {
-    &.ant-upload-drag {
-      background-color: $dark-bg-tertiary !important;
-      border-color: $dark-border !important;
-
-      .ant-upload-drag-icon {
-        color: $dark-text-tertiary !important;
-      }
-
-      .ant-upload-text {
-        color: $dark-text-primary !important;
-      }
-
-      .ant-upload-hint {
-        color: $dark-text-muted !important;
-      }
-
-      &:hover {
-        border-color: $primary-color !important;
-      }
-    }
-  }
-
-  // Badges and Tags
-  .ant-badge {
-    .ant-badge-count {
-      background-color: $dark-error-color !important;
-    }
-  }
-
-  // Statistic
-  .ant-statistic {
-    .ant-statistic-title {
-      color: $dark-text-secondary !important;
-    }
-
-    .ant-statistic-content {
-      color: $dark-text-primary !important;
-    }
-  }
-
-  // Empty state
-  .ant-empty {
-    .ant-empty-description {
-      color: $dark-text-muted !important;
-    }
-  }
-
-  // Dropdown menus
-  .ant-dropdown-menu {
-    background-color: $dark-bg-elevated !important;
-    border-color: $dark-border !important;
-
-    .ant-dropdown-menu-item {
-      color: $dark-text-primary !important;
-
-      &:hover {
-        background-color: $dark-bg-tertiary !important;
-      }
-    }
-  }
-
-  // Popover and Tooltip
-  .ant-popover-inner {
-    background-color: $dark-bg-elevated !important;
-
-    .ant-popover-title {
-      border-bottom-color: $dark-border !important;
-      color: $dark-text-primary !important;
-    }
-
-    .ant-popover-inner-content {
-      color: $dark-text-secondary !important;
-    }
-  }
-
-  .ant-tooltip-inner {
-    background-color: $dark-bg-elevated !important;
-    color: $dark-text-primary !important;
-  }
-
-  .ant-tooltip-arrow-content {
-    background-color: $dark-bg-elevated !important;
-  }
-
-  // Body and general
-  body {
-    background-color: $dark-bg-primary !important;
-    color: $dark-text-secondary !important;
-  }
-
-  // Custom card heading
-  .ant-card h3 {
-    color: $dark-text-primary !important;
-  }
-}
-
-// Reset and base styles
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: $font-family-body;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: $bg-primary;
-  color: $primary-text-color;
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
-  line-height: 1.5;
-  font-weight: 400;
-}
-
-// Typography
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: $font-family-heading;
-  font-weight: 600;
-  line-height: 1.1;
-}
-
-h1 {
-  font-size: 3.2em;
-}
-
-h2 {
-  font-size: 2.4em;
-}
-
-h3 {
-  font-size: 1.875em;
-}
-
-h4 {
-  font-size: 1.5em;
-}
-
-h5 {
-  font-size: 1.25em;
-}
-
-h6 {
-  font-size: 1.125em;
-}
-
-// Links
-a {
-  font-weight: 500;
-  color: $primary-color;
-  text-decoration: none;
-  transition: color 0.2s ease;
-
-  &:hover {
-    color: darken($primary-color, 10%);
-  }
-}
-
-// Buttons
-button {
-  border-radius: $border-radius-base;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: $bg-secondary;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    border-color: $primary-color;
-  }
-
-  &:focus,
-  &:focus-visible {
-    outline: 2px solid $primary-color;
-    outline-offset: 2px;
-  }
-}
-
-// Dark mode styles
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: $dark-bg-primary;
-    color: $dark-text-primary;
-  }
-
-  a:hover {
-    color: lighten($primary-color, 10%);
-  }
-
-  button {
-    background-color: $dark-bg-secondary;
-    color: $dark-text-primary;
-  }
-}
-
-// Utility classes
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 $spacing-md;
-}
-
-.flex {
-  display: flex;
-}
-
-.flex-col {
-  flex-direction: column;
-}
-
-.items-center {
-  align-items: center;
-}
-
-.justify-center {
-  justify-content: center;
-}
-
-.justify-between {
-  justify-content: space-between;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.space-y-1 > * + * {
-  margin-top: $spacing-xs;
-}
-
-.space-y-2 > * + * {
-  margin-top: $spacing-sm;
-}
-
-.space-y-4 > * + * {
-  margin-top: $spacing-md;
-}
-
-.space-y-6 > * + * {
-  margin-top: $spacing-lg;
-}
-
-.space-x-4 > * + * {
-  margin-left: $spacing-md;
-}
-
-.rounded {
-  border-radius: $border-radius-base;
-}
-
-.rounded-lg {
-  border-radius: $border-radius-lg;
-}
-
-.rounded-xl {
-  border-radius: $border-radius-xl;
-}
-
-.shadow-sm {
-  box-shadow: $shadow-sm;
-}
-
-.shadow-md {
-  box-shadow: $shadow-md;
-}
-
-.shadow-lg {
-  box-shadow: $shadow-lg;
-}
-
-.shadow-xl {
-  box-shadow: $shadow-xl;
-}
-
-.p-4 {
-  padding: $spacing-md;
-}
-
-.p-6 {
-  padding: $spacing-lg;
-}
-
-.p-8 {
-  padding: $spacing-xl;
-}
-
-.m-4 {
-  margin: $spacing-md;
-}
-
-.m-6 {
-  margin: $spacing-lg;
-}
-
-.m-8 {
-  margin: $spacing-xl;
-}
-
-.mb-4 {
-  margin-bottom: $spacing-md;
-}
-
-.mb-6 {
-  margin-bottom: $spacing-lg;
-}
-
-.mb-8 {
-  margin-bottom: $spacing-xl;
-}
-
-.mt-4 {
-  margin-top: $spacing-md;
-}
-
-.mt-6 {
-  margin-top: $spacing-lg;
-}
-
-.mt-8 {
-  margin-top: $spacing-xl;
-}
-
-.w-full {
-  width: 100%;
-}
-
-.max-w-md {
-  max-width: 448px;
-}
-
-.max-w-lg {
-  max-width: 512px;
-}
-
-.max-w-xl {
-  max-width: 576px;
-}
-
-.h-12 {
-  height: 48px;
-}
-
-.min-h-screen {
-  min-height: 100vh;
-}
-
-// Gradient backgrounds
-.bg-gradient-to-br {
-  &.from-purple-50 {
-    background: linear-gradient(to bottom right, lighten($primary-color, 45%), $bg-primary);
-  }
-
-  &.from-blue-50 {
-    background: linear-gradient(to bottom right, lighten($secondary-color, 35%), $bg-primary);
-  }
-
-  &.from-orange-50 {
-    background: linear-gradient(to bottom right, lighten($warning-color, 35%), $bg-primary);
-  }
-}
-
-// Dark mode gradients
-@media (prefers-color-scheme: dark) {
-  .bg-gradient-to-br {
-    &.from-gray-900 {
-      background: linear-gradient(to bottom right, $dark-bg-primary, $dark-bg-secondary);
-    }
-
-    &.to-purple-900 {
-      background: linear-gradient(to bottom right, $dark-bg-secondary, darken($primary-color, 20%));
-    }
-
-    &.to-blue-900 {
-      background: linear-gradient(
-        to bottom right,
-        $dark-bg-secondary,
-        darken($secondary-color, 20%)
-      );
-    }
-
-    &.to-orange-900 {
-      background: linear-gradient(to bottom right, $dark-bg-secondary, darken($warning-color, 30%));
-    }
-  }
-}
-
-// Form styles
-.form-input {
-  height: 48px;
-  border-radius: $border-radius-lg;
-  border: 1px solid $border-color;
-  background-color: $bg-secondary;
-  padding: 0 $spacing-md;
-  font-size: 16px;
-  transition: all 0.2s ease;
-
-  &:focus {
-    outline: none;
-    border-color: $primary-color;
-    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
-  }
-
-  @media (prefers-color-scheme: dark) {
-    background-color: $dark-bg-secondary;
-    border-color: $dark-border;
-    color: $dark-text-primary;
-
-    &:focus {
-      border-color: $primary-color;
-      box-shadow: 0 0 0 3px rgba($primary-color, 0.2);
-    }
-  }
-}
-
-// Card styles
-.card {
-  background: $bg-primary;
-  border-radius: $border-radius-xl;
-  box-shadow: $shadow-lg;
-  border: 1px solid $border-light;
-  padding: $spacing-xl;
-
-  @media (prefers-color-scheme: dark) {
-    background: $dark-bg-secondary;
-    border-color: $dark-border;
-  }
-}
-
-.card-elevated {
-  position: relative;
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    background: linear-gradient(45deg, $primary-color, $secondary-color);
-    border-radius: $border-radius-xl;
-    filter: blur(8px);
-    opacity: 0.3;
-    z-index: -1;
-  }
-}
-
-// Global Ant Design overrides
-.ant-select-selection-item {
-  display: flex !important;
-}
-
-// Avatar styles for company and location screens
-.ant-avatar > img {
-  display: block;
-  width: 100%;
-
-  object-fit: cover;
-}
-
-.ant-avatar.ant-avatar-circle {
-  width: 45px;
-  height: 45px;
-  font-size: 22px;
+  box-shadow: 0 0 0 3px rgba(250, 173, 20, 0.3) !important;
 }
 
 // ============================================================================
-// INSPECTION FORM DRAWER STYLES
+// THEME SWITCHING OVERLAY
 // ============================================================================
 
-.ifd-content {
-  padding: 24px 32px 0 32px;
-  font-family: $font-family-body;
-  font-size: 1rem;
-  color: $primary-text-color;
-  background: $bg-primary;
-  display: flex;
-  flex-direction: column;
-}
-
-.ifd-section {
-  margin-bottom: 0;
-  padding-bottom: 0;
-}
-
-.ifd-section-title {
-  font-size: 1rem;
-  font-weight: 500;
-  color: $primary-text-color;
-  margin-bottom: 12px;
-  margin-top: 0;
-}
-
-.ifd-divider {
-  margin: 8px 0 16px 0;
-  border-color: $border-light;
-}
-
-.ifd-input,
-.ifd-select {
-  width: 100%;
-
-  .ant-select-selector {
-    font-size: 14px;
-  }
-}
-
-.ifd-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 18px;
-  padding-bottom: 18px;
-  border-top: 1px solid $border-light;
-  position: sticky;
-  bottom: 0;
-  background: $bg-primary;
-  padding-top: 16px;
-  margin-top: auto;
-}
-
-.ifd-form {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  flex: 1;
-}
-
-.ifd-form-content {
-  flex: 1;
-
-  padding-bottom: 16px;
-}
-
-.ifd-cancel-btn {
-  margin-right: $spacing-sm;
-}
-
-// ============================================================================
-// INSPECTION DETAILS PAGE STYLES
-// ============================================================================
-
-.inspection-details-page {
-  padding: $spacing-md;
-
-  .details-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: $spacing-md;
-    padding-bottom: $spacing-sm;
-    border-bottom: 1px solid $border-light;
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: $spacing-sm;
-
-      .back-button {
-        color: $primary-color;
-        font-size: $font-size-sm;
-
-        &:hover {
-          color: darken($primary-color, 10%);
-        }
-      }
-
-      .page-title {
-        margin: 0;
-        color: $primary-color;
-        font-weight: 600;
-      }
-    }
-  }
-
-  .status-bar {
-    display: flex;
-    gap: $spacing-md;
-    margin-bottom: $spacing-md;
-    padding: $spacing-sm;
-    background: $bg-secondary;
-    border-radius: $border-radius-base;
-    border: 1px solid $border-light;
-    flex-wrap: wrap;
-
-    .status-item {
-      display: flex;
-      align-items: center;
-      gap: $spacing-xs;
-
-      .label {
-        font-weight: 600;
-        color: $text-primary;
-        font-size: $font-size-sm;
-      }
-
-      .value {
-        color: $text-secondary;
-        font-size: $font-size-sm;
-      }
-    }
-  }
-
-  :global {
-    .ant-tabs {
-      .ant-tabs-tab {
-        font-size: $font-size-sm;
-        padding: $spacing-sm $spacing-md;
-      }
-
-      .ant-tabs-content {
-        padding: $spacing-md 0;
-      }
-    }
-
-    .ant-card {
-      border-color: $border-light;
-      border-radius: $border-radius-base;
-
-      .ant-card-head {
-        background: $bg-secondary;
-        border-bottom: 1px solid $border-light;
-        padding: $spacing-sm;
-
-        .ant-card-head-title {
-          font-size: $font-size-sm;
-          font-weight: 600;
-          color: $primary-color;
-        }
-      }
-
-      .ant-card-body {
-        padding: $spacing-sm;
-      }
-    }
-
-    .ant-table {
-      // Global Ant Design Table Overrides
-      .ant-table-thead > tr > th {
-        background: #fafafa;
-        border-bottom: 2px solid #f0f0f0;
-        font-weight: 600;
-        color: #262626;
-        padding: 12px 16px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .ant-table-tbody > tr > td {
-        padding: 10px;
-        border-bottom: 1px solid #f0f0f0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 0;
-      }
-
-      .ant-table-tbody > tr:hover > td {
-        padding: 10px;
-        background: #f5f5f5;
-      }
-
-      // Ensure table cells content stays in one line
-      .ant-table-cell {
-        white-space: nowrap !important;
-        overflow: hidden !important;
-
-        padding: 10px;
-        text-overflow: ellipsis !important;
-      }
-
-      // Fix for nested content in table cells
-      .ant-table-cell > div,
-      .ant-table-cell > span {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        padding: 10px;
-        display: block;
-        max-width: 100%;
-      }
-    }
-
-    .ant-divider {
-      margin: $spacing-sm 0;
-    }
-  }
-
-  .tab-content {
-    padding: $spacing-sm 0;
-  }
-
-  .info-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: $spacing-xs 0;
-
-    .label {
-      font-weight: 600;
-      color: $text-primary;
-      font-size: $font-size-sm;
-    }
-
-    .value {
-      color: $text-secondary;
-      font-size: $font-size-sm;
-    }
-  }
-
-  .notes-content {
-    color: $text-secondary;
-    font-size: $font-size-sm;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-
-  .font-semibold {
-    font-weight: 600;
-  }
-}
-
-// ============================================================================
-// INSPECTIONS LIST PAGE STYLES
-// ============================================================================
-
-.inspections-list-page {
-  .page-title {
-    margin-bottom: $spacing-md;
-  }
-
-  .filters-section {
-    margin-bottom: $spacing-md;
-
-    .filters-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: $spacing-sm;
-    }
-  }
-
-  .table-section {
-    // Removed background to match Product table style
-    border-radius: $border-radius-base;
-    // border: 1px solid $border-light; // Removed border to match Product table
-    padding: $spacing-md;
-
-    :global {
-      .ant-table {
-        .ant-table-tbody > tr > td {
-          padding-top: 8px;
-          padding-bottom: 8px;
-        }
-
-        .inspection-id {
-          @extend .table-cell-primary;
-        }
-
-        .inspection-type {
-          @extend .table-cell-secondary;
-        }
-
-        .status-value {
-          @extend .table-cell-primary;
-          font-weight: 600;
-        }
-      }
-    }
-  }
-}
-
-// Global Table Single Line Override - Applied to ALL tables
-.ant-table {
-  .ant-table-thead > tr > th {
-    padding: 10px;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
-
-  .ant-table-tbody > tr > td {
-    padding: 10px;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
-
-  // Ensure all content inside table cells stays in one line
-  .ant-table-cell {
-    padding: 10px;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-
-    > div,
-    > span,
-    > * {
-      overflow: hidden !important;
-      text-overflow: ellipsis !important;
-
-      max-width: 100% !important;
-    }
-  }
-}
-
-// Drawer Header with Switch - Global Component
-.drawer-header-with-switch {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-
-  .header-switch {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    .switch-label {
-      font-size: 14px;
-      font-weight: 500;
-      color: $primary-text-color;
-    }
-  }
-}
-
-// ============================================================================
-// GLOBAL UTILITY CLASSES - STANDARDIZED THEME
-// ============================================================================
-
-// Table Cell Styles
-.table-cell-primary {
-  font-weight: 500;
-  color: $primary-text-color;
-}
-
-.table-cell-secondary {
-  font-size: 12px;
-  color: $secondary-text-color;
-  margin-top: 2px;
-}
-
-.table-cell-success {
-  font-size: 12px;
-  color: $success-color;
-  margin-top: 2px;
-}
-
-// Form Input Styles (Global)
-.form-input-global {
-  background-color: $bg-primary;
-  border: 1px solid $border-color;
-  color: $primary-text-color;
-  border-radius: $border-radius-base;
-
-  &:hover {
-    border-color: $primary-color;
-  }
-
-  &:focus {
-    border-color: $primary-color;
-    box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
-  }
-}
-
-// Tag variables - accessible in both light and dark modes
-:root {
-  // Success colors
-  --tag-success-color: #52c41a;
-  --tag-success-bg: #f6ffed;
-  --tag-success-border: #b7eb8f;
-
-  // Error colors
-  --tag-error-color: #ff4d4f;
-  --tag-error-bg: #fff1f0;
-  --tag-error-border: #ffa39e;
-
-  // Warning colors
-  --tag-warning-color: #faad14;
-  --tag-warning-bg: #fffbe6;
-  --tag-warning-border: #ffe58f;
-
-  // Info colors
-  --tag-info-color: #1890ff;
-  --tag-info-bg: #e6f7ff;
-  --tag-info-border: #91d5ff;
-
-  // Processing colors
-  --tag-processing-color: #1890ff;
-  --tag-processing-bg: #e6f7ff;
-  --tag-processing-border: #91d5ff;
-
-  // Default colors
-  --tag-default-color: #d9d9d9;
-  --tag-default-bg: #fafafa;
-  --tag-default-border: #d9d9d9;
-}
-
-// Tag styles
-.ant-tag {
-  margin-right: 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  padding: 0 8px;
-  line-height: 22px;
-  font-weight: 500;
-
-  &.ant-tag-success {
-    color: var(--tag-success-color);
-    background: var(--tag-success-bg);
-    border-color: var(--tag-success-border);
-  }
-
-  &.ant-tag-error {
-    color: var(--tag-error-color);
-    background: var(--tag-error-bg);
-    border-color: var(--tag-error-border);
-  }
-
-  &.ant-tag-warning {
-    color: var(--tag-warning-color);
-    background: var(--tag-warning-bg);
-    border-color: var(--tag-warning-border);
-  }
-
-  &.ant-tag-processing {
-    color: var(--tag-processing-color);
-    background: var(--tag-processing-bg);
-    border-color: var(--tag-processing-border);
-  }
-}
-
-.tag-global {
-  &.active {
-    color: var(--tag-success-color);
-    background: var(--tag-success-bg);
-    border-color: var(--tag-success-border);
-  }
-
-  &.inactive {
-    color: var(--tag-error-color);
-    background: var(--tag-error-bg);
-    border-color: var(--tag-error-border);
-  }
-
-  &.pending {
-    color: var(--tag-warning-color);
-    background: var(--tag-warning-bg);
-    border-color: var(--tag-warning-border);
-  }
-
-  &.completed {
-    color: var(--tag-info-color);
-    background: var(--tag-info-bg);
-    border-color: var(--tag-info-border);
-  }
-}
-
-// Dark Mode Overrides for Global Utilities
-[data-theme='dark'] {
-  // Dark mode tag variables
-  --tag-success-color: #73d13d;
-  --tag-success-bg: rgba(82, 196, 26, 0.2);
-  --tag-success-border: rgba(82, 196, 26, 0.3);
-
-  --tag-error-color: #ff7875;
-  --tag-error-bg: rgba(255, 77, 79, 0.2);
-  --tag-error-border: rgba(255, 77, 79, 0.3);
-
-  --tag-warning-color: #ffc53d;
-  --tag-warning-bg: rgba(250, 173, 20, 0.2);
-  --tag-warning-border: rgba(250, 173, 20, 0.3);
-
-  --tag-info-color: #40a9ff;
-  --tag-info-bg: rgba(24, 144, 255, 0.2);
-  --tag-info-border: rgba(24, 144, 255, 0.3);
-
-  --tag-processing-color: #40a9ff;
-  --tag-processing-bg: rgba(24, 144, 255, 0.2);
-  --tag-processing-border: rgba(24, 144, 255, 0.3);
-
-  --tag-default-color: #aaa;
-  --tag-default-bg: rgba(255, 255, 255, 0.08);
-  --tag-default-border: rgba(255, 255, 255, 0.2);
-
-  // Auth form label
-  .auth-form-label {
-    color: $dark-text-primary !important;
-  }
-
-  // Switch label
-  .drawer-header-with-switch {
-    .header-switch {
-      .switch-label {
-        color: $dark-text-primary;
-        font-weight: 600;
-      }
-    }
-  }
-
-  // Table Cells
-  .table-cell-primary {
-    color: $dark-text-primary;
-  }
-
-  .table-cell-secondary {
-    color: $dark-text-secondary;
-  }
-
-  .table-cell-success {
-    color: $dark-success-text;
-  }
-
-  // Form Inputs
-  .form-input-global {
-    background-color: $dark-bg-tertiary;
-    border-color: $dark-border;
-    color: $dark-text-primary;
-
-    &:hover {
-      border-color: $dark-border-dark;
-    }
-
-    &:focus {
-      border-color: $primary-color;
-      background-color: $dark-bg-surface;
-    }
-  }
-
-  // Tags
-  .tag-global {
-    &.tag-active {
-      background: rgba($dark-success-color, 0.2);
-      color: $dark-success-text;
-      border-color: rgba($dark-success-color, 0.3);
-    }
-
-    &.tag-inactive {
-      background: rgba($dark-text-disabled, 0.2);
-      color: $dark-text-secondary;
-      border-color: rgba($dark-text-disabled, 0.3);
-    }
-
-    &.tag-warning {
-      background: rgba($dark-warning-color, 0.2);
-      color: $dark-warning-text;
-      border-color: rgba($dark-warning-color, 0.3);
-    }
-  }
-
-  // Ant Design Tag Overrides
-  .ant-tag {
-    &.ant-tag-success {
-      background: rgba($success-color, 0.2);
-      border-color: rgba($success-color, 0.3);
-      color: $success-color;
-    }
-
-    &.ant-tag-warning {
-      background: rgba($warning-color, 0.2);
-      border-color: rgba($warning-color, 0.3);
-      color: $warning-color;
-    }
-
-    &.ant-tag-error {
-      background: rgba($error-color, 0.2);
-      border-color: rgba($error-color, 0.3);
-      color: $error-color;
-    }
-
-    &.ant-tag-processing {
-      background: rgba($primary-color, 0.2);
-      border-color: rgba($primary-color, 0.3);
-      color: $primary-color;
-    }
-  }
-}
-
-// ============================================================================
-// GLOBAL LOADING CONTAINER - Centered spinner for all list pages
-// ============================================================================
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 300px;
-  width: 100%;
-  padding: $spacing-2xl;
-  
-  p {
-    margin-top: $spacing-md;
-    color: $text-secondary;
-    font-size: $font-size-sm;
-  }
-}
-
-// Ensure loading container works inside table-container
-.table-container .loading-container {
-  min-height: 400px;
-}
-
-// ============================================================================
-// THEME SWITCHING OVERLAY - Blur effect with centered loader
-// ============================================================================
 .theme-switching-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 9999;
+  background-color: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
   display: flex;
-  justify-content: center;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: opacity 0.3s ease;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease-in-out;
 }
 
-[data-theme='dark'] .theme-switching-overlay {
-  background-color: rgba(0, 0, 0, 0.5);
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 // ============================================================================
-// PAGE HEADER SECTION - Global margin fix
+// LAYOUT SPECIFIC STYLES
 // ============================================================================
-.page-header-section {
-  margin-bottom: 10px !important;
+
+.app-layout {
+  min-height: 100vh;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+.app-content {
+  padding: 24px;
+  min-height: 280px;
+}
+
+.app-footer {
+  text-align: center;
+  padding: 16px 50px;
+}
+
+// ============================================================================
+// RESPONSIVE UTILITIES
+// ============================================================================
+
+@media (max-width: 768px) {
+  .app-content {
+    padding: 16px;
+  }
+
+  .app-header {
+    padding: 0 16px;
+  }
+}
+
+@media (max-width: 576px) {
+  .app-content {
+    padding: 12px;
+  }
+
+  .app-header {
+    padding: 0 12px;
+  }
 }

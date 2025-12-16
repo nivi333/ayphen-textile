@@ -14,6 +14,7 @@
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
     "@ant-design/plots": "^2.6.6",
+    "@ayphen-web/theme": "file:./theme",
     "@hookform/resolvers": "^5.2.2",
     "@stripe/react-stripe-js": "^5.4.1",
     "@stripe/stripe-js": "^8.5.3",

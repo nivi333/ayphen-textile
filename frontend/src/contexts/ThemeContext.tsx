@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { ConfigProvider, theme as antdTheme, ThemeConfig, Spin } from 'antd';
+import { ConfigProvider, Spin } from 'antd';
+import { ThemeProvider as AyphenThemeProvider, useGlobalTheme } from '@ayphen-web/theme';
 
 export type AppTheme = 'light' | 'dark';
 
@@ -12,30 +13,23 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
-const DOC_PRIMARY = '#7b5fc9';
-const DOC_SUCCESS = '#52c41a';
-const DOC_ERROR = '#ff4d4f';
-const DOC_WARNING = '#faad14';
-
-function getInitialTheme(): AppTheme {
-  const stored = localStorage.getItem('theme');
-  if (stored === 'light' || stored === 'dark') return stored;
-  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  return prefersDark ? 'dark' : 'light';
-}
-
-export default function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<AppTheme>(getInitialTheme);
+// Inner component that uses the Ayphen theme
+function ThemeProviderInner({ children }: { children: React.ReactNode }) {
+  const { isDarkMode, toggleTheme, antTheme } = useGlobalTheme();
   const [isThemeSwitching, setIsThemeSwitching] = useState(false);
 
+  const theme: AppTheme = isDarkMode ? 'dark' : 'light';
+
   const setTheme = (newTheme: AppTheme) => {
-    if (newTheme === theme) return;
+    const shouldBeDark = newTheme === 'dark';
+    if (shouldBeDark === isDarkMode) return;
+
     // Show blur and loader immediately on click
     setIsThemeSwitching(true);
     // Use requestAnimationFrame to ensure the overlay is rendered before theme change
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        setThemeState(newTheme);
+        toggleTheme();
         // Keep loader visible during transition
         setTimeout(() => {
           setIsThemeSwitching(false);
@@ -47,7 +41,6 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
   const toggle = () => setTheme(theme === 'light' ? 'dark' : 'light');
 
   useEffect(() => {
-    localStorage.setItem('theme', theme);
     const root = document.documentElement;
     root.setAttribute('data-theme', theme);
     if (theme === 'dark') {
@@ -57,32 +50,32 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
     }
   }, [theme]);
 
-  const antdConfig: ThemeConfig = useMemo(() => ({
-    algorithm: theme === 'dark' ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
-    token: {
-      colorPrimary: DOC_PRIMARY,
-      colorSuccess: DOC_SUCCESS,
-      colorError: DOC_ERROR,
-      colorWarning: DOC_WARNING,
-      borderRadius: 10,
-      fontFamily: 'Inter, ui-sans-serif, system-ui',
-    },
-  }), [theme]);
-
-  const ctx: ThemeContextValue = useMemo(() => ({ theme, setTheme, toggle, isThemeSwitching }), [theme, isThemeSwitching]);
+  const ctx: ThemeContextValue = useMemo(
+    () => ({ theme, setTheme, toggle, isThemeSwitching }),
+    [theme, isThemeSwitching]
+  );
 
   return (
     <ThemeContext.Provider value={ctx}>
-      <ConfigProvider theme={antdConfig}>
+      <ConfigProvider theme={antTheme}>
         {children}
         {/* Theme switching overlay with blur effect */}
         {isThemeSwitching && (
-          <div className="theme-switching-overlay">
-            <Spin size="large" />
+          <div className='theme-switching-overlay'>
+            <Spin size='large' />
           </div>
         )}
       </ConfigProvider>
     </ThemeContext.Provider>
+  );
+}
+
+// Main ThemeProvider that wraps with Ayphen ThemeProvider
+export default function ThemeProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <AyphenThemeProvider>
+      <ThemeProviderInner>{children}</ThemeProviderInner>
+    </AyphenThemeProvider>
   );
 }
 
@@ -91,3 +84,6 @@ export function useTheme() {
   if (!ctx) throw new Error('useTheme must be used within ThemeProvider');
   return ctx;
 }
+
+// Re-export Ayphen theme hook for components that need theme tokens
+export { useGlobalTheme } from '@ayphen-web/theme';
