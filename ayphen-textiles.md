@@ -123,21 +123,43 @@ export const darkColorTokens = {
 
 ### **Typography System**
 
+#### **Font Families**
+```typescript
+const fontFamilies = {
+  // Primary font family (sans-serif)
+  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
+  
+  // Monospace font family (for code)
+  fontFamilyCode: "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace",
+};
+```
+
+#### **Font Sizes**
 ```typescript
 const fontTokens = {
-  // Font Sizes
-  fontSize: 13,          // Base
-  fontSizeSM: 12,        // Small
-  fontSizeLG: 16,        // Large
-  fontSizeXL: 20,        // Extra Large
-  fontSizeXS: 10,        // Extra Small
+  // Base Font Size
+  fontSize: 13,          // Default base size (13px)
+  
+  // Font Size Scale
+  fontSizeXS: 10,        // Extra Small (10px)
+  fontSizeSM: 12,        // Small (12px)
+  fontSizeLG: 16,        // Large (16px)
+  fontSizeXL: 20,        // Extra Large (20px)
   
   // Heading Sizes
-  fontSizeHeading1: 38,
-  fontSizeHeading2: 30,
-  fontSizeHeading3: 24,
-  fontSizeHeading4: 22,
-  fontSizeHeading5: 16,
+  fontSizeHeading1: 38,  // H1 (38px)
+  fontSizeHeading2: 30,  // H2 (30px)
+  fontSizeHeading3: 24,  // H3 (24px)
+  fontSizeHeading4: 22,  // H4 (22px)
+  fontSizeHeading5: 16,  // H5 (16px)
+  
+  // Line Heights
+  lineHeight: 1.5715,         // Base line height
+  lineHeightHeading1: 1.21,   // H1 line height
+  lineHeightHeading2: 1.27,   // H2 line height
+  lineHeightHeading3: 1.33,   // H3 line height
+  lineHeightHeading4: 1.4,    // H4 line height
+  lineHeightHeading5: 1.5,    // H5 line height
   
   // Font Weights
   fontWeightThin: 100,
@@ -149,6 +171,33 @@ const fontTokens = {
   fontWeightExtraBold: 800,
   fontWeightMax: 900,
 };
+```
+
+**Usage in Components:**
+```typescript
+import styled from 'styled-components';
+import { pxToRem } from '@/theme';
+
+const Heading1 = styled.h1`
+  font-family: ${(props) => props.theme.fontFamily};
+  font-size: ${(props) => pxToRem(props.theme.fontSizeHeading1)};
+  font-weight: ${(props) => props.theme.fontWeightBold};
+  line-height: ${(props) => props.theme.lineHeightHeading1};
+  color: ${(props) => props.theme.colorText};
+`;
+
+const BodyText = styled.p`
+  font-family: ${(props) => props.theme.fontFamily};
+  font-size: ${(props) => pxToRem(props.theme.fontSize)};
+  font-weight: ${(props) => props.theme.fontWeightNormal};
+  line-height: ${(props) => props.theme.lineHeight};
+  color: ${(props) => props.theme.colorText};
+`;
+
+const CodeBlock = styled.code`
+  font-family: ${(props) => props.theme.fontFamilyCode};
+  font-size: ${(props) => pxToRem(props.theme.fontSizeSM)};
+`;
 ```
 
 ### **Spacing & Sizing**
@@ -238,52 +287,282 @@ export const useGlobalTheme = () => {
 };
 ```
 
-### **Component Theming (Ant Design)**
+### **Component Theming (Ant Design) - Complete Configuration**
 
+#### **Light Mode Theme**
 ```typescript
-// Light Mode
 const antThemeConfigLight: ThemeConfig = {
   token: antThemeTokenLight,
   components: {
+    // Layout Components
     Layout: {
       bodyBg: "#ffffff",
       siderBg: "#ffffff",
       triggerBg: "#ffffff",
       triggerColor: "#df005c",
       headerHeight: 60,
+      headerBg: "#ffffff",
+      headerPadding: "0 24px",
+      footerBg: "#f5f5f5",
+      footerPadding: "24px 50px",
     },
+    
+    // Form Components
     Input: {
       colorBgContainer: "#f3f3f5",
       activeBorderColor: "#00000040",
       controlOutline: "#00000026",
       lineWidth: 1,
       lineWidthFocus: 1,
+      paddingBlock: 6,
+      paddingInline: 11,
     },
     Select: {
       selectorBg: "#f3f3f5",
       activeBorderColor: "#00000040",
-      // ... (see docs/05-COMPONENT-THEMING.md)
+      controlOutline: "#00000026",
+      optionSelectedBg: "#df005c1a",
+      optionActiveBg: "#f5f5f5",
     },
-    // ... more components
+    InputNumber: {
+      colorBgContainer: "#f3f3f5",
+      activeBorderColor: "#00000040",
+      controlOutline: "#00000026",
+    },
+    DatePicker: {
+      colorBgContainer: "#f3f3f5",
+      activeBorderColor: "#00000040",
+      controlOutline: "#00000026",
+    },
+    Checkbox: {
+      colorPrimary: "#df005c",
+      colorPrimaryHover: "#eb2671",
+    },
+    Radio: {
+      colorPrimary: "#df005c",
+      colorPrimaryHover: "#eb2671",
+    },
+    Switch: {
+      colorPrimary: "#df005c",
+      colorPrimaryHover: "#eb2671",
+    },
+    
+    // Data Display Components
+    Table: {
+      headerBg: "#fafafa",
+      headerColor: "#000000e0",
+      rowHoverBg: "#f5f5f5",
+      borderColor: "#f0f0f0",
+      headerSplitColor: "#f0f0f0",
+    },
+    Tabs: {
+      itemColor: "#000000a6",
+      itemSelectedColor: "#df005c",
+      itemHoverColor: "#df005c",
+      inkBarColor: "#df005c",
+      cardBg: "#fafafa",
+    },
+    Card: {
+      colorBgContainer: "#ffffff",
+      colorBorderSecondary: "#f0f0f0",
+    },
+    Descriptions: {
+      labelBg: "#fafafa",
+      contentColor: "#000000e0",
+    },
+    
+    // Feedback Components
+    Modal: {
+      contentBg: "#ffffff",
+      headerBg: "#ffffff",
+      footerBg: "#ffffff",
+    },
+    Drawer: {
+      colorBgElevated: "#ffffff",
+      colorBgMask: "rgba(0, 0, 0, 0.45)",
+    },
+    Notification: {
+      colorBgElevated: "#ffffff",
+      colorText: "#000000e0",
+    },
+    Alert: {
+      colorInfoBg: "#e6f7ff",
+      colorSuccessBg: "#f6ffed",
+      colorWarningBg: "#fffbe6",
+      colorErrorBg: "#fff2f0",
+    },
+    
+    // Navigation Components
+    Menu: {
+      itemBg: "#ffffff",
+      itemColor: "#000000e0",
+      itemHoverBg: "#f5f5f5",
+      itemHoverColor: "#df005c",
+      itemSelectedBg: "#df005c1a",
+      itemSelectedColor: "#df005c",
+    },
+    Dropdown: {
+      colorBgElevated: "#ffffff",
+      controlItemBgHover: "#f5f5f5",
+      controlItemBgActive: "#df005c1a",
+    },
+    
+    // Button Component
+    Button: {
+      primaryColor: "#ffffff",
+      primaryShadow: "0 2px 0 rgba(223, 0, 92, 0.1)",
+      defaultBg: "#ffffff",
+      defaultBorderColor: "#d9d9d9",
+      defaultColor: "#000000e0",
+      defaultHoverBg: "#ffffff",
+      defaultHoverBorderColor: "#df005c",
+      defaultHoverColor: "#df005c",
+    },
+    
+    // Typography Component
+    Typography: {
+      titleMarginBottom: "0.5em",
+      titleMarginTop: "1.2em",
+    },
   },
 };
+```
 
-// Dark Mode
+#### **Dark Mode Theme**
+```typescript
 const antThemeConfigDark: ThemeConfig = {
   token: antThemeTokenDark,
   components: {
+    // Layout Components
     Layout: {
       bodyBg: "#141414",
       siderBg: "#181818ff",
       triggerBg: "#181818ff",
       triggerColor: "#ffffff",
+      headerHeight: 60,
+      headerBg: "#141414",
+      headerPadding: "0 24px",
+      footerBg: "#1f1f1f",
+      footerPadding: "24px 50px",
     },
+    
+    // Form Components
     Input: {
       colorBgContainer: "#1e1e1e",
       activeBorderColor: "#595959",
-      // ... (see docs/05-COMPONENT-THEMING.md)
+      controlOutline: "rgba(255, 255, 255, 0.1)",
+      lineWidth: 1,
+      lineWidthFocus: 1,
+      paddingBlock: 6,
+      paddingInline: 11,
     },
-    // ... more components
+    Select: {
+      selectorBg: "#1e1e1e",
+      activeBorderColor: "#595959",
+      controlOutline: "rgba(255, 255, 255, 0.1)",
+      optionSelectedBg: "#c103511a",
+      optionActiveBg: "#262626",
+    },
+    InputNumber: {
+      colorBgContainer: "#1e1e1e",
+      activeBorderColor: "#595959",
+      controlOutline: "rgba(255, 255, 255, 0.1)",
+    },
+    DatePicker: {
+      colorBgContainer: "#1e1e1e",
+      activeBorderColor: "#595959",
+      controlOutline: "rgba(255, 255, 255, 0.1)",
+    },
+    Checkbox: {
+      colorPrimary: "#c10351",
+      colorPrimaryHover: "#d91559",
+    },
+    Radio: {
+      colorPrimary: "#c10351",
+      colorPrimaryHover: "#d91559",
+    },
+    Switch: {
+      colorPrimary: "#c10351",
+      colorPrimaryHover: "#d91559",
+    },
+    
+    // Data Display Components
+    Table: {
+      headerBg: "#1f1f1f",
+      headerColor: "rgba(255, 255, 255, 0.85)",
+      rowHoverBg: "#262626",
+      borderColor: "#303030",
+      headerSplitColor: "#303030",
+    },
+    Tabs: {
+      itemColor: "rgba(255, 255, 255, 0.65)",
+      itemSelectedColor: "#c10351",
+      itemHoverColor: "#c10351",
+      inkBarColor: "#c10351",
+      cardBg: "#1f1f1f",
+    },
+    Card: {
+      colorBgContainer: "#141414",
+      colorBorderSecondary: "#303030",
+    },
+    Descriptions: {
+      labelBg: "#1f1f1f",
+      contentColor: "rgba(255, 255, 255, 0.85)",
+    },
+    
+    // Feedback Components
+    Modal: {
+      contentBg: "#141414",
+      headerBg: "#141414",
+      footerBg: "#141414",
+    },
+    Drawer: {
+      colorBgElevated: "#141414",
+      colorBgMask: "rgba(0, 0, 0, 0.65)",
+    },
+    Notification: {
+      colorBgElevated: "#1f1f1f",
+      colorText: "rgba(255, 255, 255, 0.85)",
+    },
+    Alert: {
+      colorInfoBg: "#111b26",
+      colorSuccessBg: "#162312",
+      colorWarningBg: "#2b2111",
+      colorErrorBg: "#2a1215",
+    },
+    
+    // Navigation Components
+    Menu: {
+      itemBg: "#181818ff",
+      itemColor: "rgba(255, 255, 255, 0.85)",
+      itemHoverBg: "#262626",
+      itemHoverColor: "#c10351",
+      itemSelectedBg: "#c103511a",
+      itemSelectedColor: "#c10351",
+    },
+    Dropdown: {
+      colorBgElevated: "#1f1f1f",
+      controlItemBgHover: "#262626",
+      controlItemBgActive: "#c103511a",
+    },
+    
+    // Button Component
+    Button: {
+      primaryColor: "#ffffff",
+      primaryShadow: "0 2px 0 rgba(193, 3, 81, 0.1)",
+      defaultBg: "#141414",
+      defaultBorderColor: "#424242",
+      defaultColor: "rgba(255, 255, 255, 0.85)",
+      defaultHoverBg: "#1f1f1f",
+      defaultHoverBorderColor: "#c10351",
+      defaultHoverColor: "#c10351",
+    },
+    
+    // Typography Component
+    Typography: {
+      titleMarginBottom: "0.5em",
+      titleMarginTop: "1.2em",
+    },
   },
 };
 ```
@@ -481,7 +760,7 @@ export const DrawerTitle = styled(Typography.Text)`
 - Fields: First Name, Last Name, Email/Phone (smart validation), Password, Confirm Password
 - Email/Phone validation with country code support (+1, +91, etc.)
 - Password strength validation (8+ chars, uppercase, lowercase, number)
-- Global email/phone uniqueness (one email = one user across all companies)
+- Global email/phone uniqueness (one email = one user across all companies, one phone = one user across all companies)
 - Users can belong to multiple companies with different roles
 
 #### **User Login**
@@ -501,24 +780,176 @@ export const DrawerTitle = styled(Typography.Text)`
 
 ### **MODULE 2: Company Management (Multi-Tenant)**
 
+#### **Company Data Model**
+
+```typescript
+export interface CompanyModel {
+  id?: number;
+  companyId?: string;                    // Auto-generated code (COMP-001)
+  guuid?: string;                        // UUID
+  companyName: string;                   // Required, unique
+  registeredCountryId?: number | string;
+  currencyId?: number | string;
+  timeZoneId?: number | string;
+  aliasEmail?: string;
+  dateTimeFormatId?: number | string;
+  registrationTypeId?: number | string;
+  industryTypeId?: number | string;      // Textile Manufacturing, Garment Production, etc.
+  registeredCompany?: boolean;
+  companyRegistrationNumber?: string;
+  companyRegistrationDate?: string;
+  residentStatusId?: string;
+  migrationDate?: string;
+  financialYearEndMonthId?: number;
+  financialYearEndDay?: number;
+  vatRegistered?: boolean;
+  vatRegistrationNumber?: string;
+  vatRegistrationDate?: string;
+  reportBasisId?: number;
+  description?: string;
+  establishedDate?: string;
+  businessType?: string;
+  certifications?: string[];             // Array of certification names
+  
+  // Address (stored in both company and location tables)
+  address?: CompanyAddress;
+  
+  // Communication
+  communication?: CompanyCommunication;
+  
+  // Logo
+  logo?: FileModel;                      // 1MB limit, JPG/PNG
+  
+  // Notes
+  notes?: CompanyNote;
+  
+  // Status
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: number;
+  updatedBy?: number;
+}
+
+export interface CompanyAddress {
+  addressId?: number;
+  line1?: string;                        // Address Line 1
+  line2?: string;                        // Address Line 2
+  cityId?: string;
+  cityText?: string;                     // City name
+  stateRegionProvinceId?: string;
+  stateRegionProvinceText?: string;      // State/Province name
+  countyId?: string;
+  countyText?: string;                   // County name
+  postalCode?: string;                   // Pincode/Postal code
+  countryId?: number | string;
+  countryText?: string;                  // Country name
+}
+
+export interface CompanyCommunication {
+  communicationId?: number;
+  email?: string;
+  phoneCode?: number | string;           // Country code (+1, +91, etc.)
+  phoneNo?: number | string;
+  faxNo?: string;
+  website?: string;
+}
+
+export interface CompanyNote {
+  noteId?: number;
+  recordId?: number;
+  entityId?: number;
+  noteTypeId?: number;
+  noteContent?: string;
+}
+
+export interface FileModel {
+  fileId?: number;
+  fileName?: string;
+  fileUrl?: string;
+  fileSize?: number;
+  fileType?: string;
+  base64Data?: string;                   // For upload
+}
+
+// Transfer Company Ownership
+export interface TransferCompanyRequestDTO {
+  currentUserPassword: string;
+  destinationUsername: string;
+  destinationPassword: string;
+}
+
+// Accept Company Invitation
+export interface AcceptCompanyRequestDTO {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+}
+```
+
 #### **Company Creation**
 - Drawer-based form (not separate page)
 - **Section 1 - Basic Information:**
-  - Company Logo: Upload with base64 encoding (2MB limit, JPG/PNG)
+  - Company Logo: Upload with base64 encoding (1MB limit, JPG/PNG)
   - Company Name: Required, unique
-  - Industry: Dropdown (Textile Manufacturing, Garment Production, etc.)
+  - Registered Country: Dropdown with search
+  - Currency: Dropdown (INR, USD, EUR, GBP, etc.)
+  - Time Zone: Dropdown with search
+  - Industry Type: Dropdown (Textile Manufacturing, Garment Production, Knitting & Weaving, Fabric Processing, etc.)
   - Description: Optional text area
-- **Section 2 - Head Office Location:**
-  - Address Line 1, Address Line 2, City, State, Pincode
-  - Automatically becomes headquarters AND default location
-- **Section 3 - Business Details:**
-  - Established Date, Business Type, Certifications
+  - Alias Email: Optional
+  
+- **Section 2 - Registration Details:**
+  - Registered Company: Toggle (Yes/No)
+  - Company Registration Number: Text input (required if registered)
+  - Company Registration Date: DatePicker (required if registered)
+  - Registration Type: Dropdown (Private Limited, Public Limited, Partnership, Sole Proprietorship, etc.)
+  - Resident Status: Dropdown
+  
+- **Section 3 - Tax Information:**
+  - VAT Registered: Toggle (Yes/No)
+  - VAT Registration Number: Text input (required if VAT registered)
+  - VAT Registration Date: DatePicker (required if VAT registered)
+  
+- **Section 4 - Financial Year:**
+  - Financial Year End Month: Dropdown (January - December)
+  - Financial Year End Day: Number input (1-31)
+  - Report Basis: Dropdown (Accrual, Cash)
+  
+- **Section 5 - Head Office Location:**
+  - Address Line 1: Text input (required)
+  - Address Line 2: Text input (optional)
+  - City: Text input or dropdown (required)
+  - State/Province: Text input or dropdown (required)
+  - County: Text input (optional)
+  - Postal Code: Text input (required)
+  - Country: Dropdown with search (required)
+  - **IMPORTANT**: Automatically becomes headquarters AND default location. Store address fields in BOTH company table AND location table at creation time.
+  
+- **Section 6 - Contact Information:**
+  - Email: Email input (optional)
+  - Phone Code: Dropdown (+1, +91, etc.)
+  - Phone Number: Number input (optional)
+  - Fax Number: Text input (optional)
+  - Website: URL input (optional)
+  
+- **Section 7 - Business Details:**
+  - Established Date: DatePicker
+  - Business Type: Dropdown
+  - Certifications: Multi-select with add/remove UI (ISO, GOTS, OEKO-TEX, etc.)
+  - Migration Date: DatePicker (optional, for data migration tracking)
+  
+- **Section 8 - Notes:**
+  - Notes: Text area (optional, max 1000 chars)
+  
 - User automatically becomes OWNER with full permissions
+- Active Toggle: In drawer header (disabled on create, default true)
 
 #### **Company Selection**
 - Tab System: "Owner" | "Roles" tabs
 - Single-line list items with company info
 - Role Badges: OWNER (Blue), ADMIN (Purple), MANAGER (Green), EMPLOYEE (Orange)
+- Industry type display
 - Click anywhere on row → Switch context → Dashboard
 
 #### **User Invitation System**
@@ -532,21 +963,155 @@ export const DrawerTitle = styled(Typography.Text)`
 
 ### **MODULE 3: Location Management**
 
+#### **Location Data Model**
+
+```typescript
+export interface LocationModel {
+  id?: number;
+  locationId?: string;                   // Auto-generated code (LOC-001)
+  guuid?: string;                        // UUID
+  companyId: number;                     // Foreign key to company
+  code?: string;                         // Location code
+  name: string;                          // Location name (required)
+  description?: string;
+  
+  // Location Type
+  businessOperationType?: string;        // Headquarters, Branch, Warehouse, Factory
+  businessOperationTypeId?: number | string;
+  
+  // Flags
+  isDefault?: boolean;                   // Only one per company (used in financial documents)
+  isHeadOffice?: boolean;                // Only one per company
+  isEnable?: boolean;                    // Active status
+  hasOpeningBalance?: boolean;
+  
+  // Address
+  address?: LocationAddress;
+  
+  // Logo/Image
+  logo?: FileModel;                      // 1MB limit, JPG/PNG
+  
+  // Counts
+  linkedUsersCount?: number;             // Number of users assigned
+  userCount?: number;
+  
+  // Timestamps
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: number;
+  updatedBy?: number;
+  
+  // UI Helper
+  disabled?: boolean;                    // For dropdown disable logic
+}
+
+export interface LocationAddress {
+  id?: number;
+  addressLine1?: string;                 // Address Line 1 (required)
+  addressLine2?: string;                 // Address Line 2 (optional)
+  city?: CityModel;                      // City object
+  cityText?: string;                     // City name as text
+  town?: string | null;
+  county?: CountyModel;                  // County object
+  countyText?: string;                   // County name as text
+  region?: StateModel;                   // State/Province object
+  regionText?: string;                   // State/Province name as text
+  eirCode?: string;                      // Postal/Pin code
+  country?: CountryModel;                // Country object
+  countryText?: string;                  // Country name as text
+}
+
+export interface CityModel {
+  id?: number;
+  name?: string;
+  code?: string;
+}
+
+export interface CountyModel {
+  id?: number;
+  name?: string;
+  code?: string;
+}
+
+export interface StateModel {
+  id?: number;
+  name?: string;
+  code?: string;
+}
+
+export interface CountryModel {
+  id?: number;
+  name?: string;
+  code?: string;
+  phoneCode?: string;                    // +1, +91, etc.
+}
+
+// Location Users (for user assignment)
+export interface CompanyLocationUserModel {
+  id?: number;
+  iamUserId?: string;
+  locationId?: number;
+  locationName?: string;
+  userName?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  companyRoleName?: string;
+  logo?: FileModel;
+  userLogo?: FileModel;
+  role?: UserRoleModel;
+  status?: StatusModel;
+  isActive?: boolean;
+}
+
+export interface UserRoleModel {
+  id?: number;
+  roleName?: string;                     // OWNER, ADMIN, MANAGER, EMPLOYEE
+  roleCode?: string;
+}
+
+export interface StatusModel {
+  id?: number;
+  statusName?: string;
+  statusCode?: string;
+}
+```
+
 #### **Location Creation/Edit**
 - Drawer-based form (720px width)
 - **Section 1 - Basic Information:**
-  - Location Name, Type (Headquarters, Branch, Warehouse, Factory)
-  - Location Image: Drag & drop upload (2MB limit)
+  - Location Name: Text input (required, unique within company)
+  - Location Code: Auto-generated (LOC-001, LOC-002, etc.) - Display only
+  - Location Type: Dropdown (Headquarters, Branch, Warehouse, Factory)
+  - Location Image: Drag & drop upload (1MB limit, JPG/PNG)
+  - Description: Text area (optional, max 500 chars)
+  
 - **Section 2 - Address Details:**
-  - Country, Address Line 1, Address Line 2, City, State, Pincode
+  - Country: Dropdown with search (required)
+  - Address Line 1: Text input (required)
+  - Address Line 2: Text input (optional)
+  - City: Text input or dropdown (required)
+  - State/Region/Province: Text input or dropdown (required)
+  - County: Text input (optional)
+  - Town: Text input (optional)
+  - Postal Code/Pin Code/Eir Code: Text input (required)
+  
 - **Section 3 - Contact Information:**
-  - Email, Phone, Website
+  - Email: Email input (optional, with validation)
+  - Phone Code: Dropdown (+1, +91, etc.)
+  - Phone Number: Number input (optional, with country code)
+  - Website: URL input (optional, with validation)
+  
 - **Section 4 - Settings (OWNER/ADMIN only):**
   - Is Default: Toggle (only one per company, used in financial documents)
   - Is Headquarters: Toggle (only one per company)
-  - Is Active: Toggle (in header, disabled on create, enabled on edit)
-- First location automatically becomes default + headquarters
-- Cannot delete or deactivate default/headquarters location
+  - Has Opening Balance: Toggle (for accounting)
+  - Is Active: Toggle (in header, disabled on create, enabled on edit, default true)
+  - Auto-toggle Logic: Setting new Default/HQ automatically unsets previous ones
+  
+- **First location automatically becomes default + headquarters**
+- **Cannot delete or deactivate default/headquarters location**
+- **User Assignment**: Show linked users count, allow assigning users to location
 
 ---
 
@@ -793,16 +1358,205 @@ export const DrawerTitle = styled(Typography.Text)`
 - Production Efficiency
 - Quality Metrics
 
-#### **Dashboard Analytics**
-- KPI cards for all modules
-- Real-time metrics from all business areas
-- Total Products, Active Orders, Team Members, Monthly Revenue
-- Financial stats (invoices, bills, purchase orders, pending payments)
-- Inventory stats (low stock, out of stock, total value)
-- Quality stats (inspections, defects)
-- Machine stats (total, active, under maintenance, breakdowns)
-- Customer & supplier counts
-- Textile operations stats (fabric, yarn, dyeing, garment production)
+#### **Dashboard Analytics (Executive Dashboard)**
+
+**Single Unified Dashboard** - All KPIs and metrics in one comprehensive view
+
+##### **KPI Cards (Top Section)**
+```typescript
+interface DashboardKPIs {
+  // Core Business Metrics
+  totalProducts: number;                 // Live count of active products
+  activeOrders: number;                  // Live count of active sales orders
+  teamMembers: number;                   // Live count from user_companies
+  monthlyRevenue: number;                // Calculated from invoices/orders
+  
+  // Financial Metrics
+  totalInvoices: number;
+  totalBills: number;
+  totalPurchaseOrders: number;
+  pendingPayments: number;               // Invoices with balance due
+  overdueInvoices: number;               // Invoices past due date
+  
+  // Inventory Metrics
+  lowStockItems: number;                 // Below reorder level
+  outOfStockItems: number;               // Zero stock
+  totalInventoryValue: number;           // Sum of (stock × cost price)
+  stockMovementsToday: number;           // Today's movements count
+  
+  // Quality Metrics
+  totalInspections: number;
+  passedInspections: number;
+  failedInspections: number;
+  openDefects: number;
+  criticalDefects: number;
+  qualityPassRate: number;               // Percentage
+  
+  // Machine Metrics
+  totalMachines: number;
+  activeMachines: number;                // Status: IN_USE
+  machinesUnderMaintenance: number;      // Status: UNDER_MAINTENANCE
+  machinesUnderRepair: number;           // Status: UNDER_REPAIR
+  activeBreakdowns: number;              // Open breakdown tickets
+  maintenanceDueThisWeek: number;        // Upcoming maintenance
+  
+  // Customer & Supplier Metrics
+  totalCustomers: number;
+  activeCustomers: number;
+  totalSuppliers: number;
+  activeSuppliers: number;
+  
+  // Textile Operations Metrics
+  fabricProductionThisMonth: number;     // Meters produced
+  yarnProductionThisMonth: number;       // Kg produced
+  dyeingBatchesThisMonth: number;        // Batches processed
+  garmentsProducedThisMonth: number;     // Units produced
+  designsInProduction: number;           // Active designs
+}
+```
+
+##### **Charts & Visualizations**
+```typescript
+interface DashboardCharts {
+  // Revenue Trends (Line Chart)
+  revenueTrends: {
+    month: string;                       // "Jan 2024", "Feb 2024", etc.
+    revenue: number;
+    expenses: number;
+    profit: number;
+  }[];
+  
+  // Top Products (Bar Chart)
+  topProducts: {
+    productName: string;
+    quantitySold: number;
+    revenue: number;
+  }[];
+  
+  // Top Customers (Bar Chart)
+  topCustomers: {
+    customerName: string;
+    totalRevenue: number;
+    orderCount: number;
+  }[];
+  
+  // Stock Status (Pie Chart)
+  stockStatus: {
+    adequate: number;                    // Above reorder level
+    low: number;                         // Below reorder level
+    outOfStock: number;                  // Zero stock
+  };
+  
+  // Quality Metrics (Donut Chart)
+  qualityMetrics: {
+    passed: number;
+    failed: number;
+    conditionalPass: number;
+    reworkRequired: number;
+  };
+  
+  // Machine Utilization (Gauge Chart)
+  machineUtilization: {
+    inUse: number;
+    idle: number;
+    maintenance: number;
+    repair: number;
+  };
+  
+  // Production Summary (Stacked Bar Chart)
+  productionSummary: {
+    month: string;
+    fabric: number;                      // Meters
+    yarn: number;                        // Kg
+    garments: number;                    // Units
+  }[];
+}
+```
+
+##### **Recent Activities (Bottom Section)**
+```typescript
+interface RecentActivities {
+  // Recent Orders
+  recentOrders: {
+    orderCode: string;
+    customerName: string;
+    totalAmount: number;
+    status: string;
+    createdAt: string;
+  }[];
+  
+  // Recent Invoices
+  recentInvoices: {
+    invoiceCode: string;
+    customerName: string;
+    totalAmount: number;
+    balanceDue: number;
+    status: string;
+    dueDate: string;
+  }[];
+  
+  // Low Stock Alerts
+  lowStockAlerts: {
+    productCode: string;
+    productName: string;
+    currentStock: number;
+    reorderLevel: number;
+    location: string;
+  }[];
+  
+  // Active Breakdowns
+  activeBreakdowns: {
+    ticketId: string;
+    machineCode: string;
+    machineName: string;
+    severity: string;
+    status: string;
+    createdAt: string;
+  }[];
+  
+  // Upcoming Maintenance
+  upcomingMaintenance: {
+    machineCode: string;
+    machineName: string;
+    maintenanceType: string;
+    nextDue: string;
+    assignedTechnician: string;
+  }[];
+}
+```
+
+##### **Dashboard API Endpoints**
+```typescript
+// GET /api/v1/analytics/dashboard
+// Returns comprehensive dashboard analytics
+
+// GET /api/v1/analytics/revenue-trends
+// Query params: startDate, endDate, groupBy (day/week/month)
+
+// GET /api/v1/analytics/top-products
+// Query params: limit (default 10), period (day/week/month/year)
+
+// GET /api/v1/analytics/top-customers
+// Query params: limit (default 10), period (day/week/month/year)
+
+// GET /api/v1/analytics/quality-metrics
+// Query params: startDate, endDate
+
+// GET /api/v1/analytics/production-summary
+// Query params: startDate, endDate, groupBy (day/week/month)
+
+// GET /api/v1/analytics/machine-utilization
+// Query params: locationId (optional)
+```
+
+##### **Dashboard Features**
+- **Real-time Updates**: Auto-refresh every 30 seconds
+- **Date Range Filter**: Global date range selector (Today, This Week, This Month, This Year, Custom)
+- **Location Filter**: Filter by specific location or view all
+- **Export**: Export dashboard data as PDF or Excel
+- **Drill-down**: Click on any KPI card to view detailed report
+- **Responsive Design**: Optimized for desktop, tablet, and mobile
+- **Role-Based Views**: Different KPIs visible based on user role (OWNER sees all, EMPLOYEE sees limited)
 
 ---
 
