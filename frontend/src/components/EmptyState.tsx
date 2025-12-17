@@ -1,5 +1,5 @@
 import { Empty } from 'antd';
-import { GradientButton } from './ui';
+import { Button } from './Button';
 
 interface EmptyStateProps {
   title?: string;
@@ -22,9 +22,9 @@ export default function EmptyState({
       <div className='mt-2 text-base font-semibold'>{title}</div>
       {description && <div className='text-muted text-sm'>{description}</div>}
       {actionText && onAction && (
-        <GradientButton size='small' className='mt-3' onClick={onAction}>
+        <Button type='primary' size='small' className='mt-3' onClick={onAction}>
           {actionText}
-        </GradientButton>
+        </Button>
       )}
     </div>
   );

@@ -3,7 +3,7 @@ import {
   Drawer,
   Form,
   Input,
-  Button,
+  Button as AntButton,
   Divider,
   Select,
   Upload,
@@ -23,7 +23,7 @@ import {
   UpdateCompanyRequest,
 } from '../services/companyService';
 import { EmailPhoneInput } from './ui/EmailPhoneInput';
-import { GradientButton } from './ui';
+import { Button } from './Button';
 import './CompanyCreationDrawer.scss';
 
 const { Option } = Select;
@@ -713,12 +713,12 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
             {/* Action Buttons */}
           </div>
           <div className='ccd-actions'>
-            <Button onClick={onClose} className='ccd-cancel-btn'>
+            <AntButton onClick={onClose} className='ccd-cancel-btn'>
               Cancel
-            </Button>
-            <GradientButton size='small' htmlType='submit' loading={uploading}>
+            </AntButton>
+            <Button type='primary' size='small' htmlType='submit' loading={uploading}>
               {submitLabel}
-            </GradientButton>
+            </Button>
           </div>
         </Form>
       </div>

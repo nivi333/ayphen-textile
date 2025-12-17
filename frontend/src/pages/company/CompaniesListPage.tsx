@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import useAuth from '../../contexts/AuthContext';
 import { CompanyCreationDrawer } from '../../components/CompanyCreationDrawer';
 import HeadingText from '../../components/ui/HeadingText';
-import { GradientButton } from '../../components/ui';
+import { AddNewButton } from '../../components';
 import { BrandLogo } from '../../components/BrandLogo';
 import { companyService } from '../../services/companyService';
 import './CompaniesListPage.scss';
@@ -140,14 +140,13 @@ export default function CompaniesListPage() {
         {/* <BrandLogo width={150} height={36} /> */}
         <BrandLogo width={150} height={36} />
         <div className='companies-top-bar-actions'>
-          <GradientButton
-            type='primary'
+          <AddNewButton
             size='middle'
             className='companies-add-btn'
             onClick={() => setDrawerOpen(true)}
           >
             {COMPANY_TEXT.ADD_COMPANY}
-          </GradientButton>
+          </AddNewButton>
           <Button
             type='default'
             danger
@@ -220,13 +219,14 @@ export default function CompaniesListPage() {
                           />
                           {company.status === 'PENDING' && (
                             <div onClick={e => e.stopPropagation()}>
-                              <GradientButton
+                              <Button
+                                type='primary'
                                 size='small'
                                 onClick={() => handleAcceptInvitation(company.invitationId!)}
                                 style={{ marginLeft: 8, fontSize: '11px', padding: '2px 8px' }}
                               >
                                 Accept
-                              </GradientButton>
+                              </Button>
                             </div>
                           )}
                           <TeamOutlined className='companies-card-team' />

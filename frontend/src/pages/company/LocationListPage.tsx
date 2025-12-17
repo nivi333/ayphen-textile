@@ -1,23 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import {
-  Table,
-  Button,
-  Tag,
-  Avatar,
-  Dropdown,
-  Modal,
-  message,
-  Empty,
-  Spin,
-  Checkbox,
-} from 'antd';
+import { Table, Button, Tag, Avatar, Dropdown, Modal, message, Empty, Spin, Checkbox } from 'antd';
 import { EditOutlined, DeleteOutlined, EnvironmentOutlined, MoreOutlined } from '@ant-design/icons';
 import useAuth from '../../contexts/AuthContext';
 import { useHeader } from '../../contexts/HeaderContext';
 import { locationService, Location } from '../../services/locationService';
 import { MainLayout } from '../../components/layout';
 import { Heading } from '../../components/Heading';
-import { GradientButton } from '../../components/ui';
+import { AddNewButton } from '../../components';
 import {
   LOCATION_TABLE_CONFIG,
   LOCATION_EMPTY_STATE,
@@ -41,14 +30,9 @@ export default function LocationListPage() {
   useEffect(() => {
     const isEmployee = currentCompany?.role === 'EMPLOYEE';
     setHeaderActions(
-      <GradientButton 
-        onClick={handleAddLocation} 
-        size='small' 
-        className='add-location-btn'
-        disabled={isEmployee}
-      >
-        Add Location
-      </GradientButton>
+      <AddNewButton onClick={() => setDrawerVisible(true)} icon={<PlusOutlined />}>
+        {LOCATION_TEXT.ADD_LOCATION}
+      </AddNewButton>
     );
 
     // Cleanup when component unmounts
@@ -126,25 +110,25 @@ export default function LocationListPage() {
   const getActionMenuItems = (location: Location) => {
     const isEmployee = currentCompany?.role === 'EMPLOYEE';
     return [
-    {
-      key: 'edit',
-      icon: <EditOutlined />,
-      label: 'Edit',
-      onClick: () => handleEditLocation(location),
-      disabled: isEmployee,
-    },
-    {
-      type: 'divider' as const,
-    },
-    {
-      key: 'delete',
-      icon: <DeleteOutlined />,
-      label: 'Delete',
-      onClick: () => handleDeleteLocation(location),
-      danger: true,
-      disabled: location.isHeadquarters || isEmployee, // Cannot delete headquarters or if employee
-    },
-  ];
+      {
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => handleEditLocation(location),
+        disabled: isEmployee,
+      },
+      {
+        type: 'divider' as const,
+      },
+      {
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => handleDeleteLocation(location),
+        danger: true,
+        disabled: location.isHeadquarters || isEmployee, // Cannot delete headquarters or if employee
+      },
+    ];
   };
 
   const columns = [
@@ -154,19 +138,19 @@ export default function LocationListPage() {
       width: 300,
       render: (record: Location) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <Avatar 
-            src={record.imageUrl} 
-            icon={<EnvironmentOutlined />}
-            style={{ flexShrink: 0 }}
-          >
+          <Avatar src={record.imageUrl} icon={<EnvironmentOutlined />} style={{ flexShrink: 0 }}>
             {record.name.charAt(0)}
           </Avatar>
           <div style={{ minWidth: 0, flex: 1 }}>
             <div className='location-name' style={{ fontWeight: 500, marginBottom: 2 }}>
               {record.name}
             </div>
-            <div className='location-address' style={{ color: '#666', fontSize: '12px', lineHeight: '1.4' }}>
-              {record.addressLine1}{record.addressLine2 ? `, ${record.addressLine2}` : ''}, {record.city}, {record.state}
+            <div
+              className='location-address'
+              style={{ color: '#666', fontSize: '12px', lineHeight: '1.4' }}
+            >
+              {record.addressLine1}
+              {record.addressLine2 ? `, ${record.addressLine2}` : ''}, {record.city}, {record.state}
             </div>
           </div>
         </div>
@@ -264,13 +248,9 @@ export default function LocationListPage() {
               image={Empty.PRESENTED_IMAGE_SIMPLE}
               description={LOCATION_EMPTY_STATE.DESCRIPTION}
             >
-              <GradientButton 
-                size='small' 
-                onClick={handleAddLocation}
-                disabled={currentCompany?.role === 'EMPLOYEE'}
-              >
-                {LOCATION_EMPTY_STATE.BUTTON_TEXT}
-              </GradientButton>
+              <AddNewButton onClick={() => setDrawerVisible(true)} icon={<PlusOutlined />}>
+                {LOCATION_TEXT.ADD_LOCATION}
+              </AddNewButton>
             </Empty>
           ) : (
             <Table

@@ -1,9 +1,15 @@
-export { Button } from './Button';
-export { Card } from './Card';
-export { BrandLogo } from './BrandLogo';
-export * as Icons from './icons';
-export { Input } from './Input';
-export { Tag } from './Tag';
+// Export all button variants
+export { Button, AddNewButton, DeleteButton, EditButton } from './Button';
+
+// Export all input variants
+export { Input, InputPassword, InputTextArea } from './Input';
+
+// Export UI components
+export { SearchInput } from './ui/SearchInput';
+export { default as GradientButton } from './ui/GradientButton';
+export { default as LinkButton } from './ui/LinkButton';
 export { Alert } from './Alert';
+export { Card } from './Card';
+export { Tag } from './Tag';
 export { default as EmptyState } from './EmptyState';
-export { default as ThemeSwitch } from './ThemeSwitch';
+export { Heading } from './Heading';
