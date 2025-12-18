@@ -1,12 +1,12 @@
-@import '../index.scss';
+@import '../styles/base.scss';
 
 .company-creation-drawer {
   .ccd-content {
     padding: 24px 32px 0 32px;
     font-family: $font-family-body;
     font-size: 1rem;
-    color: $primary-text-color;
-    background: $bg-primary;
+    color: var(--color-text);
+    background: var(--color-bg-container);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -16,7 +16,7 @@
     font-family: $font-family-heading;
     font-size: 1.5rem;
     font-weight: 600;
-    color: $primary-text-color;
+    color: var(--color-text);
     margin-bottom: 0;
   }
 
@@ -28,7 +28,7 @@
   .ccd-section-title {
     font-size: 1rem;
     font-weight: 500;
-    color: $primary-text-color;
+    color: var(--color-text);
     margin-bottom: 12px;
     margin-top: 0;
   }
@@ -51,7 +51,7 @@
       .active-label {
         font-size: 14px;
         font-weight: 500;
-        color: $primary-text-color;
+        color: var(--color-text);
       }
 
       .active-toggle-item {
@@ -104,14 +104,14 @@
     border-top: 1px solid $border-light;
     position: sticky;
     bottom: 0;
-    background: $bg-primary;
+    background: var(--color-bg-container);
     padding-top: 16px;
     margin-top: auto;
   }
 
   .ant-upload-drag {
-    background: $bg-secondary;
-    border: 1.5px dashed $secondary-color;
+    background: var(--color-bg-layout);
+    border: 1.5px dashed var(--color-secondary);
     border-radius: $border-radius-base;
   }
 
@@ -140,8 +140,8 @@
       width: 28px;
       height: 32px;
       border-radius: 50%;
-      background-color: $error-color;
-      color: $bg-primary;
+      background-color: var(--color-error);
+      color: var(--color-bg-container);
       border: none;
       display: flex;
       align-items: center;
@@ -163,14 +163,14 @@
 
   .ccd-logo-help-text {
     text-align: start;
-    color: $tertiary-text-color;
+    color: var(--color-text-tertiary);
     font-size: 12px;
     margin: 6px 0;
   }
 
   .ccd-upload-icon {
     font-size: 32px;
-    color: $tertiary-text-color;
+    color: var(--color-text-tertiary);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -187,11 +187,11 @@
       display: flex;
       align-items: center;
       padding: 0 7px;
-      background-color: $bg-secondary;
-      border: 1px solid $border-color;
+      background-color: var(--color-bg-layout);
+      border: 1px solid var(--color-border);
       border-right: none;
       border-radius: $border-radius-base 0 0 $border-radius-base;
-      color: $secondary-text-color;
+      color: var(--color-text-secondary);
       font-size: 14px;
     }
 
@@ -210,7 +210,7 @@
   }
 
   .ccd-cancel-btn {
-    margin-right: $spacing-sm;
+    margin-right: var(--padding-xs);
   }
 
   .ccd-form {
@@ -251,7 +251,7 @@
 
     .ant-upload-drag {
       background: $dark-bg-tertiary;
-      border-color: $primary-color;
+      border-color: var(--color-primary);
     }
 
     .ccd-logo-help-text {

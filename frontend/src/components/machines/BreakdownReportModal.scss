@@ -1,4 +1,4 @@
-@import '../../index.scss';
+@import '../../styles/base.scss';
 
 .breakdown-report-form {
   .full-width {
@@ -17,8 +17,8 @@
     gap: 8px;
 
     &:hover {
-      border-color: #7b5fc9;
-      color: #7b5fc9;
+      border-color: #df005c;
+      color: #df005c;
     }
   }
 
@@ -39,8 +39,8 @@
   margin-right: 8px;
 
   &:hover {
-    border-color: #7b5fc9;
-    color: #7b5fc9;
+    border-color: #df005c;
+    color: #df005c;
   }
 
   &:disabled {

@@ -1,4 +1,4 @@
-@import '../../index.scss';
+@import '../../styles/base.scss';
 
 .reports-page {
   .page-container {
@@ -7,18 +7,18 @@
   }
 
   .page-header-section {
-    margin-bottom: $spacing-lg;
+    margin-bottom: var(--padding-lg);
 
     .page-description {
-      color: $text-secondary;
+      color: var(--color-text-secondary);
       font-size: $font-size-sm;
-      margin-top: $spacing-xs;
+      margin-top: var(--padding-xxs);
       margin-bottom: 0;
     }
   }
 
   .report-categories {
-    margin-bottom: $spacing-lg;
+    margin-bottom: var(--padding-lg);
   }
 
   .report-category-card {
@@ -29,17 +29,17 @@
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: $shadow-md;
-      border-color: $primary-color;
+      box-shadow: var(--box-shadow-secondary);
+      border-color: var(--color-primary);
     }
 
     .ant-card-body {
-      padding: $spacing-lg;
+      padding: var(--padding-lg);
     }
 
     .category-icon {
       font-size: 36px;
-      margin-bottom: $spacing-sm;
+      margin-bottom: var(--padding-xs);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -52,15 +52,15 @@
       .category-title {
         font-size: $font-size-base;
         font-weight: 600;
-        color: $text-primary;
-        margin-bottom: $spacing-xs;
+        color: var(--color-text);
+        margin-bottom: var(--padding-xxs);
         font-family: $font-family-heading;
       }
 
       .category-description {
-        color: $text-secondary;
+        color: var(--color-text-secondary);
         font-size: $font-size-xs;
-        margin-bottom: $spacing-md;
+        margin-bottom: var(--padding);
         min-height: 32px;
         line-height: 1.4;
       }
@@ -69,19 +69,19 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding-top: $spacing-sm;
+        padding-top: var(--padding-xs);
         border-top: 1px solid $border-light;
 
         .report-count {
-          color: $text-secondary;
+          color: var(--color-text-secondary);
           font-size: $font-size-xs;
           display: flex;
           align-items: center;
-          gap: $spacing-xs;
+          gap: var(--padding-xxs);
         }
 
         .view-link {
-          color: $primary-color;
+          color: var(--color-primary);
           font-weight: 500;
           font-size: $font-size-xs;
         }
@@ -90,7 +90,7 @@
   }
 
   .coming-soon-section {
-    margin-top: $spacing-lg;
+    margin-top: var(--padding-lg);
 
     .ant-card {
       border-radius: $border-radius-lg;
@@ -101,12 +101,12 @@
         h3 {
           font-size: $font-size-lg;
           font-weight: 600;
-          color: $text-primary;
-          margin-bottom: $spacing-xs;
+          color: var(--color-text);
+          margin-bottom: var(--padding-xxs);
         }
 
         p {
-          color: $text-secondary;
+          color: var(--color-text-secondary);
           margin: 0;
         }
       }
@@ -122,7 +122,7 @@
       border-color: $dark-border;
 
       &:hover {
-        border-color: $primary-color;
+        border-color: var(--color-primary);
         background: lighten($dark-bg-surface, 2%);
       }
 
@@ -168,12 +168,12 @@
 @media (max-width: 768px) {
   .reports-page {
     .page-container {
-      padding: $spacing-md;
+      padding: var(--padding);
     }
 
     .report-category-card {
       .ant-card-body {
-        padding: $spacing-lg;
+        padding: var(--padding-lg);
       }
 
       .category-icon {

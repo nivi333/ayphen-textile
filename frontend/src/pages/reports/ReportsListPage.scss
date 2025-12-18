@@ -1,8 +1,8 @@
-@import '../../index.scss';
+@import '../../styles/base.scss';
 @import './shared/ReportStyles.scss';
 
 .reports-categories-section {
-  margin-top: $spacing-lg;
+  margin-top: var(--padding-lg);
 }
 
 .report-category-card {
@@ -11,7 +11,7 @@
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: $shadow-lg;
+    box-shadow: var(--box-shadow);
   }
 
   .category-icon {
@@ -19,17 +19,17 @@
     justify-content: center;
     align-items: center;
     height: 120px;
-    background: linear-gradient(135deg, $primary-color, lighten($primary-color, 15%));
+    background: linear-gradient(135deg, var(--color-primary), lighten(var(--color-primary), 15%));
 
     .anticon {
       font-size: 48px;
-      color: $bg-primary;
+      color: var(--color-bg-container);
     }
   }
 
   .ant-card-meta-title {
     font-size: 18px;
-    margin-bottom: $spacing-sm;
+    margin-bottom: var(--padding-xs);
   }
 
   .ant-card-meta-description {
@@ -43,12 +43,12 @@
   }
 
   .report-count {
-    margin-top: $spacing-md;
-    color: $text-secondary;
+    margin-top: var(--padding);
+    color: var(--color-text-secondary);
     font-size: 14px;
   }
 }
 
 .breadcrumb-navigation {
-  margin-bottom: $spacing-md;
+  margin-bottom: var(--padding);
 }

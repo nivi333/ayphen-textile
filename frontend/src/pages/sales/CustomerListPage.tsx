@@ -220,7 +220,7 @@ export default function CustomerListPage() {
       sorter: (a: Customer, b: Customer) => (a.name || '').localeCompare(b.name || ''),
       render: (name: string, record: Customer) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Avatar icon={<UserOutlined />} style={{ flexShrink: 0, backgroundColor: '#7b5fc9' }}>
+          <Avatar icon={<UserOutlined />} style={{ flexShrink: 0, backgroundColor: '#df005c' }}>
             {name.charAt(0)}
           </Avatar>
           <div style={{ minWidth: 0, flex: 1 }}>

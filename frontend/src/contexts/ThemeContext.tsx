@@ -13,12 +13,43 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
+import { lightColorTokens, extraColorTokensLight } from '../../theme/src/lib/color-tokens/light';
+import { darkColorTokens, extraColorTokensDark } from '../../theme/src/lib/color-tokens/dark';
+
+// Helper to convert camelCase to kebab-case for CSS variables
+const toKebabCase = (str: string) =>
+  str.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase();
+
 // Inner component that uses the Ayphen theme
 function ThemeProviderInner({ children }: { children: React.ReactNode }) {
   const { isDarkMode, toggleTheme, antTheme } = useGlobalTheme();
   const [isThemeSwitching, setIsThemeSwitching] = useState(false);
 
   const theme: AppTheme = isDarkMode ? 'dark' : 'light';
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.setAttribute('data-theme', theme);
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+
+    // Inject CSS variables
+    const tokens =
+      theme === 'dark'
+        ? { ...darkColorTokens, ...extraColorTokensDark }
+        : { ...lightColorTokens, ...extraColorTokensLight };
+
+    Object.entries(tokens).forEach(([key, value]) => {
+      // Handle gradients or simple color strings
+      if (typeof value === 'string') {
+        const cssVarName = `--${toKebabCase(key)}`;
+        root.style.setProperty(cssVarName, value);
+      }
+    });
+  }, [theme]);
 
   const setTheme = (newTheme: AppTheme) => {
     const shouldBeDark = newTheme === 'dark';
@@ -39,16 +70,6 @@ function ThemeProviderInner({ children }: { children: React.ReactNode }) {
   };
 
   const toggle = () => setTheme(theme === 'light' ? 'dark' : 'light');
-
-  useEffect(() => {
-    const root = document.documentElement;
-    root.setAttribute('data-theme', theme);
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-  }, [theme]);
 
   const ctx: ThemeContextValue = useMemo(
     () => ({ theme, setTheme, toggle, isThemeSwitching }),

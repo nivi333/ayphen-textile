@@ -1,4 +1,4 @@
-@import '../../index.scss';
+@import '../../styles/base.scss';
 
 .defects-table {
   .ant-table-tbody > tr > td {
@@ -8,7 +8,7 @@
 
   .defect-id {
     font-weight: 500;
-    color: #7b5fc9;
+    color: #df005c;
   }
 
   .defect-type {

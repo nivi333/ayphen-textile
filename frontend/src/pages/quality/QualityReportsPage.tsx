@@ -284,7 +284,7 @@ const QualityReportsPage: React.FC = () => {
     xField: 'date',
     yField: 'passRate',
     smooth: true,
-    color: '#7b5fc9',
+    color: '#df005c',
     point: {
       size: 3,
       shape: 'circle',

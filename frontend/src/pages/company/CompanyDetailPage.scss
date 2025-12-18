@@ -1,11 +1,11 @@
-@import '../../index.scss';
+@import '../../styles/base.scss';
 
 .company-detail-page {
   display: flex;
   flex-direction: column;
   gap: 24px;
   padding: 24px 32px 48px;
-  background: $bg-primary;
+  background: var(--color-bg-container);
   min-height: calc(100vh - 64px);
 
   @media (max-width: 768px) {
@@ -28,14 +28,14 @@
 }
 
 .ghost-button {
-  border: 1px solid $border-color;
-  color: $primary-text-color;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
   background: transparent;
   border-radius: 8px;
 
   &:hover {
-    border-color: $primary-color;
-    color: $primary-color;
+    border-color: var(--color-primary);
+    color: var(--color-primary);
   }
 }
 
@@ -55,7 +55,7 @@
 
 .company-profile-avatar {
   background: #fff;
-  color: $primary-color;
+  color: var(--color-primary);
   border: 1px solid rgba(123, 95, 201, 0.18);
 }
 
@@ -93,11 +93,11 @@
   padding: 6px 12px;
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.04);
-  color: $secondary-text-color;
+  color: var(--color-text-secondary);
   font-size: 0.85rem;
 
   svg {
-    color: $primary-color;
+    color: var(--color-primary);
   }
 }
 
@@ -118,7 +118,7 @@
   padding: 6px 12px;
   border-radius: 8px;
   background: rgba(123, 95, 201, 0.12);
-  color: $primary-color;
+  color: var(--color-primary);
 }
 
 .profile-section {
@@ -132,7 +132,7 @@
 .profile-section-title {
   font-size: 0.85rem;
   font-weight: 600;
-  color: $primary-text-color;
+  color: var(--color-text);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   margin-bottom: 16px;
@@ -155,7 +155,7 @@
 
 .profile-info-value {
   font-size: 0.95rem;
-  color: $primary-text-color;
+  color: var(--color-text);
   font-weight: 500;
 }
 
@@ -165,10 +165,10 @@
 }
 
 .profile-link {
-  color: $primary-color;
+  color: var(--color-primary);
 
   &:hover {
-    color: darken($primary-color, 6%);
+    color: darken(var(--color-primary), 6%);
   }
 }
 
@@ -178,7 +178,7 @@
 }
 
 .profile-notes-text {
-  color: $secondary-text-color;
+  color: var(--color-text-secondary);
   white-space: pre-wrap;
 }
 
@@ -200,20 +200,20 @@
     color: $dark-text-primary;
 
     &:hover {
-      border-color: $primary-color;
-      color: $primary-color;
+      border-color: var(--color-primary);
+      color: var(--color-primary);
     }
   }
 
   .company-profile-card {
     background-color: $dark-bg-surface;
-    border-color: rgba($primary-color, 0.2);
+    border-color: rgba(var(--color-primary), 0.2);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
   }
 
   .company-profile-avatar {
     background: $dark-bg-tertiary;
-    border-color: rgba($primary-color, 0.3);
+    border-color: rgba(var(--color-primary), 0.3);
   }
 
   .company-profile-name {
@@ -225,13 +225,13 @@
     color: $dark-text-secondary;
 
     svg {
-      color: $primary-color;
+      color: var(--color-primary);
     }
   }
 
   .company-profile-code-value {
-    background: rgba($primary-color, 0.2);
-    color: $primary-color;
+    background: rgba(var(--color-primary), 0.2);
+    color: var(--color-primary);
   }
 
   .profile-section {

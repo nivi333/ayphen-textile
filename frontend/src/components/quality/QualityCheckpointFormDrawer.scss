@@ -1,4 +1,4 @@
-@import '../../index.scss';
+@import '../../styles/base.scss';
 
 .quality-checkpoint-form {
   .form-section {
@@ -7,7 +7,7 @@
     h3 {
       font-size: 16px;
       font-weight: 600;
-      color: $text-primary;
+      color: var(--color-text);
       margin-bottom: 16px;
       padding-bottom: 8px;
       border-bottom: 1px solid $border-light;
@@ -20,7 +20,7 @@
 
   .ant-form-item-label > label {
     font-weight: 500;
-    color: $text-primary;
+    color: var(--color-text);
   }
 }
 

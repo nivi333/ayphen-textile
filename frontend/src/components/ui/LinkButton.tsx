@@ -30,7 +30,7 @@ export default function LinkButton({ children, onClick, href, target, className 
         padding: 0, 
         height: 'auto', 
         fontWeight: 500,
-        color: '#7b5fc9',
+        color: '#df005c',
         fontSize: '12px',
         border: 'none',
         boxShadow: 'none',

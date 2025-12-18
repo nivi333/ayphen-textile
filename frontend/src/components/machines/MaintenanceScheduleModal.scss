@@ -1,4 +1,4 @@
-@import '../../index.scss';
+@import '../../styles/base.scss';
 
 .maintenance-schedule-form {
   .full-width {
@@ -8,16 +8,16 @@
 
 .cancel-btn {
   padding: 8px 16px;
-  border: 1px solid $border-color;
+  border: 1px solid var(--color-border);
   border-radius: 10px;
-  background: $bg-primary;
+  background: var(--color-bg-container);
   cursor: pointer;
   font-size: 14px;
   margin-right: 8px;
 
   &:hover {
-    border-color: $primary-color;
-    color: $primary-color;
+    border-color: var(--color-primary);
+    color: var(--color-primary);
   }
 
   &:disabled {
@@ -34,8 +34,8 @@
     color: $dark-text-primary;
 
     &:hover {
-      border-color: $primary-color;
-      color: $primary-color;
+      border-color: var(--color-primary);
+      color: var(--color-primary);
     }
   }
 }

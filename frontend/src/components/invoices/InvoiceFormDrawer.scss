@@ -1,14 +1,14 @@
-@import '../../index.scss';
+@import '../../styles/base.scss';
 
-@import '../../index.scss';
+@import '../../styles/base.scss';
 
 .invoice-form-drawer {
   .invoice-drawer-content {
     padding: 24px 32px 0 32px;
     font-family: $font-family-body;
     font-size: 1rem;
-    color: $primary-text-color;
-    background: $bg-primary;
+    color: var(--color-text);
+    background: var(--color-bg-container);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -18,7 +18,7 @@
     font-family: $font-family-heading;
     font-size: 1.5rem;
     font-weight: 600;
-    color: $primary-text-color;
+    color: var(--color-text);
     margin-bottom: 0;
   }
 
@@ -30,7 +30,7 @@
   .invoice-section-title {
     font-size: 1rem;
     font-weight: 500;
-    color: $primary-text-color;
+    color: var(--color-text);
     margin-bottom: 12px;
     margin-top: 0;
   }
@@ -62,13 +62,13 @@
     border-top: 1px solid $border-light;
     position: sticky;
     bottom: 0;
-    background: $bg-primary;
+    background: var(--color-bg-container);
     padding-top: 16px;
     margin-top: auto;
   }
 
   .invoice-cancel-btn {
-    margin-right: $spacing-sm;
+    margin-right: var(--padding-xs);
   }
 
   .invoice-form {

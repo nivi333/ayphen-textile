@@ -10,7 +10,7 @@ export default function AnimatedBackground({ variant = 'login', children }: Anim
     switch (variant) {
       case 'register':
         return {
-          primary: '#7b5fc9',
+          primary: '#df005c',
           secondary: '#a2d8e5',
           accent: '#e879f9',
         };
@@ -22,7 +22,7 @@ export default function AnimatedBackground({ variant = 'login', children }: Anim
         };
       default: // login
         return {
-          primary: '#7b5fc9',
+          primary: '#df005c',
           secondary: '#a2d8e5',
           accent: '#c084fc',
         };

@@ -1,16 +1,16 @@
-@import '../../../index.scss';
+@import '../../../styles/base.scss';
 
 // Common report page styles
 .filters-section {
   display: flex;
   justify-content: space-between;
-  margin-bottom: $spacing-lg;
+  margin-bottom: var(--padding-lg);
   flex-wrap: wrap;
-  gap: $spacing-md;
+  gap: var(--padding);
 }
 
 .breadcrumb-navigation {
-  margin-bottom: $spacing-md;
+  margin-bottom: var(--padding);
 }
 
 // Report cards styling
@@ -20,7 +20,7 @@
   
   &:hover {
     transform: translateY(-5px);
-    box-shadow: $shadow-lg;
+    box-shadow: var(--box-shadow);
   }
   
   .report-card-icon {
@@ -28,27 +28,27 @@
     justify-content: center;
     align-items: center;
     height: 80px;
-    background: linear-gradient(135deg, $primary-color, lighten($primary-color, 15%));
-    color: $bg-primary;
+    background: linear-gradient(135deg, var(--color-primary), lighten(var(--color-primary), 15%));
+    color: var(--color-bg-container);
     font-size: 32px;
     border-radius: $border-radius-base $border-radius-base 0 0;
   }
   
   .report-card-content {
-    padding: $spacing-md;
+    padding: var(--padding);
   }
   
   .report-card-title {
     font-size: $font-size-lg;
     font-weight: 600;
-    margin-bottom: $spacing-xs;
-    color: $primary-text-color;
+    margin-bottom: var(--padding-xxs);
+    color: var(--color-text);
   }
   
   .report-card-description {
     font-size: $font-size-sm;
-    color: $text-secondary;
-    margin-bottom: $spacing-md;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--padding);
     height: 40px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -62,18 +62,18 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: $spacing-sm;
+    margin-top: var(--padding-xs);
   }
   
   .report-last-generated {
     font-size: $font-size-xs;
-    color: $text-secondary;
+    color: var(--color-text-secondary);
   }
 }
 
 // Summary cards styling
 .report-summary-section {
-  margin-bottom: $spacing-lg;
+  margin-bottom: var(--padding-lg);
 
   .summary-card {
     height: 100%;
@@ -81,14 +81,14 @@
     
     .summary-title {
       font-size: $font-size-sm;
-      color: $text-secondary;
-      margin-bottom: $spacing-xs;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--padding-xxs);
     }
     
     .summary-value {
       font-size: $font-size-2xl;
       font-weight: 600;
-      color: $primary-color;
+      color: var(--color-primary);
     }
   }
 }
@@ -96,21 +96,21 @@
 // Report content styling
 .report-content-section {
   .report-data {
-    background-color: $bg-primary;
+    background-color: var(--color-bg-container);
     border-radius: $border-radius-base;
-    padding: $spacing-md;
-    box-shadow: $shadow-md;
+    padding: var(--padding);
+    box-shadow: var(--box-shadow-secondary);
 
     .loading-container {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: $spacing-xl 0;
+      padding: var(--padding-xl) 0;
       
       p {
-        margin-top: $spacing-md;
-        color: $text-secondary;
+        margin-top: var(--padding);
+        color: var(--color-text-secondary);
       }
     }
   }
@@ -118,8 +118,8 @@
 
 // Table styling to match products table
 .ant-table-tbody > tr > td {
-  padding-top: $spacing-sm;
-  padding-bottom: $spacing-sm;
+  padding-top: var(--padding-xs);
+  padding-bottom: var(--padding-xs);
 }
 
 .ant-table-thead > tr > th {
@@ -128,12 +128,12 @@
 }
 
 .ant-table-tbody > tr:hover > td {
-  background-color: rgba($primary-color, 0.05);
+  background-color: rgba(var(--color-primary), 0.05);
 }
 
 // Reports grid styling
 .reports-grid {
-  margin-top: $spacing-lg;
+  margin-top: var(--padding-lg);
 }
 
 // Dark theme support
@@ -168,7 +168,7 @@
     }
     
     .summary-value {
-      color: $primary-color;
+      color: var(--color-primary);
     }
   }
   
@@ -187,7 +187,7 @@
     }
     
     .ant-table-tbody > tr:hover > td {
-      background-color: rgba($primary-color, 0.1);
+      background-color: rgba(var(--color-primary), 0.1);
     }
   }
 }

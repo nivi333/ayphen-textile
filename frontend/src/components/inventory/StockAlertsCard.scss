@@ -1,9 +1,9 @@
-@import '../../index.scss';
+@import '../../styles/base.scss';
 
 // Stock Alerts Card Styles
 .stock-alerts-card {
   .alerts-header {
-    background-color: $bg-secondary;
+    background-color: var(--color-bg-layout);
     border: 1px solid $border-light;
     padding: 12px 16px;
     border-radius: $border-radius-base;
@@ -23,7 +23,7 @@
     width: 40px;
     height: 40px;
     background-color: $bg-tertiary;
-    color: $tertiary-text-color;
+    color: var(--color-text-tertiary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -32,19 +32,19 @@
 
   .alert-meta {
     font-size: 11px;
-    color: $tertiary-text-color;
+    color: var(--color-text-tertiary);
   }
 
   .success-icon {
-    color: $success-color;
+    color: var(--color-success);
   }
 
   .error-badge {
-    background-color: $error-color;
+    background-color: var(--color-error);
   }
 
   .warning-badge {
-    background-color: $warning-color;
+    background-color: var(--color-warning);
   }
 
   .alerts-footer {

@@ -138,7 +138,7 @@ const DashboardPage: React.FC = () => {
                       value={totalRevenue}
                       prefix={<DollarOutlined />}
                       suffix={<RiseOutlined className='kpi-trend-icon positive' />}
-                      valueStyle={{ color: '#7b5fc9', fontSize: '24px', fontWeight: 600 }}
+                      valueStyle={{ color: '#df005c', fontSize: '24px', fontWeight: 600 }}
                       formatter={(value) => `$${Number(value).toLocaleString()}`}
                     />
                     <div className='kpi-trend positive'>+12.5% from last month</div>
@@ -192,7 +192,7 @@ const DashboardPage: React.FC = () => {
                         yField='value'
                         seriesField='type'
                         smooth={true}
-                        color={['#7b5fc9', '#52c41a']}
+                        color={['#df005c', '#52c41a']}
                         legend={{ position: 'top' }}
                         yAxis={{
                           label: {

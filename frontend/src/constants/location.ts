@@ -14,11 +14,15 @@ export const LOCATION_TYPE_LABELS = {
   STORE: 'Store',
 } as const;
 
+export const LOCATION_TEXT = {
+  ADD_LOCATION: 'Add Location',
+} as const;
+
 export const LOCATION_TYPE_COLORS = {
   BRANCH: '#52c41a', // Success green
   WAREHOUSE: '#faad14', // Warning orange
   FACTORY: '#1890ff', // Info blue
-  STORE: '#7b5fc9', // Store purple
+  STORE: '#df005c', // Store purple
 } as const;
 
 export const LOCATION_STATUS = {

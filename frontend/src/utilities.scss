@@ -1,45 +1,45 @@
 // Common utility classes for theme-aware styling
-@import './index.scss';
+@import './styles/base.scss';
 
 // Text color utilities
 .text-error {
-  color: $error-color;
+  color: var(--color-error);
 }
 
 .text-success {
-  color: $success-color;
+  color: var(--color-success);
 }
 
 .text-warning {
-  color: $warning-color;
+  color: var(--color-warning);
 }
 
 .text-info {
-  color: $info-color;
+  color: var(--color-info);
 }
 
 .text-muted {
-  color: $tertiary-text-color;
+  color: var(--color-text-tertiary);
   font-size: 12px;
 }
 
 .text-secondary {
-  color: $secondary-text-color;
+  color: var(--color-text-secondary);
 }
 
 .text-primary {
-  color: $primary-text-color;
+  color: var(--color-text);
 }
 
 // Required field indicator
 .required-indicator {
-  color: $error-color;
+  color: var(--color-error);
   margin-left: 4px;
 }
 
 // Optional field indicator
 .optional-indicator {
-  color: $tertiary-text-color;
+  color: var(--color-text-tertiary);
   font-size: 12px;
   margin-left: 4px;
 }
@@ -47,27 +47,27 @@
 // Error message
 .error-message {
   font-size: 12px;
-  color: $error-color;
+  color: var(--color-error);
   margin-left: 8px;
 }
 
 // Success message
 .success-message {
   margin-top: 8px;
-  color: $success-color;
+  color: var(--color-success);
 }
 
 // Form label styles
 .form-label {
-  color: $secondary-text-color;
+  color: var(--color-text-secondary);
   font-weight: 500;
   font-size: 14px;
 }
 
 // Input styles for auth forms
 .auth-input-style {
-  border: 1px solid $border-color;
-  background-color: $bg-secondary;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-layout);
   border-radius: $border-radius-base;
   padding: 8px 12px;
 }
@@ -132,7 +132,7 @@
 // Global Active/Status Text
 .status-label-active {
   font-weight: 500;
-  color: $primary-text-color;
+  color: var(--color-text);
   
   [data-theme='dark'] & {
     color: $dark-text-primary;

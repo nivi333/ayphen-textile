@@ -1,21 +1,21 @@
-@import '../../index.scss';
+@import '../../styles/base.scss';
 
 .dashboard-container {
   .kpi-card {
     border-radius: $border-radius-base;
-    box-shadow: $shadow-sm;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
     border: 1px solid $border-light;
 
     &:hover {
-      box-shadow: $shadow-md;
+      box-shadow: var(--box-shadow-secondary);
       transform: translateY(-2px);
     }
 
     .ant-statistic-title {
       font-size: $font-size-sm;
-      color: $secondary-text-color;
-      margin-bottom: $spacing-xs;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--padding-xxs);
       font-weight: 500;
     }
 
@@ -25,24 +25,24 @@
     }
 
     .kpi-trend {
-      margin-top: $spacing-sm;
+      margin-top: var(--padding-xs);
       font-size: $font-size-xs;
-      color: $secondary-text-color;
+      color: var(--color-text-secondary);
       font-weight: 500;
 
       &.positive {
-        color: $success-color;
+        color: var(--color-success);
       }
 
       &.negative {
-        color: $error-color;
+        color: var(--color-error);
       }
     }
   }
 
   .chart-card {
     border-radius: $border-radius-base;
-    box-shadow: $shadow-sm;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     border: 1px solid $border-light;
     height: 100%;
 
@@ -52,108 +52,108 @@
       .ant-card-head-title {
         font-size: $font-size-lg;
         font-weight: 600;
-        color: $primary-text-color;
+        color: var(--color-text);
       }
     }
 
     .ant-card-body {
-      padding: $spacing-lg;
+      padding: var(--padding-lg);
     }
   }
 
   .dashboard-charts-row {
-    margin-top: $spacing-lg;
+    margin-top: var(--padding-lg);
   }
 
   .kpi-trend-icon {
     font-size: 14px;
     
     &.positive {
-      color: $success-color;
+      color: var(--color-success);
     }
 
     &.negative {
-      color: $error-color;
+      color: var(--color-error);
     }
   }
 
   .dashboard-quick-actions {
     margin-top: $spacing-2xl;
-    margin-bottom: $spacing-xl;
+    margin-bottom: var(--padding-xl);
 
     h3 {
-      margin-bottom: $spacing-md;
+      margin-bottom: var(--padding);
     }
   }
 
   .dashboard-action-card {
     text-align: center;
     border-radius: $border-radius-lg;
-    box-shadow: $shadow-sm;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     border: 1px solid $border-light;
     transition: all 0.2s ease;
     cursor: pointer;
 
     &:hover {
-      box-shadow: $shadow-md;
+      box-shadow: var(--box-shadow-secondary);
       transform: translateY(-2px);
     }
   }
 
   .dashboard-action-icon {
     font-size: 32px;
-    margin-bottom: $spacing-sm;
+    margin-bottom: var(--padding-xs);
   }
 
   .dashboard-action-content {
     h4 {
       font-size: 16px;
       font-weight: 500;
-      color: $primary-text-color;
-      margin-bottom: $spacing-xs;
+      color: var(--color-text);
+      margin-bottom: var(--padding-xxs);
     }
 
     p {
       font-size: 14px;
-      color: $secondary-text-color;
+      color: var(--color-text-secondary);
       margin: 0;
     }
   }
 
   .dashboard-recent-activity {
-    margin-top: $spacing-xl;
-    margin-bottom: $spacing-xl;
+    margin-top: var(--padding-xl);
+    margin-bottom: var(--padding-xl);
   }
 
   .dashboard-activity-card {
     border-radius: $border-radius-lg;
-    box-shadow: $shadow-sm;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     border: 1px solid $border-light;
   }
 
   .dashboard-empty-state {
     text-align: center;
     padding: $spacing-2xl;
-    color: $secondary-text-color;
+    color: var(--color-text-secondary);
 
     p {
       font-size: 16px;
-      margin: $spacing-sm 0;
-      color: $primary-text-color;
+      margin: var(--padding-xs) 0;
+      color: var(--color-text);
     }
 
     span {
       font-size: 14px;
-      color: $tertiary-text-color;
+      color: var(--color-text-tertiary);
     }
   }
 
   .dashboard-machine-analytics {
-    margin-top: $spacing-xl;
-    margin-bottom: $spacing-xl;
+    margin-top: var(--padding-xl);
+    margin-bottom: var(--padding-xl);
 
     h3 {
-      margin-bottom: $spacing-md;
+      margin-bottom: var(--padding);
     }
   }
 }
@@ -162,15 +162,15 @@
 @media (max-width: 768px) {
   .dashboard-container {
     .dashboard-content {
-      padding: $spacing-md;
+      padding: var(--padding);
     }
 
     .kpi-card {
-      margin-bottom: $spacing-sm;
+      margin-bottom: var(--padding-xs);
     }
 
     .dashboard-action-card {
-      margin-bottom: $spacing-sm;
+      margin-bottom: var(--padding-xs);
     }
   }
 }

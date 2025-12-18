@@ -1,6 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { Table, Button, Tag, Avatar, Dropdown, Modal, message, Empty, Spin, Checkbox } from 'antd';
-import { EditOutlined, DeleteOutlined, EnvironmentOutlined, MoreOutlined } from '@ant-design/icons';
+import {
+  EditOutlined,
+  DeleteOutlined,
+  EnvironmentOutlined,
+  MoreOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
 import useAuth from '../../contexts/AuthContext';
 import { useHeader } from '../../contexts/HeaderContext';
 import { locationService, Location } from '../../services/locationService';
@@ -12,6 +18,7 @@ import {
   LOCATION_EMPTY_STATE,
   LOCATION_SUCCESS_MESSAGES,
   LOCATION_ERROR_MESSAGES,
+  LOCATION_TEXT,
 } from '../../constants/location';
 import LocationDrawer from '../../components/location/LocationDrawer';
 import './LocationListPage.scss';
@@ -30,7 +37,7 @@ export default function LocationListPage() {
   useEffect(() => {
     const isEmployee = currentCompany?.role === 'EMPLOYEE';
     setHeaderActions(
-      <AddNewButton onClick={() => setDrawerVisible(true)} icon={<PlusOutlined />}>
+      <AddNewButton onClick={handleAddLocation} icon={<PlusOutlined />} disabled={isEmployee}>
         {LOCATION_TEXT.ADD_LOCATION}
       </AddNewButton>
     );

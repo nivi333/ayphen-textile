@@ -141,7 +141,7 @@ const ReportsPage: React.FC = () => {
           <div className='coming-soon-section'>
             <Card>
               <Empty
-                image={<BarChartOutlined style={{ fontSize: 64, color: '#7b5fc9' }} />}
+                image={<BarChartOutlined style={{ fontSize: 64, color: '#df005c' }} />}
                 description={
                   <div>
                     <h3>Custom Report Builder</h3>

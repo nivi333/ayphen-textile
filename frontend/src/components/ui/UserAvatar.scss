@@ -1,8 +1,8 @@
-@import '../../index.scss';
+@import '../../styles/base.scss';
 
 .user-avatar-gradient {
   border: none;
-  background: $primary-color;
+  background: var(--color-primary);
   color: white !important;
   font-weight: 600 !important;
   display: flex !important;

@@ -1,13 +1,13 @@
-@import '../../index.scss';
+@import '../../styles/base.scss';
 
 .main-layout {
   min-height: 100vh;
-  background: $bg-primary;
+  background: var(--color-bg-container);
 
   // Full Width Header
   .app-header {
-    background: $bg-primary;
-    border-bottom: 1px solid $border-color;
+    background: var(--color-bg-container);
+    border-bottom: 1px solid var(--color-border);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     padding: 0;
     height: 64px;
@@ -33,14 +33,14 @@
         .header-title {
           font-size: 20px;
           font-weight: 600;
-          color: $primary-text-color;
+          color: var(--color-text);
           margin: 0;
           line-height: 1.2;
         }
 
         .header-subtitle {
           font-size: 13px;
-          color: $secondary-text-color;
+          color: var(--color-text-secondary);
           margin: 2px 0 0 0;
           line-height: 1.2;
         }
@@ -56,13 +56,13 @@
           align-items: center;
           gap: 12px;
           padding: 6px 14px;
-          border: 1px solid rgba($primary-color, 0.18);
+          border: 1px solid rgba(var(--color-primary), 0.18);
           border-radius: 10px;
           line-height: 1.2;
 
           .ant-avatar {
-            background: $primary-color;
-            color: $bg-primary;
+            background: var(--color-primary);
+            color: var(--color-bg-container);
             font-weight: 600;
             img {
               border-radius: 50%;
@@ -77,12 +77,12 @@
             .header-user-name {
               font-size: 0.9rem;
               font-weight: 600;
-              color: $primary-text-color;
+              color: var(--color-text);
             }
 
             .header-user-email {
               font-size: 0.75rem;
-              color: $secondary-text-color;
+              color: var(--color-text-secondary);
               letter-spacing: 0.01em;
             }
           }
@@ -97,7 +97,7 @@
 
     .main-content {
       padding: 15px;
-      background: $bg-primary;
+      background: var(--color-bg-container);
       min-height: calc(100vh - 64px);
       overflow-x: auto;
     }
@@ -110,8 +110,8 @@
   justify-content: space-between;
   padding: 0 32px;
   height: 64px;
-  border-bottom: 1px solid $border-color;
-  background-color: $bg-primary;
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-bg-container);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   gap: 32px;
 
@@ -126,7 +126,7 @@
   .dashboard-header-actions {
     display: flex;
     align-items: center;
-    gap: $spacing-md;
+    gap: var(--padding);
     height: 100%;
   }
 }
@@ -154,11 +154,11 @@
 
         .header-actions {
           .header-user {
-            border-color: rgba($primary-color, 0.3);
+            border-color: rgba(var(--color-primary), 0.3);
 
             .ant-avatar {
-              background: $primary-color;
-              color: $bg-primary;
+              background: var(--color-primary);
+              color: var(--color-bg-container);
             }
 
             .header-user-info {

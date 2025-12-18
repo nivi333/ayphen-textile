@@ -1,4 +1,4 @@
-@import '../../index.scss';
+@import '../../styles/base.scss';
 
 .drawer-header-with-switch {
   display: flex;
@@ -9,20 +9,20 @@
   .header-switch {
     display: flex;
     align-items: center;
-    gap: $spacing-sm;
+    gap: var(--padding-xs);
 
     .switch-label {
       font-size: $font-size-sm;
       font-weight: 400;
-      color: $text-primary;
+      color: var(--color-text);
     }
   }
 }
 
 .machine-form {
   .form-section {
-    margin-bottom: $spacing-md;
-    padding-bottom: $spacing-md;
+    margin-bottom: var(--padding);
+    padding-bottom: var(--padding);
     border-bottom: 1px solid $border-light;
 
     &:last-child {
@@ -35,13 +35,13 @@
   .section-title {
     font-size: $font-size-lg;
     font-weight: 600;
-    color: $text-primary;
-    margin-bottom: $spacing-sm;
+    color: var(--color-text);
+    margin-bottom: var(--padding-xs);
   }
 
   .machine-image-upload {
     width: 120px;
-    margin: 0 auto $spacing-sm auto;
+    margin: 0 auto var(--padding-xs) auto;
     display: block;
 
     .machine-avatar {
@@ -52,7 +52,7 @@
 
     .machine-upload-icon {
       font-size: $font-size-3xl;
-      color: $tertiary-text-color;
+      color: var(--color-text-tertiary);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -62,13 +62,13 @@
   .machine-image-help-text {
     text-align: center;
     font-size: $font-size-xs;
-    color: $tertiary-text-color;
-    margin-bottom: $spacing-md;
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--padding);
     line-height: 1.5;
   }
 
   .ant-form-item {
-    margin-bottom: $spacing-sm;
+    margin-bottom: var(--padding-xs);
   }
 }
 

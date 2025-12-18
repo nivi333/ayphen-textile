@@ -1,11 +1,11 @@
-@import '../../index.scss';
+@import '../../styles/base.scss';
 
 .app-sidebar {
   display: flex;
   flex-direction: column;
 
-  background: $bg-primary;
-  border-right: 1px solid $border-color;
+  background: var(--color-bg-container);
+  border-right: 1px solid var(--color-border);
   width: 280px;
 
   .sidebar-container {
@@ -30,18 +30,18 @@
 
       .company-name {
         font-weight: 600;
-        color: $primary-text-color;
+        color: var(--color-text);
       }
 
       .company-industry {
         font-size: 12px;
-        color: $tertiary-text-color;
+        color: var(--color-text-tertiary);
       }
     }
 
     .dropdown-icon {
       font-size: 12px;
-      color: $tertiary-text-color;
+      color: var(--color-text-tertiary);
     }
   }
 
@@ -57,7 +57,7 @@
     gap: 10px;
     padding: 16px;
     border-top: 1px solid $border-light;
-    background: $bg-secondary;
+    background: var(--color-bg-layout);
   }
 }
 

@@ -1,27 +1,27 @@
-@import '../../index.scss';
+@import '../../styles/base.scss';
 
 .page-breadcrumb {
-  margin-bottom: $spacing-md;
-  padding: $spacing-xs 0;
+  margin-bottom: var(--padding);
+  padding: var(--padding-xxs) 0;
 
   .breadcrumb-link {
-    color: $primary-color;
+    color: var(--color-primary);
     transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
-    gap: $spacing-xs;
+    gap: var(--padding-xxs);
 
     &:hover {
-      color: darken($primary-color, 10%);
+      color: darken(var(--color-primary), 10%);
       text-decoration: none;
     }
   }
 
   .breadcrumb-current {
-    color: $text-secondary;
+    color: var(--color-text-secondary);
     display: inline-flex;
     align-items: center;
-    gap: $spacing-xs;
+    gap: var(--padding-xxs);
   }
 
   .breadcrumb-icon {
@@ -34,11 +34,11 @@
   .ant-breadcrumb-link,
   .ant-breadcrumb-separator {
     font-size: $font-size-sm;
-    color: $text-secondary;
+    color: var(--color-text-secondary);
   }
 
   .ant-breadcrumb-separator {
-    margin: 0 $spacing-xs;
+    margin: 0 var(--padding-xxs);
   }
 }
 
@@ -46,10 +46,10 @@
 [data-theme='dark'] {
   .page-breadcrumb {
     .breadcrumb-link {
-      color: $primary-color;
+      color: var(--color-primary);
 
       &:hover {
-        color: lighten($primary-color, 10%);
+        color: lighten(var(--color-primary), 10%);
       }
     }
 

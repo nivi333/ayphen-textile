@@ -239,7 +239,7 @@ const FinanceOverviewPage: React.FC = () => {
                       value={dashboardData?.monthlyRevenue || 0}
                       prefix={<DollarOutlined />}
                       suffix={<RiseOutlined style={{ color: '#52c41a', fontSize: '14px' }} />}
-                      valueStyle={{ color: '#7b5fc9', fontSize: '24px', fontWeight: 600 }}
+                      valueStyle={{ color: '#df005c', fontSize: '24px', fontWeight: 600 }}
                       formatter={value => `$${Number(value).toLocaleString()}`}
                     />
                   </Card>

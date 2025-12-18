@@ -1,42 +1,42 @@
-@import '../../index.scss';
+@import '../../styles/base.scss';
 
 .finance-overview-page {
   .page-header-section {
-    margin-bottom: $spacing-lg;
+    margin-bottom: var(--padding-lg);
     
     .header-with-actions {
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: $spacing-md;
+      gap: var(--padding);
       
       .header-actions {
         display: flex;
-        gap: $spacing-xs;
+        gap: var(--padding-xxs);
       }
     }
   }
   
   .finance-metrics-row {
-    margin-bottom: $spacing-lg;
+    margin-bottom: var(--padding-lg);
   }
 
   .finance-metric-card {
     border-radius: $border-radius-base;
-    box-shadow: $shadow-sm;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     border: 1px solid $border-light;
     transition: all 0.3s ease;
 
     &:hover {
-      box-shadow: $shadow-md;
+      box-shadow: var(--box-shadow-secondary);
       transform: translateY(-2px);
     }
 
     .ant-statistic-title {
       font-size: $font-size-sm;
-      color: $secondary-text-color;
-      margin-bottom: $spacing-xs;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--padding-xxs);
       font-weight: 500;
     }
 
@@ -48,9 +48,9 @@
 
   .finance-chart-card {
     border-radius: $border-radius-base;
-    box-shadow: $shadow-sm;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     border: 1px solid $border-light;
-    margin-bottom: $spacing-lg;
+    margin-bottom: var(--padding-lg);
 
     .ant-card-head {
       border-bottom: 1px solid $border-light;
@@ -58,22 +58,22 @@
       .ant-card-head-title {
         font-size: $font-size-lg;
         font-weight: 600;
-        color: $primary-text-color;
+        color: var(--color-text);
       }
     }
 
     .ant-card-body {
-      padding: $spacing-lg;
+      padding: var(--padding-lg);
     }
   }
 
   .finance-table-row {
-    margin-bottom: $spacing-lg;
+    margin-bottom: var(--padding-lg);
   }
 
   .finance-table-card {
     border-radius: $border-radius-base;
-    box-shadow: $shadow-sm;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     border: 1px solid $border-light;
 
     .ant-card-head {
@@ -82,7 +82,7 @@
       .ant-card-head-title {
         font-size: $font-size-lg;
         font-weight: 600;
-        color: $primary-text-color;
+        color: var(--color-text);
       }
 
       .ant-card-extra {
@@ -94,7 +94,7 @@
     }
 
     .ant-card-body {
-      padding: $spacing-md;
+      padding: var(--padding);
     }
 
     .finance-table {
@@ -108,7 +108,7 @@
       }
 
       a {
-        color: $primary-color;
+        color: var(--color-primary);
         font-weight: 500;
       }
     }
@@ -121,7 +121,7 @@
   }
 
   .finance-filters {
-    margin-bottom: $spacing-lg;
+    margin-bottom: var(--padding-lg);
     display: flex;
     justify-content: flex-end;
   }
@@ -131,7 +131,7 @@
 @media (max-width: 768px) {
   .finance-overview-page {
     .finance-metric-card {
-      margin-bottom: $spacing-sm;
+      margin-bottom: var(--padding-xs);
     }
 
     .finance-filters {
@@ -203,7 +203,7 @@
           }
 
           a {
-            color: $primary-color;
+            color: var(--color-primary);
           }
         }
 

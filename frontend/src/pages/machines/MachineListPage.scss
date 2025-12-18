@@ -1,4 +1,4 @@
-@import '../../index.scss';
+@import '../../styles/base.scss';
 
 .machines-table {
   .ant-table-tbody>tr>td {
@@ -118,7 +118,7 @@
 
       .kpi-icon {
         font-size: 18px;
-        color: #7b5fc9;
+        color: #df005c;
       }
 
       .kpi-title {

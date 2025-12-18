@@ -1,4 +1,4 @@
-@import '../../index.scss';
+@import '../../styles/base.scss';
 
 // Stock Reservation Modal Styles
 .stock-reservation-modal {
@@ -7,25 +7,25 @@
     margin-right: 8px;
 
     &.pending {
-      color: $info-color;
+      color: var(--color-info);
     }
 
     &.confirmed {
-      color: $primary-color;
+      color: var(--color-primary);
     }
 
     &.fulfilled {
-      color: $warning-color;
+      color: var(--color-warning);
     }
 
     &.cancelled {
-      color: $success-color;
+      color: var(--color-success);
     }
   }
 
   .product-details {
     font-size: 12px;
-    color: $tertiary-text-color;
+    color: var(--color-text-tertiary);
   }
 }
 
@@ -38,7 +38,7 @@
       }
 
       &.confirmed {
-        color: $primary-color;
+        color: var(--color-primary);
       }
 
       &.fulfilled {

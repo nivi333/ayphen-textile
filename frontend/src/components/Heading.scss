@@ -1,8 +1,8 @@
-@import '../index.scss';
+@import '../styles/base.scss';
 
 .app-heading {
   font-family: $font-family-body;
-  color: $primary-text-color;
+  color: var(--color-text);
   font-weight: 600;
 
   &-h1 {

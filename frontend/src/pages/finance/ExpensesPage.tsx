@@ -366,7 +366,7 @@ export default function ExpensesPage() {
                   title='Total Expenses'
                   value={stats.totalExpenses}
                   precision={2}
-                  valueStyle={{ color: '#7b5fc9' }}
+                  valueStyle={{ color: '#df005c' }}
                   prefix={<DollarOutlined />}
                   suffix='USD'
                 />

@@ -221,7 +221,7 @@ export default function SupplierListPage() {
       sorter: (a: Supplier, b: Supplier) => (a.name || '').localeCompare(b.name || ''),
       render: (name: string, record: Supplier) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Avatar icon={<UserOutlined />} style={{ flexShrink: 0, backgroundColor: '#7b5fc9' }}>
+          <Avatar icon={<UserOutlined />} style={{ flexShrink: 0, backgroundColor: '#df005c' }}>
             {name.charAt(0)}
           </Avatar>
           <div style={{ minWidth: 0, flex: 1 }}>

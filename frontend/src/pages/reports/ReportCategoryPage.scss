@@ -1,4 +1,4 @@
-@import '../../index.scss';
+@import '../../styles/base.scss';
 @import './shared/ReportStyles.scss';
 
 .report-category-page {
@@ -8,17 +8,17 @@
   }
 
   .page-header-section {
-    margin-bottom: $spacing-xl;
+    margin-bottom: var(--padding-xl);
 
     .header-content {
       display: flex;
       align-items: center;
-      gap: $spacing-md;
-      margin-top: $spacing-md;
+      gap: var(--padding);
+      margin-top: var(--padding);
 
       .header-icon {
         font-size: 25px;
-        color: $primary-color;
+        color: var(--color-primary);
         display: flex;
         align-items: center;
       }
@@ -26,19 +26,19 @@
   }
 
   .reports-section {
-    margin-bottom: $spacing-xl;
+    margin-bottom: var(--padding-xl);
 
     .section-title {
       font-size: $font-size-lg;
       font-weight: 600;
-      color: $text-primary;
-      margin-bottom: $spacing-lg;
+      color: var(--color-text);
+      margin-bottom: var(--padding-lg);
       font-family: $font-family-heading;
     }
 
     &.coming-soon {
       .section-title {
-        color: $text-secondary;
+        color: var(--color-text-secondary);
       }
     }
   }
@@ -51,8 +51,8 @@
 
     &:hover:not(.disabled) {
       transform: translateY(-2px);
-      box-shadow: $shadow-md;
-      border-color: $primary-color;
+      box-shadow: var(--box-shadow-secondary);
+      border-color: var(--color-primary);
     }
 
     &.disabled {
@@ -66,30 +66,30 @@
     }
 
     .ant-card-body {
-      padding: $spacing-sm;
+      padding: var(--padding-xs);
       display: flex;
       flex-direction: column;
-      gap: $spacing-sm;
+      gap: var(--padding-xs);
     }
 
     .report-icon {
       font-size: 28px;
-      color: $primary-color;
+      color: var(--color-primary);
       text-align: center;
-      margin-bottom: $spacing-xs;
+      margin-bottom: var(--padding-xxs);
     }
 
     .report-title {
       font-size: $font-size-sm;
       font-weight: 600;
-      color: $text-primary;
+      color: var(--color-text);
       margin: 0;
       text-align: center;
     }
 
     .report-description {
       font-size: $font-size-xs;
-      color: $text-secondary;
+      color: var(--color-text-secondary);
       margin: 0;
       text-align: center;
       min-height: 32px;
@@ -98,8 +98,8 @@
 
     .coming-soon-badge {
       background: $bg-tertiary;
-      color: $text-secondary;
-      padding: $spacing-xs $spacing-sm;
+      color: var(--color-text-secondary);
+      padding: var(--padding-xxs) var(--padding-xs);
       border-radius: $border-radius-base;
       text-align: center;
       font-size: $font-size-xs;
@@ -131,7 +131,7 @@
 
       &:hover:not(.disabled) {
         background: lighten($dark-bg-surface, 2%);
-        border-color: $primary-color;
+        border-color: var(--color-primary);
       }
 
       .report-title {
@@ -154,7 +154,7 @@
 @media (max-width: 768px) {
   .report-category-page {
     .page-container {
-      padding: $spacing-md;
+      padding: var(--padding);
     }
 
     .page-header-section {

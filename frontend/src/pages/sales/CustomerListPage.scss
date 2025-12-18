@@ -1,13 +1,13 @@
-@import '../../index.scss';
+@import '../../styles/base.scss';
 
 .customer-list-page {
   min-height: 100vh;
-  background-color: $bg-primary;
+  background-color: var(--color-bg-container);
 
   .page-header {
-    background: $bg-surface;
+    background: var(--color-bg-layout);
     border-bottom: 1px solid $border-light;
-    padding: $spacing-lg $spacing-xl;
+    padding: var(--padding-lg) var(--padding-xl);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -21,23 +21,23 @@
     .header-right {
       display: flex;
       align-items: center;
-      gap: $spacing-md;
+      gap: var(--padding);
 
       .add-customer-btn {
-        background: $primary-color;
-        border-color: $primary-color;
+        background: var(--color-primary);
+        border-color: var(--color-primary);
         color: white;
         font-weight: 500;
         border-radius: $border-radius-base;
-        padding: $spacing-md $spacing-lg;
+        padding: var(--padding) var(--padding-lg);
         height: auto;
         display: flex;
         align-items: center;
-        gap: $spacing-sm;
+        gap: var(--padding-xs);
 
         &:hover {
-          background: darken($primary-color, 10%);
-          border-color: darken($primary-color, 10%);
+          background: darken(var(--color-primary), 10%);
+          border-color: darken(var(--color-primary), 10%);
           transform: translateY(-1px);
           box-shadow: 0 4px 12px rgba(123, 95, 201, 0.3);
         }
@@ -50,19 +50,19 @@
   }
 
   .page-content {
-    padding: $spacing-xl;
-    background: $bg-primary;
+    padding: var(--padding-xl);
+    background: var(--color-bg-container);
 
     .page-container {
       max-width: 1200px;
       margin: 0 auto;
-      background: $bg-surface;
+      background: var(--color-bg-layout);
       border-radius: $border-radius-lg;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
       overflow: hidden;
 
       .page-header-section {
-        padding: $spacing-xl $spacing-xl $spacing-lg;
+        padding: var(--padding-xl) var(--padding-xl) var(--padding-lg);
         border-bottom: 1px solid $border-light;
         display: flex;
         align-items: center;
@@ -70,15 +70,15 @@
         justify-content: space-between;
 
         .page-title {
-          color: $text-primary;
+          color: var(--color-text);
           font-size: $font-size-2xl;
           font-weight: 600;
-          margin: 0 0 $spacing-sm 0;
+          margin: 0 0 var(--padding-xs) 0;
           font-family: $font-family-heading;
         }
 
         .page-subtitle {
-          color: $text-secondary;
+          color: var(--color-text-secondary);
           font-size: $font-size-base;
           margin: 0;
           font-family: $font-family-body;
@@ -86,7 +86,7 @@
       }
 
       .table-container {
-        padding: $spacing-xl;
+        padding: var(--padding-xl);
 
         .loading-container {
           display: flex;
@@ -100,9 +100,9 @@
 
         .customers-table {
           .ant-table-thead>tr>th {
-            background: $bg-primary;
+            background: var(--color-bg-container);
             border-bottom: 2px solid $border-light;
-            color: $text-primary;
+            color: var(--color-text);
             font-weight: 600;
             font-family: $font-family-heading;
             font-size: $font-size-sm;
@@ -112,7 +112,7 @@
 
           .ant-table-tbody>tr {
             &:hover>td {
-              background: $bg-primary;
+              background: var(--color-bg-container);
             }
 
             >td {
@@ -123,20 +123,20 @@
 
           .customer-name {
             font-weight: 600;
-            color: $text-primary;
+            color: var(--color-text);
             font-size: $font-size-base;
             font-family: $font-family-heading;
           }
 
           .customer-code {
-            color: $text-secondary;
+            color: var(--color-text-secondary);
             font-size: $font-size-sm;
             margin-top: 2px;
             font-family: $font-family-body;
           }
 
           .customer-contact {
-            color: $text-secondary;
+            color: var(--color-text-secondary);
             font-size: $font-size-sm;
             font-family: $font-family-body;
 
@@ -158,7 +158,7 @@
     justify-content: center;
     align-items: center;
     height: 400px;
-    color: $text-secondary;
+    color: var(--color-text-secondary);
     font-size: $font-size-lg;
     font-family: $font-family-body;
   }
@@ -166,29 +166,29 @@
   // Responsive design
   @media (max-width: 768px) {
     .page-header {
-      padding: $spacing-md $spacing-lg;
+      padding: var(--padding) var(--padding-lg);
       flex-direction: column;
-      gap: $spacing-md;
+      gap: var(--padding);
 
       .header-right {
         width: 100%;
         justify-content: flex-end;
 
         .add-customer-btn {
-          padding: $spacing-sm $spacing-md;
+          padding: var(--padding-xs) var(--padding);
           font-size: $font-size-sm;
         }
       }
     }
 
     .page-content {
-      padding: $spacing-md;
+      padding: var(--padding);
 
       .page-container {
         border-radius: $border-radius-base;
 
         .page-header-section {
-          padding: $spacing-lg;
+          padding: var(--padding-lg);
 
           .page-title {
             font-size: $font-size-xl;
@@ -200,16 +200,16 @@
         }
 
         .table-container {
-          padding: $spacing-lg;
+          padding: var(--padding-lg);
 
           .customers-table {
             .ant-table-thead>tr>th {
               font-size: $font-size-xs;
-              padding: $spacing-md $spacing-sm;
+              padding: var(--padding) var(--padding-xs);
             }
 
             .ant-table-tbody>tr>td {
-              padding: $spacing-md $spacing-sm;
+              padding: var(--padding) var(--padding-xs);
             }
 
             .customer-name {
@@ -228,15 +228,15 @@
 
   @media (max-width: 576px) {
     .page-header {
-      padding: $spacing-sm $spacing-md;
+      padding: var(--padding-xs) var(--padding);
     }
 
     .page-content {
-      padding: $spacing-sm;
+      padding: var(--padding-xs);
 
       .page-container {
         .page-header-section {
-          padding: $spacing-md;
+          padding: var(--padding);
 
           .page-title {
             font-size: $font-size-lg;
@@ -244,7 +244,7 @@
         }
 
         .table-container {
-          padding: $spacing-md;
+          padding: var(--padding);
         }
       }
     }

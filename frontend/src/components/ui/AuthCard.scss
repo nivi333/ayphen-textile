@@ -1,4 +1,4 @@
-@import '../../index.scss';
+@import '../../styles/base.scss';
 
 .auth-card-wrapper {
   max-width: 448px;
@@ -11,12 +11,9 @@
     0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
   border: none;
-  background: $bg-primary;
+  background: var(--color-bg-container);
 }
 
-.auth-card-heading {
-  margin-bottom: 24px;
-}
 
 // Dark mode support
 [data-theme='dark'] {

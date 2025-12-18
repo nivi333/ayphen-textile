@@ -1,25 +1,25 @@
-@import '../../index.scss';
+@import '../../styles/base.scss';
 
 .accounts-receivable-page {
   .stats-row {
-    margin-bottom: $spacing-lg;
+    margin-bottom: var(--padding-lg);
   }
 
   .stat-card {
     border-radius: $border-radius-base;
-    box-shadow: $shadow-sm;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     border: 1px solid $border-light;
     transition: all 0.3s ease;
 
     &:hover {
-      box-shadow: $shadow-md;
+      box-shadow: var(--box-shadow-secondary);
       transform: translateY(-2px);
     }
 
     .ant-statistic-title {
       font-size: $font-size-sm;
-      color: $secondary-text-color;
-      margin-bottom: $spacing-xs;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--padding-xxs);
       font-weight: 500;
     }
 
@@ -32,12 +32,12 @@
   .receivables-table {
     .invoice-id {
       font-weight: 500;
-      color: $primary-text-color;
+      color: var(--color-text);
     }
 
     .invoice-number {
       font-size: 12px;
-      color: $secondary-text-color;
+      color: var(--color-text-secondary);
       margin-top: 2px;
     }
 
@@ -59,7 +59,7 @@
 @media (max-width: 768px) {
   .accounts-receivable-page {
     .stat-card {
-      margin-bottom: $spacing-sm;
+      margin-bottom: var(--padding-xs);
     }
   }
 }
