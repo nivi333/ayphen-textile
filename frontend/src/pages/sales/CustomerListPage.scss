@@ -6,7 +6,7 @@
 
   .page-header {
     background: var(--color-bg-layout);
-    border-bottom: 1px solid $border-light;
+    border-bottom: 1px solid var(--color-border-secondary);
     padding: var(--padding-lg) var(--padding-xl);
     display: flex;
     justify-content: space-between;
@@ -36,8 +36,8 @@
         gap: var(--padding-xs);
 
         &:hover {
-          background: darken(var(--color-primary), 10%);
-          border-color: darken(var(--color-primary), 10%);
+          background: var(--color-primary-hover);
+          border-color: var(--color-primary-hover);
           transform: translateY(-1px);
           box-shadow: 0 4px 12px rgba(123, 95, 201, 0.3);
         }
@@ -63,7 +63,7 @@
 
       .page-header-section {
         padding: var(--padding-xl) var(--padding-xl) var(--padding-lg);
-        border-bottom: 1px solid $border-light;
+        border-bottom: 1px solid var(--color-border-secondary);
         display: flex;
         align-items: center;
         align-content: center;
@@ -99,9 +99,9 @@
         }
 
         .customers-table {
-          .ant-table-thead>tr>th {
+          .ant-table-thead > tr > th {
             background: var(--color-bg-container);
-            border-bottom: 2px solid $border-light;
+            border-bottom: 2px solid var(--color-border-secondary);
             color: var(--color-text);
             font-weight: 600;
             font-family: $font-family-heading;
@@ -110,13 +110,13 @@
             letter-spacing: 0.5px;
           }
 
-          .ant-table-tbody>tr {
-            &:hover>td {
+          .ant-table-tbody > tr {
+            &:hover > td {
               background: var(--color-bg-container);
             }
 
-            >td {
-              border-bottom: 1px solid $border-light;
+            > td {
+              border-bottom: 1px solid var(--color-border-secondary);
               padding: 10px;
             }
           }
@@ -203,12 +203,12 @@
           padding: var(--padding-lg);
 
           .customers-table {
-            .ant-table-thead>tr>th {
+            .ant-table-thead > tr > th {
               font-size: $font-size-xs;
               padding: var(--padding) var(--padding-xs);
             }
 
-            .ant-table-tbody>tr>td {
+            .ant-table-tbody > tr > td {
               padding: var(--padding) var(--padding-xs);
             }
 
@@ -271,17 +271,17 @@
 
       .table-container {
         .customers-table {
-          .ant-table-thead>tr>th {
+          .ant-table-thead > tr > th {
             background: $dark-bg-primary;
             border-bottom-color: $dark-border;
           }
 
-          .ant-table-tbody>tr {
-            &:hover>td {
+          .ant-table-tbody > tr {
+            &:hover > td {
               background: $dark-bg-primary;
             }
 
-            >td {
+            > td {
               border-bottom-color: $dark-border;
             }
           }

@@ -69,7 +69,7 @@
 
   &.active {
     border-bottom: 2.5px solid var(--color-warning);
-    color: $warning-text-color;
+    color: var(--color-warning-text);
   }
 }
 
@@ -179,7 +179,7 @@
 
 .companies-empty-icon {
   font-size: 64px;
-  color: $border-dark;
+  color: var(--color-border);
   margin-bottom: var(--padding);
 }
 
@@ -213,19 +213,19 @@
     .ant-btn-dangerous {
       background-color: #ff4d4f;
       border-color: #ff4d4f;
-      color: $dark-text-primary;
+      color: var(--color-text);
 
       &:hover {
         background-color: #d9363e;
         border-color: #d9363e;
-        color: $dark-text-primary;
+        color: var(--color-text);
       }
 
       &:focus,
       &:active {
         background-color: darken(#d9363e, 5%);
         border-color: darken(#d9363e, 5%);
-        color: $dark-text-primary;
+        color: var(--color-text);
       }
     }
   }
@@ -254,17 +254,17 @@
 
         .table-container {
           .companies-table {
-            .ant-table-thead>tr>th {
+            .ant-table-thead > tr > th {
               background: $dark-bg-tertiary;
               border-bottom-color: $dark-border;
             }
 
-            .ant-table-tbody>tr {
-              &:hover>td {
+            .ant-table-tbody > tr {
+              &:hover > td {
                 background: $dark-bg-tertiary;
               }
 
-              >td {
+              > td {
                 border-bottom-color: $dark-border;
               }
             }
@@ -278,20 +278,20 @@
       border-bottom-color: $dark-border;
 
       .companies-card-title {
-        color: $dark-text-primary;
+        color: var(--color-text);
       }
 
       .companies-card-industry {
-        color: $dark-text-tertiary;
+        color: var(--color-text-tertiary);
       }
 
       .companies-card-desc {
-        color: $dark-text-secondary;
+        color: var(--color-text-secondary);
       }
 
       .companies-card-icon {
-        border-color: $dark-text-disabled;
-        color: $dark-text-tertiary;
+        border-color: var(--color-text-quaternary);
+        color: var(--color-text-tertiary);
       }
 
       .companies-card-logo {
@@ -300,14 +300,14 @@
     }
 
     .companies-empty {
-      color: $dark-text-tertiary;
+      color: var(--color-text-tertiary);
     }
 
     .companies-tab {
-      color: $dark-text-secondary;
+      color: var(--color-text-secondary);
 
       &.active {
-        color: $dark-warning-text;
+        color: var(--color-warning-text);
       }
     }
   }

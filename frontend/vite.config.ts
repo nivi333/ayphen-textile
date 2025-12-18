@@ -20,4 +20,12 @@ export default defineConfig({
     port: 3002,
     host: true,
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: 'modern-compiler',
+        silenceDeprecations: ['legacy-js-api', 'import'],
+      },
+    },
+  },
 });

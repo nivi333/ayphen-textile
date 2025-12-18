@@ -12,7 +12,7 @@
     gap: var(--padding-xxs);
 
     &:hover {
-      color: darken(var(--color-primary), 10%);
+      color: var(--color-primary-hover);
       text-decoration: none;
     }
   }
@@ -49,7 +49,7 @@
       color: var(--color-primary);
 
       &:hover {
-        color: lighten(var(--color-primary), 10%);
+        color: color-mix(in srgb, var(--color-primary), white 10%);
       }
     }
 

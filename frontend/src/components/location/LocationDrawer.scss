@@ -81,7 +81,7 @@
 
   .ccd-divider {
     margin: 8px 0 16px 0;
-    border-color: $border-light;
+    border-color: var(--color-border-secondary);
   }
 
   .ccd-logo-section {
@@ -112,7 +112,7 @@
     justify-content: flex-end;
     gap: 8px;
     padding-top: 15px;
-    border-top: 1px solid $border-light;
+    border-top: 1px solid var(--color-border-secondary);
     position: sticky;
     bottom: 0;
     background: var(--color-bg-container);

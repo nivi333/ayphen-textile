@@ -168,7 +168,7 @@
   color: var(--color-primary);
 
   &:hover {
-    color: darken(var(--color-primary), 6%);
+    color: var(--color-primary-hover);
   }
 }
 
@@ -207,13 +207,13 @@
 
   .company-profile-card {
     background-color: $dark-bg-surface;
-    border-color: rgba(var(--color-primary), 0.2);
+    border-color: color-mix(in srgb, var(--color-primary), transparent 80%);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
   }
 
   .company-profile-avatar {
     background: $dark-bg-tertiary;
-    border-color: rgba(var(--color-primary), 0.3);
+    border-color: color-mix(in srgb, var(--color-primary), transparent 70%);
   }
 
   .company-profile-name {
@@ -230,7 +230,7 @@
   }
 
   .company-profile-code-value {
-    background: rgba(var(--color-primary), 0.2);
+    background: color-mix(in srgb, var(--color-primary), transparent 80%);
     color: var(--color-primary);
   }
 

@@ -23,7 +23,7 @@
 
   .report-category-card {
     border-radius: $border-radius-base;
-    border: 1px solid $border-light;
+    border: 1px solid var(--color-border-secondary);
     transition: all 0.3s ease;
     height: 100%;
 
@@ -70,7 +70,7 @@
         justify-content: space-between;
         align-items: center;
         padding-top: var(--padding-xs);
-        border-top: 1px solid $border-light;
+        border-top: 1px solid var(--color-border-secondary);
 
         .report-count {
           color: var(--color-text-secondary);
@@ -94,7 +94,7 @@
 
     .ant-card {
       border-radius: $border-radius-lg;
-      border: 2px dashed $border-light;
+      border: 2px dashed var(--color-border-secondary);
       background: $bg-tertiary;
 
       .ant-empty-description {
@@ -123,7 +123,7 @@
 
       &:hover {
         border-color: var(--color-primary);
-        background: lighten($dark-bg-surface, 2%);
+        background: color-mix(in srgb, var(--color-bg-elevated), white 2%);
       }
 
       .category-content {

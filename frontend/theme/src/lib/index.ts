@@ -1,22 +1,22 @@
-import { ThemeConfig } from "antd";
-import { extraColorTokensLight, lightColorTokens } from "./color-tokens/light";
-import { darkColorTokens, extraColorTokensDark } from "./color-tokens/dark";
+import { ThemeConfig } from 'antd';
+import { extraColorTokensLight, lightColorTokens } from './color-tokens/light';
+import { darkColorTokens, extraColorTokensDark } from './color-tokens/dark';
 
 const motionToken = {
   motion: true,
   motionBase: 0,
-  motionEaseInBack: "cubic-bezier(0.71, -0.46, 0.88, 0.6)",
-  motionEaseInOut: "cubic-bezier(0.645, 0.045, 0.355, 1)",
-  motionEaseInOutCirc: "cubic-bezier(0.78, 0.14, 0.15, 0.86)",
-  motionEaseInQuint: "cubic-bezier(0.755, 0.05, 0.855, 0.06)",
-  motionEaseOut: "cubic-bezier(0.215, 0.61, 0.355, 1)",
-  motionEaseOutBack: "cubic-bezier(0.12, 0.4, 0.29, 1.46)",
-  motionEaseOutCirc: "cubic-bezier(0.08, 0.82, 0.17, 1)",
-  motionEaseOutQuint: "cubic-bezier(0.23, 1, 0.32, 1)",
+  motionEaseInBack: 'cubic-bezier(0.71, -0.46, 0.88, 0.6)',
+  motionEaseInOut: 'cubic-bezier(0.645, 0.045, 0.355, 1)',
+  motionEaseInOutCirc: 'cubic-bezier(0.78, 0.14, 0.15, 0.86)',
+  motionEaseInQuint: 'cubic-bezier(0.755, 0.05, 0.855, 0.06)',
+  motionEaseOut: 'cubic-bezier(0.215, 0.61, 0.355, 1)',
+  motionEaseOutBack: 'cubic-bezier(0.12, 0.4, 0.29, 1.46)',
+  motionEaseOutCirc: 'cubic-bezier(0.08, 0.82, 0.17, 1)',
+  motionEaseOutQuint: 'cubic-bezier(0.23, 1, 0.32, 1)',
   motionUnit: 0.1,
-  motionDurationFast: "0.1s",
-  motionDurationMid: "0.2s",
-  motionDurationSlow: "0.3s",
+  motionDurationFast: '0.1s',
+  motionDurationMid: '0.2s',
+  motionDurationSlow: '0.3s',
 };
 
 const fontTokens = {
@@ -59,7 +59,7 @@ const fontTokens = {
   fontWeightExtraBold: 800,
   fontWeightMax: 900,
 
-  fontStyleNormal: "normal",
+  fontStyleNormal: 'normal',
 };
 
 const sizing = {
@@ -144,10 +144,10 @@ const controlToken = {
   controlHeightLG: 40,
   controlHeightSM: 24,
   controlHeightXS: 16,
-  controlItemBgActiveDisabled: "rgba(0, 0, 0, 0.15)",
-  controlItemBgActiveHover: "#bae0ff",
-  controlItemBgHover: "rgba(0, 0, 0, 0.04)",
-  controlOutline: "rgba(5, 145, 255, 0.1)",
+  controlItemBgActiveDisabled: 'rgba(0, 0, 0, 0.15)',
+  controlItemBgActiveHover: '#bae0ff',
+  controlItemBgHover: 'rgba(0, 0, 0, 0.04)',
+  controlOutline: 'rgba(5, 145, 255, 0.1)',
   controlOutlineWidth: 2,
   controlPaddingHorizontal: 12,
   controlPaddingHorizontalSM: 8,
@@ -155,22 +155,22 @@ const controlToken = {
 };
 
 const lineToken = {
-  lineType: "solid",
+  lineType: 'solid',
   lineWidth: 1,
   lineWidthFocus: 4,
 };
 
 const linkToken = {
-  linkDecoration: "none",
-  linkFocusDecoration: "none",
-  linkHoverDecoration: "none",
+  linkDecoration: 'none',
+  linkFocusDecoration: 'none',
+  linkHoverDecoration: 'none',
 };
 
 const shadowToken = {
   boxShadow:
-    "\n      0 6px 16px 0 rgba(0, 0, 0, 0.08),\n      0 3px 6px -4px rgba(0, 0, 0, 0.12),\n      0 9px 28px 8px rgba(0, 0, 0, 0.05)\n    ",
+    '\n      0 6px 16px 0 rgba(0, 0, 0, 0.08),\n      0 3px 6px -4px rgba(0, 0, 0, 0.12),\n      0 9px 28px 8px rgba(0, 0, 0, 0.05)\n    ',
   boxShadowSecondary:
-    "\n      0 6px 16px 0 rgba(0, 0, 0, 0.08),\n      0 3px 6px -4px rgba(0, 0, 0, 0.12),\n      0 9px 28px 8px rgba(0, 0, 0, 0.05)\n    ",
+    '\n      0 6px 16px 0 rgba(0, 0, 0, 0.08),\n      0 3px 6px -4px rgba(0, 0, 0, 0.12),\n      0 9px 28px 8px rgba(0, 0, 0, 0.05)\n    ',
 };
 
 const antThemeTokenLight = {
@@ -206,53 +206,53 @@ const antThemeConfigLight: ThemeConfig = {
       algorithm: true,
     },
     Layout: {
-      bodyBg: "#ffffff",
+      bodyBg: '#ffffff',
       // lightSiderBg: '#ffffff',
-      siderBg: "#ffffff",
-      triggerBg: "#ffffff",
-      triggerColor: "#df005c",
+      siderBg: '#ffffff',
+      triggerBg: '#ffffff',
+      triggerColor: '#df005c',
       headerHeight: 60,
     },
     Tabs: {
-      horizontalMargin: "0 0 4px 0",
+      horizontalMargin: '0 0 4px 0',
       lineType: undefined,
     },
     Table: {
-      headerBg: "#ffffff",
+      headerBg: '#ffffff',
     },
     Select: {
-      selectorBg: "#f3f3f5",
-      activeBorderColor: "#00000040",
-      controlOutline: "#00000026",
-      colorPrimary: "#00000005",
-      colorPrimaryHover: "#00000005",
+      selectorBg: '#f3f3f5',
+      activeBorderColor: '#00000040',
+      controlOutline: '#00000026',
+      colorPrimary: '#00000005',
+      colorPrimaryHover: '#00000005',
       lineWidth: 1,
       lineWidthFocus: 1,
     },
     Input: {
-      colorBgContainer: "#f3f3f5",
-      activeBorderColor: "#00000040",
-      controlOutline: "#00000026",
-      colorPrimary: "#00000005",
-      colorPrimaryHover: "#00000005",
+      colorBgContainer: '#f3f3f5',
+      activeBorderColor: '#00000040',
+      controlOutline: '#00000026',
+      colorPrimary: '#00000005',
+      colorPrimaryHover: '#00000005',
       lineWidth: 1,
       lineWidthFocus: 1,
     },
     InputNumber: {
-      colorBgContainer: "#f3f3f5",
-      activeBorderColor: "#00000040",
-      controlOutline: "#00000026",
-      colorPrimary: "#00000005",
-      colorPrimaryHover: "#00000005",
+      colorBgContainer: '#f3f3f5',
+      activeBorderColor: '#00000040',
+      controlOutline: '#00000026',
+      colorPrimary: '#00000005',
+      colorPrimaryHover: '#00000005',
       lineWidth: 1,
       lineWidthFocus: 1,
     },
     DatePicker: {
-      colorBgContainer: "#f3f3f5",
-      activeBorderColor: "#00000040",
-      controlOutline: "#00000026",
-      colorPrimary: "#00000005",
-      colorPrimaryHover: "#00000005",
+      colorBgContainer: '#f3f3f5',
+      activeBorderColor: '#00000040',
+      controlOutline: '#00000026',
+      colorPrimary: '#00000005',
+      colorPrimaryHover: '#00000005',
       lineWidth: 1,
       lineWidthFocus: 1,
     },
@@ -264,7 +264,7 @@ const antThemeConfigLight: ThemeConfig = {
       titleMarginTop: 0,
     },
     Checkbox: {
-      colorBorder: "#C4C4C4",
+      colorBorder: '#C4C4C4',
     },
     Notification: {
       fontSizeLG: 14,
@@ -296,8 +296,8 @@ const antThemeTokenDark = {
 };
 
 const styledComponentsTokensDark = {
-  ...extraColorTokensDark,
   ...antThemeTokenDark,
+  ...extraColorTokensDark,
 };
 
 const antThemeConfigDark: ThemeConfig = {
@@ -307,53 +307,53 @@ const antThemeConfigDark: ThemeConfig = {
       algorithm: true,
     },
     Layout: {
-      bodyBg: "#141414",
-      lightSiderBg: "#181818ff",
-      siderBg: "#181818ff",
-      triggerBg: "#181818ff",
-      triggerColor: "#ffffff",
+      bodyBg: '#141414',
+      lightSiderBg: '#181818ff',
+      siderBg: '#181818ff',
+      triggerBg: '#181818ff',
+      triggerColor: '#ffffff',
       headerHeight: 60,
     },
     Tabs: {
-      horizontalMargin: "0 0 4px 0",
+      horizontalMargin: '0 0 4px 0',
       lineType: undefined,
     },
     Table: {
-      headerBg: "#141414",
+      headerBg: '#141414',
     },
     Select: {
-      selectorBg: "#1e1e1e",
-      activeBorderColor: "#595959",
-      controlOutline: "#434343",
-      colorPrimary: "#595959",
-      colorPrimaryHover: "#737373",
+      selectorBg: '#1e1e1e',
+      activeBorderColor: '#595959',
+      controlOutline: '#434343',
+      colorPrimary: '#595959',
+      colorPrimaryHover: '#737373',
       lineWidth: 1,
       lineWidthFocus: 1,
     },
     Input: {
-      colorBgContainer: "#1e1e1e",
-      activeBorderColor: "#595959",
-      controlOutline: "#434343",
-      colorPrimary: "#595959",
-      colorPrimaryHover: "#737373",
+      colorBgContainer: '#1e1e1e',
+      activeBorderColor: '#595959',
+      controlOutline: '#434343',
+      colorPrimary: '#595959',
+      colorPrimaryHover: '#737373',
       lineWidth: 1,
       lineWidthFocus: 1,
     },
     InputNumber: {
-      colorBgContainer: "#1e1e1e",
-      activeBorderColor: "#595959",
-      controlOutline: "#434343",
-      colorPrimary: "#595959",
-      colorPrimaryHover: "#737373",
+      colorBgContainer: '#1e1e1e',
+      activeBorderColor: '#595959',
+      controlOutline: '#434343',
+      colorPrimary: '#595959',
+      colorPrimaryHover: '#737373',
       lineWidth: 1,
       lineWidthFocus: 1,
     },
     DatePicker: {
-      colorBgContainer: "#1e1e1e",
-      activeBorderColor: "#595959",
-      controlOutline: "#434343",
-      colorPrimary: "#595959",
-      colorPrimaryHover: "#737373",
+      colorBgContainer: '#1e1e1e',
+      activeBorderColor: '#595959',
+      controlOutline: '#434343',
+      colorPrimary: '#595959',
+      colorPrimaryHover: '#737373',
       lineWidth: 1,
       lineWidthFocus: 1,
     },
@@ -365,7 +365,7 @@ const antThemeConfigDark: ThemeConfig = {
       titleMarginTop: 0,
     },
     Checkbox: {
-      colorBorder: "#505050",
+      colorBorder: '#505050',
     },
     Notification: {
       fontSizeLG: 14,

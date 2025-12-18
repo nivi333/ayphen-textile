@@ -45,7 +45,7 @@
 
   .report-card {
     border-radius: $border-radius-base;
-    border: 1px solid $border-light;
+    border: 1px solid var(--color-border-secondary);
     transition: all 0.3s ease;
     height: 100%;
 
@@ -130,7 +130,7 @@
       border-color: $dark-border;
 
       &:hover:not(.disabled) {
-        background: lighten($dark-bg-surface, 2%);
+        background: color-mix(in srgb, var(--color-bg-elevated), white 2%);
         border-color: var(--color-primary);
       }
 

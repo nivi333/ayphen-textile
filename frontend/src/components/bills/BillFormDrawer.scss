@@ -37,7 +37,7 @@
 
   .bill-divider {
     margin: 8px 0 16px 0;
-    border-color: $border-light;
+    border-color: var(--color-border-secondary);
   }
 
   .ant-form-item {
@@ -59,7 +59,7 @@
     gap: 8px;
     margin-top: 18px;
     padding-bottom: 18px;
-    border-top: 1px solid $border-light;
+    border-top: 1px solid var(--color-border-secondary);
     position: sticky;
     bottom: 0;
     background: var(--color-bg-container);

@@ -17,34 +17,38 @@
 .report-card {
   height: 100%;
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-5px);
     box-shadow: var(--box-shadow);
   }
-  
+
   .report-card-icon {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 80px;
-    background: linear-gradient(135deg, var(--color-primary), lighten(var(--color-primary), 15%));
+    background: linear-gradient(
+      135deg,
+      var(--color-primary),
+      color-mix(in srgb, var(--color-primary), white 15%)
+    );
     color: var(--color-bg-container);
     font-size: 32px;
     border-radius: $border-radius-base $border-radius-base 0 0;
   }
-  
+
   .report-card-content {
     padding: var(--padding);
   }
-  
+
   .report-card-title {
     font-size: $font-size-lg;
     font-weight: 600;
     margin-bottom: var(--padding-xxs);
     color: var(--color-text);
   }
-  
+
   .report-card-description {
     font-size: $font-size-sm;
     color: var(--color-text-secondary);
@@ -57,14 +61,14 @@
     line-clamp: 2;
     -webkit-box-orient: vertical;
   }
-  
+
   .report-card-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-top: var(--padding-xs);
   }
-  
+
   .report-last-generated {
     font-size: $font-size-xs;
     color: var(--color-text-secondary);
@@ -78,13 +82,13 @@
   .summary-card {
     height: 100%;
     text-align: center;
-    
+
     .summary-title {
       font-size: $font-size-sm;
       color: var(--color-text-secondary);
       margin-bottom: var(--padding-xxs);
     }
-    
+
     .summary-value {
       font-size: $font-size-2xl;
       font-weight: 600;
@@ -107,7 +111,7 @@
       align-items: center;
       justify-content: center;
       padding: var(--padding-xl) 0;
-      
+
       p {
         margin-top: var(--padding);
         color: var(--color-text-secondary);
@@ -123,12 +127,12 @@
 }
 
 .ant-table-thead > tr > th {
-  background-color: $bg-tertiary;
+  background-color: var(--color-fill-secondary);
   font-weight: 500;
 }
 
 .ant-table-tbody > tr:hover > td {
-  background-color: rgba(var(--color-primary), 0.05);
+  background-color: color-mix(in srgb, var(--color-primary), transparent 95%);
 }
 
 // Reports grid styling
@@ -141,53 +145,53 @@
   .report-card {
     background-color: $dark-bg-surface;
     border-color: $dark-border;
-    
+
     .report-card-content {
       background-color: $dark-bg-surface;
     }
-    
+
     .report-card-title {
       color: $dark-text-primary;
     }
-    
+
     .report-card-description {
       color: $dark-text-secondary;
     }
   }
-  
+
   .report-data {
     background-color: $dark-bg-surface;
   }
-  
+
   .summary-card {
     background-color: $dark-bg-surface;
     border-color: $dark-border;
-    
+
     .summary-title {
       color: $dark-text-secondary;
     }
-    
+
     .summary-value {
       color: var(--color-primary);
     }
   }
-  
+
   .ant-table {
     background-color: $dark-bg-surface;
     color: $dark-text-primary;
-    
+
     .ant-table-thead > tr > th {
       background-color: $dark-bg-tertiary;
       color: $dark-text-primary;
       border-bottom-color: $dark-border;
     }
-    
+
     .ant-table-tbody > tr > td {
       border-bottom-color: $dark-border;
     }
-    
+
     .ant-table-tbody > tr:hover > td {
-      background-color: rgba(var(--color-primary), 0.1);
+      background-color: color-mix(in srgb, var(--color-primary), transparent 90%);
     }
   }
 }
