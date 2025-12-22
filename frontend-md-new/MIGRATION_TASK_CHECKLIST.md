@@ -416,6 +416,7 @@ Create all input variants in `globalComponents.tsx`:
   - Replace message with sonner toast
   - Maintain exact same validation logic
   - Keep same API integration (`authService.login`)
+  - [ ] API Integration
   
 - [ ] **RegisterPage.tsx**
   - Replace Ant Design Form with shadcn/ui Form
@@ -423,12 +424,14 @@ Create all input variants in `globalComponents.tsx`:
   - Replace message with sonner toast
   - Keep same validation schema
   - Keep same API integration (`authService.register`)
+  - [ ] API Integration
   
 - [ ] **ForgotPasswordPage.tsx**
   - Replace Ant Design Form with shadcn/ui Form
   - Use shadcn/ui Input for email
   - Replace message with sonner toast
   - Keep same API integration (`authService.forgotPassword`)
+  - [ ] API Integration
 
 ### Priority 2: Dashboard (`/src/pages/dashboard/`)
 - [ ] **DashboardPage.tsx**
@@ -438,6 +441,7 @@ Create all input variants in `globalComponents.tsx`:
   - Replace @ant-design/plots charts with Recharts
   - Maintain exact same data display
   - Keep same API integration (`analyticsService.getDashboardAnalytics`)
+  - [ ] **API Integration**: GET `/api/v1/analytics/dashboard`
 
 ### Priority 3: Product Management (`/src/pages/products/`)
 - [ ] **ProductsListPage.tsx**
@@ -447,13 +451,16 @@ Create all input variants in `globalComponents.tsx`:
   - Replace Dropdown with DropdownMenu
   - Keep same columns and data display
   - Keep same API integration (`productService`)
+  - [ ] **API Integration**: GET `/api/v1/products`, POST, PUT, DELETE
 
 - [ ] **Components (`/src/components/products/`)**
   - [ ] `ProductFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: POST `/api/v1/products`, PUT `/api/v1/products/{id}`
   - [ ] `ProductTable.tsx` → use shadcn/ui Table
   - [ ] `ProductFilters.tsx` → use shadcn/ui Select, Input
   - [ ] `ProductCard.tsx` → use shadcn/ui Card
   - [ ] `CategoryManager.tsx` → use shadcn/ui components
+    - [ ] **API Integration**: GET `/api/v1/categories`
 
 ### Priority 4: Inventory Management (`/src/pages/inventory/`)
 - [ ] **InventoryListPage.tsx**

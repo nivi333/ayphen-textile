@@ -7,13 +7,13 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '@/contexts/AuthContext';
 import {
-  TextInput,
   PasswordInput,
   PrimaryButton,
   Label,
   Card,
   Separator,
 } from '@/components/globalComponents';
+import { EmailPhoneInput, validateEmailOrPhone } from '@/components/EmailPhoneInput';
 import AuthLayout from '@/components/ui/AuthLayout';
 import { toast } from 'sonner';
 import { Facebook, Youtube, Instagram } from 'lucide-react';
@@ -66,15 +66,9 @@ export default function LoginPage() {
     const errors: Record<string, string> = {};
 
     // Email or Phone validation
-    if (!formData.emailOrPhone) {
-      errors.emailOrPhone = 'Please input your email or phone number!';
-    } else {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      const phoneRegex = /^\+?[1-9]\d{1,14}$/;
-
-      if (!emailRegex.test(formData.emailOrPhone) && !phoneRegex.test(formData.emailOrPhone)) {
-        errors.emailOrPhone = 'Please enter a valid email address or phone number';
-      }
+    const emailPhoneValidation = validateEmailOrPhone(formData.emailOrPhone);
+    if (!emailPhoneValidation.valid) {
+      errors.emailOrPhone = emailPhoneValidation.message || 'Invalid email or phone';
     }
 
     // Password validation
@@ -159,7 +153,7 @@ export default function LoginPage() {
       <Card className='w-full'>
         {/* Header */}
         <div className='mb-8 text-center'>
-          <h1 className='text-heading-2 font-heading font-semibold mb-2'>Welcome</h1>
+          <h1 className='text-heading-3 font-heading font-semibold mb-2'>Welcome</h1>
           <p className='text-sm text-muted-foreground'>Sign in to your account to continue</p>
         </div>
 
@@ -174,12 +168,10 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div>
             <Label htmlFor='emailOrPhone' required>
-              Email or Phone Number
+              Email/Phone
             </Label>
-            <TextInput
+            <EmailPhoneInput
               id='emailOrPhone'
-              type='text'
-              placeholder='Enter your email or phone number'
               value={formData.emailOrPhone}
               onChange={e => setFormData({ ...formData, emailOrPhone: e.target.value })}
               error={!!validationErrors.emailOrPhone}

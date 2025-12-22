@@ -1,3 +1,8 @@
+/**
+ * Register Page - Complete Implementation
+ * Features: emailOrPhone field (NOT separate email/phone), exact validation from existing frontend
+ */
+
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuth from '@/contexts/AuthContext';
@@ -8,8 +13,10 @@ import {
   Label,
   Card,
 } from '@/components/globalComponents';
+import { EmailPhoneInput, validateEmailOrPhone, isEmail } from '@/components/EmailPhoneInput';
 import AuthLayout from '@/components/ui/AuthLayout';
 import { toast } from 'sonner';
+import { User } from 'lucide-react';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -18,8 +25,7 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    email: '',
-    phone: '',
+    emailOrPhone: '',
     password: '',
     confirmPassword: '',
     acceptTerms: false,
@@ -30,32 +36,50 @@ export default function RegisterPage() {
   const validateForm = () => {
     const errors: Record<string, string> = {};
 
+    // First Name validation
     if (!formData.firstName.trim()) {
-      errors.firstName = 'First name is required';
+      errors.firstName = 'Please input your first name!';
+    } else if (formData.firstName.length < 3 || formData.firstName.length > 50) {
+      errors.firstName = 'First name must be between 3 and 50 characters';
+    } else if (!/^[a-zA-Z\s'-]+$/.test(formData.firstName)) {
+      errors.firstName = 'First name can only contain letters, spaces, hyphens, and apostrophes';
     }
 
+    // Last Name validation
     if (!formData.lastName.trim()) {
-      errors.lastName = 'Last name is required';
+      errors.lastName = 'Please input your last name!';
+    } else if (formData.lastName.length < 3 || formData.lastName.length > 50) {
+      errors.lastName = 'Last name must be between 3 and 50 characters';
+    } else if (!/^[a-zA-Z\s'-]+$/.test(formData.lastName)) {
+      errors.lastName = 'Last name can only contain letters, spaces, hyphens, and apostrophes';
     }
 
-    if (!formData.email.trim()) {
-      errors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = 'Invalid email format';
+    // Email or Phone validation
+    const emailPhoneValidation = validateEmailOrPhone(formData.emailOrPhone);
+    if (!emailPhoneValidation.valid) {
+      errors.emailOrPhone = emailPhoneValidation.message || 'Invalid email or phone';
     }
 
+    // Password validation
     if (!formData.password) {
-      errors.password = 'Password is required';
+      errors.password = 'Please input your password!';
     } else if (formData.password.length < 8) {
-      errors.password = 'Password must be at least 8 characters';
+      errors.password = 'Password must be at least 8 characters long';
+    } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
+      errors.password =
+        'Password must contain at least one uppercase letter, one lowercase letter, and one number';
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      errors.confirmPassword = 'Passwords do not match';
+    // Confirm Password validation
+    if (!formData.confirmPassword) {
+      errors.confirmPassword = 'Please confirm your password!';
+    } else if (formData.password !== formData.confirmPassword) {
+      errors.confirmPassword = 'The two passwords that you entered do not match!';
     }
 
+    // Terms validation
     if (!formData.acceptTerms) {
-      errors.acceptTerms = 'You must accept the terms and conditions';
+      errors.acceptTerms = 'Please accept the terms and conditions';
     }
 
     setValidationErrors(errors);
@@ -70,16 +94,20 @@ export default function RegisterPage() {
     }
 
     try {
-      await register({
+      // Determine if emailOrPhone is email or phone and structure data correctly
+      const registrationData = {
         firstName: formData.firstName,
         lastName: formData.lastName,
-        email: formData.email,
-        phone: formData.phone || undefined,
         password: formData.password,
-      });
+        ...(isEmail(formData.emailOrPhone)
+          ? { email: formData.emailOrPhone }
+          : { phone: formData.emailOrPhone }),
+      };
+
+      await register(registrationData);
 
       toast.success('Registration successful!', {
-        description: 'Please login to continue.',
+        description: 'Please check your email to verify your account.',
         duration: 3000,
       });
       navigate('/login');
@@ -109,20 +137,25 @@ export default function RegisterPage() {
 
         {/* Register Form */}
         <form onSubmit={handleSubmit} className='space-y-4'>
+          {/* First Name & Last Name */}
           <div className='grid grid-cols-2 gap-4'>
             <div>
               <Label htmlFor='firstName' required>
                 First Name
               </Label>
-              <TextInput
-                id='firstName'
-                type='text'
-                placeholder='John'
-                value={formData.firstName}
-                onChange={e => setFormData({ ...formData, firstName: e.target.value })}
-                error={!!validationErrors.firstName}
-                disabled={isLoading}
-              />
+              <div className='relative'>
+                <User className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+                <TextInput
+                  id='firstName'
+                  type='text'
+                  placeholder='Enter your first name'
+                  value={formData.firstName}
+                  onChange={e => setFormData({ ...formData, firstName: e.target.value })}
+                  error={!!validationErrors.firstName}
+                  disabled={isLoading}
+                  className='pl-10'
+                />
+              </div>
               {validationErrors.firstName && (
                 <p className='mt-1 text-xs text-error'>{validationErrors.firstName}</p>
               )}
@@ -132,58 +165,54 @@ export default function RegisterPage() {
               <Label htmlFor='lastName' required>
                 Last Name
               </Label>
-              <TextInput
-                id='lastName'
-                type='text'
-                placeholder='Doe'
-                value={formData.lastName}
-                onChange={e => setFormData({ ...formData, lastName: e.target.value })}
-                error={!!validationErrors.lastName}
-                disabled={isLoading}
-              />
+              <div className='relative'>
+                <User className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+                <TextInput
+                  id='lastName'
+                  type='text'
+                  placeholder='Enter your last name'
+                  value={formData.lastName}
+                  onChange={e => setFormData({ ...formData, lastName: e.target.value })}
+                  error={!!validationErrors.lastName}
+                  disabled={isLoading}
+                  className='pl-10'
+                />
+              </div>
               {validationErrors.lastName && (
                 <p className='mt-1 text-xs text-error'>{validationErrors.lastName}</p>
               )}
             </div>
           </div>
 
+          {/* Email or Phone Number */}
           <div>
-            <Label htmlFor='email' required>
-              Email
+            <Label htmlFor='emailOrPhone' required>
+              Email/Phone
             </Label>
-            <TextInput
-              id='email'
-              type='email'
-              placeholder='john.doe@example.com'
-              value={formData.email}
-              onChange={e => setFormData({ ...formData, email: e.target.value })}
-              error={!!validationErrors.email}
+            <EmailPhoneInput
+              id='emailOrPhone'
+              value={formData.emailOrPhone}
+              onChange={e => setFormData({ ...formData, emailOrPhone: e.target.value })}
+              error={!!validationErrors.emailOrPhone}
               disabled={isLoading}
             />
-            {validationErrors.email && (
-              <p className='mt-1 text-xs text-error'>{validationErrors.email}</p>
+            {validationErrors.emailOrPhone && (
+              <p className='mt-1 text-xs text-error'>{validationErrors.emailOrPhone}</p>
             )}
+            <p className='mt-1 text-xs text-muted-foreground'>
+              Enter your email address or phone number with country code (e.g., +1 for US, +91 for
+              India)
+            </p>
           </div>
 
-          <div>
-            <Label htmlFor='phone'>Phone (Optional)</Label>
-            <TextInput
-              id='phone'
-              type='tel'
-              placeholder='+1 234 567 8900'
-              value={formData.phone}
-              onChange={e => setFormData({ ...formData, phone: e.target.value })}
-              disabled={isLoading}
-            />
-          </div>
-
+          {/* Password */}
           <div>
             <Label htmlFor='password' required>
               Password
             </Label>
             <PasswordInput
               id='password'
-              placeholder='At least 8 characters'
+              placeholder='Create a strong password'
               value={formData.password}
               onChange={e => setFormData({ ...formData, password: e.target.value })}
               error={!!validationErrors.password}
@@ -194,13 +223,14 @@ export default function RegisterPage() {
             )}
           </div>
 
+          {/* Confirm Password */}
           <div>
             <Label htmlFor='confirmPassword' required>
               Confirm Password
             </Label>
             <PasswordInput
               id='confirmPassword'
-              placeholder='Re-enter your password'
+              placeholder='Confirm your password'
               value={formData.confirmPassword}
               onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })}
               error={!!validationErrors.confirmPassword}
@@ -211,22 +241,23 @@ export default function RegisterPage() {
             )}
           </div>
 
+          {/* Terms and Conditions */}
           <div>
             <label className='flex items-start gap-2'>
               <input
                 type='checkbox'
                 checked={formData.acceptTerms}
                 onChange={e => setFormData({ ...formData, acceptTerms: e.target.checked })}
-                className='h-4 w-4 rounded border-input'
+                className='h-4 w-4 rounded border-input mt-0.5'
                 disabled={isLoading}
               />
               <span className='text-sm text-muted-foreground'>
-                I accept the{' '}
-                <Link to='/terms' className='text-primary hover:underline'>
+                I agree to the{' '}
+                <Link to='/legal/terms' target='_blank' className='text-primary hover:underline'>
                   Terms and Conditions
                 </Link>{' '}
                 and{' '}
-                <Link to='/privacy' className='text-primary hover:underline'>
+                <Link to='/legal/privacy' target='_blank' className='text-primary hover:underline'>
                   Privacy Policy
                 </Link>
               </span>
