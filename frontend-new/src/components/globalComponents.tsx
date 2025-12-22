@@ -343,3 +343,123 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
   }
 );
 NumberInput.displayName = 'NumberInput';
+
+// ============================================================================
+// LAYOUT COMPONENTS
+// ============================================================================
+
+export interface PageContainerProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export const PageContainer = forwardRef<HTMLDivElement, PageContainerProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <div className={cn('p-lg min-h-[280px] md:p-md sm:p-sm', className)} ref={ref} {...props}>
+        {children}
+      </div>
+    );
+  }
+);
+PageContainer.displayName = 'PageContainer';
+
+export interface PageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export const PageHeader = forwardRef<HTMLDivElement, PageHeaderProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <div
+        className={cn('flex items-center justify-between mb-lg', className)}
+        ref={ref}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);
+PageHeader.displayName = 'PageHeader';
+
+export interface PageTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {}
+
+export const PageTitle = forwardRef<HTMLHeadingElement, PageTitleProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <h2
+        className={cn('font-heading text-heading-2 font-semibold m-0', className)}
+        ref={ref}
+        {...props}
+      >
+        {children}
+      </h2>
+    );
+  }
+);
+PageTitle.displayName = 'PageTitle';
+
+export interface ActionBarProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export const ActionBar = forwardRef<HTMLDivElement, ActionBarProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <div className={cn('flex items-center gap-md mb-lg', className)} ref={ref} {...props}>
+        {children}
+      </div>
+    );
+  }
+);
+ActionBar.displayName = 'ActionBar';
+
+// ============================================================================
+// COMMON UI ELEMENTS
+// ============================================================================
+
+export interface LoadingSpinnerProps {
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+}
+
+export const LoadingSpinner = ({ size = 'md', className }: LoadingSpinnerProps) => {
+  const sizeClasses = {
+    sm: 'h-4 w-4',
+    md: 'h-8 w-8',
+    lg: 'h-12 w-12',
+  };
+
+  return (
+    <div className='flex items-center justify-center'>
+      <Loader2 className={cn('animate-spin text-primary', sizeClasses[size], className)} />
+    </div>
+  );
+};
+
+export interface EmptyStateProps {
+  icon?: React.ReactNode;
+  message: string;
+  action?: React.ReactNode;
+  className?: string;
+}
+
+export const EmptyState = ({ icon, message, action, className }: EmptyStateProps) => {
+  return (
+    <div className={cn('flex flex-col items-center justify-center py-12 text-center', className)}>
+      {icon && <div className='mb-4 text-muted-foreground'>{icon}</div>}
+      <p className='text-muted-foreground mb-4'>{message}</p>
+      {action && <div>{action}</div>}
+    </div>
+  );
+};
+
+export interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
+  required?: boolean;
+}
+
+export const Label = forwardRef<HTMLLabelElement, LabelProps>(
+  ({ className, children, required, ...props }, ref) => {
+    return (
+      <label className={cn('block text-sm font-medium mb-1', className)} ref={ref} {...props}>
+        {children}
+        {required && <span className='text-error ml-1'>*</span>}
+      </label>
+    );
+  }
+);
+Label.displayName = 'Label';

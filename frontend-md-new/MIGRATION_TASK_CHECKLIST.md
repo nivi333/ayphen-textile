@@ -297,23 +297,23 @@ Create all input variants in `globalComponents.tsx`:
   - No inner padding (table fills card)
 
 ### 2.7 Layout Components
-- [ ] **PageContainer** - Main page wrapper
+- [✓] **PageContainer** - Main page wrapper
   - Padding: 24px (from `.app-content`)
   - Min height: 280px
   - Responsive padding (16px on tablet, 12px on mobile)
   
-- [ ] **PageHeader** - Standard page header
+- [✓] **PageHeader** - Standard page header
   - Display: flex
   - Justify: space-between
   - Align: center
   - Margin bottom from theme
   
-- [ ] **PageTitle** - H2 heading for pages
+- [✓] **PageTitle** - H2 heading for pages
   - Font family: Poppins (from theme)
   - Font size from theme
   - Margin: 0
   
-- [ ] **ActionBar** - Search + Filter + Actions row
+- [✓] **ActionBar** - Search + Filter + Actions row
   - Display: flex
   - Gap from theme
   - Align: center
@@ -355,11 +355,11 @@ Create all input variants in `globalComponents.tsx`:
   - Background: primary color
 
 ### 2.11 Common UI Elements
-- [ ] **EmptyState** - No data placeholder
+- [✓] **EmptyState** - No data placeholder
   - Icon + message
   - Optional action button
   
-- [ ] **LoadingSpinner** - Loading indicator
+- [✓] **LoadingSpinner** - Loading indicator
   - Loader2 from lucide-react
   - Animate-spin class
   - Size variants (sm, md, lg)
@@ -367,7 +367,7 @@ Create all input variants in `globalComponents.tsx`:
 - [ ] **Separator** - Horizontal/vertical divider
   - Margin from theme (5px 0 from `.ant-divider`)
   
-- [ ] **Label** - Form label
+- [✓] **Label** - Form label
   - Font weight: 500 (from `.auth-form-label`)
   - Font size: 14px
   - Display: block
