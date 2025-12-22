@@ -596,3 +596,28 @@ export const CountBadge = forwardRef<HTMLSpanElement, CountBadgeProps>(
   }
 );
 CountBadge.displayName = 'CountBadge';
+
+// ============================================================================
+// SEPARATOR COMPONENT
+// ============================================================================
+
+export interface SeparatorProps extends React.HTMLAttributes<HTMLDivElement> {
+  orientation?: 'horizontal' | 'vertical';
+}
+
+export const Separator = forwardRef<HTMLDivElement, SeparatorProps>(
+  ({ className, orientation = 'horizontal', ...props }, ref) => {
+    return (
+      <div
+        className={cn(
+          'bg-border',
+          orientation === 'horizontal' ? 'h-[1px] w-full my-[5px]' : 'w-[1px] h-full mx-[5px]',
+          className
+        )}
+        ref={ref}
+        {...props}
+      />
+    );
+  }
+);
+Separator.displayName = 'Separator';

@@ -364,7 +364,7 @@ Create all input variants in `globalComponents.tsx`:
   - Animate-spin class
   - Size variants (sm, md, lg)
   
-- [ ] **Separator** - Horizontal/vertical divider
+- [✓] **Separator** - Horizontal/vertical divider
   - Margin from theme (5px 0 from `.ant-divider`)
   
 - [✓] **Label** - Form label
@@ -383,25 +383,25 @@ Create all input variants in `globalComponents.tsx`:
 - [✓] Copy assets from `frontend/src/assets/` to `frontend-new/src/assets/`
 
 ### 2.13 Create Layout Structure
-- [ ] Create `MainLayout.tsx` - Main app layout
+- [✓] Create `MainLayout.tsx` - Main app layout
   - Header (sticky top)
   - Sidebar (collapsible)
   - Main content area
   - No Ant Design Layout components
   
-- [ ] Create `Header.tsx` - App header
+- [✓] Create `Header.tsx` - App header
   - Brand logo (left)
   - User menu + theme toggle (right)
   - Height: 60px
   - Padding: 0 24px (from `.app-header`)
   
-- [ ] Create `Sidebar.tsx` - Navigation sidebar
+- [✓] Create `Sidebar.tsx` - Navigation sidebar
   - Collapsible (width: 64px collapsed, 256px expanded)
   - Menu items with icons
   - Active state highlighting
   - Smooth transition
   
-- [ ] Create `ProtectedRoute.tsx` - Auth guard
+- [✓] Create `ProtectedRoute.tsx` - Auth guard
   - Copy logic from `frontend`
   - Update imports for new components
 
