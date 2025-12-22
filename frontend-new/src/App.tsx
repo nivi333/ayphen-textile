@@ -1,14 +1,44 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/layout/ProtectedRoute';
+import MainLayout from './components/layout/MainLayout';
+import LoginPage from './pages/auth/LoginPage';
+import RegisterPage from './pages/auth/RegisterPage';
+import DashboardPage from './pages/DashboardPage';
+import './index.css';
 
 function App() {
   return (
-    <>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public Routes */}
+          <Route path='/login' element={<LoginPage />} />
+          <Route path='/register' element={<RegisterPage />} />
+
+          {/* Protected Routes */}
+          <Route
+            path='/'
+            element={
+              <ProtectedRoute>
+                <MainLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Navigate to='/dashboard' replace />} />
+            <Route path='dashboard' element={<DashboardPage />} />
+            {/* Add more protected routes here */}
+          </Route>
+
+          {/* Catch all - redirect to dashboard */}
+          <Route path='*' element={<Navigate to='/dashboard' replace />} />
+        </Routes>
+      </BrowserRouter>
+
+      {/* Toast Notifications */}
       <Toaster position='top-right' richColors />
-      <div className='min-h-screen bg-background text-foreground'>
-        <h1 className='text-3xl font-bold p-8'>Ayphen Textile - Frontend New</h1>
-        <p className='px-8 text-muted-foreground'>shadcn/ui + Tailwind CSS Migration</p>
-      </div>
-    </>
+    </AuthProvider>
   );
 }
 
