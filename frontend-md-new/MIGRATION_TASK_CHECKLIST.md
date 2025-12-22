@@ -103,56 +103,56 @@
 - [✓] Import Tailwind CSS in `main.tsx`
 
 ### 1.4 Install shadcn/ui & Radix UI Primitives
-- [ ] Run `npx shadcn-ui@latest init`
-- [ ] Install `@radix-ui/react-dialog`
-- [ ] Install `@radix-ui/react-dropdown-menu`
-- [ ] Install `@radix-ui/react-select`
-- [ ] Install `@radix-ui/react-switch`
-- [ ] Install `@radix-ui/react-tabs`
-- [ ] Install `@radix-ui/react-toast`
-- [ ] Install `@radix-ui/react-checkbox`
-- [ ] Install `@radix-ui/react-radio-group`
-- [ ] Install `@radix-ui/react-slider`
-- [ ] Install `@radix-ui/react-avatar`
-- [ ] Install `@radix-ui/react-label`
-- [ ] Install `@radix-ui/react-separator`
-- [ ] Install `@radix-ui/react-alert-dialog`
-- [ ] Install `@radix-ui/react-popover`
+- [✓] Run `npx shadcn-ui@latest init`
+- [✓] Install `@radix-ui/react-dialog`
+- [✓] Install `@radix-ui/react-dropdown-menu`
+- [✓] Install `@radix-ui/react-select`
+- [✓] Install `@radix-ui/react-switch`
+- [✓] Install `@radix-ui/react-tabs`
+- [✓] Install `@radix-ui/react-toast`
+- [✓] Install `@radix-ui/react-checkbox`
+- [✓] Install `@radix-ui/react-radio-group`
+- [✓] Install `@radix-ui/react-slider`
+- [✓] Install `@radix-ui/react-avatar`
+- [✓] Install `@radix-ui/react-label`
+- [✓] Install `@radix-ui/react-separator`
+- [✓] Install `@radix-ui/react-alert-dialog`
+- [✓] Install `@radix-ui/react-popover`
 
 ### 1.5 Install Utility & Chart Libraries
-- [ ] Install `class-variance-authority` (CVA for component variants)
-- [ ] Install `clsx` (conditional classes)
-- [ ] Install `tailwind-merge` (merge Tailwind classes)
-- [ ] Install `tailwindcss-animate` (animations)
-- [ ] Install `sonner` (toast notifications)
-- [ ] Install `recharts` (charts, replacing @ant-design/plots)
-- [ ] Install `lucide-react` (icons)
-- [ ] Install `date-fns` or `dayjs` (date utilities)
+- [✓] Install `class-variance-authority` (CVA for component variants)
+- [✓] Install `clsx` (conditional classes)
+- [✓] Install `tailwind-merge` (merge Tailwind classes)
+- [✓] Install `tailwindcss-animate` (animations)
+- [✓] Install `sonner` (toast notifications)
+- [✓] Install `recharts` (charts, replacing @ant-design/plots)
+- [✓] Install `lucide-react` (icons)
+- [✓] Install `date-fns` or `dayjs` (date utilities)
 
 ### 1.6 Add shadcn/ui Base Components
-- [ ] `npx shadcn-ui@latest add button`
-- [ ] `npx shadcn-ui@latest add input`
-- [ ] `npx shadcn-ui@latest add select`
-- [ ] `npx shadcn-ui@latest add table`
-- [ ] `npx shadcn-ui@latest add sheet`
-- [ ] `npx shadcn-ui@latest add dialog`
-- [ ] `npx shadcn-ui@latest add form`
-- [ ] `npx shadcn-ui@latest add card`
-- [ ] `npx shadcn-ui@latest add badge`
-- [ ] `npx shadcn-ui@latest add avatar`
-- [ ] `npx shadcn-ui@latest add dropdown-menu`
-- [ ] `npx shadcn-ui@latest add tabs`
-- [ ] `npx shadcn-ui@latest add switch`
-- [ ] `npx shadcn-ui@latest add checkbox`
-- [ ] `npx shadcn-ui@latest add radio-group`
-- [ ] `npx shadcn-ui@latest add slider`
-- [ ] `npx shadcn-ui@latest add alert-dialog`
-- [ ] `npx shadcn-ui@latest add toast`
-- [ ] `npx shadcn-ui@latest add label`
-- [ ] `npx shadcn-ui@latest add separator`
-- [ ] `npx shadcn-ui@latest add skeleton`
-- [ ] `npx shadcn-ui@latest add popover`
-- [ ] `npx shadcn-ui@latest add calendar`
+- [✓] `npx shadcn-ui@latest add button`
+- [✓] `npx shadcn-ui@latest add input`
+- [✓] `npx shadcn-ui@latest add select`
+- [✓] `npx shadcn-ui@latest add table`
+- [✓] `npx shadcn-ui@latest add sheet`
+- [✓] `npx shadcn-ui@latest add dialog`
+- [✓] `npx shadcn-ui@latest add form`
+- [✓] `npx shadcn-ui@latest add card`
+- [✓] `npx shadcn-ui@latest add badge`
+- [✓] `npx shadcn-ui@latest add avatar`
+- [✓] `npx shadcn-ui@latest add dropdown-menu`
+- [✓] `npx shadcn-ui@latest add tabs`
+- [✓] `npx shadcn-ui@latest add switch`
+- [✓] `npx shadcn-ui@latest add checkbox`
+- [✓] `npx shadcn-ui@latest add radio-group`
+- [✓] `npx shadcn-ui@latest add slider`
+- [✓] `npx shadcn-ui@latest add alert-dialog`
+- [✓] `npx shadcn-ui@latest add toast`
+- [✓] `npx shadcn-ui@latest add label`
+- [✓] `npx shadcn-ui@latest add separator`
+- [✓] `npx shadcn-ui@latest add skeleton`
+- [✓] `npx shadcn-ui@latest add popover`
+- [✓] `npx shadcn-ui@latest add calendar`
 
 ### 1.7 Adapt Theme Package (`frontend-new/theme`)
 - [ ] Update `theme/package.json` - remove Ant Design dependencies
