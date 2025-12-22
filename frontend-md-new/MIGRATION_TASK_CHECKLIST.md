@@ -284,16 +284,16 @@ Create all input variants in `globalComponents.tsx`:
   - Text color variants (primary, secondary, success)
 
 ### 2.6 Card Components
-- [ ] **Card** - Standard card
+- [✓] **Card** - Standard card
   - Border radius from theme
   - Box shadow from theme
   - Padding from theme
   
-- [ ] **StatsCard** - Card for statistics/metrics
+- [✓] **StatsCard** - Card for statistics/metrics
   - Icon + value + label layout
   - Hover effect
   
-- [ ] **TableCard** - Card containing a table
+- [✓] **TableCard** - Card containing a table
   - No inner padding (table fills card)
 
 ### 2.7 Layout Components
@@ -345,12 +345,12 @@ Create all input variants in `globalComponents.tsx`:
   - Max width from theme
 
 ### 2.10 Badge/Tag Components
-- [ ] **StatusBadge** - Status indicator
+- [✓] **StatusBadge** - Status indicator
   - Variants: success, warning, error, info, default
   - Colors from theme
   - Border radius from theme
   
-- [ ] **CountBadge** - Numeric badge
+- [✓] **CountBadge** - Numeric badge
   - Small, circular
   - Background: primary color
 

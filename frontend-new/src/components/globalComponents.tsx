@@ -463,3 +463,136 @@ export const Label = forwardRef<HTMLLabelElement, LabelProps>(
   }
 );
 Label.displayName = 'Label';
+
+// ============================================================================
+// CARD COMPONENTS
+// ============================================================================
+
+export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export const Card = forwardRef<HTMLDivElement, CardProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <div
+        className={cn(
+          'rounded-base border bg-card text-card-foreground shadow-base p-lg',
+          className
+        )}
+        ref={ref}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);
+Card.displayName = 'Card';
+
+export interface StatsCardProps extends React.HTMLAttributes<HTMLDivElement> {
+  icon?: React.ReactNode;
+  value: string | number;
+  label: string;
+}
+
+export const StatsCard = forwardRef<HTMLDivElement, StatsCardProps>(
+  ({ className, icon, value, label, ...props }, ref) => {
+    return (
+      <div
+        className={cn(
+          'rounded-base border bg-card text-card-foreground shadow-base p-lg hover:shadow-secondary transition-shadow cursor-pointer',
+          className
+        )}
+        ref={ref}
+        {...props}
+      >
+        <div className='flex items-start justify-between'>
+          <div className='flex-1'>
+            <p className='text-2xl font-bold mb-1'>{value}</p>
+            <p className='text-sm text-muted-foreground'>{label}</p>
+          </div>
+          {icon && <div className='ml-4 text-primary'>{icon}</div>}
+        </div>
+      </div>
+    );
+  }
+);
+StatsCard.displayName = 'StatsCard';
+
+export interface TableCardProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export const TableCard = forwardRef<HTMLDivElement, TableCardProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <div
+        className={cn(
+          'rounded-base border bg-card text-card-foreground shadow-base overflow-hidden',
+          className
+        )}
+        ref={ref}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);
+TableCard.displayName = 'TableCard';
+
+// ============================================================================
+// BADGE/TAG COMPONENTS
+// ============================================================================
+
+const badgeVariants = cva(
+  'inline-flex items-center rounded-base px-2.5 py-0.5 text-xs font-medium transition-colors',
+  {
+    variants: {
+      variant: {
+        default: 'bg-primary/10 text-primary border border-primary/20',
+        success: 'bg-success/10 text-success border border-success/20',
+        warning: 'bg-warning/10 text-warning border border-warning/20',
+        error: 'bg-error/10 text-error border border-error/20',
+        info: 'bg-info/10 text-info border border-info/20',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+    },
+  }
+);
+
+export interface StatusBadgeProps
+  extends React.HTMLAttributes<HTMLSpanElement>,
+    VariantProps<typeof badgeVariants> {}
+
+export const StatusBadge = forwardRef<HTMLSpanElement, StatusBadgeProps>(
+  ({ className, variant, children, ...props }, ref) => {
+    return (
+      <span className={cn(badgeVariants({ variant }), className)} ref={ref} {...props}>
+        {children}
+      </span>
+    );
+  }
+);
+StatusBadge.displayName = 'StatusBadge';
+
+export interface CountBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+  count: number;
+}
+
+export const CountBadge = forwardRef<HTMLSpanElement, CountBadgeProps>(
+  ({ className, count, ...props }, ref) => {
+    return (
+      <span
+        className={cn(
+          'inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-medium min-w-[20px] h-5 px-1.5',
+          className
+        )}
+        ref={ref}
+        {...props}
+      >
+        {count > 99 ? '99+' : count}
+      </span>
+    );
+  }
+);
+CountBadge.displayName = 'CountBadge';
