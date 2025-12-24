@@ -237,7 +237,6 @@ export default function CompanyDetailPage() {
             Back to Dashboard
           </SecondaryButton>
         </div>
-        </div>
 
         {/* Profile Card */}
         <Card className='p-6'>
@@ -329,7 +328,6 @@ export default function CompanyDetailPage() {
           </div>
         </Card>
       </div>
-
-    </div>
+  </div>
   );
 }
