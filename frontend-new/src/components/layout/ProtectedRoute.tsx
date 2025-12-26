@@ -13,18 +13,10 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children, requireCompany = false }: ProtectedRouteProps) {
-  const { user, currentCompany, isLoading } = useAuth();
+  const { isAuthenticated, currentCompany, isLoading } = useAuth();
   const location = useLocation();
 
-  console.log('=== PROTECTED ROUTE DEBUG ===');
-  console.log('Path:', location.pathname);
-  console.log('Require Company:', requireCompany);
-  console.log('Current Company:', currentCompany);
-  console.log('User:', user);
-  console.log('Is Loading:', isLoading);
-
   if (isLoading) {
-    console.log('ProtectedRoute: Showing loading spinner');
     return (
       <div className='flex h-screen items-center justify-center'>
         <LoadingSpinner size='lg' />
@@ -32,25 +24,23 @@ export default function ProtectedRoute({ children, requireCompany = false }: Pro
     );
   }
 
-  if (!user) {
-    console.log('ProtectedRoute: No user, redirecting to /login');
-    // Redirect to login page, but save the location they were trying to access
+  // Redirect to login if not authenticated
+  if (!isAuthenticated) {
     return <Navigate to='/login' state={{ from: location }} replace />;
   }
 
-  // If route requires a company but none is selected, redirect to company selection
-  if (requireCompany && !currentCompany) {
-    console.log('ProtectedRoute: Company required but not selected, redirecting to /companies');
+  // Only redirect to company selection if company is required and not selected
+  // Don't redirect if we're already on the companies page
+  if (requireCompany && !currentCompany && location.pathname !== '/companies') {
     return <Navigate to='/companies' replace />;
   }
 
-  console.log('ProtectedRoute: All checks passed, rendering children');
   return <>{children}</>;
 }
 
 // Public route component (for login, register, etc.)
 export function PublicRoute({ children }: { children: React.ReactNode }) {
-  const { user, isLoading } = useAuth();
+  const { isAuthenticated, currentCompany, isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -60,8 +50,13 @@ export function PublicRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // If user is already logged in, redirect to companies page
-  if (user) {
+  // Redirect authenticated users
+  if (isAuthenticated) {
+    // If user has a current company, go to dashboard
+    if (currentCompany) {
+      return <Navigate to='/dashboard' replace />;
+    }
+    // Otherwise, go to company selection
     return <Navigate to='/companies' replace />;
   }
 

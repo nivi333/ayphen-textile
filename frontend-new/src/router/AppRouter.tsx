@@ -38,6 +38,7 @@ import {
   AccountsPayablePage,
   ExpensesPage,
   PettyCashPage,
+  ReportsListPage,
   FinancialReportsPage,
   InventoryReportsPage,
   SalesReportsPage,

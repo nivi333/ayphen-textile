@@ -82,26 +82,22 @@ export default function CompaniesListPage() {
   }
 
   const handleCompanySelect = async (company: Company) => {
-    console.log('=== COMPANY SELECTION DEBUG ===');
-    console.log('1. Selected company:', company);
+    console.log('[CompaniesListPage] handleCompanySelect called with:', company.name);
     setLoading(true);
     try {
-      console.log('2. Calling switchCompany...');
+      console.log('[CompaniesListPage] Calling switchCompany...');
       await switchCompany(company);
-      console.log('3. switchCompany completed successfully');
-      console.log('4. About to navigate to /dashboard');
+      console.log('[CompaniesListPage] switchCompany completed successfully');
       toast.success('Company switched successfully');
-
-      // Use window.location for a hard redirect instead of navigate()
-      console.log('5. Using window.location.href to navigate');
-      window.location.href = '/dashboard';
+      console.log('[CompaniesListPage] Navigating to /dashboard...');
+      navigate('/dashboard');
+      console.log('[CompaniesListPage] navigate() called');
     } catch (error: unknown) {
-      console.error('Error in handleCompanySelect:', error);
+      console.error('[CompaniesListPage] Error in handleCompanySelect:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to switch company';
       toast.error(errorMessage);
     } finally {
       setLoading(false);
-      console.log('6. Loading set to false');
     }
   };
 

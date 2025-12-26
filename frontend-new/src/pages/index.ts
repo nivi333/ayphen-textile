@@ -1,4 +1,5 @@
 // Re-export all page components for better TypeScript module resolution
+import PlaceholderPage from '@/components/PlaceholderPage';
 
 // Authentication
 export { default as LoginPage } from './auth/LoginPage';
@@ -13,64 +14,66 @@ export { default as CompaniesListPage } from './company/CompaniesListPage';
 export { default as CompanyDetailPage } from './company/CompanyDetailPage';
 export { default as LocationListPage } from './company/LocationListPage';
 
-// Products
-export { default as ProductsListPage } from './products/ProductsListPage';
+// Products - TODO: Migrate these pages
+export const ProductsListPage = PlaceholderPage;
 
-// Inventory
-export { default as InventoryListPage } from './inventory/InventoryListPage';
+// Inventory - TODO: Migrate these pages
+export const InventoryListPage = PlaceholderPage;
 
-// Machines
-export { default as MachineListPage } from './machines/MachineListPage';
+// Machines - TODO: Migrate these pages
+export const MachineListPage = PlaceholderPage;
 
-// Orders
-export { default as OrdersListPage } from './orders/OrdersListPage';
+// Orders - TODO: Migrate these pages
+export const OrdersListPage = PlaceholderPage;
 
-// Invoices
-export { default as InvoicesListPage } from './invoices/InvoicesListPage';
+// Invoices - TODO: Migrate these pages
+export const InvoicesListPage = PlaceholderPage;
 
-// Bills
-export { default as BillsListPage } from './bills/BillsListPage';
+// Bills - TODO: Migrate these pages
+export const BillsListPage = PlaceholderPage;
 
-// Sales
-export { default as CustomerListPage } from './sales/CustomerListPage';
+// Sales - TODO: Migrate these pages
+export const CustomerListPage = PlaceholderPage;
 
-// Purchase
-export { default as SupplierListPage } from './purchase/SupplierListPage';
-export { default as PurchaseOrdersListPage } from './purchase/PurchaseOrdersListPage';
+// Purchase - TODO: Migrate these pages
+export const SupplierListPage = PlaceholderPage;
+export const PurchaseOrdersListPage = PlaceholderPage;
 
-// Quality Control
-export { default as QualityCheckpointsListPage } from './quality/QualityCheckpointsListPage';
-export { default as QualityDefectsListPage } from './quality/QualityDefectsListPage';
-export { default as QualityReportsPage } from './quality/QualityReportsPage';
-export { default as ComplianceReportsListPage } from './quality/ComplianceReportsListPage';
-export { default as InspectionsListPage } from './quality/InspectionsListPage';
-export { default as InspectionDetailsPage } from './quality/InspectionDetailsPage';
+// Quality Control - TODO: Migrate these pages
+export const QualityCheckpointsListPage = PlaceholderPage;
+export const QualityDefectsListPage = PlaceholderPage;
+export const QualityReportsPage = PlaceholderPage;
+export const ComplianceReportsListPage = PlaceholderPage;
+export const InspectionsListPage = PlaceholderPage;
+export const InspectionDetailsPage = PlaceholderPage;
 
-// Users
-export { default as UserProfilePage } from './users/UserProfilePage';
-export { default as UsersListPage } from './users/UsersListPage';
+// Users - TODO: Migrate these pages
+export const UserProfilePage = PlaceholderPage;
+export const UsersListPage = PlaceholderPage;
 
-// Finance
-export { default as FinanceOverviewPage } from './finance/FinanceOverviewPage';
-export { default as AccountsReceivablePage } from './finance/AccountsReceivablePage';
-export { default as AccountsPayablePage } from './finance/AccountsPayablePage';
-export { default as ExpensesPage } from './finance/ExpensesPage';
-export { default as PettyCashPage } from './finance/PettyCashPage';
+// Finance - TODO: Migrate these pages
+export const FinanceOverviewPage = PlaceholderPage;
+export const AccountsReceivablePage = PlaceholderPage;
+export const AccountsPayablePage = PlaceholderPage;
+export const ExpensesPage = PlaceholderPage;
+export const PettyCashPage = PlaceholderPage;
 
-// Reports
-export { default as ReportsPage } from './reports/ReportsPage';
-export { default as ReportsListPage } from './reports/ReportsListPage';
-export { default as FinancialReportsPage } from './reports/FinancialReportsPage';
-export { default as InventoryReportsPage } from './reports/InventoryReportsPage';
-export { default as SalesReportsPage } from './reports/SalesReportsPage';
+// Reports - TODO: Migrate these pages
+export const ReportsListPage = PlaceholderPage;
+export const FinancialReportsPage = PlaceholderPage;
+export const InventoryReportsPage = PlaceholderPage;
+export const SalesReportsPage = PlaceholderPage;
+export const OperationalReportsPage = PlaceholderPage;
 
-export { default as OperationalReportsPage } from './reports/OperationalReportsPage';
-export { default as SubscriptionPlansPage } from './subscription/SubscriptionPlansPage';
+// Subscription
+export const SubscriptionPlansPage = PlaceholderPage;
 
-// Textile Operations
-export { default as FabricProductionListPage } from './textile/FabricProductionListPage';
-export { default as YarnManufacturingListPage } from './textile/YarnManufacturingListPage';
-export { default as DyeingFinishingListPage } from './textile/DyeingFinishingListPage';
-export { default as GarmentManufacturingListPage } from './textile/GarmentManufacturingListPage';
-export { default as DesignPatternsListPage } from './textile/DesignPatternsListPage';
-export { default as LegalPage } from './legal/LegalPage';
+// Textile Operations - TODO: Migrate these pages
+export const FabricProductionListPage = PlaceholderPage;
+export const YarnManufacturingListPage = PlaceholderPage;
+export const DyeingFinishingListPage = PlaceholderPage;
+export const GarmentManufacturingListPage = PlaceholderPage;
+export const DesignPatternsListPage = PlaceholderPage;
+
+// Legal - TODO: Migrate these pages
+export const LegalPage = PlaceholderPage;
