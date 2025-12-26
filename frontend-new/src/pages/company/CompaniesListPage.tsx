@@ -172,7 +172,7 @@ export default function CompaniesListPage() {
                     {(activeTab === 'owner' ? ownerCompanies : roleCompanies).map(company => (
                       <li
                         key={company.id}
-                        className={`flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md hover:border-primary/50 bg-card ${
+                        className={`flex items-center justify-between p-2 border rounded-lg cursor-pointer transition-all hover:shadow-md hover:border-primary/50 bg-card ${
                           loading ? 'opacity-50 pointer-events-none' : ''
                         }`}
                         onClick={() => !loading && handleCompanySelect(company)}
