@@ -452,6 +452,10 @@ Create all input variants in `globalComponents.tsx`:
   - [x] Frontend Integration: Complete via AuthContext `forgotPassword()` function
   - [ ] Backend API: `POST /api/v1/auth/forgot-password` - **ON HOLD** (requires email service setup)
 
+- [x] **Routing & Navigation**
+  - [x] Add route to `AppRouter.tsx` (`/login`, `/register`, `/forgot-password`)
+  - [x] Verify navigation flow (PublicRoute/ProtectedRoute)
+
 
 ### Priority 2: Company & Location Management (`/src/pages/company/`)
 
@@ -496,6 +500,11 @@ Create all input variants in `globalComponents.tsx`:
       - PUT `/api/v1/locations/{id}` - Update location
   - [x] `LocationTable.tsx` → use Table
 
+- [x] **Routing & Navigation**
+  - [x] Add route to `AppRouter.tsx` (`/companies`, `/companies/:tenantId`, `/locations`)
+  - [x] Add sidebar link in `Sidebar.tsx` (Locations, Company Details)
+  - [x] Verify navigation flow
+
 ### Priority 3: Dashboard (`/src/pages/dashboard/`)
 
 > [!NOTE]
@@ -510,27 +519,37 @@ Create all input variants in `globalComponents.tsx`:
   - Keep same API integration (`analyticsService.getDashboardAnalytics`)
   - [x] **API Integration**: GET `/api/v1/analytics/dashboard`
 
+- [x] **Routing & Navigation**
+  - [x] Add route to `AppRouter.tsx` (`/dashboard`)
+  - [x] Add sidebar link in `Sidebar.tsx` (Dashboard)
+  - [x] Verify navigation flow
+
 ### Priority 4: Product Management (`/src/pages/products/`)
 
 > [!NOTE]
 > **Why Priority 4**: Products are the foundation for inventory, orders, and all transactions. Must be created before inventory can be tracked.
-- [ ] **ProductsListPage.tsx**
+- [x] **ProductsListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet for product form
   - Replace Modal with AlertDialog for delete confirmation
   - Replace Dropdown with DropdownMenu
   - Keep same columns and data display
   - Keep same API integration (`productService`)
-  - [ ] **API Integration**: GET `/api/v1/products`, POST, PUT, DELETE
+  - [x] **API Integration**: GET `/api/v1/products`, POST, PUT, DELETE
 
-- [ ] **Components (`/src/components/products/`)**
-  - [ ] `ProductFormDrawer.tsx` → use Sheet
-    - [ ] **API Integration**: POST `/api/v1/products`, PUT `/api/v1/products/{id}`
-  - [ ] `ProductTable.tsx` → use shadcn/ui Table
-  - [ ] `ProductFilters.tsx` → use shadcn/ui Select, Input
-  - [ ] `ProductCard.tsx` → use shadcn/ui Card
-  - [ ] `CategoryManager.tsx` → use shadcn/ui components
-    - [ ] **API Integration**: GET `/api/v1/categories`
+- [x] **Components (`/src/components/products/`)**
+  - [x] `ProductFormDrawer.tsx` → use Sheet
+    - [x] **API Integration**: POST `/api/v1/products`, PUT `/api/v1/products/{id}`
+  - [x] `ProductTable.tsx` → use shadcn/ui Table
+  - [x] `ProductFilters.tsx` → use shadcn/ui Select, Input (Integrated in Page)
+  - [x] `StockAdjustmentDialog.tsx` (Replaces `StockAdjustmentModal`)
+  - [x] `CategoryManager.tsx` → use shadcn/ui components (Integrated in Form)
+    - [x] **API Integration**: GET `/api/v1/categories`
+
+- [x] **Routing & Navigation**
+  - [x] Add route to `AppRouter.tsx` (`/products`)
+  - [x] Add sidebar link in `Sidebar.tsx` (Products)
+  - [x] Verify navigation flow
 
 ### Priority 5: Customer & Supplier Management (`/src/pages/sales/`, `/src/pages/purchase/`)
 
@@ -570,6 +589,11 @@ Create all input variants in `globalComponents.tsx`:
       - PUT `/api/v1/suppliers/{id}` - Update supplier
   - [ ] `SupplierTable.tsx` → use Table
 
+- [ ] **Routing & Navigation**
+  - [ ] Add route to `AppRouter.tsx` (`/customers`, `/suppliers`)
+  - [ ] Add sidebar link in `Sidebar.tsx`
+  - [ ] Verify navigation flow
+
 ### Priority 6: Inventory Management (`/src/pages/inventory/`)
 
 > [!NOTE]
@@ -604,6 +628,11 @@ Create all input variants in `globalComponents.tsx`:
   - [ ] `StockLevelIndicator.tsx` → use Badge
   - [ ] `InventoryChart.tsx` → use Recharts
 
+- [ ] **Routing & Navigation**
+  - [ ] Add route to `AppRouter.tsx` (`/inventory`)
+  - [ ] Add sidebar link in `Sidebar.tsx`
+  - [ ] Verify navigation flow
+
 ### Priority 7: Orders Management (`/src/pages/orders/`)
 
 > [!NOTE]
@@ -627,6 +656,11 @@ Create all input variants in `globalComponents.tsx`:
       - PATCH `/api/v1/orders/{id}/status` - Update order status
   - [ ] `OrderTable.tsx` → use shadcn/ui Table
 
+- [ ] **Routing & Navigation**
+  - [ ] Add route to `AppRouter.tsx` (`/orders`)
+  - [ ] Add sidebar link in `Sidebar.tsx`
+  - [ ] Verify navigation flow
+
 ### Priority 8: Purchase Orders (`/src/pages/purchase/`)
 
 > [!NOTE]
@@ -648,6 +682,11 @@ Create all input variants in `globalComponents.tsx`:
       - POST `/api/v1/purchase-orders` - Create purchase order
       - PUT `/api/v1/purchase-orders/{id}` - Update purchase order
   - [ ] `PurchaseOrderTable.tsx` → use Table
+
+- [ ] **Routing & Navigation**
+  - [ ] Add route to `AppRouter.tsx` (`/purchase-orders`)
+  - [ ] Add sidebar link in `Sidebar.tsx`
+  - [ ] Verify navigation flow
 
 ### Priority 9: Invoices & Bills (`/src/pages/invoices/`, `/src/pages/bills/`)
 
@@ -684,6 +723,11 @@ Create all input variants in `globalComponents.tsx`:
       - POST `/api/v1/bills` - Create bill
       - PUT `/api/v1/bills/{id}` - Update bill
   - [ ] `/src/components/bills/BillTable.tsx` → use Table
+
+- [ ] **Routing & Navigation**
+  - [ ] Add route to `AppRouter.tsx` (`/invoices`, `/bills`)
+  - [ ] Add sidebar link in `Sidebar.tsx`
+  - [ ] Verify navigation flow
 
 ### Priority 10: Finance Module (`/src/pages/finance/`)
 
@@ -727,6 +771,11 @@ Create all input variants in `globalComponents.tsx`:
     - [ ] **API Integration**: 
       - POST `/api/v1/expenses` - Create expense
       - PUT `/api/v1/expenses/{id}` - Update expense
+
+- [ ] **Routing & Navigation**
+  - [ ] Add route to `AppRouter.tsx` (`/finance`)
+  - [ ] Add sidebar link in `Sidebar.tsx`
+  - [ ] Verify navigation flow
 
 ### Priority 11: Quality Control (`/src/pages/quality/`)
 
@@ -795,6 +844,11 @@ Create all input variants in `globalComponents.tsx`:
   - [ ] `QualityMetricsCard.tsx` → use Card
   - [ ] `DefectChart.tsx` → use Recharts
 
+- [ ] **Routing & Navigation**
+  - [ ] Add route to `AppRouter.tsx` (`/quality`)
+  - [ ] Add sidebar link in `Sidebar.tsx`
+  - [ ] Verify navigation flow
+
 ### Priority 12: Machine Management (`/src/pages/machines/`)
 
 > [!NOTE]
@@ -830,6 +884,11 @@ Create all input variants in `globalComponents.tsx`:
   - [ ] `MachineStatusBadge.tsx` → use Badge
   - [ ] `MachineUtilizationChart.tsx` → use Recharts
     - [ ] **API Integration**: GET `/api/v1/machines/utilization` - Get utilization data
+
+- [ ] **Routing & Navigation**
+  - [ ] Add route to `AppRouter.tsx` (`/machines`)
+  - [ ] Add sidebar link in `Sidebar.tsx`
+  - [ ] Verify navigation flow
 
 ### Priority 13: Reports Module (`/src/pages/reports/`)
 
@@ -894,6 +953,11 @@ Create all input variants in `globalComponents.tsx`:
   - [ ] All inventory report components → use Table, Recharts
   - [ ] All operational report components → use Table, Recharts
   - [ ] All sales report components → use Table, Recharts
+
+- [ ] **Routing & Navigation**
+  - [ ] Add route to `AppRouter.tsx` (`/reports`)
+  - [ ] Add sidebar link in `Sidebar.tsx`
+  - [ ] Verify navigation flow
 
 ### Priority 14: Textile Operations (`/src/pages/textile/`)
 
@@ -961,6 +1025,11 @@ Create all input variants in `globalComponents.tsx`:
   - [ ] All table components → use shadcn/ui Table
   - [ ] All chart components → use Recharts
 
+- [ ] **Routing & Navigation**
+  - [ ] Add route to `AppRouter.tsx` (`/textile`)
+  - [ ] Add sidebar link in `Sidebar.tsx`
+  - [ ] Verify navigation flow
+
 ### Priority 15: User Management (`/src/pages/users/`)
 
 > [!NOTE]
@@ -993,6 +1062,11 @@ Create all input variants in `globalComponents.tsx`:
   - [ ] `UserDevicesList.tsx` → use Table
     - [ ] **API Integration**: GET `/api/v1/users/{id}/devices` - Get user devices
 
+- [ ] **Routing & Navigation**
+  - [ ] Add route to `AppRouter.tsx` (`/users`)
+  - [ ] Add sidebar link in `Sidebar.tsx`
+  - [ ] Verify navigation flow
+
 ### Priority 16: Subscription Management (`/src/pages/subscription/`)
 
 > [!NOTE]
@@ -1011,6 +1085,11 @@ Create all input variants in `globalComponents.tsx`:
 - [ ] **Components (`/src/components/subscription/`)**
   - [ ] `SubscriptionPlanCard.tsx` → use Card
 
+- [ ] **Routing & Navigation**
+  - [ ] Add route to `AppRouter.tsx` (`/subscriptions`)
+  - [ ] Add sidebar link in `Sidebar.tsx`
+  - [ ] Verify navigation flow
+
 ### Priority 17: Legal Pages (`/src/pages/legal/`)
 
 > [!NOTE]
@@ -1018,6 +1097,11 @@ Create all input variants in `globalComponents.tsx`:
 - [ ] **LegalPage.tsx**
   - Replace Ant Design Tabs with shadcn/ui Tabs
   - Use Tailwind for content styling
+
+- [ ] **Routing & Navigation**
+  - [ ] Add route to `AppRouter.tsx` (`/legal`)
+  - [ ] Add sidebar link in `Sidebar.tsx`
+  - [ ] Verify navigation flow
 
 ---
 

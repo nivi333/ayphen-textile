@@ -144,7 +144,7 @@ export default function LoginPage() {
     }
   };
 
-  const handleSocialClick = (platform: string, url: string) => {
+  const handleSocialClick = (_platform: string, url: string) => {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
@@ -165,7 +165,7 @@ export default function LoginPage() {
         )}
 
         {/* Login Form */}
-        <form onSubmit={handleSubmit} className='space-y-4'>
+        <form onSubmit={handleSubmit} className='space-y-2'>
           <div>
             <Label htmlFor='emailOrPhone' required>
               Email/Phone

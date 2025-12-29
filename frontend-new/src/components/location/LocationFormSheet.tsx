@@ -37,9 +37,9 @@ const locationSchema = z.object({
   state: z.string().min(1, 'State is required').max(100),
   pincode: z.string().min(1, 'Postal code is required').max(20),
   locationType: z.enum(['BRANCH', 'WAREHOUSE', 'FACTORY', 'STORE']),
-  isDefault: z.boolean().default(false),
-  isHeadquarters: z.boolean().default(false),
-  isActive: z.boolean().default(true),
+  isActive: z.boolean().optional(),
+  isDefault: z.boolean().optional(),
+  isHeadquarters: z.boolean().optional(),
 });
 
 type LocationFormValues = z.infer<typeof locationSchema>;
@@ -215,11 +215,11 @@ export function LocationFormSheet({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
             {/* Section 1: Basic Information */}
-            <div className='space-y-4'>
+            <div className='space-y-2'>
               <h3 className='text-sm font-medium'>Basic Information</h3>
 
               {/* Image Upload */}
-              <div className='flex flex-col items-center gap-2'>
+              <div className='flex flex-col items-start gap-2'>
                 <div className='relative'>
                   <input
                     type='file'
@@ -255,7 +255,7 @@ export function LocationFormSheet({
                     )}
                   </label>
                 </div>
-                <p className='text-xs text-muted-foreground text-center'>
+                <p className='text-xs text-muted-foreground text-left'>
                   Upload Location Image (JPG/PNG, max 2MB)
                   <br />
                   Drag & drop or click to upload
@@ -365,7 +365,7 @@ export function LocationFormSheet({
             <Separator />
 
             {/* Section 2: Address Information */}
-            <div className='space-y-4'>
+            <div className='space-y-2'>
               <h3 className='text-sm font-medium'>Address Information</h3>
 
               <div className='grid grid-cols-2 gap-4'>
@@ -452,7 +452,7 @@ export function LocationFormSheet({
             <Separator />
 
             {/* Section 3: Location Settings */}
-            <div className='space-y-4'>
+            <div className='space-y-2'>
               <h3 className='text-sm font-medium'>Location Settings</h3>
 
               <div className='grid grid-cols-2 gap-4'>

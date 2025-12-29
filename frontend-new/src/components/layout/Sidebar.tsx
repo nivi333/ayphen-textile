@@ -3,6 +3,7 @@
  * Collapsible navigation sidebar with menu items
  */
 
+import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
@@ -19,6 +20,20 @@ import {
   Building2,
   MapPin,
   LogOut,
+  ShoppingBag,
+  FileCheck,
+  FilePlus,
+  UserCheck,
+  Shield,
+  DollarSign,
+  BarChart3,
+  Box,
+  Wrench,
+  Scissors,
+  Palette,
+  Shirt,
+  Grid3x3,
+  Paintbrush,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -39,21 +54,138 @@ interface NavItem {
   label: string;
   icon: React.ReactNode;
   path: string;
+  children?: NavItem[];
 }
 
 const navItems: NavItem[] = [
   { label: 'Dashboard', icon: <LayoutDashboard className='h-5 w-5' />, path: '/dashboard' },
-  { label: 'Products', icon: <Package className='h-5 w-5' />, path: '/products' },
-  { label: 'Customers', icon: <Users className='h-5 w-5' />, path: '/customers' },
-  { label: 'Orders', icon: <ShoppingCart className='h-5 w-5' />, path: '/orders' },
-  { label: 'Reports', icon: <FileText className='h-5 w-5' />, path: '/reports' },
-  { label: 'Settings', icon: <Settings className='h-5 w-5' />, path: '/settings' },
+  {
+    label: 'Stock',
+    icon: <Box className='h-5 w-5' />,
+    path: '/stock',
+    children: [
+      { label: 'Products', icon: <Package className='h-4 w-4' />, path: '/products' },
+      { label: 'Inventory', icon: <Grid3x3 className='h-4 w-4' />, path: '/inventory' },
+    ],
+  },
+  {
+    label: 'Sales',
+    icon: <ShoppingBag className='h-5 w-5' />,
+    path: '/sales',
+    children: [
+      { label: 'Customers', icon: <UserCheck className='h-4 w-4' />, path: '/customers' },
+      { label: 'Sales Orders', icon: <FilePlus className='h-4 w-4' />, path: '/sales/orders' },
+      { label: 'Invoices', icon: <FileCheck className='h-4 w-4' />, path: '/sales/invoices' },
+    ],
+  },
+  {
+    label: 'Purchases',
+    icon: <ShoppingBag className='h-5 w-5' />,
+    path: '/purchases',
+    children: [
+      { label: 'Suppliers', icon: <UserCheck className='h-4 w-4' />, path: '/suppliers' },
+      {
+        label: 'Purchase Orders',
+        icon: <FilePlus className='h-4 w-4' />,
+        path: '/purchases/orders',
+      },
+    ],
+  },
+  {
+    label: 'Purchase',
+    icon: <ShoppingCart className='h-5 w-5' />,
+    path: '/purchase',
+    children: [
+      { label: 'Suppliers', icon: <Users className='h-4 w-4' />, path: '/suppliers' },
+      {
+        label: 'Purchase Orders',
+        icon: <FilePlus className='h-4 w-4' />,
+        path: '/purchase/orders',
+      },
+      { label: 'Bills', icon: <FileCheck className='h-4 w-4' />, path: '/purchase/bills' },
+    ],
+  },
+  { label: 'Machines', icon: <Wrench className='h-5 w-5' />, path: '/machines' },
+  { label: 'Users', icon: <Users className='h-5 w-5' />, path: '/users' },
+  {
+    label: 'Quality Control',
+    icon: <Shield className='h-5 w-5' />,
+    path: '/quality',
+    children: [
+      { label: 'Inspections', icon: <Shield className='h-4 w-4' />, path: '/inspections' },
+      { label: 'Checkpoints', icon: <Shield className='h-4 w-4' />, path: '/quality/checkpoints' },
+      { label: 'Defects', icon: <Shield className='h-4 w-4' />, path: '/quality/defects' },
+      {
+        label: 'Compliance Reports',
+        icon: <Shield className='h-4 w-4' />,
+        path: '/quality/compliance',
+      },
+      {
+        label: 'Quality Reports',
+        icon: <BarChart3 className='h-4 w-4' />,
+        path: '/quality/reports',
+      },
+    ],
+  },
+  {
+    label: 'Textile Operations',
+    icon: <Shirt className='h-5 w-5' />,
+    path: '/textile',
+    children: [
+      { label: 'Fabric Production', icon: <Shirt className='h-4 w-4' />, path: '/textile/fabrics' },
+      {
+        label: 'Yarn Manufacturing',
+        icon: <Paintbrush className='h-4 w-4' />,
+        path: '/textile/yarns',
+      },
+      {
+        label: 'Dyeing & Finishing',
+        icon: <Palette className='h-4 w-4' />,
+        path: '/textile/dyeing',
+      },
+      {
+        label: 'Garment Manufacturing',
+        icon: <Scissors className='h-4 w-4' />,
+        path: '/textile/garments',
+      },
+      {
+        label: 'Design & Patterns',
+        icon: <Grid3x3 className='h-4 w-4' />,
+        path: '/textile/designs',
+      },
+    ],
+  },
+  { label: 'Finance', icon: <DollarSign className='h-5 w-5' />, path: '/finance' },
+  {
+    label: 'Reports',
+    icon: <FileText className='h-5 w-5' />,
+    path: '/reports',
+    children: [
+      {
+        label: 'Financial Reports',
+        icon: <DollarSign className='h-4 w-4' />,
+        path: '/reports/financial',
+      },
+      {
+        label: 'Operational Reports',
+        icon: <BarChart3 className='h-4 w-4' />,
+        path: '/reports/operational',
+      },
+      { label: 'Inventory Reports', icon: <Box className='h-4 w-4' />, path: '/reports/inventory' },
+      { label: 'Sales Reports', icon: <ShoppingBag className='h-4 w-4' />, path: '/reports/sales' },
+    ],
+  },
 ];
 
 export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { currentCompany, logout } = useAuth();
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+
+  const toggleExpand = (key: string) => {
+    setExpandedItems(prev => (prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]));
+  };
 
   const handleLogout = () => {
     logout();
@@ -120,26 +252,75 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       )}
 
       {/* Navigation Items */}
-      <nav className='flex-1 space-y-1 p-2 pt-4'>
+      <nav className='flex-1 space-y-1 p-2 pt-4 overflow-y-auto'>
         {navItems.map(item => {
           const isActive = location.pathname === item.path;
+          const isExpanded = expandedItems.includes(item.label);
+          const hasChildren = item.children && item.children.length > 0;
 
           return (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={cn(
-                'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                isActive
-                  ? 'sidebar-link-active'
-                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-                collapsed && 'justify-center'
+            <div key={item.label}>
+              {hasChildren ? (
+                <>
+                  <button
+                    onClick={() => toggleExpand(item.label)}
+                    className={cn(
+                      'flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                      'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+                      collapsed && 'justify-center'
+                    )}
+                    title={collapsed ? item.label : undefined}
+                  >
+                    {item.icon}
+                    {!collapsed && (
+                      <>
+                        <span className='flex-1 text-left'>{item.label}</span>
+                        <ChevronDown
+                          className={cn('h-4 w-4 transition-transform', isExpanded && 'rotate-180')}
+                        />
+                      </>
+                    )}
+                  </button>
+                  {!collapsed && isExpanded && item.children && (
+                    <div className='ml-4 mt-1 space-y-1'>
+                      {item.children.map(child => {
+                        const isChildActive = location.pathname === child.path;
+                        return (
+                          <Link
+                            key={child.path}
+                            to={child.path}
+                            className={cn(
+                              'flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors',
+                              isChildActive
+                                ? 'sidebar-link-active'
+                                : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                            )}
+                          >
+                            {child.icon}
+                            <span>{child.label}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <Link
+                  to={item.path}
+                  className={cn(
+                    'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                    isActive
+                      ? 'sidebar-link-active'
+                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+                    collapsed && 'justify-center'
+                  )}
+                  title={collapsed ? item.label : undefined}
+                >
+                  {item.icon}
+                  {!collapsed && <span>{item.label}</span>}
+                </Link>
               )}
-              title={collapsed ? item.label : undefined}
-            >
-              {item.icon}
-              {!collapsed && <span>{item.label}</span>}
-            </Link>
+            </div>
           );
         })}
       </nav>

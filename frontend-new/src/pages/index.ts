@@ -15,7 +15,7 @@ export { default as CompanyDetailPage } from './company/CompanyDetailPage';
 export { default as LocationListPage } from './company/LocationListPage';
 
 // Products - TODO: Migrate these pages
-export const ProductsListPage = PlaceholderPage;
+export { default as ProductsListPage } from './products/ProductsListPage';
 
 // Inventory - TODO: Migrate these pages
 export const InventoryListPage = PlaceholderPage;
@@ -33,10 +33,10 @@ export const InvoicesListPage = PlaceholderPage;
 export const BillsListPage = PlaceholderPage;
 
 // Sales - TODO: Migrate these pages
-export const CustomerListPage = PlaceholderPage;
+export { default as CustomerListPage } from './sales/CustomerListPage';
 
 // Purchase - TODO: Migrate these pages
-export const SupplierListPage = PlaceholderPage;
+export { default as SupplierListPage } from './purchase/SupplierListPage';
 export const PurchaseOrdersListPage = PlaceholderPage;
 
 // Quality Control - TODO: Migrate these pages

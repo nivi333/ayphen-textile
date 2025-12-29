@@ -98,7 +98,9 @@ export default function AppRouter() {
               path='/companies/:tenantId'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <CompanyDetailPage />
+                  <MainLayout>
+                    <CompanyDetailPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -118,7 +120,9 @@ export default function AppRouter() {
               path='/locations'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <LocationListPage />
+                  <MainLayout>
+                    <LocationListPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -133,7 +137,7 @@ export default function AppRouter() {
             />
 
             <Route
-              path='/sales/invoices'
+              path='/sales/invoices' 
               element={
                 <ProtectedRoute requireCompany={true}>
                   <InvoicesListPage />
@@ -145,7 +149,9 @@ export default function AppRouter() {
               path='/customers'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <CustomerListPage />
+                  <MainLayout>
+                    <CustomerListPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -154,7 +160,9 @@ export default function AppRouter() {
               path='/suppliers'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <SupplierListPage />
+                  <MainLayout>
+                    <SupplierListPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -181,7 +189,9 @@ export default function AppRouter() {
               path='/products'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <ProductsListPage />
+                  <MainLayout>
+                    <ProductsListPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -461,6 +471,18 @@ export default function AppRouter() {
               element={
                 <ProtectedRoute>
                   <LegalPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Settings */}
+            <Route
+              path='/settings'
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <UserProfilePage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />

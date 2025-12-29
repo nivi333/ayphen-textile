@@ -12,6 +12,10 @@ import CompaniesListPage from './pages/company/CompaniesListPage';
 import CompanyDetailPage from './pages/company/CompanyDetailPage';
 import DashboardPage from './pages/dashboard/DashboardPage';
 import LocationListPage from './pages/company/LocationListPage';
+import ProductsListPage from './pages/products/ProductsListPage';
+import CustomerListPage from './pages/sales/CustomerListPage';
+import SupplierListPage from './pages/purchase/SupplierListPage';
+import PlaceholderPage from './components/PlaceholderPage';
 import { SidebarStylesInjector } from './styles/sidebar.styles';
 import './index.css';
 
@@ -72,7 +76,7 @@ function App() {
               />
 
               <Route
-                path='/company/:tenantId'
+                path='/companies/:tenantId'
                 element={
                   <ProtectedRoute requireCompany={true}>
                     <MainLayout>
@@ -88,6 +92,269 @@ function App() {
                   <ProtectedRoute requireCompany={true}>
                     <MainLayout>
                       <LocationListPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path='/products'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <ProductsListPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Placeholder routes for not-yet-migrated pages */}
+              <Route
+                path='/customers'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <CustomerListPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/inventory'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <PlaceholderPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/machines'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <PlaceholderPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/users'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <PlaceholderPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/sales/orders'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <PlaceholderPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/sales/invoices'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <PlaceholderPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/purchase/orders'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <PlaceholderPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/purchase/bills'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <PlaceholderPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/suppliers'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <SupplierListPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/inspections'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <PlaceholderPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/quality/checkpoints'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <PlaceholderPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/quality/defects'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <PlaceholderPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/quality/compliance'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <PlaceholderPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/quality/reports'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <PlaceholderPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/finance'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <PlaceholderPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/reports'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <PlaceholderPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/reports/financial'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <PlaceholderPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/reports/operational'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <PlaceholderPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/reports/inventory'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <PlaceholderPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/reports/sales'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <PlaceholderPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/textile/fabrics'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <PlaceholderPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/textile/yarns'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <PlaceholderPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/textile/dyeing'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <PlaceholderPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/textile/garments'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <PlaceholderPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/textile/designs'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <PlaceholderPage />
                     </MainLayout>
                   </ProtectedRoute>
                 }

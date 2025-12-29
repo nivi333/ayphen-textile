@@ -220,7 +220,7 @@ export function CompanyCreationSheet({
               <h3 className='text-sm font-medium'>Basic Information</h3>
 
               {/* Logo Upload */}
-              <div className='flex flex-col items-center gap-2'>
+              <div className='flex flex-col items-start gap-2'>
                 <div className='relative'>
                   <input
                     type='file'
@@ -256,7 +256,7 @@ export function CompanyCreationSheet({
                     )}
                   </label>
                 </div>
-                <p className='text-xs text-muted-foreground text-center'>
+                <p className='text-xs text-muted-foreground text-left'>
                   Upload Logo (PNG/JPG/SVG, max 2MB)
                   <br />
                   Drag & drop or click to upload

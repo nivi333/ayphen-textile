@@ -222,7 +222,7 @@ export default function CompanyDetailPage() {
   ].filter(Boolean) as { icon: ReactNode; text: ReactNode }[];
 
   return (
-    <div className='min-h-screen bg-background p-6'>
+    <div className='min-h-screen bg-background'>
       <div className='max-w-7xl mx-auto'>
         {/* Header */}
         <div className='flex items-center justify-between mb-6'>

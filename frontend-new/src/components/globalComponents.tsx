@@ -8,6 +8,13 @@ import { forwardRef, ButtonHTMLAttributes, InputHTMLAttributes, useState } from 
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 import { Loader2, Eye, EyeOff, Search, X, ChevronUp, ChevronDown } from 'lucide-react';
+import {
+  Select as ShadcnSelect,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 // ============================================================================
 // BUTTON COMPONENTS
@@ -353,7 +360,7 @@ export interface PageContainerProps extends React.HTMLAttributes<HTMLDivElement>
 export const PageContainer = forwardRef<HTMLDivElement, PageContainerProps>(
   ({ className, children, ...props }, ref) => {
     return (
-      <div className={cn('p-lg min-h-[280px] md:p-md sm:p-sm', className)} ref={ref} {...props}>
+      <div className={cn('min-h-[280px]', className)} ref={ref} {...props}>
         {children}
       </div>
     );
@@ -367,7 +374,7 @@ export const PageHeader = forwardRef<HTMLDivElement, PageHeaderProps>(
   ({ className, children, ...props }, ref) => {
     return (
       <div
-        className={cn('flex items-center justify-between mb-lg', className)}
+        className={cn('flex items-center justify-between mb-sm', className)}
         ref={ref}
         {...props}
       >
@@ -400,7 +407,7 @@ export interface ActionBarProps extends React.HTMLAttributes<HTMLDivElement> {}
 export const ActionBar = forwardRef<HTMLDivElement, ActionBarProps>(
   ({ className, children, ...props }, ref) => {
     return (
-      <div className={cn('flex items-center gap-md mb-lg', className)} ref={ref} {...props}>
+      <div className={cn('flex items-center gap-md mb-md', className)} ref={ref} {...props}>
         {children}
       </div>
     );
@@ -772,6 +779,48 @@ export const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(
   }
 );
 TableCell.displayName = 'TableCell';
+
+// ============================================================================
+// SELECT COMPONENT
+// ============================================================================
+
+export interface SelectOption {
+  value: string;
+  label: string;
+}
+
+export interface SelectProps {
+  value: string;
+  onChange: (value: string) => void;
+  options: SelectOption[];
+  placeholder?: string;
+  className?: string;
+  disabled?: boolean;
+}
+
+export const Select = ({
+  value,
+  onChange,
+  options,
+  placeholder = 'Select...',
+  className,
+  disabled,
+}: SelectProps) => {
+  return (
+    <ShadcnSelect value={value} onValueChange={onChange} disabled={disabled}>
+      <SelectTrigger className={className}>
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent>
+        {options.map(option => (
+          <SelectItem key={option.value} value={option.value}>
+            {option.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </ShadcnSelect>
+  );
+};
 
 // ============================================================================
 // SHEET/DRAWER COMPONENTS

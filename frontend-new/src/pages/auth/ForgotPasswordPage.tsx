@@ -71,7 +71,7 @@ export default function ForgotPasswordPage() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className='space-y-4'>
+        <form onSubmit={handleSubmit} className='space-y-2'>
           <div>
             <Label htmlFor='email' required>
               Email Address
