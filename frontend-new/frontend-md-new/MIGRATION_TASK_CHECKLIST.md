@@ -505,10 +505,96 @@ Create all input variants in `globalComponents.tsx`:
   - [x] Add sidebar link in `Sidebar.tsx` (Locations, Company Details)
   - [x] Verify navigation flow
 
-### Priority 3: Dashboard (`/src/pages/dashboard/`)
+### Priority 3: User Management & Invitations (`/src/pages/users/`, `/src/components/users/`)
 
 > [!NOTE]
-> **Why Priority 3**: After company selection, the dashboard is the first screen users see. It provides overview metrics and navigation to other modules.
+> **Why Priority 3**: User invitation and role management is foundational for multi-tenant collaboration. Users must already exist in the system (registered) before they can be invited to join a company. Must be implemented before any team-based workflows.
+
+> [!IMPORTANT]
+> **User Invitation Workflow**:
+> 1. User registers in the system (`/auth/register`) - becomes a platform user
+> 2. Company Owner/Admin invites existing user by email/phone to join their company
+> 3. User receives invitation (stored in `company_invitations` table)
+> 4. User accepts/rejects invitation
+> 5. Upon acceptance, user-company-role relationship created in `company_users` table
+> 6. User can belong to multiple companies with different roles (OWNER, ADMIN, MANAGER, EMPLOYEE)
+> 7. User can be invited to multiple companies
+> 8. Invited User role will be displayed under company list role tab with Accept/Reject action button
+> 9. Only after accepting the invitation, the user will be added to the company and can be assigned a role
+
+- [ ] **UsersListPage.tsx**
+  - Replace Ant Design Table with shadcn/ui Table
+  - Replace Drawer with Sheet for user form
+  - Show company users with their roles
+  - Show pending invitations section
+  - Keep same API integration (`userService`, `companyService`)
+  - [ ] **API Integration**:
+    - GET `/api/v1/companies/{companyId}/users` - List all users in company
+    - GET `/api/v1/users/{id}` - Get user details
+    - PUT `/api/v1/users/{id}` - Update user profile
+    - PUT `/api/v1/companies/{companyId}/users/{userId}/role` - Update user role
+    - DELETE `/api/v1/companies/{companyId}/users/{userId}` - Remove user from company
+    - GET `/api/v1/companies/{companyId}/invitations` - List pending invitations
+
+- [ ] **Components (`/src/components/users/`)**
+  - [ ] `UserInviteDialog.tsx` → use Dialog/Sheet
+    - Form with email/phone input (must match existing user)
+    - Role selection dropdown (ADMIN, MANAGER, EMPLOYEE)
+    - Location assignment dropdown
+    - Validation for email/phone format
+    - [ ] **API Integration**:
+      - POST `/api/v1/companies/{companyId}/invite` - Send invitation to existing user
+        ```json
+        {
+          "emailOrPhone": "user@example.com",
+          "role": "MANAGER",
+          "locationId": "location-uuid"
+        }
+        ```
+      - DELETE `/api/v1/companies/invitations/{invitationId}` - Cancel pending invitation
+  
+  - [ ] `UserFormSheet.tsx` → use Sheet
+    - Edit user profile (name, phone, email)
+    - Update user role in company
+    - [ ] **API Integration**:
+      - PUT `/api/v1/users/{id}` - Update user profile
+      - PUT `/api/v1/companies/{companyId}/users/{userId}/role` - Update role
+  
+  - [ ] `InvitationAcceptDialog.tsx` → use Dialog
+    - Show invitation details (company name, role, location)
+    - Accept/Reject buttons
+    - [ ] **API Integration**:
+      - POST `/api/v1/companies/accept-invitation/{invitationId}` - Accept invitation
+      - POST `/api/v1/companies/reject-invitation/{invitationId}` - Reject invitation
+  
+  - [ ] `PendingInvitationsTable.tsx` → use Table
+    - Show pending invitations with email, role, sent date
+    - Cancel invitation action
+    - Resend invitation action (if needed)
+
+- [ ] **Dashboard Integration**
+  - [ ] Add "Invite Team Member" button to Dashboard quick actions
+  - [ ] Show pending invitations count badge
+  - [ ] Quick action card for team management
+
+- [ ] **Routing & Navigation**
+  - [ ] Add route to `App.tsx` (`/users`)
+  - [ ] Add sidebar link in `Sidebar.tsx` (Users/Team)
+  - [ ] Add notification for pending invitations (if user has any)
+  - [ ] Verify navigation flow
+
+- [ ] **Role-Based Permissions**
+  - [ ] Implement role hierarchy: OWNER > ADMIN > MANAGER > EMPLOYEE
+  - [ ] OWNER can invite ADMIN, MANAGER, EMPLOYEE
+  - [ ] ADMIN can invite MANAGER, EMPLOYEE
+  - [ ] MANAGER can invite EMPLOYEE
+  - [ ] Role-based UI element visibility
+  - [ ] Multi-company role support (user can have different roles in different companies)
+
+### Priority 4: Dashboard (`/src/pages/dashboard/`)
+
+> [!NOTE]
+> **Why Priority 4**: After company selection, the dashboard is the first screen users see. It provides overview metrics and navigation to other modules.
 
 - [x] **DashboardPage.tsx** ✅ COMPLETE
   - Replace Ant Design Card with shadcn/ui Card
@@ -524,10 +610,10 @@ Create all input variants in `globalComponents.tsx`:
   - [x] Add sidebar link in `Sidebar.tsx` (Dashboard)
   - [x] Verify navigation flow
 
-### Priority 4: Product Management (`/src/pages/products/`)
+### Priority 5: Product Management (`/src/pages/products/`)
 
 > [!NOTE]
-> **Why Priority 4**: Products are the foundation for inventory, orders, and all transactions. Must be created before inventory can be tracked.
+> **Why Priority 5**: Products are the foundation for inventory, orders, and all transactions. Must be created before inventory can be tracked.
 - [x] **ProductsListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet for product form
@@ -551,10 +637,10 @@ Create all input variants in `globalComponents.tsx`:
   - [x] Add sidebar link in `Sidebar.tsx` (Products)
   - [x] Verify navigation flow
 
-### Priority 5: Customer & Supplier Management (`/src/pages/sales/`, `/src/pages/purchase/`)
+### Priority 6: Customer & Supplier Management (`/src/pages/sales/`, `/src/pages/purchase/`)
 
 > [!NOTE]
-> **Why Priority 5**: Customers and suppliers are master data required for creating orders, invoices, bills, and purchase orders.
+> **Why Priority 6**: Customers and suppliers are master data required for creating orders, invoices, bills, and purchase orders.
 
 **Customer Management:**
 - [x] **CustomerListPage.tsx**
@@ -594,10 +680,10 @@ Create all input variants in `globalComponents.tsx`:
   - [x] Add sidebar link in `Sidebar.tsx`
   - [x] Verify navigation flow
 
-### Priority 6: Inventory Management (`/src/pages/inventory/`)
+### Priority 7: Inventory Management (`/src/pages/inventory/`)
 
 > [!NOTE]
-> **Why Priority 6**: Inventory tracking requires products and locations to exist first. It's the foundation for order fulfillment.
+> **Why Priority 7**: Inventory tracking requires products and locations to exist first. It's the foundation for order fulfillment.
 - [x] **InventoryListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Tabs with shadcn/ui Tabs
@@ -627,10 +713,10 @@ Create all input variants in `globalComponents.tsx`:
   - [x] Add sidebar link in `Sidebar.tsx`
   - [x] Verify navigation flow
 
-### Priority 7: Orders Management (`/src/pages/orders/`)
+### Priority 8: Orders Management (`/src/pages/orders/`)
 
 > [!NOTE]
-> **Why Priority 7**: Sales orders require products, customers, and inventory to exist. They drive the sales workflow.
+> **Why Priority 8**: Sales orders require products, customers, and inventory to exist. They drive the sales workflow.
 - [x] **OrdersListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet for order form
@@ -655,10 +741,10 @@ Create all input variants in `globalComponents.tsx`:
   - [x] Add sidebar link in `Sidebar.tsx`
   - [x] Verify navigation flow
 
-### Priority 8: Purchase Orders (`/src/pages/purchase/`)
+### Priority 9: Purchase Orders (`/src/pages/purchase/`)
 
 > [!NOTE]
-> **Why Priority 8**: Purchase orders require suppliers and products. They drive the procurement workflow.
+> **Why Priority 9**: Purchase orders require suppliers and products. They drive the procurement workflow.
 
 - [x] **PurchaseOrdersListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
@@ -682,10 +768,10 @@ Create all input variants in `globalComponents.tsx`:
   - [x] Add sidebar link in `Sidebar.tsx`
   - [x] Verify navigation flow
 
-### Priority 9: Invoices & Bills (`/src/pages/invoices/`, `/src/pages/bills/`)
+### Priority 10: Invoices & Bills (`/src/pages/invoices/`, `/src/pages/bills/`)
 
 > [!NOTE]
-> **Why Priority 9**: Invoices and bills are financial documents that require customers, suppliers, and orders to exist.
+> **Why Priority 10**: Invoices and bills are financial documents that require customers, suppliers, and orders to exist.
 
 - [x] **InvoicesListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
