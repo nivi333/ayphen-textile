@@ -23,8 +23,8 @@ export { default as InventoryListPage } from './inventory/InventoryListPage';
 // Machines - TODO: Migrate these pages
 export const MachineListPage = PlaceholderPage;
 
-// Orders - TODO: Migrate these pages
-export const OrdersListPage = PlaceholderPage;
+// Orders
+export { default as OrdersListPage } from './orders/OrdersListPage';
 
 // Invoices - TODO: Migrate these pages
 export const InvoicesListPage = PlaceholderPage;
@@ -32,12 +32,12 @@ export const InvoicesListPage = PlaceholderPage;
 // Bills - TODO: Migrate these pages
 export const BillsListPage = PlaceholderPage;
 
-// Sales - TODO: Migrate these pages
+// Sales
 export { default as CustomerListPage } from './sales/CustomerListPage';
 
-// Purchase - TODO: Migrate these pages
+// Purchase
 export { default as SupplierListPage } from './purchase/SupplierListPage';
-export const PurchaseOrdersListPage = PlaceholderPage;
+export { default as PurchaseOrdersListPage } from './purchase/PurchaseOrdersListPage';
 
 // Quality Control - TODO: Migrate these pages
 export const QualityCheckpointsListPage = PlaceholderPage;

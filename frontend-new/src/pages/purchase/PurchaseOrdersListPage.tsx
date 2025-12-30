@@ -10,6 +10,7 @@ import {
   Truck,
   Package,
   Clock,
+  FileText,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -57,38 +58,40 @@ import {
   PrimaryButton,
   EmptyState,
 } from '@/components/globalComponents';
-import { OrderFormSheet } from '@/components/orders/OrderFormSheet';
-import { orderService, OrderSummary, OrderStatus } from '@/services/orderService';
+import { PurchaseOrderFormSheet } from '@/components/purchase/PurchaseOrderFormSheet';
+import {
+  purchaseOrderService,
+  PurchaseOrderSummary,
+  POStatus,
+} from '@/services/purchaseOrderService';
 import { locationService } from '@/services/locationService';
 import useAuth from '@/contexts/AuthContext';
 import { format } from 'date-fns';
 
 const STATUS_CONFIG: Record<
-  OrderStatus,
+  POStatus,
   { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon?: any }
 > = {
   DRAFT: { label: 'Draft', variant: 'secondary', icon: Clock },
+  SENT: { label: 'Sent', variant: 'outline', icon: FileText },
   CONFIRMED: { label: 'Confirmed', variant: 'default', icon: CheckCircle },
-  IN_PRODUCTION: { label: 'In Production', variant: 'outline', icon: Package },
-  READY_TO_SHIP: { label: 'Ready to Ship', variant: 'outline', icon: Package },
-  SHIPPED: { label: 'Shipped', variant: 'outline', icon: Truck },
-  DELIVERED: { label: 'Delivered', variant: 'outline', icon: CheckCircle },
+  PARTIALLY_RECEIVED: { label: 'Partially Received', variant: 'outline', icon: Package },
+  RECEIVED: { label: 'Received', variant: 'outline', icon: Truck },
   CANCELLED: { label: 'Cancelled', variant: 'destructive', icon: XCircle },
 };
 
-const NEXT_STATUS_MAP: Record<OrderStatus, OrderStatus[]> = {
-  DRAFT: ['CONFIRMED', 'CANCELLED'],
-  CONFIRMED: ['IN_PRODUCTION', 'CANCELLED'],
-  IN_PRODUCTION: ['READY_TO_SHIP', 'CANCELLED'],
-  READY_TO_SHIP: ['SHIPPED'],
-  SHIPPED: ['DELIVERED'],
-  DELIVERED: [],
+const NEXT_STATUS_MAP: Record<POStatus, POStatus[]> = {
+  DRAFT: ['SENT', 'CANCELLED'],
+  SENT: ['CONFIRMED', 'CANCELLED'],
+  CONFIRMED: ['PARTIALLY_RECEIVED', 'RECEIVED', 'CANCELLED'],
+  PARTIALLY_RECEIVED: ['RECEIVED'],
+  RECEIVED: [],
   CANCELLED: [],
 };
 
-export default function OrdersListPage() {
+export default function PurchaseOrdersListPage() {
   const [loading, setLoading] = useState(false);
-  const [orders, setOrders] = useState<OrderSummary[]>([]);
+  const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrderSummary[]>([]);
   const [locations, setLocations] = useState<any[]>([]);
 
   // Filters
@@ -97,22 +100,22 @@ export default function OrdersListPage() {
 
   // Sheet & Dialogs
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [editingOrder, setEditingOrder] = useState<any | null>(null);
+  const [editingPO, setEditingPO] = useState<any | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [orderToDelete, setOrderToDelete] = useState<string | null>(null);
+  const [poToDelete, setPoToDelete] = useState<string | null>(null);
 
   const { currentCompany } = useAuth();
 
   useEffect(() => {
     if (currentCompany?.id) {
       fetchLocations();
-      fetchOrders();
+      fetchPurchaseOrders();
     }
   }, [currentCompany?.id]);
 
   useEffect(() => {
     if (currentCompany?.id) {
-      fetchOrders();
+      fetchPurchaseOrders();
     }
   }, [searchText, statusFilter]);
 
@@ -125,71 +128,77 @@ export default function OrdersListPage() {
     }
   };
 
-  const fetchOrders = async () => {
+  const fetchPurchaseOrders = async () => {
     setLoading(true);
     try {
-      // Note: OrderService.getOrders(params) supports status, customerName etc.
-      const params: any = {};
-      if (statusFilter !== 'all') params.status = statusFilter;
-      if (searchText) params.customerName = searchText; // Simple search mapping
+      const response = await purchaseOrderService.getPurchaseOrders();
+      let filtered = response || [];
 
-      const response = await orderService.getOrders(params);
-      setOrders(response || []);
+      // Apply filters
+      if (statusFilter !== 'all') {
+        filtered = filtered.filter(po => po.status === statusFilter);
+      }
+      if (searchText) {
+        filtered = filtered.filter(po =>
+          po.supplierName?.toLowerCase().includes(searchText.toLowerCase())
+        );
+      }
+
+      setPurchaseOrders(filtered);
     } catch (error: any) {
-      console.error('Error fetching orders:', error);
-      toast.error('Failed to fetch orders');
+      console.error('Error fetching purchase orders:', error);
+      toast.error('Failed to fetch purchase orders');
     } finally {
       setLoading(false);
     }
   };
 
   const handleRefresh = () => {
-    fetchOrders();
+    fetchPurchaseOrders();
   };
 
   const handleCreate = () => {
-    setEditingOrder(null);
+    setEditingPO(null);
     setIsSheetOpen(true);
   };
 
-  const handleEdit = async (order: OrderSummary) => {
+  const handleEdit = async (po: PurchaseOrderSummary) => {
     try {
       setLoading(true);
-      // We need full details for editing, list view might be summary
-      const details = await orderService.getOrderById(order.orderId);
-      setEditingOrder(details);
+      const details = await purchaseOrderService.getPurchaseOrderById(po.poId);
+      setEditingPO(details);
       setIsSheetOpen(true);
     } catch (error) {
-      toast.error('Failed to load order details');
+      toast.error('Failed to load purchase order details');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDeleteClick = (orderId: string) => {
-    setOrderToDelete(orderId);
+  const handleDeleteClick = (poId: string) => {
+    setPoToDelete(poId);
     setDeleteDialogOpen(true);
   };
 
   const handleConfirmDelete = async () => {
-    if (!orderToDelete) return;
+    if (!poToDelete) return;
     try {
-      await orderService.deleteOrder(orderToDelete);
-      toast.success('Order deleted');
-      fetchOrders();
+      await purchaseOrderService.deletePurchaseOrder(poToDelete);
+      toast.success('Purchase order deleted');
+      fetchPurchaseOrders();
     } catch (error: any) {
-      toast.error(error.message || 'Failed to delete order');
+      toast.error(error.message || 'Failed to delete purchase order');
     } finally {
       setDeleteDialogOpen(false);
-      setOrderToDelete(null);
+      setPoToDelete(null);
     }
   };
 
-  const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
+  const handleStatusChange = async (poId: string, newStatus: POStatus) => {
     try {
-      await orderService.updateOrderStatus(orderId, newStatus);
-      toast.success(`Order status updated to ${STATUS_CONFIG[newStatus].label}`);
-      fetchOrders();
+      await purchaseOrderService.updatePOStatus(poId, newStatus);
+      toast.success(`Purchase order status updated to ${STATUS_CONFIG[newStatus].label}`);
+      fetchPurchaseOrders();
     } catch (error: any) {
       toast.error(error.message || 'Failed to update status');
     }
@@ -204,7 +213,7 @@ export default function OrdersListPage() {
   if (!currentCompany) {
     return (
       <PageContainer>
-        <EmptyState message='Please select a company to view orders.' />
+        <EmptyState message='Please select a company to view purchase orders.' />
       </PageContainer>
     );
   }
@@ -212,16 +221,16 @@ export default function OrdersListPage() {
   return (
     <PageContainer>
       <PageHeader>
-        <PageTitle>Sales Orders</PageTitle>
+        <PageTitle>Purchase Orders</PageTitle>
         <PrimaryButton onClick={handleCreate}>
-          <Plus className='mr-2 h-4 w-4' /> Create Order
+          <Plus className='mr-2 h-4 w-4' /> Create Purchase Order
         </PrimaryButton>
       </PageHeader>
 
       <ActionBar>
         <div className='flex-1 max-w-md'>
           <SearchInput
-            placeholder='Search by customer...'
+            placeholder='Search by supplier...'
             value={searchText}
             onChange={e => setSearchText(e.target.value)}
             onClear={() => setSearchText('')}
@@ -239,7 +248,7 @@ export default function OrdersListPage() {
             <SelectItem value='all'>All Status</SelectItem>
             {Object.keys(STATUS_CONFIG).map(status => (
               <SelectItem key={status} value={status}>
-                {STATUS_CONFIG[status as OrderStatus].label}
+                {STATUS_CONFIG[status as POStatus].label}
               </SelectItem>
             ))}
           </SelectContent>
@@ -250,9 +259,10 @@ export default function OrdersListPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Order ID</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Date</TableHead>
+              <TableHead>PO ID</TableHead>
+              <TableHead>Supplier</TableHead>
+              <TableHead>PO Date</TableHead>
+              <TableHead>Expected Delivery</TableHead>
               <TableHead>Location</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className='text-right'>Total</TableHead>
@@ -262,40 +272,45 @@ export default function OrdersListPage() {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={7} className='text-center py-10'>
-                  Loading orders...
+                <TableCell colSpan={8} className='text-center py-10'>
+                  Loading purchase orders...
                 </TableCell>
               </TableRow>
-            ) : orders.length === 0 ? (
+            ) : purchaseOrders.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className='text-center py-10 text-muted-foreground'>
-                  No orders found
+                <TableCell colSpan={8} className='text-center py-10 text-muted-foreground'>
+                  No purchase orders found
                 </TableCell>
               </TableRow>
             ) : (
-              orders.map(order => {
-                const statusInfo = STATUS_CONFIG[order.status] || {
-                  label: order.status,
+              purchaseOrders.map(po => {
+                const statusInfo = STATUS_CONFIG[po.status] || {
+                  label: po.status,
                   variant: 'secondary',
                 };
 
                 return (
-                  <TableRow key={order.orderId}>
-                    <TableCell className='font-medium'>{order.orderId}</TableCell>
+                  <TableRow key={po.poId}>
+                    <TableCell className='font-medium'>{po.poId}</TableCell>
                     <TableCell>
-                      <div className='font-medium'>{order.customerName}</div>
-                      {order.customerCode && (
-                        <div className='text-xs text-muted-foreground'>{order.customerCode}</div>
+                      <div className='font-medium'>{po.supplierName}</div>
+                      {po.supplierCode && (
+                        <div className='text-xs text-muted-foreground'>{po.supplierCode}</div>
                       )}
                     </TableCell>
-                    <TableCell>{format(new Date(order.orderDate), 'MMM d, yyyy')}</TableCell>
-                    <TableCell>{getLocationName(order.locationId)}</TableCell>
+                    <TableCell>{format(new Date(po.poDate), 'MMM d, yyyy')}</TableCell>
+                    <TableCell>
+                      {po.expectedDeliveryDate
+                        ? format(new Date(po.expectedDeliveryDate), 'MMM d, yyyy')
+                        : '—'}
+                    </TableCell>
+                    <TableCell>{getLocationName(po.locationId)}</TableCell>
                     <TableCell>
                       <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
                     </TableCell>
                     <TableCell className='text-right font-medium'>
-                      {order.currency}{' '}
-                      {Number(order.totalAmount).toLocaleString(undefined, {
+                      {po.currency}{' '}
+                      {Number(po.totalAmount).toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                       })}
                     </TableCell>
@@ -309,17 +324,17 @@ export default function OrdersListPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align='end'>
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem onClick={() => handleEdit(order)}>
+                          <DropdownMenuItem onClick={() => handleEdit(po)}>
                             <Edit className='mr-2 h-4 w-4' /> Edit
                           </DropdownMenuItem>
-                          {NEXT_STATUS_MAP[order.status]?.length > 0 && (
+                          {NEXT_STATUS_MAP[po.status]?.length > 0 && (
                             <>
                               <DropdownMenuSeparator />
                               <DropdownMenuLabel>Change Status</DropdownMenuLabel>
-                              {NEXT_STATUS_MAP[order.status].map(nextStatus => (
+                              {NEXT_STATUS_MAP[po.status].map(nextStatus => (
                                 <DropdownMenuItem
                                   key={nextStatus}
-                                  onClick={() => handleStatusChange(order.orderId, nextStatus)}
+                                  onClick={() => handleStatusChange(po.poId, nextStatus)}
                                 >
                                   {STATUS_CONFIG[nextStatus].label}
                                 </DropdownMenuItem>
@@ -329,7 +344,7 @@ export default function OrdersListPage() {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             className='text-destructive focus:text-destructive'
-                            onClick={() => handleDeleteClick(order.orderId)}
+                            onClick={() => handleDeleteClick(po.poId)}
                           >
                             <Trash2 className='mr-2 h-4 w-4' /> Delete
                           </DropdownMenuItem>
@@ -344,22 +359,22 @@ export default function OrdersListPage() {
         </Table>
       </div>
 
-      <OrderFormSheet
+      <PurchaseOrderFormSheet
         open={isSheetOpen}
         onClose={() => {
           setIsSheetOpen(false);
-          setEditingOrder(null);
+          setEditingPO(null);
         }}
         onSaved={handleRefresh}
-        initialData={editingOrder}
+        initialData={editingPO}
       />
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the order and remove it
-              from our servers.
+              This action cannot be undone. This will permanently delete the purchase order and
+              remove it from our servers.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

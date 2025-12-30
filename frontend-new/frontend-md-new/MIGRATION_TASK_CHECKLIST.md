@@ -660,27 +660,27 @@ Create all input variants in `globalComponents.tsx`:
 > [!NOTE]
 > **Why Priority 8**: Purchase orders require suppliers and products. They drive the procurement workflow.
 
-- [ ] **PurchaseOrdersListPage.tsx**
+- [x] **PurchaseOrdersListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`purchaseOrderService`)
-  - [ ] **API Integration**: 
+  - [x] **API Integration**: 
     - GET `/api/v1/purchase-orders` - List all purchase orders
     - GET `/api/v1/purchase-orders/{id}` - Get PO details
     - DELETE `/api/v1/purchase-orders/{id}` - Delete PO
     - PATCH `/api/v1/purchase-orders/{id}/status` - Update PO status
 
-- [ ] **Components (`/src/components/purchase/`)**
-  - [ ] `PurchaseOrderFormDrawer.tsx` → use Sheet
-    - [ ] **API Integration**: 
+- [x] **Components (`/src/components/purchase/`)**
+  - [x] `PurchaseOrderFormSheet.tsx` (replaced `PurchaseOrderFormDrawer.tsx`)
+    - [x] **API Integration**: 
       - POST `/api/v1/purchase-orders` - Create purchase order
       - PUT `/api/v1/purchase-orders/{id}` - Update purchase order
-  - [ ] `PurchaseOrderTable.tsx` → use Table
+  - [x] `PurchaseOrderTable.tsx` → integrated into `PurchaseOrdersListPage.tsx`
 
-- [ ] **Routing & Navigation**
-  - [ ] Add route to `AppRouter.tsx` (`/purchase-orders`)
-  - [ ] Add sidebar link in `Sidebar.tsx`
-  - [ ] Verify navigation flow
+- [x] **Routing & Navigation**
+  - [x] Add route to `AppRouter.tsx` (`/purchase/orders`), `App.tsx`
+  - [x] Add sidebar link in `Sidebar.tsx`
+  - [x] Verify navigation flow
 
 ### Priority 9: Invoices & Bills (`/src/pages/invoices/`, `/src/pages/bills/`)
 

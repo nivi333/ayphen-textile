@@ -554,7 +554,7 @@ export function CompanyCreationSheet({
                   control={form.control}
                   name='businessType'
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className='flex flex-col'>
                       <FormLabel required>Business Type</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>

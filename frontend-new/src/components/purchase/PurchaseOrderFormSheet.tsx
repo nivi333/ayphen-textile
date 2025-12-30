@@ -30,41 +30,40 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 
-import { orderService, CreateOrderRequest, OrderDetail } from '@/services/orderService';
-import { customerService, Customer } from '@/services/customerService';
+import {
+  purchaseOrderService,
+  CreatePurchaseOrderRequest,
+  PurchaseOrderDetail,
+} from '@/services/purchaseOrderService';
+import { supplierService, Supplier } from '@/services/supplierService';
 import { locationService, Location } from '@/services/locationService';
 import { productService, ProductSummary } from '@/services/productService';
 
-const orderItemSchema = z.object({
+const purchaseOrderItemSchema = z.object({
   productId: z.string().optional(),
   itemCode: z.string().min(1, 'Item code is required'),
   description: z.string().optional(),
   quantity: z.number().min(0.001, 'Quantity must be greater than 0'),
   unitOfMeasure: z.string().min(1, 'UOM is required'),
-  unitPrice: z.number().min(0, 'Unit price must be non-negative'),
+  unitCost: z.number().min(0, 'Unit cost must be non-negative'),
 });
 
-const orderSchema = z.object({
-  customerId: z.string().min(1, 'Customer is required'),
-  orderDate: z.date({
-    required_error: 'Order date is required',
+const purchaseOrderSchema = z.object({
+  supplierId: z.string().min(1, 'Supplier is required'),
+  poDate: z.date({
+    required_error: 'PO date is required',
     invalid_type_error: 'Please select a valid date',
   }),
-  deliveryDate: z.date().optional(),
+  expectedDeliveryDate: z.date().optional(),
   currency: z.string().max(10).optional(),
   notes: z.string().max(1000).optional(),
   locationId: z.string().optional(),
-  shippingCarrier: z.string().max(255).optional(),
-  trackingNumber: z.string().max(255).optional(),
   shippingMethod: z.string().max(255).optional(),
-  deliveryWindowStart: z.date().optional(),
-  deliveryWindowEnd: z.date().optional(),
   isActive: z.boolean().default(true),
-  items: z.array(orderItemSchema).min(1, 'At least one item is required'),
+  items: z.array(purchaseOrderItemSchema).min(1, 'At least one item is required'),
 });
 
-// Explicitly type the form values
-type OrderFormValues = z.infer<typeof orderSchema>;
+type PurchaseOrderFormValues = z.infer<typeof purchaseOrderSchema>;
 
 const UOM_OPTIONS = [
   { value: 'PCS', label: 'PCS - Pieces' },
@@ -82,29 +81,34 @@ const UOM_OPTIONS = [
   { value: 'SPOOL', label: 'SPOOL - Spools' },
 ];
 
-interface OrderFormSheetProps {
+interface PurchaseOrderFormSheetProps {
   open: boolean;
   onClose: () => void;
   onSaved: () => void;
-  initialData?: OrderDetail | null;
+  initialData?: PurchaseOrderDetail | null;
 }
 
-export function OrderFormSheet({ open, onClose, onSaved, initialData }: OrderFormSheetProps) {
+export function PurchaseOrderFormSheet({
+  open,
+  onClose,
+  onSaved,
+  initialData,
+}: PurchaseOrderFormSheetProps) {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   // Data states
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [products, setProducts] = useState<ProductSummary[]>([]);
 
   const isEditing = !!initialData;
 
-  const form = useForm<OrderFormValues>({
-    resolver: zodResolver(orderSchema) as any,
+  const form = useForm<PurchaseOrderFormValues>({
+    resolver: zodResolver(purchaseOrderSchema) as any,
     defaultValues: {
       currency: 'INR',
-      orderDate: new Date(),
+      poDate: new Date(),
       isActive: true,
       items: [
         {
@@ -112,7 +116,7 @@ export function OrderFormSheet({ open, onClose, onSaved, initialData }: OrderFor
           description: '',
           quantity: 1,
           unitOfMeasure: 'PCS',
-          unitPrice: 0,
+          unitCost: 0,
           productId: '',
         },
       ],
@@ -127,12 +131,12 @@ export function OrderFormSheet({ open, onClose, onSaved, initialData }: OrderFor
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [customersRes, locationsRes, productsRes] = await Promise.all([
-        customerService.getCustomers({ isActive: true }),
+      const [suppliersRes, locationsRes, productsRes] = await Promise.all([
+        supplierService.getSuppliers({ isActive: true }),
         locationService.getLocations(),
         productService.getProducts({ isActive: true, limit: 1000 }),
       ]);
-      setCustomers(customersRes.customers || []);
+      setSuppliers(suppliersRes.suppliers || []);
       setLocations(locationsRes || []);
       setProducts(productsRes.data || []);
     } catch (error) {
@@ -148,23 +152,16 @@ export function OrderFormSheet({ open, onClose, onSaved, initialData }: OrderFor
       fetchData();
       if (initialData) {
         // Populate form
-        // Need to cast optional dates properly for RHF
         form.reset({
-          customerId: initialData.customerId || (initialData.customer?.id as string),
-          orderDate: new Date(initialData.orderDate),
-          deliveryDate: initialData.deliveryDate ? new Date(initialData.deliveryDate) : undefined,
+          supplierId: initialData.supplierId || (initialData.supplier?.id as string),
+          poDate: new Date(initialData.poDate),
+          expectedDeliveryDate: initialData.expectedDeliveryDate
+            ? new Date(initialData.expectedDeliveryDate)
+            : undefined,
           currency: initialData.currency || 'INR',
           notes: initialData.notes || '',
           locationId: initialData.locationId || undefined,
-          shippingCarrier: initialData.shippingCarrier || undefined,
-          trackingNumber: initialData.trackingNumber || undefined,
           shippingMethod: initialData.shippingMethod || undefined,
-          deliveryWindowStart: initialData.deliveryWindowStart
-            ? new Date(initialData.deliveryWindowStart)
-            : undefined,
-          deliveryWindowEnd: initialData.deliveryWindowEnd
-            ? new Date(initialData.deliveryWindowEnd)
-            : undefined,
           isActive: initialData.isActive ?? true,
           items: initialData.items.map(item => ({
             productId: item.productId || undefined,
@@ -172,13 +169,13 @@ export function OrderFormSheet({ open, onClose, onSaved, initialData }: OrderFor
             description: item.description || '',
             quantity: item.quantity,
             unitOfMeasure: item.unitOfMeasure,
-            unitPrice: item.unitPrice,
+            unitCost: item.unitCost,
           })),
         });
       } else {
         form.reset({
           currency: 'INR',
-          orderDate: new Date(),
+          poDate: new Date(),
           isActive: true,
           items: [
             {
@@ -186,7 +183,7 @@ export function OrderFormSheet({ open, onClose, onSaved, initialData }: OrderFor
               description: '',
               quantity: 1,
               unitOfMeasure: 'PCS',
-              unitPrice: 0,
+              unitCost: 0,
             },
           ],
         });
@@ -200,48 +197,44 @@ export function OrderFormSheet({ open, onClose, onSaved, initialData }: OrderFor
       form.setValue(`items.${index}.itemCode`, product.productCode);
       form.setValue(`items.${index}.description`, product.name);
       form.setValue(`items.${index}.unitOfMeasure`, product.unitOfMeasure);
-      form.setValue(`items.${index}.unitPrice`, product.sellingPrice);
+      form.setValue(`items.${index}.unitCost`, product.costPrice);
     }
   };
 
-  const onSubmit = async (values: OrderFormValues) => {
+  const onSubmit = async (values: PurchaseOrderFormValues) => {
     setSubmitting(true);
     try {
-      // Find customer details
-      const selectedCustomer = customers.find(c => c.id === values.customerId);
+      // Find supplier details
+      const selectedSupplier = suppliers.find(s => s.id === values.supplierId);
 
-      const payload: CreateOrderRequest = {
-        customerId: values.customerId,
-        customerName: selectedCustomer ? selectedCustomer.name : '',
-        customerCode: selectedCustomer?.code,
-        orderDate: values.orderDate.toISOString(),
-        deliveryDate: values.deliveryDate?.toISOString(),
+      const payload: CreatePurchaseOrderRequest = {
+        supplierId: values.supplierId,
+        supplierName: selectedSupplier ? selectedSupplier.name : '',
+        supplierCode: selectedSupplier?.code,
+        poDate: values.poDate.toISOString(),
+        expectedDeliveryDate: values.expectedDeliveryDate?.toISOString(),
         currency: values.currency,
         notes: values.notes,
         locationId: values.locationId,
-        shippingCarrier: values.shippingCarrier,
-        trackingNumber: values.trackingNumber,
         shippingMethod: values.shippingMethod,
-        deliveryWindowStart: values.deliveryWindowStart?.toISOString(),
-        deliveryWindowEnd: values.deliveryWindowEnd?.toISOString(),
         items: values.items.map(item => ({
           ...item,
           productId: item.productId || undefined,
         })),
       };
 
-      if (isEditing && initialData?.orderId) {
-        await orderService.updateOrder(initialData.orderId, payload);
-        toast.success('Order updated successfully');
+      if (isEditing && initialData?.poId) {
+        await purchaseOrderService.updatePurchaseOrder(initialData.poId, payload);
+        toast.success('Purchase order updated successfully');
       } else {
-        await orderService.createOrder(payload);
-        toast.success('Order created successfully');
+        await purchaseOrderService.createPurchaseOrder(payload);
+        toast.success('Purchase order created successfully');
       }
       onSaved();
       onClose();
     } catch (error: any) {
-      console.error('Error saving order:', error);
-      toast.error(error.message || 'Failed to save order');
+      console.error('Error saving purchase order:', error);
+      toast.error(error.message || 'Failed to save purchase order');
     } finally {
       setSubmitting(false);
     }
@@ -252,7 +245,7 @@ export function OrderFormSheet({ open, onClose, onSaved, initialData }: OrderFor
       <SheetContent className='w-[720px] sm:max-w-[720px] overflow-y-auto'>
         <SheetHeader>
           <div className='flex items-center justify-between'>
-            <SheetTitle>{isEditing ? 'Edit Sales Order' : 'Create Sales Order'}</SheetTitle>
+            <SheetTitle>{isEditing ? 'Edit Purchase Order' : 'Create Purchase Order'}</SheetTitle>
             {isEditing && (
               <div className='flex items-center gap-2 mr-6'>
                 <span className='text-sm font-medium'>Active</span>
@@ -267,36 +260,36 @@ export function OrderFormSheet({ open, onClose, onSaved, initialData }: OrderFor
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 mt-6'>
-            {/* Order Info */}
+            {/* Purchase Order Info */}
             <div className='space-y-4'>
-              <h3 className='text-sm font-medium'>Order Info</h3>
+              <h3 className='text-sm font-medium'>Purchase Order Info</h3>
 
               <div className='grid grid-cols-2 gap-4'>
                 <div className='no-form-context-needed space-y-2'>
                   <label className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'>
-                    Order Code
+                    PO Code
                   </label>
-                  <Input disabled placeholder='Auto-generated' value={initialData?.orderId || ''} />
+                  <Input disabled placeholder='Auto-generated' value={initialData?.poId || ''} />
                 </div>
 
                 <FormField
                   control={form.control}
-                  name='customerId'
+                  name='supplierId'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
-                        Customer
+                        Supplier
                       </FormLabel>
                       <Select onValueChange={field.onChange} value={field.value} disabled={loading}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder='Select customer' />
+                            <SelectValue placeholder='Select supplier' />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {customers.map(customer => (
-                            <SelectItem key={customer.id} value={customer.id}>
-                              {customer.name} {customer.code ? `(${customer.code})` : ''}
+                          {suppliers.map(supplier => (
+                            <SelectItem key={supplier.id} value={supplier.id}>
+                              {supplier.name} {supplier.code ? `(${supplier.code})` : ''}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -310,11 +303,11 @@ export function OrderFormSheet({ open, onClose, onSaved, initialData }: OrderFor
               <div className='grid grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}
-                  name='orderDate'
+                  name='poDate'
                   render={({ field }) => (
                     <FormItem className='flex flex-col'>
                       <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
-                        Order Date
+                        PO Date
                       </FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
@@ -395,7 +388,7 @@ export function OrderFormSheet({ open, onClose, onSaved, initialData }: OrderFor
                     <Select onValueChange={field.onChange} value={field.value || ''}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder='Select shipping location' />
+                          <SelectValue placeholder='Select receiving location' />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -430,7 +423,7 @@ export function OrderFormSheet({ open, onClose, onSaved, initialData }: OrderFor
                       description: '',
                       quantity: 1,
                       unitOfMeasure: 'PCS',
-                      unitPrice: 0,
+                      unitCost: 0,
                     })
                   }
                 >
@@ -563,11 +556,11 @@ export function OrderFormSheet({ open, onClose, onSaved, initialData }: OrderFor
                   <div className='grid grid-cols-2 gap-4'>
                     <FormField
                       control={form.control}
-                      name={`items.${index}.unitPrice`}
+                      name={`items.${index}.unitCost`}
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
-                            Unit Price
+                            Unit Cost
                           </FormLabel>
                           <FormControl>
                             <Input
@@ -601,10 +594,10 @@ export function OrderFormSheet({ open, onClose, onSaved, initialData }: OrderFor
               <div className='grid grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}
-                  name='deliveryDate'
+                  name='expectedDeliveryDate'
                   render={({ field }) => (
                     <FormItem className='flex flex-col'>
-                      <FormLabel>Delivery Date</FormLabel>
+                      <FormLabel>Expected Delivery Date</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -652,111 +645,6 @@ export function OrderFormSheet({ open, onClose, onSaved, initialData }: OrderFor
                   )}
                 />
               </div>
-
-              <div className='grid grid-cols-2 gap-4'>
-                <FormField
-                  control={form.control}
-                  name='shippingCarrier'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Shipping Carrier</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value || ''}
-                          placeholder='e.g., FedEx, DHL'
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name='trackingNumber'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tracking Number</FormLabel>
-                      <FormControl>
-                        <Input {...field} value={field.value || ''} placeholder='Tracking number' />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className='grid grid-cols-2 gap-4'>
-                <FormField
-                  control={form.control}
-                  name='deliveryWindowStart'
-                  render={({ field }) => (
-                    <FormItem className='flex flex-col'>
-                      <FormLabel>Delivery Window Start</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant='outline'
-                              className={cn(
-                                'w-full pl-3 text-left font-normal',
-                                !field.value && 'text-muted-foreground'
-                              )}
-                            >
-                              {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
-                              <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className='w-auto p-0' align='start'>
-                          <Calendar
-                            mode='single'
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name='deliveryWindowEnd'
-                  render={({ field }) => (
-                    <FormItem className='flex flex-col'>
-                      <FormLabel>Delivery Window End</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant='outline'
-                              className={cn(
-                                'w-full pl-3 text-left font-normal',
-                                !field.value && 'text-muted-foreground'
-                              )}
-                            >
-                              {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
-                              <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className='w-auto p-0' align='start'>
-                          <Calendar
-                            mode='single'
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
             </div>
 
             <SheetFooter className='gap-2'>
@@ -765,7 +653,7 @@ export function OrderFormSheet({ open, onClose, onSaved, initialData }: OrderFor
               </Button>
               <Button type='submit' disabled={submitting}>
                 {submitting && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
-                {isEditing ? 'Update Sales Order' : 'Create Sales Order'}
+                {isEditing ? 'Update Purchase Order' : 'Create Purchase Order'}
               </Button>
             </SheetFooter>
           </form>

@@ -79,19 +79,6 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    label: 'Purchases',
-    icon: <ShoppingBag className='h-5 w-5' />,
-    path: '/purchases',
-    children: [
-      { label: 'Suppliers', icon: <UserCheck className='h-4 w-4' />, path: '/suppliers' },
-      {
-        label: 'Purchase Orders',
-        icon: <FilePlus className='h-4 w-4' />,
-        path: '/purchases/orders',
-      },
-    ],
-  },
-  {
     label: 'Purchase',
     icon: <ShoppingCart className='h-5 w-5' />,
     path: '/purchase',
