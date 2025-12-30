@@ -58,7 +58,7 @@ import {
   PrimaryButton,
   EmptyState,
 } from '@/components/globalComponents';
-import { BillFormSheet } from '@/components/bills/BillFormSheet';
+import { BillFormSheet } from '@/components/bills';
 import { billService, BillSummary, BillStatus } from '@/services/billService';
 import { locationService } from '@/services/locationService';
 import useAuth from '@/contexts/AuthContext';
@@ -149,10 +149,6 @@ export default function BillsListPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleRefresh = () => {
-    fetchBills();
   };
 
   const handleCreate = () => {
@@ -396,7 +392,6 @@ export default function BillsListPage() {
           setIsSheetOpen(false);
           setEditingBill(null);
         }}
-        onSaved={handleRefresh}
         initialData={editingBill}
       />
 

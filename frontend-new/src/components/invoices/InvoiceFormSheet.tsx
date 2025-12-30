@@ -3,11 +3,10 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 interface InvoiceFormSheetProps {
   open: boolean;
   onClose: () => void;
-  onSaved: () => void;
   initialData?: any | null;
 }
 
-export function InvoiceFormSheet({ open, onClose, onSaved, initialData }: InvoiceFormSheetProps) {
+export function InvoiceFormSheet({ open, onClose, initialData }: InvoiceFormSheetProps) {
   // TODO: Implement full invoice form with react-hook-form + zod
   // This is a placeholder that will be implemented in the next step
 

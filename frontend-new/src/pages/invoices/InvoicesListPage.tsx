@@ -5,7 +5,6 @@ import {
   MoreHorizontal,
   Edit,
   Trash2,
-  FileText,
   Send,
   DollarSign,
   CheckCircle,
@@ -59,7 +58,7 @@ import {
   PrimaryButton,
   EmptyState,
 } from '@/components/globalComponents';
-import { InvoiceFormSheet } from '@/components/invoices/InvoiceFormSheet';
+import { InvoiceFormSheet } from '@/components/invoices';
 import { invoiceService, InvoiceSummary, InvoiceStatus } from '@/services/invoiceService';
 import { locationService } from '@/services/locationService';
 import useAuth from '@/contexts/AuthContext';
@@ -150,10 +149,6 @@ export default function InvoicesListPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleRefresh = () => {
-    fetchInvoices();
   };
 
   const handleCreate = () => {
@@ -401,7 +396,6 @@ export default function InvoicesListPage() {
           setIsSheetOpen(false);
           setEditingInvoice(null);
         }}
-        onSaved={handleRefresh}
         initialData={editingInvoice}
       />
 

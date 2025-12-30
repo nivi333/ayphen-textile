@@ -3,11 +3,10 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 interface BillFormSheetProps {
   open: boolean;
   onClose: () => void;
-  onSaved: () => void;
   initialData?: any | null;
 }
 
-export function BillFormSheet({ open, onClose, onSaved, initialData }: BillFormSheetProps) {
+export function BillFormSheet({ open, onClose, initialData }: BillFormSheetProps) {
   // TODO: Implement full bill form with react-hook-form + zod
   // This is a placeholder that will be implemented in the next step
 
