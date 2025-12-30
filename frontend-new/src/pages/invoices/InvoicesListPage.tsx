@@ -5,12 +5,13 @@ import {
   MoreHorizontal,
   Edit,
   Trash2,
-  CheckCircle,
-  XCircle,
-  Truck,
-  Package,
-  Clock,
   FileText,
+  Send,
+  DollarSign,
+  CheckCircle,
+  AlertCircle,
+  XCircle,
+  Clock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -58,40 +59,36 @@ import {
   PrimaryButton,
   EmptyState,
 } from '@/components/globalComponents';
-import { PurchaseOrderFormSheet } from '@/components/purchase';
-import {
-  purchaseOrderService,
-  PurchaseOrderSummary,
-  POStatus,
-} from '@/services/purchaseOrderService';
+import { InvoiceFormSheet } from '@/components/invoices/InvoiceFormSheet';
+import { invoiceService, InvoiceSummary, InvoiceStatus } from '@/services/invoiceService';
 import { locationService } from '@/services/locationService';
 import useAuth from '@/contexts/AuthContext';
 import { format } from 'date-fns';
 
 const STATUS_CONFIG: Record<
-  POStatus,
+  InvoiceStatus,
   { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon?: any }
 > = {
   DRAFT: { label: 'Draft', variant: 'secondary', icon: Clock },
-  SENT: { label: 'Sent', variant: 'outline', icon: FileText },
-  CONFIRMED: { label: 'Confirmed', variant: 'default', icon: CheckCircle },
-  PARTIALLY_RECEIVED: { label: 'Partially Received', variant: 'outline', icon: Package },
-  RECEIVED: { label: 'Received', variant: 'outline', icon: Truck },
+  SENT: { label: 'Sent', variant: 'outline', icon: Send },
+  PARTIALLY_PAID: { label: 'Partially Paid', variant: 'outline', icon: DollarSign },
+  PAID: { label: 'Paid', variant: 'default', icon: CheckCircle },
+  OVERDUE: { label: 'Overdue', variant: 'destructive', icon: AlertCircle },
   CANCELLED: { label: 'Cancelled', variant: 'destructive', icon: XCircle },
 };
 
-const NEXT_STATUS_MAP: Record<POStatus, POStatus[]> = {
+const NEXT_STATUS_MAP: Record<InvoiceStatus, InvoiceStatus[]> = {
   DRAFT: ['SENT', 'CANCELLED'],
-  SENT: ['CONFIRMED', 'CANCELLED'],
-  CONFIRMED: ['PARTIALLY_RECEIVED', 'RECEIVED', 'CANCELLED'],
-  PARTIALLY_RECEIVED: ['RECEIVED'],
-  RECEIVED: [],
+  SENT: ['PARTIALLY_PAID', 'PAID', 'OVERDUE', 'CANCELLED'],
+  PARTIALLY_PAID: ['PAID', 'OVERDUE'],
+  OVERDUE: ['PARTIALLY_PAID', 'PAID'],
+  PAID: [],
   CANCELLED: [],
 };
 
-export default function PurchaseOrdersListPage() {
+export default function InvoicesListPage() {
   const [loading, setLoading] = useState(false);
-  const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrderSummary[]>([]);
+  const [invoices, setInvoices] = useState<InvoiceSummary[]>([]);
   const [locations, setLocations] = useState<any[]>([]);
 
   // Filters
@@ -100,22 +97,22 @@ export default function PurchaseOrdersListPage() {
 
   // Sheet & Dialogs
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [editingPO, setEditingPO] = useState<any | null>(null);
+  const [editingInvoice, setEditingInvoice] = useState<any | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [poToDelete, setPoToDelete] = useState<string | null>(null);
+  const [invoiceToDelete, setInvoiceToDelete] = useState<InvoiceSummary | null>(null);
 
   const { currentCompany } = useAuth();
 
   useEffect(() => {
     if (currentCompany?.id) {
       fetchLocations();
-      fetchPurchaseOrders();
+      fetchInvoices();
     }
   }, [currentCompany?.id]);
 
   useEffect(() => {
     if (currentCompany?.id) {
-      fetchPurchaseOrders();
+      fetchInvoices();
     }
   }, [searchText, statusFilter]);
 
@@ -128,77 +125,86 @@ export default function PurchaseOrdersListPage() {
     }
   };
 
-  const fetchPurchaseOrders = async () => {
+  const fetchInvoices = async () => {
     setLoading(true);
     try {
-      const response = await purchaseOrderService.getPurchaseOrders();
+      const response = await invoiceService.getInvoices();
       let filtered = response || [];
 
       // Apply filters
       if (statusFilter !== 'all') {
-        filtered = filtered.filter(po => po.status === statusFilter);
+        filtered = filtered.filter(inv => inv.status === statusFilter);
       }
       if (searchText) {
-        filtered = filtered.filter(po =>
-          po.supplierName?.toLowerCase().includes(searchText.toLowerCase())
+        filtered = filtered.filter(
+          inv =>
+            inv.customerName?.toLowerCase().includes(searchText.toLowerCase()) ||
+            inv.invoiceId?.toLowerCase().includes(searchText.toLowerCase())
         );
       }
 
-      setPurchaseOrders(filtered);
+      setInvoices(filtered);
     } catch (error: any) {
-      console.error('Error fetching purchase orders:', error);
-      toast.error('Failed to fetch purchase orders');
+      console.error('Error fetching invoices:', error);
+      toast.error('Failed to fetch invoices');
     } finally {
       setLoading(false);
     }
   };
 
   const handleRefresh = () => {
-    fetchPurchaseOrders();
+    fetchInvoices();
   };
 
   const handleCreate = () => {
-    setEditingPO(null);
+    setEditingInvoice(null);
     setIsSheetOpen(true);
   };
 
-  const handleEdit = async (po: PurchaseOrderSummary) => {
+  const handleEdit = async (invoice: InvoiceSummary) => {
     try {
       setLoading(true);
-      const details = await purchaseOrderService.getPurchaseOrderById(po.poId);
-      setEditingPO(details);
+      const details = await invoiceService.getInvoiceById(invoice.invoiceId);
+      setEditingInvoice(details);
       setIsSheetOpen(true);
     } catch (error) {
-      toast.error('Failed to load purchase order details');
+      toast.error('Failed to load invoice details');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDeleteClick = (poId: string) => {
-    setPoToDelete(poId);
+  const handleDeleteClick = (invoice: InvoiceSummary) => {
+    // Only DRAFT invoices can be deleted
+    if (invoice.status !== 'DRAFT') {
+      toast.error(
+        'Only draft invoices can be deleted to maintain audit trail and financial records.'
+      );
+      return;
+    }
+    setInvoiceToDelete(invoice);
     setDeleteDialogOpen(true);
   };
 
   const handleConfirmDelete = async () => {
-    if (!poToDelete) return;
+    if (!invoiceToDelete) return;
     try {
-      await purchaseOrderService.deletePurchaseOrder(poToDelete);
-      toast.success('Purchase order deleted');
-      fetchPurchaseOrders();
+      await invoiceService.deleteInvoice(invoiceToDelete.invoiceId);
+      toast.success('Invoice deleted successfully');
+      fetchInvoices();
     } catch (error: any) {
-      toast.error(error.message || 'Failed to delete purchase order');
+      toast.error(error.message || 'Failed to delete invoice');
     } finally {
       setDeleteDialogOpen(false);
-      setPoToDelete(null);
+      setInvoiceToDelete(null);
     }
   };
 
-  const handleStatusChange = async (poId: string, newStatus: POStatus) => {
+  const handleStatusChange = async (invoiceId: string, newStatus: InvoiceStatus) => {
     try {
-      await purchaseOrderService.updatePOStatus(poId, newStatus);
-      toast.success(`Purchase order status updated to ${STATUS_CONFIG[newStatus].label}`);
-      fetchPurchaseOrders();
+      await invoiceService.updateInvoiceStatus(invoiceId, newStatus);
+      toast.success(`Invoice status updated to ${STATUS_CONFIG[newStatus].label}`);
+      fetchInvoices();
     } catch (error: any) {
       toast.error(error.message || 'Failed to update status');
     }
@@ -213,7 +219,7 @@ export default function PurchaseOrdersListPage() {
   if (!currentCompany) {
     return (
       <PageContainer>
-        <EmptyState message='Please select a company to view purchase orders.' />
+        <EmptyState message='Please select a company to view invoices.' />
       </PageContainer>
     );
   }
@@ -221,16 +227,16 @@ export default function PurchaseOrdersListPage() {
   return (
     <PageContainer>
       <PageHeader>
-        <PageTitle>Purchase Orders</PageTitle>
+        <PageTitle>Invoices</PageTitle>
         <PrimaryButton onClick={handleCreate}>
-          <Plus className='mr-2 h-4 w-4' /> Create Purchase Order
+          <Plus className='mr-2 h-4 w-4' /> Create Invoice
         </PrimaryButton>
       </PageHeader>
 
       <ActionBar>
         <div className='flex-1 max-w-md'>
           <SearchInput
-            placeholder='Search by supplier...'
+            placeholder='Search by customer or invoice ID...'
             value={searchText}
             onChange={e => setSearchText(e.target.value)}
             onClear={() => setSearchText('')}
@@ -248,7 +254,7 @@ export default function PurchaseOrdersListPage() {
             <SelectItem value='all'>All Status</SelectItem>
             {Object.keys(STATUS_CONFIG).map(status => (
               <SelectItem key={status} value={status}>
-                {STATUS_CONFIG[status as POStatus].label}
+                {STATUS_CONFIG[status as InvoiceStatus].label}
               </SelectItem>
             ))}
           </SelectContent>
@@ -259,60 +265,86 @@ export default function PurchaseOrdersListPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>PO ID</TableHead>
-              <TableHead>Supplier</TableHead>
-              <TableHead>PO Date</TableHead>
-              <TableHead>Expected Delivery</TableHead>
+              <TableHead>Invoice ID</TableHead>
+              <TableHead>Customer</TableHead>
+              <TableHead>Invoice Date</TableHead>
+              <TableHead>Due Date</TableHead>
               <TableHead>Location</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className='text-right'>Total</TableHead>
+              <TableHead className='text-right'>Total Amount</TableHead>
+              <TableHead className='text-right'>Balance Due</TableHead>
               <TableHead className='w-[60px]'></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={8} className='text-center py-10'>
-                  Loading purchase orders...
+                <TableCell colSpan={9} className='text-center py-10'>
+                  Loading invoices...
                 </TableCell>
               </TableRow>
-            ) : purchaseOrders.length === 0 ? (
+            ) : invoices.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className='text-center py-10 text-muted-foreground'>
-                  No purchase orders found
+                <TableCell colSpan={9} className='text-center py-10 text-muted-foreground'>
+                  No invoices found
                 </TableCell>
               </TableRow>
             ) : (
-              purchaseOrders.map(po => {
-                const statusInfo = STATUS_CONFIG[po.status] || {
-                  label: po.status,
+              invoices.map(invoice => {
+                const statusInfo = STATUS_CONFIG[invoice.status] || {
+                  label: invoice.status,
                   variant: 'secondary',
                 };
+                const isOverdue =
+                  invoice.status !== 'PAID' &&
+                  invoice.status !== 'CANCELLED' &&
+                  new Date(invoice.dueDate) < new Date();
 
                 return (
-                  <TableRow key={po.poId}>
-                    <TableCell className='font-medium'>{po.poId}</TableCell>
-                    <TableCell>
-                      <div className='font-medium'>{po.supplierName}</div>
-                      {po.supplierCode && (
-                        <div className='text-xs text-muted-foreground'>{po.supplierCode}</div>
+                  <TableRow key={invoice.invoiceId}>
+                    <TableCell className='font-medium'>
+                      <div>{invoice.invoiceId}</div>
+                      {invoice.invoiceNumber && (
+                        <div className='text-xs text-muted-foreground'>
+                          #{invoice.invoiceNumber}
+                        </div>
                       )}
                     </TableCell>
-                    <TableCell>{format(new Date(po.poDate), 'MMM d, yyyy')}</TableCell>
                     <TableCell>
-                      {po.expectedDeliveryDate
-                        ? format(new Date(po.expectedDeliveryDate), 'MMM d, yyyy')
-                        : '—'}
+                      <div className='font-medium'>{invoice.customerName}</div>
+                      {invoice.customerCode && (
+                        <div className='text-xs text-muted-foreground'>{invoice.customerCode}</div>
+                      )}
                     </TableCell>
-                    <TableCell>{getLocationName(po.locationId)}</TableCell>
+                    <TableCell>{format(new Date(invoice.invoiceDate), 'MMM d, yyyy')}</TableCell>
+                    <TableCell className={isOverdue ? 'text-destructive' : ''}>
+                      {format(new Date(invoice.dueDate), 'MMM d, yyyy')}
+                    </TableCell>
+                    <TableCell>{getLocationName(invoice.locationId)}</TableCell>
                     <TableCell>
                       <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
                     </TableCell>
                     <TableCell className='text-right font-medium'>
-                      {po.currency}{' '}
-                      {Number(po.totalAmount).toLocaleString(undefined, {
+                      {invoice.currency}{' '}
+                      {Number(invoice.totalAmount).toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                       })}
+                    </TableCell>
+                    <TableCell className='text-right font-medium'>
+                      <span
+                        className={
+                          isOverdue
+                            ? 'text-destructive'
+                            : Number(invoice.balanceDue) > 0
+                              ? 'text-yellow-600'
+                              : 'text-green-600'
+                        }
+                      >
+                        {invoice.currency}{' '}
+                        {Number(invoice.balanceDue).toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                        })}
+                      </span>
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>
@@ -324,30 +356,34 @@ export default function PurchaseOrdersListPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align='end'>
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem onClick={() => handleEdit(po)}>
+                          <DropdownMenuItem onClick={() => handleEdit(invoice)}>
                             <Edit className='mr-2 h-4 w-4' /> Edit
                           </DropdownMenuItem>
-                          {NEXT_STATUS_MAP[po.status]?.length > 0 && (
+                          {NEXT_STATUS_MAP[invoice.status]?.length > 0 && (
                             <>
                               <DropdownMenuSeparator />
                               <DropdownMenuLabel>Change Status</DropdownMenuLabel>
-                              {NEXT_STATUS_MAP[po.status].map(nextStatus => (
+                              {NEXT_STATUS_MAP[invoice.status].map(nextStatus => (
                                 <DropdownMenuItem
                                   key={nextStatus}
-                                  onClick={() => handleStatusChange(po.poId, nextStatus)}
+                                  onClick={() => handleStatusChange(invoice.invoiceId, nextStatus)}
                                 >
                                   {STATUS_CONFIG[nextStatus].label}
                                 </DropdownMenuItem>
                               ))}
                             </>
                           )}
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className='text-destructive focus:text-destructive'
-                            onClick={() => handleDeleteClick(po.poId)}
-                          >
-                            <Trash2 className='mr-2 h-4 w-4' /> Delete
-                          </DropdownMenuItem>
+                          {invoice.status === 'DRAFT' && (
+                            <>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                className='text-destructive focus:text-destructive'
+                                onClick={() => handleDeleteClick(invoice)}
+                              >
+                                <Trash2 className='mr-2 h-4 w-4' /> Delete
+                              </DropdownMenuItem>
+                            </>
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -359,22 +395,23 @@ export default function PurchaseOrdersListPage() {
         </Table>
       </div>
 
-      <PurchaseOrderFormSheet
+      <InvoiceFormSheet
         open={isSheetOpen}
         onClose={() => {
           setIsSheetOpen(false);
-          setEditingPO(null);
+          setEditingInvoice(null);
         }}
         onSaved={handleRefresh}
-        initialData={editingPO}
+        initialData={editingInvoice}
       />
+
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the purchase order and
-              remove it from our servers.
+              This action cannot be undone. This will permanently delete invoice "
+              {invoiceToDelete?.invoiceId}" and remove it from our servers.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

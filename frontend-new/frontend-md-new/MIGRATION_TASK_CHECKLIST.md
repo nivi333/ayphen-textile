@@ -687,41 +687,41 @@ Create all input variants in `globalComponents.tsx`:
 > [!NOTE]
 > **Why Priority 9**: Invoices and bills are financial documents that require customers, suppliers, and orders to exist.
 
-- [ ] **InvoicesListPage.tsx**
+- [x] **InvoicesListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`invoiceService`)
-  - [ ] **API Integration**: 
+  - [x] **API Integration**: 
     - GET `/api/v1/invoices` - List all invoices
     - GET `/api/v1/invoices/{id}` - Get invoice details
     - DELETE `/api/v1/invoices/{id}` - Delete invoice
     - PATCH `/api/v1/invoices/{id}/status` - Update invoice status
 
-- [ ] **BillsListPage.tsx**
+- [x] **BillsListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`billService`)
-  - [ ] **API Integration**: \n    - GET `/api/v1/bills` - List all bills
+  - [x] **API Integration**: \n    - GET `/api/v1/bills` - List all bills
     - GET `/api/v1/bills/{id}` - Get bill details
     - DELETE `/api/v1/bills/{id}` - Delete bill
     - PATCH `/api/v1/bills/{id}/status` - Update bill status
 
-- [ ] **Components**
-  - [ ] `/src/components/invoices/InvoiceFormDrawer.tsx` → use Sheet
+- [/] **Components** (Placeholder forms created, full implementation pending)
+  - [/] `/src/components/invoices/InvoiceFormSheet.tsx` → use Sheet
     - [ ] **API Integration**: 
       - POST `/api/v1/invoices` - Create invoice
       - PUT `/api/v1/invoices/{id}` - Update invoice
-  - [ ] `/src/components/invoices/InvoiceTable.tsx` → use Table
-  - [ ] `/src/components/bills/BillFormDrawer.tsx` → use Sheet
+  - [ ] `/src/components/invoices/InvoiceTable.tsx` → use Table (Integrated in page)
+  - [/] `/src/components/bills/BillFormSheet.tsx` → use Sheet
     - [ ] **API Integration**: 
       - POST `/api/v1/bills` - Create bill
       - PUT `/api/v1/bills/{id}` - Update bill
-  - [ ] `/src/components/bills/BillTable.tsx` → use Table
+  - [ ] `/src/components/bills/BillTable.tsx` → use Table (Integrated in page)
 
-- [ ] **Routing & Navigation**
-  - [ ] Add route to `AppRouter.tsx` (`/invoices`, `/bills`)
-  - [ ] Add sidebar link in `Sidebar.tsx`
-  - [ ] Verify navigation flow
+- [x] **Routing & Navigation**
+  - [x] Add route to `AppRouter.tsx` (`/invoices`, `/bills`), `App.tsx`
+  - [x] Add sidebar link in `Sidebar.tsx` (Already exists)
+  - [x] Verify navigation flow
 
 ### Priority 10: Finance Module (`/src/pages/finance/`)
 
@@ -767,7 +767,7 @@ Create all input variants in `globalComponents.tsx`:
       - PUT `/api/v1/expenses/{id}` - Update expense
 
 - [ ] **Routing & Navigation**
-  - [ ] Add route to `AppRouter.tsx` (`/finance`)
+  - [ ] Add route to `AppRouter.tsx` (`/finance`), `App.tsx`
   - [ ] Add sidebar link in `Sidebar.tsx`
   - [ ] Verify navigation flow
 
@@ -839,7 +839,7 @@ Create all input variants in `globalComponents.tsx`:
   - [ ] `DefectChart.tsx` → use Recharts
 
 - [ ] **Routing & Navigation**
-  - [ ] Add route to `AppRouter.tsx` (`/quality`)
+  - [ ] Add route to `AppRouter.tsx` (`/quality`), `App.tsx`
   - [ ] Add sidebar link in `Sidebar.tsx`
   - [ ] Verify navigation flow
 

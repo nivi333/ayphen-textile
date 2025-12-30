@@ -16,6 +16,9 @@ import ProductsListPage from './pages/products/ProductsListPage';
 import CustomerListPage from './pages/sales/CustomerListPage';
 import OrdersListPage from './pages/orders/OrdersListPage';
 import SupplierListPage from './pages/purchase/SupplierListPage';
+import PurchaseOrdersListPage from './pages/purchase/PurchaseOrdersListPage';
+import InvoicesListPage from './pages/invoices/InvoicesListPage';
+import BillsListPage from './pages/bills/BillsListPage';
 import PlaceholderPage from './components/PlaceholderPage';
 import { SidebarStylesInjector } from './styles/sidebar.styles';
 import './index.css';
@@ -161,11 +164,11 @@ function App() {
                 }
               />
               <Route
-                path='/sales/invoices'
+                path='/invoices'
                 element={
                   <ProtectedRoute requireCompany={true}>
                     <MainLayout>
-                      <PlaceholderPage />
+                      <InvoicesListPage />
                     </MainLayout>
                   </ProtectedRoute>
                 }
@@ -175,17 +178,17 @@ function App() {
                 element={
                   <ProtectedRoute requireCompany={true}>
                     <MainLayout>
-                      <PlaceholderPage />
+                      <PurchaseOrdersListPage />
                     </MainLayout>
                   </ProtectedRoute>
                 }
               />
               <Route
-                path='/purchase/bills'
+                path='/bills'
                 element={
                   <ProtectedRoute requireCompany={true}>
                     <MainLayout>
-                      <PlaceholderPage />
+                      <BillsListPage />
                     </MainLayout>
                   </ProtectedRoute>
                 }

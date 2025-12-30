@@ -26,11 +26,11 @@ export const MachineListPage = PlaceholderPage;
 // Orders
 export { default as OrdersListPage } from './orders/OrdersListPage';
 
-// Invoices - TODO: Migrate these pages
-export const InvoicesListPage = PlaceholderPage;
+// Invoices
+export { default as InvoicesListPage } from './invoices/InvoicesListPage';
 
-// Bills - TODO: Migrate these pages
-export const BillsListPage = PlaceholderPage;
+// Bills
+export { default as BillsListPage } from './bills/BillsListPage';
 
 // Sales
 export { default as CustomerListPage } from './sales/CustomerListPage';

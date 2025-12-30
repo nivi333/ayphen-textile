@@ -1,0 +1,28 @@
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+
+interface InvoiceFormSheetProps {
+  open: boolean;
+  onClose: () => void;
+  onSaved: () => void;
+  initialData?: any | null;
+}
+
+export function InvoiceFormSheet({ open, onClose, onSaved, initialData }: InvoiceFormSheetProps) {
+  // TODO: Implement full invoice form with react-hook-form + zod
+  // This is a placeholder that will be implemented in the next step
+
+  return (
+    <Sheet open={open} onOpenChange={val => !val && onClose()}>
+      <SheetContent className='w-[720px] sm:max-w-[720px] overflow-y-auto'>
+        <SheetHeader>
+          <SheetTitle>{initialData ? 'Edit Invoice' : 'Create Invoice'}</SheetTitle>
+        </SheetHeader>
+        <div className='py-6'>
+          <p className='text-sm text-muted-foreground'>
+            Invoice form implementation in progress...
+          </p>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}
