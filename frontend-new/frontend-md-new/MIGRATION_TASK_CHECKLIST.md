@@ -706,17 +706,17 @@ Create all input variants in `globalComponents.tsx`:
     - DELETE `/api/v1/bills/{id}` - Delete bill
     - PATCH `/api/v1/bills/{id}/status` - Update bill status
 
-- [/] **Components** (Placeholder forms created, full implementation pending)
-  - [/] `/src/components/invoices/InvoiceFormSheet.tsx` → use Sheet
-    - [ ] **API Integration**: 
+- [x] **Components**
+  - [x] `/src/components/invoices/InvoiceFormSheet.tsx` → use Sheet
+    - [x] **API Integration**: 
       - POST `/api/v1/invoices` - Create invoice
       - PUT `/api/v1/invoices/{id}` - Update invoice
-  - [ ] `/src/components/invoices/InvoiceTable.tsx` → use Table (Integrated in page)
-  - [/] `/src/components/bills/BillFormSheet.tsx` → use Sheet
-    - [ ] **API Integration**: 
+  - [x] `/src/components/invoices/InvoiceTable.tsx` → use Table (Integrated in page)
+  - [x] `/src/components/bills/BillFormSheet.tsx` → use Sheet
+    - [x] **API Integration**: 
       - POST `/api/v1/bills` - Create bill
       - PUT `/api/v1/bills/{id}` - Update bill
-  - [ ] `/src/components/bills/BillTable.tsx` → use Table (Integrated in page)
+  - [x] `/src/components/bills/BillTable.tsx` → use Table (Integrated in page)
 
 - [x] **Routing & Navigation**
   - [x] Add route to `AppRouter.tsx` (`/invoices`, `/bills`), `App.tsx`
