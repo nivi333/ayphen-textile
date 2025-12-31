@@ -39,24 +39,24 @@ export { default as CustomerListPage } from './sales/CustomerListPage';
 export { default as SupplierListPage } from './purchase/SupplierListPage';
 export { default as PurchaseOrdersListPage } from './purchase/PurchaseOrdersListPage';
 
-// Quality Control - TODO: Migrate these pages
-export const QualityCheckpointsListPage = PlaceholderPage;
-export const QualityDefectsListPage = PlaceholderPage;
-export const QualityReportsPage = PlaceholderPage;
-export const ComplianceReportsListPage = PlaceholderPage;
-export const InspectionsListPage = PlaceholderPage;
-export const InspectionDetailsPage = PlaceholderPage;
+// Quality Control
+export { default as QualityCheckpointsListPage } from './quality/QualityCheckpointsListPage';
+export { default as QualityDefectsListPage } from './quality/QualityDefectsListPage';
+export { default as QualityReportsPage } from './quality/QualityReportsPage';
+export { default as ComplianceReportsListPage } from './quality/ComplianceReportsListPage';
+export { default as InspectionsListPage } from './quality/InspectionsListPage';
+export { default as InspectionDetailsPage } from './quality/InspectionDetailsPage';
 
 // Users
 export { default as UsersListPage } from './users/UsersListPage';
 export const UserProfilePage = PlaceholderPage; // TODO: Migrate this page
 
-// Finance - TODO: Migrate these pages
-export const FinanceOverviewPage = PlaceholderPage;
-export const AccountsReceivablePage = PlaceholderPage;
-export const AccountsPayablePage = PlaceholderPage;
-export const ExpensesPage = PlaceholderPage;
-export const PettyCashPage = PlaceholderPage;
+// Finance
+export { default as FinanceOverviewPage } from './finance/FinanceOverviewPage';
+export { default as AccountsReceivablePage } from './finance/AccountsReceivablePage';
+export { default as AccountsPayablePage } from './finance/AccountsPayablePage';
+export { default as ExpensesPage } from './finance/ExpensesPage';
+export { default as PettyCashPage } from './finance/PettyCashPage';
 
 // Reports - TODO: Migrate these pages
 export const ReportsListPage = PlaceholderPage;

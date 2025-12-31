@@ -133,8 +133,7 @@ export default function InventoryListPage() {
   };
 
   return (
-    <MainLayout>
-      <div className='space-y-6'>
+      <div className='space-y-3'>
         {/* Header */}
         <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4'>
           <div>
@@ -239,6 +238,5 @@ export default function InventoryListPage() {
         {/* Reservation Dialog - Not integrated in list/actions yet, but available */}
         {/* <StockReservationDialog ... /> */}
       </div>
-    </MainLayout>
   );
 }
