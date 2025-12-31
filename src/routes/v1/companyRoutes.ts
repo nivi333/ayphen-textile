@@ -12,6 +12,9 @@ const router = Router();
 // Check slug availability (authenticated users only)
 router.get('/check-slug', companyController.checkSlugAvailability.bind(companyController));
 
+// Check name availability (authenticated users only)
+router.get('/check-name', companyController.checkNameAvailability.bind(companyController));
+
 // Get all companies for authenticated user
 router.get('/', companyController.getUserCompanies.bind(companyController));
 
@@ -28,24 +31,28 @@ router.get('/:tenantId/logo', companyController.getCompanyLogo.bind(companyContr
 router.post('/:tenantId/switch', companyController.switchCompany.bind(companyController));
 
 // Update company details (OWNER/ADMIN only)
-router.put('/:tenantId', 
-  requireRole(['OWNER', 'ADMIN']), 
+router.put(
+  '/:tenantId',
+  requireRole(['OWNER', 'ADMIN']),
   companyController.updateCompany.bind(companyController)
 );
 
 // Invite user to company (OWNER/ADMIN only)
-router.post('/:tenantId/invite', 
-  requireRole(['OWNER', 'ADMIN']), 
+router.post(
+  '/:tenantId/invite',
+  requireRole(['OWNER', 'ADMIN']),
   companyController.inviteUser.bind(companyController)
 );
 
 // Accept company invitation
-router.post('/accept-invitation/:invitationId', 
+router.post(
+  '/accept-invitation/:invitationId',
   companyController.acceptInvitation.bind(companyController)
 );
 
 // Delete company (OWNER only)
-router.delete('/:tenantId',
+router.delete(
+  '/:tenantId',
   requireRole(['OWNER']),
   companyController.deleteCompany.bind(companyController)
 );

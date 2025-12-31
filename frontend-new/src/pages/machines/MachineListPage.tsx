@@ -231,12 +231,8 @@ export default function MachineListPage() {
       <PageHeader>
         <div>
           <PageTitle>Machine Management</PageTitle>
-          <p className='text-sm text-muted-foreground mt-1'>
-            Manage your machines, maintenance schedules, and breakdowns
-          </p>
         </div>
         <PrimaryButton onClick={handleCreateMachine} disabled={isEmployee}>
-          <Cog className='mr-2 h-4 w-4' />
           Add Machine
         </PrimaryButton>
       </PageHeader>
@@ -283,11 +279,9 @@ export default function MachineListPage() {
         </div>
       ) : machines.length === 0 ? (
         <EmptyState
-          icon={<Cog className='h-12 w-12' />}
           message='No machines found. Get started by adding your first machine.'
           action={
             <PrimaryButton onClick={handleCreateMachine} disabled={isEmployee}>
-              <Cog className='mr-2 h-4 w-4' />
               Add First Machine
             </PrimaryButton>
           }

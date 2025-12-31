@@ -48,6 +48,29 @@ async function generateLocationId(): Promise<string> {
 }
 
 class CompanyService {
+  // Check if company name already exists (case-insensitive)
+  async checkNameExists(name: string, excludeCompanyId?: string): Promise<boolean> {
+    try {
+      const trimmedName = name.trim();
+
+      // Use raw query for case-insensitive comparison
+      const existing = await globalPrisma.companies.findFirst({
+        where: {
+          name: {
+            equals: trimmedName,
+            mode: 'insensitive',
+          },
+          ...(excludeCompanyId && { id: { not: excludeCompanyId } }),
+        },
+      });
+
+      return !!existing;
+    } catch (error) {
+      console.error('Error checking company name:', error);
+      return false; // Allow on error to not block operations
+    }
+  }
+
   // Create company with user as owner (with transaction safety)
   async createCompany(userId: string, companyData: CreateCompanyData) {
     // CRITICAL: Validate userId (UUID format and existence)
@@ -83,6 +106,12 @@ class CompanyService {
     // Validate business rules
     if (companyData.name.length < 2 || companyData.name.length > 100) {
       throw new Error('Company name must be between 2 and 100 characters');
+    }
+
+    // CRITICAL: Check company name uniqueness (case-insensitive)
+    const nameExists = await this.checkNameExists(companyData.name);
+    if (nameExists) {
+      throw new Error('Company name already exists. Please choose a different name.');
     }
 
     // CRITICAL: Validate required address fields for default location creation
@@ -522,6 +551,14 @@ class CompanyService {
 
       if (!userCompany) {
         throw new Error('Access denied. Only OWNER or ADMIN can update company.');
+      }
+
+      // CRITICAL: Check company name uniqueness if name is being updated
+      if (updateData.name !== undefined) {
+        const nameExists = await this.checkNameExists(updateData.name, companyId);
+        if (nameExists) {
+          throw new Error('Company name already exists. Please choose a different name.');
+        }
       }
 
       // Map updateData (camelCase) to Prisma fields (snake_case)

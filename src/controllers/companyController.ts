@@ -87,7 +87,7 @@ export class CompanyController {
       }
 
       const userId = req.userId!;
-      
+
       // Normalize address fields
       const companyData = {
         ...value,
@@ -95,7 +95,7 @@ export class CompanyController {
         // Remove address1 since we've normalized it
         address1: undefined,
       };
-      
+
       const company = await companyService.createCompany(userId, companyData);
 
       res.status(201).json({
@@ -299,7 +299,13 @@ export class CompanyController {
         locationId,
       });
 
-      const invitation = await companyService.inviteUser(userId, tenantId, emailOrPhone, role, locationId);
+      const invitation = await companyService.inviteUser(
+        userId,
+        tenantId,
+        emailOrPhone,
+        role,
+        locationId
+      );
 
       res.status(201).json({
         success: true,
@@ -386,6 +392,37 @@ export class CompanyController {
       res.status(500).json({
         success: false,
         message: error.message || 'Failed to check slug availability',
+      });
+    }
+  }
+
+  /**
+   * Check if company name is available
+   * GET /api/v1/companies/check-name?name=example
+   */
+  async checkNameAvailability(req: Request, res: Response): Promise<void> {
+    try {
+      const { name } = req.query;
+
+      if (!name || typeof name !== 'string') {
+        res.status(400).json({
+          success: false,
+          message: 'Name parameter is required',
+        });
+        return;
+      }
+
+      const nameExists = await companyService.checkNameExists(name);
+
+      res.json({
+        success: true,
+        available: !nameExists,
+      });
+    } catch (error: any) {
+      logger.error('Error checking name availability:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to check name availability',
       });
     }
   }
