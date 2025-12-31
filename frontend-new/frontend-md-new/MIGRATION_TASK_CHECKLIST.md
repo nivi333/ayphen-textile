@@ -482,7 +482,9 @@ Create all input variants in `globalComponents.tsx`:
 - [x] **CompanyDetailPage.tsx**
   - Replace Ant Design Descriptions with custom layout
   - Replace Tabs with shadcn/ui Tabs
+  - [x] **Edit Company Functionality**: Added Edit Company button with CompanyCreationSheet integration
   - [x] **API Integration**: GET `/api/v1/companies/{id}` - Get detailed company info
+  - [x] **API Integration**: PUT `/api/v1/companies/{id}` - Update company details
  
 - [x] **LocationListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
