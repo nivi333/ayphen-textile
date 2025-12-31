@@ -137,20 +137,21 @@ print_section "STEP 2: Creating 9 Employee Users"
 
 ROLES=("ADMIN" "ADMIN" "ADMIN" "MANAGER" "MANAGER" "MANAGER" "EMPLOYEE" "EMPLOYEE" "EMPLOYEE")
 
-for i in {1..9}; do
-    ROLE=${ROLES[$i-1]}
-    EMAIL="$(echo $ROLE | tr '[:upper:]' '[:lower:]')${i}@lavoro.com"  # Convert to lowercase
+for i in {0..8}; do
+    ROLE=${ROLES[$i]}
+    USER_NUM=$((i + 1))
+    EMAIL="$(echo $ROLE | tr '[:upper:]' '[:lower:]')${USER_NUM}@lavoro.com"  # Convert to lowercase
     
-    print_info "Creating employee user $i: $EMAIL..."
+    print_info "Creating employee user $USER_NUM: $EMAIL..."
     
     REGISTER_RESPONSE=$(curl -s -X POST "$BASE_URL/auth/register" \
       -H "$CONTENT_TYPE" \
       -d "{
         \"email\": \"$EMAIL\",
-        \"phone\": \"+9198765432${i}0\",
+        \"phone\": \"+9198765432${USER_NUM}0\",
         \"password\": \"$OWNER_PASSWORD\",
         \"firstName\": \"${ROLE}\",
-        \"lastName\": \"User${i}\",
+        \"lastName\": \"User${USER_NUM}\",
         \"hasConsentedToTerms\": true,
         \"hasConsentedToPrivacy\": true,
         \"hasConsentedToCookies\": true
@@ -173,9 +174,9 @@ for i in {1..9}; do
     if [ "$TOKEN" != "null" ] && [ -n "$TOKEN" ]; then
         EMPLOYEE_EMAILS[$i]=$EMAIL
         EMPLOYEE_TOKENS[$i]=$TOKEN
-        print_status 0 "Employee user $i ready: $EMAIL (Role: $ROLE)"
+        print_status 0 "Employee user $USER_NUM ready: $EMAIL (Role: $ROLE)"
     else
-        print_status 1 "Failed to create/login employee user $i"
+        print_status 1 "Failed to create/login employee user $USER_NUM"
     fi
 done
 
@@ -243,9 +244,10 @@ LOCATIONS_RESPONSE=$(curl -s -X GET "$BASE_URL/locations" \
 
 FIRST_LOCATION_ID=$(echo $LOCATIONS_RESPONSE | jq -r '.data[0].id')
 
-for i in {1..9}; do
-    ROLE=${ROLES[$i-1]}
+for i in {0..8}; do
+    ROLE=${ROLES[$i]}
     EMAIL=${EMPLOYEE_EMAILS[$i]}
+    USER_NUM=$((i + 1))
     
     print_info "Sending invitation to $EMAIL as $ROLE..."
     
@@ -787,10 +789,11 @@ echo "  Role: OWNER (All 3 companies)"
 echo ""
 
 echo -e "${GREEN}EMPLOYEE USERS (Company 1 - ${COMPANY_NAMES[0]}):${NC}"
-for i in {1..9}; do
-    ROLE=${ROLES[$i-1]}
+for i in {0..8}; do
+    ROLE=${ROLES[$i]}
     EMAIL=${EMPLOYEE_EMAILS[$i]}
-    echo "  $i. $EMAIL | $OWNER_PASSWORD | $ROLE"
+    USER_NUM=$((i + 1))
+    echo "  $USER_NUM. $EMAIL | $OWNER_PASSWORD | $ROLE"
 done
 echo ""
 
