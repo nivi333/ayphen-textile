@@ -916,41 +916,41 @@ Create all input variants in `globalComponents.tsx`:
 > [!NOTE]
 > **Why Priority 12**: Machine management is for tracking equipment and maintenance.
 
-- [ ] **MachineListPage.tsx**
+- [x] **MachineListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Replace Tag with Badge for machine status
   - Keep same API integration (`machineService`)
-  - [ ] **API Integration**: 
+  - [x] **API Integration**: 
     - GET `/api/v1/machines` - List all machines
     - GET `/api/v1/machines/{id}` - Get machine details
     - DELETE `/api/v1/machines/{id}` - Delete machine
 
-- [ ] **Components (`/src/components/machines/`)**
-  - [ ] `MachineFormDrawer.tsx` → use Sheet
-    - [ ] **API Integration**: 
+- [x] **Components (`/src/components/machines/`)**
+  - [x] `MachineFormSheet.tsx` (formerly MachineFormDrawer.tsx) → use Sheet
+    - [x] **API Integration**: 
       - POST `/api/v1/machines` - Create machine
       - PUT `/api/v1/machines/{id}` - Update machine
-  - [ ] `BreakdownFormDrawer.tsx` → use Sheet
+  - [ ] `BreakdownFormSheet.tsx` → use Sheet (Placeholder for future)
     - [ ] **API Integration**: 
       - POST `/api/v1/machines/{id}/breakdown` - Report breakdown
       - GET `/api/v1/machines/{id}/breakdowns` - Get breakdown history
-  - [ ] `MaintenanceScheduleDrawer.tsx` → use Sheet
+  - [ ] `MaintenanceScheduleSheet.tsx` → use Sheet (Placeholder for future)
     - [ ] **API Integration**: 
       - POST `/api/v1/machines/{id}/maintenance/schedule` - Schedule maintenance
       - PUT `/api/v1/machines/maintenance/{id}` - Update schedule
-  - [ ] `MaintenanceRecordDrawer.tsx` → use Sheet
+  - [ ] `MaintenanceRecordSheet.tsx` → use Sheet (Placeholder for future)
     - [ ] **API Integration**: 
       - POST `/api/v1/machines/{id}/maintenance/record` - Record maintenance
       - GET `/api/v1/machines/{id}/maintenance` - Get maintenance history
-  - [ ] `MachineStatusBadge.tsx` → use Badge
-  - [ ] `MachineUtilizationChart.tsx` → use Recharts
+  - [x] `MachineStatusBadge` → use Badge (Implemented inline in MachineListPage)
+  - [ ] `MachineUtilizationChart.tsx` → use Recharts (Placeholder for future)
     - [ ] **API Integration**: GET `/api/v1/machines/utilization` - Get utilization data
 
-- [ ] **Routing & Navigation**
-  - [ ] Add route to `AppRouter.tsx` (`/machines`)
-  - [ ] Add sidebar link in `Sidebar.tsx`
-  - [ ] Verify navigation flow
+- [x] **Routing & Navigation**
+  - [x] Add route to `AppRouter.tsx` (`/machines`)
+  - [x] Add sidebar link in `Sidebar.tsx` (Already exists)
+  - [x] Verify navigation flow
 
 ### Priority 13: Reports Module (`/src/pages/reports/`)
 

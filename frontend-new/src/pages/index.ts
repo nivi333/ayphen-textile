@@ -20,8 +20,8 @@ export { default as ProductsListPage } from './products/ProductsListPage';
 // Inventory - TODO: Migrate these pages
 export { default as InventoryListPage } from './inventory/InventoryListPage';
 
-// Machines - TODO: Migrate these pages
-export const MachineListPage = PlaceholderPage;
+// Machines
+export { default as MachineListPage } from './machines/MachineListPage';
 
 // Orders
 export { default as OrdersListPage } from './orders/OrdersListPage';
