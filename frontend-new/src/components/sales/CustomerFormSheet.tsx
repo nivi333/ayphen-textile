@@ -32,7 +32,8 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, X } from 'lucide-react';
-import { Customer } from '@/services/customerService';
+import { Customer, customerService } from '@/services/customerService';
+import { toast } from 'sonner';
 
 const customerSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -181,6 +182,8 @@ export function CustomerFormSheet({
       });
 
       form.reset(resetData);
+      setOriginalName(initialData.name);
+      setNameUnique(true);
     } else {
       form.reset({
         name: '',
@@ -215,12 +218,18 @@ export function CustomerFormSheet({
         tags: [],
         isActive: true,
       });
+      setOriginalName('');
+      setNameUnique(true);
     }
   }, [initialData, isOpen, form]);
 
   const handleOpenChange = (open: boolean) => {
     if (!open) onClose();
   };
+
+  const [nameUnique, setNameUnique] = useState(true);
+  const [nameChecking, setNameChecking] = useState(false);
+  const [originalName, setOriginalName] = useState('');
 
   const [tagInput, setTagInput] = useState('');
 
@@ -239,6 +248,43 @@ export function CustomerFormSheet({
     field.onChange(field.value?.filter((tag: string) => tag !== tagToRemove) || []);
   };
 
+  // Name uniqueness validation
+  const checkNameUnique = async (name: string) => {
+    if (!name || name.trim() === '') {
+      setNameUnique(true);
+      return;
+    }
+    if (initialData && name.trim().toLowerCase() === originalName.toLowerCase()) {
+      setNameUnique(true);
+      return;
+    }
+    try {
+      setNameChecking(true);
+      const isAvailable = await customerService.checkNameAvailability(name.trim());
+      setNameUnique(isAvailable);
+    } catch (error) {
+      setNameUnique(true);
+    } finally {
+      setNameChecking(false);
+    }
+  };
+
+  // Debounce name validation
+  useEffect(() => {
+    const nameValue = form.watch('name');
+    if (!nameValue) return;
+    const timeoutId = setTimeout(() => checkNameUnique(nameValue), 500);
+    return () => clearTimeout(timeoutId);
+  }, [form.watch('name')]);
+
+  const handleSubmit = async (data: CustomerFormValues) => {
+    if (!nameUnique) {
+      toast.error('Customer name already exists. Please choose a different name.');
+      return;
+    }
+    await onSubmit(data);
+  };
+
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <SheetContent className='w-full sm:max-w-[600px] overflow-y-auto'>
@@ -250,7 +296,7 @@ export function CustomerFormSheet({
         </SheetHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-6'>
             {/* Basic Information */}
             <div className='space-y-4'>
               <h3 className='text-sm font-medium text-muted-foreground'>Basic Information</h3>
@@ -277,8 +323,26 @@ export function CustomerFormSheet({
                         Customer Name <span className='text-destructive'>*</span>
                       </FormLabel>
                       <FormControl>
-                        <Input placeholder='Enter name' {...field} />
+                        <div className='relative'>
+                          <Input
+                            placeholder='Enter name'
+                            {...field}
+                            onChange={e => {
+                              field.onChange(e);
+                              if (e.target.value && e.target.value.trim()) {
+                                setNameChecking(true);
+                              }
+                            }}
+                            className={!nameUnique ? 'border-red-500' : ''}
+                          />
+                          {nameChecking && (
+                            <Loader2 className='absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground' />
+                          )}
+                        </div>
                       </FormControl>
+                      {!nameUnique && (
+                        <p className='text-sm text-red-500'>This customer name is already in use</p>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}

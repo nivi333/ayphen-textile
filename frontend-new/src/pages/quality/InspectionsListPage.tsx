@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Search, MoreVertical, Eye, Edit, Trash2, Plus } from 'lucide-react';
+import { MoreVertical, Eye, Edit, Trash2, Plus } from 'lucide-react';
 import {
   PageContainer,
   PageHeader,

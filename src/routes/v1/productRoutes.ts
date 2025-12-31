@@ -5,6 +5,17 @@ import { requireRole } from '../../middleware/tenantIsolation';
 const router = Router();
 
 /**
+ * @route   GET /api/v1/products/check-name
+ * @desc    Check product name availability
+ * @access  OWNER, ADMIN, MANAGER
+ */
+router.get(
+  '/check-name',
+  requireRole(['OWNER', 'ADMIN', 'MANAGER']),
+  productController.checkNameAvailability.bind(productController)
+);
+
+/**
  * @route   POST /api/v1/products
  * @desc    Create a new product
  * @access  OWNER, ADMIN, MANAGER

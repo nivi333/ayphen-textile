@@ -235,7 +235,10 @@ class ProductService {
     }
   }
 
-  async adjustStock(productId: string, data: StockAdjustmentRequest): Promise<{
+  async adjustStock(
+    productId: string,
+    data: StockAdjustmentRequest
+  ): Promise<{
     product: ProductDetail;
     adjustment: StockAdjustment;
   }> {
@@ -245,7 +248,7 @@ class ProductService {
         method: 'POST',
         headers: this.getAuthHeaders(),
         body: JSON.stringify(data),
-      },
+      }
     );
 
     const result = await response.json().catch(() => ({}));
@@ -285,6 +288,29 @@ class ProductService {
     }
 
     return result.data as ProductCategory;
+  }
+
+  async checkNameAvailability(name: string): Promise<boolean> {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/products/check-name?name=${encodeURIComponent(name)}`,
+        {
+          headers: this.getAuthHeaders(),
+        }
+      );
+
+      if (!response.ok) {
+        // If API fails, allow the name (backend will validate)
+        console.warn('Name check API failed, skipping client-side validation');
+        return true;
+      }
+
+      const result = await response.json();
+      return result.available;
+    } catch (error) {
+      console.error('Error checking product name availability:', error);
+      return true; // Allow on error, backend will validate
+    }
   }
 }
 

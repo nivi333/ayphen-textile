@@ -199,6 +199,21 @@ class SupplierService {
       throw new Error(error.response?.data?.message || 'Failed to delete supplier');
     }
   }
+
+  async checkNameAvailability(name: string): Promise<boolean> {
+    try {
+      const companyId = this.getCompanyId();
+      const response = await axios.get(
+        `${API_BASE_URL}/companies/${companyId}/suppliers/check-name?name=${encodeURIComponent(name)}`,
+        { headers: this.getAuthHeaders() }
+      );
+
+      return response.data.available;
+    } catch (error: any) {
+      console.error('Error checking supplier name availability:', error);
+      return true; // Allow on error, backend will validate
+    }
+  }
 }
 
 export const supplierService = new SupplierService();

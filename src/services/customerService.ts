@@ -380,6 +380,26 @@ class CustomerService {
       updatedAt: customer.updated_at,
     };
   }
+
+  async checkNameAvailability(name: string, companyId: string): Promise<boolean> {
+    try {
+      const existingCustomer = await prisma.customers.findFirst({
+        where: {
+          company_id: companyId,
+          name: {
+            equals: name,
+            mode: 'insensitive',
+          },
+          is_active: true,
+        },
+      });
+
+      return !existingCustomer;
+    } catch (error) {
+      console.error('Error checking customer name availability:', error);
+      throw new Error('Failed to check name availability');
+    }
+  }
 }
 
 export const customerService = new CustomerService();

@@ -70,7 +70,7 @@ export default function MachineListPage() {
   const [machines, setMachines] = useState<Machine[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(false);
-  const [tableLoading, setTableLoading] = useState(false);
+
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editingMachineId, setEditingMachineId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -116,7 +116,7 @@ export default function MachineListPage() {
 
   const refreshMachines = async () => {
     try {
-      setTableLoading(true);
+      setLoading(true);
       const machinesData = await machineService.getMachines({
         search: searchText || undefined,
         locationId: selectedLocation,
@@ -127,7 +127,7 @@ export default function MachineListPage() {
       console.error('Error refreshing machines:', error);
       toast.error(error.message || 'Failed to refresh machines');
     } finally {
-      setTableLoading(false);
+      setLoading(false);
     }
   };
 
@@ -150,7 +150,7 @@ export default function MachineListPage() {
     if (!machineToDelete) return;
 
     try {
-      setTableLoading(true);
+      setLoading(true);
       const result = await machineService.deleteMachine(machineToDelete.id);
       if (result.success) {
         toast.success('Machine deleted successfully');
@@ -162,7 +162,7 @@ export default function MachineListPage() {
       console.error('Error deleting machine:', error);
       toast.error(error.message || 'Failed to delete machine');
     } finally {
-      setTableLoading(false);
+      setLoading(false);
       setDeleteDialogOpen(false);
       setMachineToDelete(null);
     }

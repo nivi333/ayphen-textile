@@ -63,6 +63,9 @@ export function LocationFormSheet({
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string>('');
   const [isActive, setIsActive] = useState(true);
+  const [nameUnique, setNameUnique] = useState(true);
+  const [nameChecking, setNameChecking] = useState(false);
+  const [originalName, setOriginalName] = useState('');
 
   const form = useForm<LocationFormValues>({
     resolver: zodResolver(locationSchema),
@@ -94,6 +97,8 @@ export function LocationFormSheet({
         });
         setIsActive(editingLocation.isActive !== undefined ? editingLocation.isActive : true);
         setImageUrl(editingLocation.imageUrl || '');
+        setOriginalName(editingLocation.name);
+        setNameUnique(true);
       } else {
         form.reset({
           isActive: true,
@@ -103,9 +108,23 @@ export function LocationFormSheet({
         });
         setIsActive(true);
         setImageUrl('');
+        setOriginalName('');
+        setNameUnique(true);
       }
     }
   }, [visible, editingLocation, form]);
+
+  // Debounce name validation
+  useEffect(() => {
+    const nameValue = form.watch('name');
+    if (!nameValue) return;
+
+    const timeoutId = setTimeout(() => {
+      checkNameUnique(nameValue);
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [form.watch('name')]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -133,9 +152,41 @@ export function LocationFormSheet({
     reader.readAsDataURL(file);
   };
 
+  // Name uniqueness validation with debouncing
+  const checkNameUnique = async (name: string) => {
+    if (!name || name.trim() === '') {
+      setNameUnique(true);
+      return;
+    }
+
+    // Skip check if name hasn't changed (edit mode)
+    if (editingLocation && name.trim().toLowerCase() === originalName.toLowerCase()) {
+      setNameUnique(true);
+      return;
+    }
+
+    try {
+      setNameChecking(true);
+      const isAvailable = await locationService.checkNameAvailability(name.trim());
+      setNameUnique(isAvailable);
+    } catch (error) {
+      console.error('Error checking name availability:', error);
+      setNameUnique(true); // Allow on error
+    } finally {
+      setNameChecking(false);
+    }
+  };
+
   const onSubmit = async (values: LocationFormValues) => {
     try {
       setLoading(true);
+
+      // Check name uniqueness before submission
+      if (!nameUnique) {
+        toast.error('Location name already exists. Please choose a different name.');
+        setLoading(false);
+        return;
+      }
 
       // Validate business logic
       if (values.isDefault && !editingLocation) {
@@ -291,8 +342,28 @@ export function LocationFormSheet({
                     <FormItem>
                       <FormLabel>Location Name</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder='Enter location name' maxLength={100} />
+                        <div className='relative'>
+                          <Input
+                            {...field}
+                            placeholder='Enter location name'
+                            maxLength={100}
+                            onChange={e => {
+                              field.onChange(e);
+                              const value = e.target.value;
+                              if (value && value.trim()) {
+                                setNameChecking(true);
+                              }
+                            }}
+                            className={!nameUnique ? 'border-red-500' : ''}
+                          />
+                          {nameChecking && (
+                            <Loader2 className='absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground' />
+                          )}
+                        </div>
                       </FormControl>
+                      {!nameUnique && (
+                        <p className='text-sm text-red-500'>This location name is already in use</p>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}

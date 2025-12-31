@@ -8,7 +8,8 @@ const createSupplierSchema = Joi.object({
   name: Joi.string().min(2).max(100).required(),
   supplierType: Joi.string()
     .valid('MANUFACTURER', 'DISTRIBUTOR', 'WHOLESALER', 'IMPORTER', 'LOCAL_VENDOR')
-    .optional().allow(null),
+    .optional()
+    .allow(null),
   companyRegNo: Joi.string().max(50).optional().allow('', null),
   // Contact Info
   email: Joi.string().email().required(),
@@ -37,7 +38,8 @@ const createSupplierSchema = Joi.object({
   // Financial
   paymentTerms: Joi.string()
     .valid('NET_30', 'NET_60', 'NET_90', 'ADVANCE', 'COD', 'CREDIT')
-    .optional().allow(null),
+    .optional()
+    .allow(null),
   creditPeriod: Joi.number().integer().min(0).optional().allow(null),
   currency: Joi.string().valid('INR', 'USD', 'EUR', 'GBP').default('INR'),
   taxId: Joi.string().max(50).optional().allow('', null),
@@ -55,17 +57,17 @@ const createSupplierSchema = Joi.object({
   minOrderQty: Joi.number().integer().min(0).optional().allow(null),
   minOrderValue: Joi.number().min(0).precision(2).optional().allow(null),
   // Quality & Compliance
-  qualityRating: Joi.string()
-    .valid('EXCELLENT', 'GOOD', 'AVERAGE', 'POOR')
-    .optional().allow(null),
+  qualityRating: Joi.string().valid('EXCELLENT', 'GOOD', 'AVERAGE', 'POOR').optional().allow(null),
   certifications: Joi.array().items(Joi.string().max(50)).optional().allow(null),
   complianceStatus: Joi.string()
     .valid('COMPLIANT', 'NON_COMPLIANT', 'PENDING_REVIEW')
-    .optional().allow(null),
+    .optional()
+    .allow(null),
   // Additional
   supplierCategory: Joi.string()
     .valid('PREFERRED', 'APPROVED', 'TRIAL', 'BLACKLISTED')
-    .optional().allow(null),
+    .optional()
+    .allow(null),
   assignedManager: Joi.string().uuid().optional().allow('', null),
   notes: Joi.string().max(500).optional().allow('', null),
   tags: Joi.array().items(Joi.string().max(50)).optional().allow(null),
@@ -77,7 +79,8 @@ const updateSupplierSchema = Joi.object({
   name: Joi.string().min(2).max(100).optional(),
   supplierType: Joi.string()
     .valid('MANUFACTURER', 'DISTRIBUTOR', 'WHOLESALER', 'IMPORTER', 'LOCAL_VENDOR')
-    .optional().allow(null),
+    .optional()
+    .allow(null),
   companyRegNo: Joi.string().max(50).optional().allow('', null),
   // Contact Info
   email: Joi.string().email().optional().allow('', null),
@@ -107,7 +110,8 @@ const updateSupplierSchema = Joi.object({
   // Financial
   paymentTerms: Joi.string()
     .valid('NET_30', 'NET_60', 'NET_90', 'ADVANCE', 'COD', 'CREDIT')
-    .optional().allow(null),
+    .optional()
+    .allow(null),
   creditPeriod: Joi.number().integer().min(0).optional().allow(null),
   currency: Joi.string().valid('INR', 'USD', 'EUR', 'GBP').optional().allow(null),
   taxId: Joi.string().max(50).optional().allow('', null),
@@ -125,17 +129,17 @@ const updateSupplierSchema = Joi.object({
   minOrderQty: Joi.number().integer().min(0).optional().allow(null),
   minOrderValue: Joi.number().min(0).precision(2).optional().allow(null),
   // Quality & Compliance
-  qualityRating: Joi.string()
-    .valid('EXCELLENT', 'GOOD', 'AVERAGE', 'POOR')
-    .optional().allow(null),
+  qualityRating: Joi.string().valid('EXCELLENT', 'GOOD', 'AVERAGE', 'POOR').optional().allow(null),
   certifications: Joi.array().items(Joi.string().max(50)).optional().allow(null),
   complianceStatus: Joi.string()
     .valid('COMPLIANT', 'NON_COMPLIANT', 'PENDING_REVIEW')
-    .optional().allow(null),
+    .optional()
+    .allow(null),
   // Additional
   supplierCategory: Joi.string()
     .valid('PREFERRED', 'APPROVED', 'TRIAL', 'BLACKLISTED')
-    .optional().allow(null),
+    .optional()
+    .allow(null),
   assignedManager: Joi.string().uuid().optional().allow('', null),
   notes: Joi.string().max(500).optional().allow('', null),
   tags: Joi.array().items(Joi.string().max(50)).optional().allow(null),
@@ -285,6 +289,34 @@ export class SupplierController {
       res.status(statusCode).json({
         success: false,
         message: error.message || 'Failed to delete supplier',
+      });
+    }
+  }
+
+  async checkNameAvailability(req: Request, res: Response): Promise<void> {
+    try {
+      const { tenantId } = req.params;
+      const { name } = req.query;
+
+      if (!name || typeof name !== 'string') {
+        res.status(400).json({
+          success: false,
+          message: 'Name parameter is required',
+        });
+        return;
+      }
+
+      const isAvailable = await supplierService.checkNameAvailability(name.trim(), tenantId);
+
+      res.json({
+        success: true,
+        available: isAvailable,
+      });
+    } catch (error: any) {
+      logger.error('Error checking supplier name availability:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to check name availability',
       });
     }
   }

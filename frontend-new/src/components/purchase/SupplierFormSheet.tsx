@@ -32,7 +32,8 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, X } from 'lucide-react';
-import { Supplier } from '@/services/supplierService';
+import { Supplier, supplierService } from '@/services/supplierService';
+import { toast } from 'sonner';
 
 const supplierSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -146,6 +147,10 @@ export function SupplierFormSheet({
     },
   });
 
+  const [nameUnique, setNameUnique] = useState(true);
+  const [nameChecking, setNameChecking] = useState(false);
+  const [originalName, setOriginalName] = useState('');
+
   const [tagInput, setTagInput] = useState('');
 
   const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>, field: any) => {
@@ -180,6 +185,8 @@ export function SupplierFormSheet({
       });
 
       form.reset(resetData);
+      setOriginalName(initialData.name);
+      setNameUnique(true);
     } else {
       form.reset({
         name: '',
@@ -212,11 +219,50 @@ export function SupplierFormSheet({
         notes: '',
         isActive: true,
       });
+      setOriginalName('');
+      setNameUnique(true);
     }
   }, [initialData, isOpen, form]);
 
   const handleOpenChange = (open: boolean) => {
     if (!open) onClose();
+  };
+
+  // Name uniqueness validation
+  const checkNameUnique = async (name: string) => {
+    if (!name || name.trim() === '') {
+      setNameUnique(true);
+      return;
+    }
+    if (initialData && name.trim().toLowerCase() === originalName.toLowerCase()) {
+      setNameUnique(true);
+      return;
+    }
+    try {
+      setNameChecking(true);
+      const isAvailable = await supplierService.checkNameAvailability(name.trim());
+      setNameUnique(isAvailable);
+    } catch (error) {
+      setNameUnique(true);
+    } finally {
+      setNameChecking(false);
+    }
+  };
+
+  // Debounce name validation
+  useEffect(() => {
+    const nameValue = form.watch('name');
+    if (!nameValue) return;
+    const timeoutId = setTimeout(() => checkNameUnique(nameValue), 500);
+    return () => clearTimeout(timeoutId);
+  }, [form.watch('name')]);
+
+  const handleSubmit = async (data: SupplierFormValues) => {
+    if (!nameUnique) {
+      toast.error('Supplier name already exists. Please choose a different name.');
+      return;
+    }
+    await onSubmit(data);
   };
 
   return (
@@ -230,7 +276,7 @@ export function SupplierFormSheet({
         </SheetHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-2'>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-2'>
             {/* Basic Information */}
             <div className='space-y-2'>
               <h3 className='text-sm font-medium text-muted-foreground'>Basic Information</h3>
@@ -255,8 +301,26 @@ export function SupplierFormSheet({
                     <FormItem>
                       <FormLabel>Supplier Name</FormLabel>
                       <FormControl>
-                        <Input placeholder='Enter supplier name' {...field} />
+                        <div className='relative'>
+                          <Input
+                            placeholder='Enter supplier name'
+                            {...field}
+                            onChange={e => {
+                              field.onChange(e);
+                              if (e.target.value && e.target.value.trim()) {
+                                setNameChecking(true);
+                              }
+                            }}
+                            className={!nameUnique ? 'border-red-500' : ''}
+                          />
+                          {nameChecking && (
+                            <Loader2 className='absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground' />
+                          )}
+                        </div>
                       </FormControl>
+                      {!nameUnique && (
+                        <p className='text-sm text-red-500'>This supplier name is already in use</p>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}

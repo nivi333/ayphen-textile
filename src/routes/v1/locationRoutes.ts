@@ -8,6 +8,9 @@ const router = Router();
  * All routes require authentication (handled by tenantIsolationMiddleware in parent router)
  */
 
+// Check location name availability
+router.get('/check-name', locationController.checkNameAvailability.bind(locationController));
+
 // Get all locations for the company
 router.get('/', locationController.getLocations.bind(locationController));
 
@@ -24,6 +27,9 @@ router.put('/:locationId', locationController.updateLocation.bind(locationContro
 router.delete('/:locationId', locationController.deleteLocation.bind(locationController));
 
 // Set default location
-router.patch('/:locationId/set-default', locationController.setDefaultLocation.bind(locationController));
+router.patch(
+  '/:locationId/set-default',
+  locationController.setDefaultLocation.bind(locationController)
+);
 
 export default router;

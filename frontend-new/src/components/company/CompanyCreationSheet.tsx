@@ -84,7 +84,7 @@ export function CompanyCreationSheet({
   const [uploading, setUploading] = useState(false);
   const [slugChecking, setSlugChecking] = useState(false);
   const [slugUnique, setSlugUnique] = useState(true);
-  const [nameChecking, setNameChecking] = useState(false);
+
   const [nameUnique, setNameUnique] = useState(true);
   const [loading, setLoading] = useState(false);
   const [originalSlug, setOriginalSlug] = useState<string>('');
@@ -101,7 +101,6 @@ export function CompanyCreationSheet({
     setLogoFile(null);
     setSlugChecking(false);
     setSlugUnique(true);
-    setNameChecking(false);
     setNameUnique(true);
     setOriginalSlug('');
     setOriginalName('');
@@ -186,7 +185,6 @@ export function CompanyCreationSheet({
       return;
     }
 
-    setNameChecking(true);
     try {
       // Use backend API to check name availability (similar to slug check)
       const response = await fetch(
@@ -213,7 +211,7 @@ export function CompanyCreationSheet({
       console.error('Error checking company name:', error);
       setNameUnique(true); // Allow on error, backend will validate
     } finally {
-      setNameChecking(false);
+      // Name checking complete
     }
   };
 

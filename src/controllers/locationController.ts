@@ -1,5 +1,9 @@
 import { Request, Response } from 'express';
-import { locationService, createLocationSchema, updateLocationSchema } from '../services/locationService';
+import {
+  locationService,
+  createLocationSchema,
+  updateLocationSchema,
+} from '../services/locationService';
 
 export class LocationController {
   async createLocation(req: Request, res: Response) {
@@ -68,7 +72,7 @@ export class LocationController {
       });
     } catch (error: any) {
       console.error('Error fetching location:', error);
-      
+
       if (error.message === 'Location not found') {
         res.status(404).json({
           success: false,
@@ -111,7 +115,7 @@ export class LocationController {
       });
     } catch (error: any) {
       console.error('Error updating location:', error);
-      
+
       if (error.message === 'Location not found') {
         res.status(404).json({
           success: false,
@@ -143,7 +147,7 @@ export class LocationController {
       });
     } catch (error: any) {
       console.error('Error deleting location:', error);
-      
+
       if (error.message === 'Location not found') {
         res.status(404).json({
           success: false,
@@ -176,7 +180,7 @@ export class LocationController {
       });
     } catch (error: any) {
       console.error('Error setting default location:', error);
-      
+
       if (error.message === 'Location not found') {
         res.status(404).json({
           success: false,
@@ -188,6 +192,34 @@ export class LocationController {
       res.status(500).json({
         success: false,
         message: error.message || 'Failed to set default location',
+      });
+    }
+  }
+
+  async checkNameAvailability(req: Request, res: Response) {
+    try {
+      const { tenantId } = req;
+      const { name } = req.query;
+
+      if (!name || typeof name !== 'string') {
+        res.status(400).json({
+          success: false,
+          message: 'Name parameter is required',
+        });
+        return;
+      }
+
+      const isAvailable = await locationService.checkNameAvailability(name.trim(), tenantId);
+
+      res.json({
+        success: true,
+        available: isAvailable,
+      });
+    } catch (error: any) {
+      console.error('Error checking location name availability:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to check name availability',
       });
     }
   }

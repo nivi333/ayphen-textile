@@ -357,6 +357,26 @@ class SupplierService {
       updatedAt: supplier.updated_at,
     };
   }
+
+  async checkNameAvailability(name: string, companyId: string): Promise<boolean> {
+    try {
+      const existingSupplier = await prisma.suppliers.findFirst({
+        where: {
+          company_id: companyId,
+          name: {
+            equals: name,
+            mode: 'insensitive',
+          },
+          is_active: true,
+        },
+      });
+
+      return !existingSupplier;
+    } catch (error) {
+      console.error('Error checking supplier name availability:', error);
+      throw new Error('Failed to check name availability');
+    }
+  }
 }
 
 export const supplierService = new SupplierService();

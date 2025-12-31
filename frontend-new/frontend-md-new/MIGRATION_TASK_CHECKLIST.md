@@ -965,7 +965,7 @@ Create all input variants in `globalComponents.tsx`:
 ### Data Validation & Uniqueness
 
 > [!IMPORTANT]
-> **Data Integrity**: Ensuring uniqueness of key identifiers across the application.
+> **Data Integrity**: Ensuring uniqueness of key identifiers across the application in both frontend and backend.
 
 - [x] **Company Name Uniqueness (Global)**
   - [x] Implemented in `CompanyCreationSheet.tsx`

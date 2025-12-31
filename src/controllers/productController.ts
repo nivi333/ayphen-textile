@@ -9,7 +9,17 @@ const createProductSchema = Joi.object({
   sku: Joi.string().max(100).optional().allow('', null),
   name: Joi.string().min(1).max(255).required(),
   description: Joi.string().max(1000).optional().allow('', null),
-  productType: Joi.string().valid('OWN_MANUFACTURE', 'VENDOR_SUPPLIED', 'OUTSOURCED', 'RAW_MATERIAL', 'FINISHED_GOODS', 'SEMI_FINISHED').optional().allow(null),
+  productType: Joi.string()
+    .valid(
+      'OWN_MANUFACTURE',
+      'VENDOR_SUPPLIED',
+      'OUTSOURCED',
+      'RAW_MATERIAL',
+      'FINISHED_GOODS',
+      'SEMI_FINISHED'
+    )
+    .optional()
+    .allow(null),
   material: Joi.string().max(100).optional().allow('', null),
   color: Joi.string().max(50).optional().allow('', null),
   size: Joi.string().max(50).optional().allow('', null),
@@ -31,7 +41,17 @@ const updateProductSchema = Joi.object({
   productCode: Joi.string().optional().allow('', null), // Allow productCode for edit
   name: Joi.string().min(1).max(255).optional(),
   description: Joi.string().max(1000).optional().allow('', null),
-  productType: Joi.string().valid('OWN_MANUFACTURE', 'VENDOR_SUPPLIED', 'OUTSOURCED', 'RAW_MATERIAL', 'FINISHED_GOODS', 'SEMI_FINISHED').optional().allow(null),
+  productType: Joi.string()
+    .valid(
+      'OWN_MANUFACTURE',
+      'VENDOR_SUPPLIED',
+      'OUTSOURCED',
+      'RAW_MATERIAL',
+      'FINISHED_GOODS',
+      'SEMI_FINISHED'
+    )
+    .optional()
+    .allow(null),
   material: Joi.string().max(100).optional().allow('', null),
   color: Joi.string().max(50).optional().allow('', null),
   size: Joi.string().max(50).optional().allow('', null),
@@ -121,7 +141,8 @@ export class ProductController {
       const filters = {
         categoryId: req.query.categoryId as string,
         search: req.query.search as string,
-        isActive: req.query.isActive === 'true' ? true : req.query.isActive === 'false' ? false : undefined,
+        isActive:
+          req.query.isActive === 'true' ? true : req.query.isActive === 'false' ? false : undefined,
         lowStock: req.query.lowStock === 'true',
         minPrice: req.query.minPrice ? parseFloat(req.query.minPrice as string) : undefined,
         maxPrice: req.query.maxPrice ? parseFloat(req.query.maxPrice as string) : undefined,
@@ -392,6 +413,44 @@ export class ProductController {
       res.status(500).json({
         success: false,
         message: err.message || 'Failed to create category',
+      });
+    }
+  }
+
+  /**
+   * Check product name availability
+   */
+  async checkNameAvailability(req: Request, res: Response): Promise<void> {
+    try {
+      const companyId = (req as any).tenantId;
+      if (!companyId) {
+        res.status(400).json({
+          success: false,
+          message: 'Company context required',
+        });
+        return;
+      }
+
+      const { name } = req.query;
+      if (!name || typeof name !== 'string') {
+        res.status(400).json({
+          success: false,
+          message: 'Name parameter is required',
+        });
+        return;
+      }
+
+      const isAvailable = await productService.checkNameAvailability(name.trim(), companyId);
+
+      res.status(200).json({
+        success: true,
+        available: isAvailable,
+      });
+    } catch (err: any) {
+      logger.error('Error checking product name availability:', err);
+      res.status(500).json({
+        success: false,
+        message: err.message || 'Failed to check name availability',
       });
     }
   }

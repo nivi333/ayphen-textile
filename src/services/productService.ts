@@ -127,7 +127,7 @@ export class ProductService {
       .map(word => word.charAt(0).toUpperCase())
       .join('')
       .substring(0, 3);
-    
+
     const timestamp = Date.now().toString().slice(-6);
     return `${prefix}-${timestamp}`;
   }
@@ -199,8 +199,8 @@ export class ProductService {
     }
 
     const productId = await this.generateProductId(companyId);
-    const productCode = data.productCode || await this.generateProductCode(companyId);
-    const sku = data.sku || await this.generateSKU(companyId, data.name);
+    const productCode = data.productCode || (await this.generateProductCode(companyId));
+    const sku = data.sku || (await this.generateSKU(companyId, data.name));
 
     // Check product code uniqueness within company
     const existingCode = await this.prisma.products.findFirst({
@@ -498,11 +498,7 @@ export class ProductService {
   /**
    * Adjust stock for a product
    */
-  async adjustStock(
-    companyId: string,
-    productId: string,
-    data: StockAdjustmentData
-  ) {
+  async adjustStock(companyId: string, productId: string, data: StockAdjustmentData) {
     if (!companyId || !companyId.trim()) {
       throw new Error('Missing required field: companyId');
     }
@@ -748,6 +744,29 @@ export class ProductService {
       adjustedBy: adjustment.adjusted_by,
       createdAt: adjustment.created_at,
     };
+  }
+
+  /**
+   * Check product name availability
+   */
+  async checkNameAvailability(name: string, companyId: string): Promise<boolean> {
+    try {
+      const existingProduct = await this.prisma.products.findFirst({
+        where: {
+          company_id: companyId,
+          name: {
+            equals: name,
+            mode: 'insensitive',
+          },
+          is_active: true,
+        },
+      });
+
+      return !existingProduct;
+    } catch (error) {
+      console.error('Error checking product name availability:', error);
+      throw new Error('Failed to check name availability');
+    }
   }
 }
 

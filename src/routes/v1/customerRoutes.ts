@@ -9,28 +9,34 @@ const router = Router({ mergeParams: true });
  * Mounted at /companies/:tenantId/customers
  */
 
+// Check customer name availability
+router.get('/check-name', customerController.checkNameAvailability.bind(customerController));
+
 // Get all customers
 router.get('/', customerController.getCustomers.bind(customerController));
 
 // Create new customer
-router.post('/',
-    requireRole(['OWNER', 'ADMIN', 'MANAGER']),
-    customerController.createCustomer.bind(customerController)
+router.post(
+  '/',
+  requireRole(['OWNER', 'ADMIN', 'MANAGER']),
+  customerController.createCustomer.bind(customerController)
 );
 
 // Get customer details
 router.get('/:id', customerController.getCustomerById.bind(customerController));
 
 // Update customer
-router.put('/:id',
-    requireRole(['OWNER', 'ADMIN', 'MANAGER']),
-    customerController.updateCustomer.bind(customerController)
+router.put(
+  '/:id',
+  requireRole(['OWNER', 'ADMIN', 'MANAGER']),
+  customerController.updateCustomer.bind(customerController)
 );
 
 // Delete customer
-router.delete('/:id',
-    requireRole(['OWNER', 'ADMIN']),
-    customerController.deleteCustomer.bind(customerController)
+router.delete(
+  '/:id',
+  requireRole(['OWNER', 'ADMIN']),
+  customerController.deleteCustomer.bind(customerController)
 );
 
 export default router;

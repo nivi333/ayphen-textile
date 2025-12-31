@@ -153,6 +153,29 @@ class LocationService {
       throw error;
     }
   }
+
+  async checkNameAvailability(name: string): Promise<boolean> {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/locations/check-name?name=${encodeURIComponent(name)}`,
+        {
+          headers: this.getAuthHeaders(),
+        }
+      );
+
+      if (!response.ok) {
+        // If API fails, allow the name (backend will validate)
+        console.warn('Name check API failed, skipping client-side validation');
+        return true;
+      }
+
+      const result = await response.json();
+      return result.available;
+    } catch (error) {
+      console.error('Error checking location name availability:', error);
+      return true; // Allow on error, backend will validate
+    }
+  }
 }
 
 export const locationService = new LocationService();

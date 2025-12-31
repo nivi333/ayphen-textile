@@ -81,6 +81,9 @@ export function ProductFormSheet({
 }: ProductFormSheetProps) {
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState<{ url: string; name?: string } | null>(null);
+  const [nameUnique, setNameUnique] = useState(true);
+  const [nameChecking, setNameChecking] = useState(false);
+  const [originalName, setOriginalName] = useState('');
 
   const isEditing = mode === 'edit' && !!editingProductId;
 
@@ -108,6 +111,8 @@ export function ProductFormSheet({
       reorderLevel: 0,
     });
     setImageFile(null);
+    setOriginalName('');
+    setNameUnique(true);
   }, [form]);
 
   // Load data for editing
@@ -137,6 +142,8 @@ export function ProductFormSheet({
           if (product.imageUrl) {
             setImageFile({ url: product.imageUrl });
           }
+          setOriginalName(product.name);
+          setNameUnique(true);
         })
         .catch(error => {
           console.error('Error loading product:', error);
@@ -180,7 +187,40 @@ export function ProductFormSheet({
     reader.readAsDataURL(file);
   };
 
+  // Name uniqueness validation
+  const checkNameUnique = async (name: string) => {
+    if (!name || name.trim() === '') {
+      setNameUnique(true);
+      return;
+    }
+    if (isEditing && name.trim().toLowerCase() === originalName.toLowerCase()) {
+      setNameUnique(true);
+      return;
+    }
+    try {
+      setNameChecking(true);
+      const isAvailable = await productService.checkNameAvailability(name.trim());
+      setNameUnique(isAvailable);
+    } catch (error) {
+      setNameUnique(true);
+    } finally {
+      setNameChecking(false);
+    }
+  };
+
+  // Debounce name validation
+  useEffect(() => {
+    const nameValue = form.watch('name');
+    if (!nameValue) return;
+    const timeoutId = setTimeout(() => checkNameUnique(nameValue), 500);
+    return () => clearTimeout(timeoutId);
+  }, [form.watch('name')]);
+
   const onSubmit = async (values: ProductFormValues) => {
+    if (!nameUnique) {
+      toast.error('Product name already exists. Please choose a different name.');
+      return;
+    }
     setLoading(true);
     try {
       const payload: CreateProductRequest = {
@@ -299,8 +339,26 @@ export function ProductFormSheet({
                     <FormItem>
                       <FormLabel required>Product Name</FormLabel>
                       <FormControl>
-                        <Input placeholder='Enter product name' {...field} />
+                        <div className='relative'>
+                          <Input
+                            placeholder='Enter product name'
+                            {...field}
+                            onChange={e => {
+                              field.onChange(e);
+                              if (e.target.value && e.target.value.trim()) {
+                                setNameChecking(true);
+                              }
+                            }}
+                            className={!nameUnique ? 'border-red-500' : ''}
+                          />
+                          {nameChecking && (
+                            <Loader2 className='absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground' />
+                          )}
+                        </div>
                       </FormControl>
+                      {!nameUnique && (
+                        <p className='text-sm text-red-500'>This product name is already in use</p>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -337,7 +395,7 @@ export function ProductFormSheet({
                     </FormItem>
                   )}
                 />
-                  <FormField
+                <FormField
                   control={form.control}
                   name='barcode'
                   render={({ field }) => (

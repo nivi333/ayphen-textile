@@ -13,7 +13,6 @@ import { Separator } from '@/components/ui/separator';
 // import { Badge } from '@/components/ui/badge'; // Used in table, not here yet
 import { toast } from 'sonner';
 
-import MainLayout from '@/components/layout/MainLayout';
 import { InventoryTable } from '@/components/inventory/InventoryTable';
 import { InventoryFormSheet } from '@/components/inventory/InventoryFormSheet';
 import { StockMovementDialog } from '@/components/inventory/StockMovementDialog';
@@ -133,110 +132,110 @@ export default function InventoryListPage() {
   };
 
   return (
-      <div className='space-y-3'>
-        {/* Header */}
-        <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4'>
-          <div>
-            <h1 className='text-2xl font-bold tracking-tight'>Inventory</h1>
-            <p className='text-muted-foreground'>Manage stock levels across all locations</p>
+    <div className='space-y-3'>
+      {/* Header */}
+      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4'>
+        <div>
+          <h1 className='text-2xl font-bold tracking-tight'>Inventory</h1>
+          <p className='text-muted-foreground'>Manage stock levels across all locations</p>
+        </div>
+        <Button onClick={handleAddInventory}>
+          <Plus className='mr-2 h-4 w-4' /> Add Inventory
+        </Button>
+      </div>
+
+      <Separator />
+
+      {/* Filters */}
+      <div className='flex flex-col sm:flex-row gap-4 items-end sm:items-center flex-wrap'>
+        <div className='flex items-center gap-2 w-full sm:w-auto'>
+          <div className='relative w-full sm:w-64'>
+            <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
+            <Input
+              placeholder='Search products...'
+              className='pl-8'
+              value={searchText}
+              onChange={e => setSearchText(e.target.value)}
+            />
           </div>
-          <Button onClick={handleAddInventory}>
-            <Plus className='mr-2 h-4 w-4' /> Add Inventory
+        </div>
+
+        <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+          <SelectTrigger className='w-full sm:w-48'>
+            <SelectValue placeholder='All Locations' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='all'>All Locations</SelectItem>
+            {locations.map(loc => (
+              <SelectItem key={loc.id} value={loc.id}>
+                {loc.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={selectedProduct} onValueChange={setSelectedProduct}>
+          <SelectTrigger className='w-full sm:w-48'>
+            <SelectValue placeholder='All Products' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='all'>All Products</SelectItem>
+            {products.map(prod => (
+              <SelectItem key={prod.id} value={prod.id}>
+                {prod.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <div className='flex items-center gap-2 ml-auto'>
+          <Button variant='outline' size='icon' onClick={handleRefresh} title='Refresh'>
+            <RefreshCcw className='h-4 w-4' />
+          </Button>
+          <Button
+            variant='outline'
+            onClick={clearFilters}
+            disabled={!searchText && selectedLocation === 'all' && selectedProduct === 'all'}
+          >
+            <Filter className='mr-2 h-4 w-4' /> Clear
           </Button>
         </div>
-
-        <Separator />
-
-        {/* Filters */}
-        <div className='flex flex-col sm:flex-row gap-4 items-end sm:items-center flex-wrap'>
-          <div className='flex items-center gap-2 w-full sm:w-auto'>
-            <div className='relative w-full sm:w-64'>
-              <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
-              <Input
-                placeholder='Search products...'
-                className='pl-8'
-                value={searchText}
-                onChange={e => setSearchText(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-            <SelectTrigger className='w-full sm:w-48'>
-              <SelectValue placeholder='All Locations' />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='all'>All Locations</SelectItem>
-              {locations.map(loc => (
-                <SelectItem key={loc.id} value={loc.id}>
-                  {loc.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={selectedProduct} onValueChange={setSelectedProduct}>
-            <SelectTrigger className='w-full sm:w-48'>
-              <SelectValue placeholder='All Products' />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='all'>All Products</SelectItem>
-              {products.map(prod => (
-                <SelectItem key={prod.id} value={prod.id}>
-                  {prod.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <div className='flex items-center gap-2 ml-auto'>
-            <Button variant='outline' size='icon' onClick={handleRefresh} title='Refresh'>
-              <RefreshCcw className='h-4 w-4' />
-            </Button>
-            <Button
-              variant='outline'
-              onClick={clearFilters}
-              disabled={!searchText && selectedLocation === 'all' && selectedProduct === 'all'}
-            >
-              <Filter className='mr-2 h-4 w-4' /> Clear
-            </Button>
-          </div>
-        </div>
-
-        {/* Table */}
-        <InventoryTable
-          data={inventory}
-          loading={loading}
-          onEdit={handleEdit}
-          onRecordMovement={handleRecordMovement}
-          onViewHistory={handleViewHistory}
-          onRefresh={handleRefresh}
-        />
-
-        {/* Form Sheet */}
-        <InventoryFormSheet
-          open={isFormOpen}
-          onClose={() => {
-            setIsFormOpen(false);
-            setSelectedRecord(null);
-          }}
-          onSaved={handleRefresh}
-        />
-
-        {/* Movement Dialog */}
-        <StockMovementDialog
-          open={isMovementOpen}
-          onClose={() => {
-            setIsMovementOpen(false);
-            setSelectedRecord(null);
-          }}
-          onSuccess={handleRefresh}
-          initialProductId={selectedRecord?.productId}
-          initialLocationId={selectedRecord?.locationId}
-        />
-
-        {/* Reservation Dialog - Not integrated in list/actions yet, but available */}
-        {/* <StockReservationDialog ... /> */}
       </div>
+
+      {/* Table */}
+      <InventoryTable
+        data={inventory}
+        loading={loading}
+        onEdit={handleEdit}
+        onRecordMovement={handleRecordMovement}
+        onViewHistory={handleViewHistory}
+        onRefresh={handleRefresh}
+      />
+
+      {/* Form Sheet */}
+      <InventoryFormSheet
+        open={isFormOpen}
+        onClose={() => {
+          setIsFormOpen(false);
+          setSelectedRecord(null);
+        }}
+        onSaved={handleRefresh}
+      />
+
+      {/* Movement Dialog */}
+      <StockMovementDialog
+        open={isMovementOpen}
+        onClose={() => {
+          setIsMovementOpen(false);
+          setSelectedRecord(null);
+        }}
+        onSuccess={handleRefresh}
+        initialProductId={selectedRecord?.productId}
+        initialLocationId={selectedRecord?.locationId}
+      />
+
+      {/* Reservation Dialog - Not integrated in list/actions yet, but available */}
+      {/* <StockReservationDialog ... /> */}
+    </div>
   );
 }

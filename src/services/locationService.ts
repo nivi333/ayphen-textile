@@ -469,6 +469,26 @@ export class LocationService {
       throw error;
     }
   }
+
+  async checkNameAvailability(name: string, companyId: string): Promise<boolean> {
+    try {
+      const existingLocation = await this.prisma.company_locations.findFirst({
+        where: {
+          company_id: companyId,
+          name: {
+            equals: name,
+            mode: 'insensitive',
+          },
+          is_active: true,
+        },
+      });
+
+      return !existingLocation;
+    } catch (error) {
+      console.error('Error checking location name availability:', error);
+      throw new Error('Failed to check name availability');
+    }
+  }
 }
 
 export const locationService = new LocationService();

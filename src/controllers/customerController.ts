@@ -8,7 +8,8 @@ const createCustomerSchema = Joi.object({
   name: Joi.string().min(2).max(100).required(),
   customerType: Joi.string()
     .valid('INDIVIDUAL', 'BUSINESS', 'DISTRIBUTOR', 'RETAILER', 'WHOLESALER')
-    .optional().allow(null),
+    .optional()
+    .allow(null),
   companyName: Joi.when('customerType', {
     is: Joi.string().valid('BUSINESS'),
     then: Joi.string().min(2).max(100).required(),
@@ -48,7 +49,8 @@ const createCustomerSchema = Joi.object({
   // Financial Information
   paymentTerms: Joi.string()
     .valid('NET_30', 'NET_60', 'NET_90', 'ADVANCE', 'COD', 'CREDIT')
-    .optional().allow(null),
+    .optional()
+    .allow(null),
   creditLimit: Joi.number().min(0).precision(2).optional().allow(null),
   currency: Joi.string().valid('INR', 'USD', 'EUR', 'GBP').default('INR'),
   taxId: Joi.string().max(50).optional().allow('', null),
@@ -71,7 +73,8 @@ const updateCustomerSchema = Joi.object({
   name: Joi.string().min(2).max(100).optional(),
   customerType: Joi.string()
     .valid('INDIVIDUAL', 'BUSINESS', 'DISTRIBUTOR', 'RETAILER', 'WHOLESALER')
-    .optional().allow(null),
+    .optional()
+    .allow(null),
   companyName: Joi.when('customerType', {
     is: Joi.string().valid('BUSINESS'),
     then: Joi.string().min(2).max(100).required(),
@@ -112,7 +115,8 @@ const updateCustomerSchema = Joi.object({
   // Financial Information
   paymentTerms: Joi.string()
     .valid('NET_30', 'NET_60', 'NET_90', 'ADVANCE', 'COD', 'CREDIT')
-    .optional().allow(null),
+    .optional()
+    .allow(null),
   creditLimit: Joi.number().min(0).precision(2).optional().allow(null),
   currency: Joi.string().valid('INR', 'USD', 'EUR', 'GBP').optional().allow(null),
   taxId: Joi.string().max(50).optional().allow('', null),
@@ -275,6 +279,34 @@ export class CustomerController {
       res.status(statusCode).json({
         success: false,
         message: error.message || 'Failed to delete customer',
+      });
+    }
+  }
+
+  async checkNameAvailability(req: Request, res: Response): Promise<void> {
+    try {
+      const { tenantId } = req.params;
+      const { name } = req.query;
+
+      if (!name || typeof name !== 'string') {
+        res.status(400).json({
+          success: false,
+          message: 'Name parameter is required',
+        });
+        return;
+      }
+
+      const isAvailable = await customerService.checkNameAvailability(name.trim(), tenantId);
+
+      res.json({
+        success: true,
+        available: isAvailable,
+      });
+    } catch (error: any) {
+      logger.error('Error checking customer name availability:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to check name availability',
       });
     }
   }
