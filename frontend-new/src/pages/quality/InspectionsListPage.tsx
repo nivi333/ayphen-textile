@@ -217,8 +217,9 @@ const InspectionsListPage = () => {
           }
         />
       ) : (
-        <Card>
-          <DataTable>
+      ) : (
+        <div className='rounded-base border bg-card'>
+          <DataTable className='border-none'>
             <TableHeader>
               <TableRow>
                 <TableHead className='w-[80px]'>Code</TableHead>
@@ -316,7 +317,8 @@ const InspectionsListPage = () => {
               })}
             </TableBody>
           </DataTable>
-        </Card>
+        </div>
+      )}
       )}
     </PageContainer>
   );

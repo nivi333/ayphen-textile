@@ -197,8 +197,14 @@ const QualityCheckpointsListPage = () => {
           }
         />
       ) : (
-        <Card>
-          <DataTable sortColumn={sortColumn} sortDirection={sortDirection} onSort={handleSort}>
+      ) : (
+        <div className='rounded-base border bg-card'>
+          <DataTable
+            sortColumn={sortColumn}
+            sortDirection={sortDirection}
+            onSort={handleSort}
+            className='border-none'
+          >
             <TableHeader>
               <TableRow>
                 <TableHead className='w-[140px]' sortable sortKey='checkpointId'>
@@ -287,7 +293,7 @@ const QualityCheckpointsListPage = () => {
               ))}
             </TableBody>
           </DataTable>
-        </Card>
+        </div>
       )}
     </PageContainer>
   );

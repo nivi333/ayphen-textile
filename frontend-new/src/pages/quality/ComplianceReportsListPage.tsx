@@ -203,8 +203,14 @@ const ComplianceReportsListPage = () => {
           }
         />
       ) : (
-        <Card>
-          <DataTable sortColumn={sortColumn} sortDirection={sortDirection} onSort={handleSort}>
+      ) : (
+        <div className='rounded-base border bg-card'>
+          <DataTable
+            sortColumn={sortColumn}
+            sortDirection={sortDirection}
+            onSort={handleSort}
+            className='border-none'
+          >
             <TableHeader>
               <TableRow>
                 <TableHead className='w-[120px]' sortable sortKey='reportId'>
@@ -278,7 +284,7 @@ const ComplianceReportsListPage = () => {
               ))}
             </TableBody>
           </DataTable>
-        </Card>
+        </div>>
       )}
     </PageContainer>
   );
