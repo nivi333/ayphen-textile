@@ -1,4 +1,4 @@
-# Lavoro AI Ferri - Frontend API Reference
+# Ayphen Textile - Frontend API Reference
 ## Complete Backend API Integration Guide
 
 This document lists all backend APIs used by the frontend. **No changes required** - all services remain identical during shadcn/ui migration.

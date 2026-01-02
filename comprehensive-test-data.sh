@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # =========================================
-# LAVORO AI FERRI - COMPREHENSIVE TEST DATA SCRIPT
+# Ayphen Textile - COMPREHENSIVE TEST DATA SCRIPT
 # =========================================
 # This script creates a complete test environment with:
 # - 1 Owner User (owns all 3 companies)

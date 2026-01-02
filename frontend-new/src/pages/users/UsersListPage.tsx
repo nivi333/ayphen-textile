@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import useAuth from '@/contexts/AuthContext';
 import { userService, User, UserFilters } from '@/services/userService';
+import { useSortableTable } from '@/hooks/useSortableTable';
 import UserInviteSheet from '@/components/users/UserInviteSheet';
 import UserEditSheet from '@/components/users/UserEditSheet';
 import {
@@ -146,6 +147,17 @@ const UsersListPage = () => {
       toast.error(error.message || 'Failed to remove user');
     }
   };
+
+  const {
+    sortedData: sortedUsers,
+    sortColumn,
+    sortDirection,
+    handleSort,
+  } = useSortableTable({
+    data: users,
+    defaultSortColumn: 'firstName',
+    defaultSortDirection: 'asc',
+  });
 
   const handleChangeRole = (user: User) => {
     setUserToChangeRole(user);
@@ -395,7 +407,7 @@ const UsersListPage = () => {
             }
           />
         ) : (
-          <DataTable>
+          <DataTable sortColumn={sortColumn} sortDirection={sortDirection} onSort={handleSort}>
             <TableHeader>
               <TableRow>
                 <TableHead className='w-[50px]'>
@@ -404,15 +416,23 @@ const UsersListPage = () => {
                     onCheckedChange={toggleSelectAll}
                   />
                 </TableHead>
-                <TableHead className='w-[280px]'>User</TableHead>
-                <TableHead className='w-[120px]'>Role</TableHead>
-                <TableHead className='w-[100px]'>Status</TableHead>
-                <TableHead className='w-[150px]'>Last Active</TableHead>
+                <TableHead className='w-[280px]' sortable sortKey='firstName'>
+                  User
+                </TableHead>
+                <TableHead className='w-[120px]' sortable sortKey='role'>
+                  Role
+                </TableHead>
+                <TableHead className='w-[100px]' sortable sortKey='isActive'>
+                  Status
+                </TableHead>
+                <TableHead className='w-[150px]' sortable sortKey='lastActive'>
+                  Last Active
+                </TableHead>
                 <TableHead className='w-[80px] text-center'>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users.map(user => (
+              {sortedUsers.map(user => (
                 <TableRow key={user.id}>
                   <TableCell>
                     <Checkbox

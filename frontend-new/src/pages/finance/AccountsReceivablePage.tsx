@@ -25,6 +25,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { invoiceService, InvoiceSummary, InvoiceStatus } from '@/services/invoiceService';
 import useAuth from '@/contexts/AuthContext';
+import { useSortableTable } from '@/hooks/useSortableTable';
 
 const STATUS_COLORS: Record<InvoiceStatus, 'default' | 'success' | 'warning' | 'error' | 'info'> = {
   DRAFT: 'default',
@@ -98,6 +99,17 @@ const AccountsReceivablePage = () => {
   const handleSendReminder = (invoice: InvoiceSummary) => {
     toast.info(`Send reminder for invoice ${invoice.invoiceId}`);
   };
+
+  const {
+    sortedData: sortedInvoices,
+    sortColumn,
+    sortDirection,
+    handleSort,
+  } = useSortableTable({
+    data: invoices,
+    defaultSortColumn: 'invoiceDate',
+    defaultSortDirection: 'desc',
+  });
 
   if (!currentCompany) {
     return (
@@ -188,21 +200,33 @@ const AccountsReceivablePage = () => {
         <EmptyState message='No invoices found' />
       ) : (
         <Card>
-          <DataTable>
+          <DataTable sortColumn={sortColumn} sortDirection={sortDirection} onSort={handleSort}>
             <TableHeader>
               <TableRow>
-                <TableHead>Invoice ID</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Invoice Date</TableHead>
-                <TableHead>Due Date</TableHead>
-                <TableHead className='text-right'>Total Amount</TableHead>
+                <TableHead sortable sortKey='invoiceId'>
+                  Invoice ID
+                </TableHead>
+                <TableHead sortable sortKey='customerName'>
+                  Customer
+                </TableHead>
+                <TableHead sortable sortKey='status'>
+                  Status
+                </TableHead>
+                <TableHead sortable sortKey='invoiceDate'>
+                  Invoice Date
+                </TableHead>
+                <TableHead sortable sortKey='dueDate'>
+                  Due Date
+                </TableHead>
+                <TableHead className='text-right' sortable sortKey='totalAmount'>
+                  Total Amount
+                </TableHead>
                 <TableHead className='text-right'>Amount Due</TableHead>
                 <TableHead className='w-[50px]'>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {invoices.map(invoice => {
+              {sortedInvoices.map(invoice => {
                 const amountDue = invoice.totalAmount - (invoice.amountPaid || 0);
                 const isOverdue =
                   invoice.dueDate &&

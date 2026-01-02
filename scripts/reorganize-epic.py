@@ -12,7 +12,7 @@ with open('z-epics/Textile-Application.md', 'r') as f:
 
 # Create the reorganized content
 reorganized = f"""# 🏭 EPIC: Multi-Tenant Textile Manufacturing ERP System
-## Lavoro AI Ferri - Complete Development Roadmap
+## Ayphen Textile - Complete Development Roadmap
 
 **Last Updated**: {datetime.now().strftime('%B %d, %Y')}  
 **Version**: 2.0 (Reorganized & Expanded)

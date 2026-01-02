@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # =========================================
-# LAVORO AI FERRI - COMPREHENSIVE DATA TEST
+# Ayphen Textile - COMPREHENSIVE DATA TEST
 # =========================================
 # Creates comprehensive test data for frontend-new
 # Tests all uniqueness validations

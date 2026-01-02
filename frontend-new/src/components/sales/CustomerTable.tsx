@@ -25,6 +25,9 @@ interface CustomerTableProps {
   onEdit: (customer: Customer) => void;
   onDelete: (customer: Customer) => void;
   userRole?: string;
+  sortColumn?: string;
+  sortDirection?: 'asc' | 'desc';
+  onSort?: (column: string) => void;
 }
 
 export function CustomerTable({
@@ -33,6 +36,9 @@ export function CustomerTable({
   onEdit,
   onDelete,
   userRole,
+  sortColumn,
+  sortDirection,
+  onSort,
 }: CustomerTableProps) {
   const isEmployee = userRole === 'EMPLOYEE';
 
@@ -41,15 +47,27 @@ export function CustomerTable({
   }
 
   return (
-    <DataTable>
+    <DataTable sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort}>
       <TableHeader>
         <TableRow>
-          <TableHead>Name</TableHead>
-          <TableHead>Phone</TableHead>
-          <TableHead>Email</TableHead>
-          <TableHead>Location</TableHead>
-          <TableHead>Type</TableHead>
-          <TableHead>Status</TableHead>
+          <TableHead sortable sortKey='name'>
+            Name
+          </TableHead>
+          <TableHead sortable sortKey='phone'>
+            Phone
+          </TableHead>
+          <TableHead sortable sortKey='email'>
+            Email
+          </TableHead>
+          <TableHead sortable sortKey='billingCity'>
+            Location
+          </TableHead>
+          <TableHead sortable sortKey='customerType'>
+            Type
+          </TableHead>
+          <TableHead sortable sortKey='isActive'>
+            Status
+          </TableHead>
           <TableHead className='w-[80px]'></TableHead>
         </TableRow>
       </TableHeader>

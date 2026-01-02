@@ -7,7 +7,7 @@ import { config } from '../config/config';
 const swaggerDefinition = {
   openapi: '3.0.0',
   info: {
-    title: 'Lavoro AI Ferri - Textile Manufacturing ERP API',
+    title: 'Ayphen Textile - Textile Manufacturing ERP API',
     version: '1.0.0',
     description: `
       A comprehensive RESTful API for textile manufacturing ERP system with multi-tenant architecture.
@@ -98,7 +98,7 @@ const swaggerDefinition = {
           },
         },
       },
-      
+
       // Authentication schemas
       LoginRequest: {
         type: 'object',
@@ -117,7 +117,7 @@ const swaggerDefinition = {
           },
         },
       },
-      
+
       RegisterRequest: {
         type: 'object',
         required: ['firstName', 'lastName', 'password'],
@@ -149,12 +149,13 @@ const swaggerDefinition = {
             format: 'password',
             minLength: 8,
             maxLength: 128,
-            description: 'Must contain at least one lowercase letter, one uppercase letter, one number, and one special character',
+            description:
+              'Must contain at least one lowercase letter, one uppercase letter, one number, and one special character',
             example: 'SecurePass123!',
           },
         },
       },
-      
+
       AuthTokens: {
         type: 'object',
         properties: {
@@ -175,7 +176,7 @@ const swaggerDefinition = {
           },
         },
       },
-      
+
       User: {
         type: 'object',
         properties: {
@@ -212,7 +213,7 @@ const swaggerDefinition = {
           },
         },
       },
-      
+
       Company: {
         type: 'object',
         properties: {
@@ -241,7 +242,7 @@ const swaggerDefinition = {
           },
         },
       },
-      
+
       Session: {
         type: 'object',
         properties: {
@@ -280,7 +281,7 @@ const swaggerDefinition = {
           },
         },
       },
-      
+
       HealthStatus: {
         type: 'object',
         properties: {
@@ -327,7 +328,7 @@ const swaggerDefinition = {
         },
       },
     },
-    
+
     responses: {
       UnauthorizedError: {
         description: 'Authentication required',
@@ -348,7 +349,7 @@ const swaggerDefinition = {
           },
         },
       },
-      
+
       ForbiddenError: {
         description: 'Access denied',
         content: {
@@ -368,7 +369,7 @@ const swaggerDefinition = {
           },
         },
       },
-      
+
       ValidationError: {
         description: 'Validation failed',
         content: {
@@ -394,7 +395,7 @@ const swaggerDefinition = {
           },
         },
       },
-      
+
       RateLimitError: {
         description: 'Rate limit exceeded',
         content: {
@@ -415,7 +416,7 @@ const swaggerDefinition = {
           },
         },
       },
-      
+
       InternalServerError: {
         description: 'Internal server error',
         content: {
@@ -437,13 +438,13 @@ const swaggerDefinition = {
       },
     },
   },
-  
+
   security: [
     {
       bearerAuth: [],
     },
   ],
-  
+
   tags: [
     {
       name: 'Authentication',
@@ -483,11 +484,7 @@ const swaggerDefinition = {
 // Options for swagger-jsdoc
 const swaggerOptions = {
   definition: swaggerDefinition,
-  apis: [
-    './src/routes/v1/*.ts',
-    './src/controllers/*.ts',
-    './src/docs/paths/*.yaml',
-  ],
+  apis: ['./src/routes/v1/*.ts', './src/controllers/*.ts', './src/docs/paths/*.yaml'],
 };
 
 // Generate swagger specification
@@ -503,7 +500,8 @@ const swaggerUiOptions = {
     tryItOutEnabled: true,
     requestInterceptor: (req: any) => {
       // Add request ID header
-      req.headers['X-Request-ID'] = `swagger_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      req.headers['X-Request-ID'] =
+        `swagger_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       return req;
     },
   },
@@ -513,7 +511,7 @@ const swaggerUiOptions = {
     .swagger-ui .info .title { color: #3b4151; }
     .swagger-ui .scheme-container { background: #f7f7f7; padding: 15px; margin: 20px 0; }
   `,
-  customSiteTitle: 'Lavoro AI Ferri API Documentation',
+  customSiteTitle: 'Ayphen Textile API Documentation',
 };
 
 /**
@@ -522,12 +520,12 @@ const swaggerUiOptions = {
 export const setupSwagger = (app: Express): void => {
   // Serve swagger documentation
   app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerUiOptions));
-  
+
   // Serve swagger JSON
   app.get('/docs.json', (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.send(swaggerSpec);
   });
-  
+
   console.log(`📚 API Documentation available at: http://${config.host}:${config.port}/docs`);
 };

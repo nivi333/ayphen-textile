@@ -20,8 +20,8 @@ export default function Header({ onMenuClick }: HeaderProps) {
         </IconButton>
 
         <div className='flex items-center gap-2'>
-          <img src='/src/assets/lavoro-ai-ferri.png' alt='Lavoro ai Ferri' className='h-8' />
-          <span className='hidden text-lg font-semibold md:inline-block'>Lavoro ai Ferri</span>
+          <img src='/src/assets/lavoro-ai-ferri.png' alt='Ayphen Textile' className='h-8' />
+          <span className='hidden text-lg font-semibold md:inline-block'>Ayphen Textile</span>
         </div>
       </div>
 

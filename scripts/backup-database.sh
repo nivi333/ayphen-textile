@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Database Backup Script for Lavoro AI Ferri
+# Database Backup Script for Ayphen Textile
 # Supports both single database and multi-tenant schema backups
 
 set -euo pipefail

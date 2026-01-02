@@ -4,7 +4,7 @@
  * NO HARDCODED VALUES - All styling from @ayphen-web/theme
  */
 
-import { forwardRef, ButtonHTMLAttributes, InputHTMLAttributes, useState } from 'react';
+import React, { forwardRef, ButtonHTMLAttributes, InputHTMLAttributes, useState } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 import { Loader2, Eye, EyeOff, Search, X, ChevronUp, ChevronDown } from 'lucide-react';
@@ -633,30 +633,54 @@ Separator.displayName = 'Separator';
 // TABLE COMPONENTS
 // ============================================================================
 
-export interface DataTableProps extends React.HTMLAttributes<HTMLTableElement> {}
+// ============================================================================
+// TABLE COMPONENTS
+// ============================================================================
+
+interface TableSortingContextType {
+  sortColumn?: string;
+  sortDirection?: 'asc' | 'desc';
+  onSort?: (column: string) => void;
+}
+
+const TableSortingContext = React.createContext<TableSortingContextType>({});
+
+export interface DataTableProps extends React.HTMLAttributes<HTMLTableElement> {
+  sortColumn?: string;
+  sortDirection?: 'asc' | 'desc';
+  onSort?: (column: string) => void;
+}
 
 /**
  * DataTable - Standard data table wrapper
  * - Border from theme
  * - Padding: 10px per cell (from .ant-table-cell)
  * - Hover row effect
+ * - Provides sorting context to children
  */
 export const DataTable = forwardRef<HTMLTableElement, DataTableProps>(
-  ({ className, children, ...props }, ref) => {
+  ({ className, children, sortColumn, sortDirection, onSort, ...props }, ref) => {
+    const sortingContextValue = React.useMemo(
+      () => ({ sortColumn, sortDirection, onSort }),
+      [sortColumn, sortDirection, onSort]
+    );
+
     return (
-      <div className='relative w-full overflow-auto'>
-        <table
-          ref={ref}
-          className={cn(
-            'w-full caption-bottom text-sm border-collapse',
-            'border border-border rounded-base',
-            className
-          )}
-          {...props}
-        >
-          {children}
-        </table>
-      </div>
+      <TableSortingContext.Provider value={sortingContextValue}>
+        <div className='relative w-full overflow-auto'>
+          <table
+            ref={ref}
+            className={cn(
+              'w-full caption-bottom text-sm border-collapse',
+              'border border-border rounded-base',
+              className
+            )}
+            {...props}
+          >
+            {children}
+          </table>
+        </div>
+      </TableSortingContext.Provider>
     );
   }
 );
@@ -721,15 +745,49 @@ TableRow.displayName = 'TableRow';
 
 export interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableCellElement> {
   sortable?: boolean;
+  sortKey?: string; // Key to sort by
+  // Legacy props for backward compatibility while migrating
   sortDirection?: 'asc' | 'desc' | null;
   onSort?: () => void;
 }
 
 export const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
-  ({ className, children, sortable = false, sortDirection = null, onSort, ...props }, ref) => {
+  (
+    {
+      className,
+      children,
+      sortable = false,
+      sortKey,
+      sortDirection: propSortDirection,
+      onSort: propOnSort,
+      ...props
+    },
+    ref
+  ) => {
+    const {
+      sortColumn,
+      sortDirection: contextSortDirection,
+      onSort: contextOnSort,
+    } = React.useContext(TableSortingContext);
+
+    // Determine values to use: props take precedence (legacy behavior), fallback to context
+    const currentSortDirection =
+      propSortDirection !== undefined
+        ? propSortDirection
+        : sortColumn === sortKey
+          ? contextSortDirection
+          : null;
+    const handleSort = () => {
+      if (propOnSort) {
+        propOnSort();
+      } else if (contextOnSort && sortKey) {
+        contextOnSort(sortKey);
+      }
+    };
+
     const handleClick = () => {
-      if (sortable && onSort) {
-        onSort();
+      if (sortable) {
+        handleSort();
       }
     };
 
@@ -751,16 +809,25 @@ export const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
           {children}
           {sortable && (
             <div className='flex flex-col'>
+              {/* Show icons if sorted or arguments are active. If not sorted, we might want to show nothing or faint icons. 
+                  Users request: "if user removes sortable key, icon will appear" - wait, user said "if the named is removed the sorting icon will be appear" 
+                  which is a bit ambiguous. 
+                  "if the named is removed the sorting icon will be appear" -> maybe he means if he doesn't pass sortDirection/onSort explicitly?
+                  "add sort to all table with keyword sortable" -> if sortable is present, it should work.
+
+                  Let's stick to standard behavior: always show icons (maybe faint) or show only when sorted? 
+                  Current implementation showed icons always (one active, one inactive).
+              */}
               <ChevronUp
                 className={cn(
                   'h-3 w-3 -mb-1',
-                  sortDirection === 'asc' ? 'text-primary' : 'text-muted-foreground/40'
+                  currentSortDirection === 'asc' ? 'text-primary' : 'text-muted-foreground/40'
                 )}
               />
               <ChevronDown
                 className={cn(
                   'h-3 w-3',
-                  sortDirection === 'desc' ? 'text-primary' : 'text-muted-foreground/40'
+                  currentSortDirection === 'desc' ? 'text-primary' : 'text-muted-foreground/40'
                 )}
               />
             </div>

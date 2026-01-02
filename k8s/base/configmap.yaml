@@ -6,29 +6,29 @@ metadata:
     app: lavoro-backend
 data:
   # Redis Configuration
-  redis-host: "redis-service"
-  redis-port: "6379"
-  
+  redis-host: 'redis-service'
+  redis-port: '6379'
+
   # JWT Configuration
-  jwt-expires-in: "1h"
-  jwt-refresh-expires-in: "7d"
-  
+  jwt-expires-in: '1h'
+  jwt-refresh-expires-in: '7d'
+
   # Rate Limiting
-  rate-limit-window-ms: "900000"  # 15 minutes
-  rate-limit-max-requests: "100"
-  
+  rate-limit-window-ms: '900000' # 15 minutes
+  rate-limit-max-requests: '100'
+
   # CORS Configuration
-  cors-origin: "*"
-  cors-credentials: "true"
-  
+  cors-origin: '*'
+  cors-credentials: 'true'
+
   # Logging
-  log-level: "info"
-  
+  log-level: 'info'
+
   # Database Pool Configuration
-  db-max-connections: "20"
-  db-idle-timeout: "30000"
-  db-connection-timeout: "60000"
-  
+  db-max-connections: '20'
+  db-idle-timeout: '30000'
+  db-connection-timeout: '60000'
+
   # Application Configuration
-  app-name: "Lavoro AI Ferri"
-  app-version: "1.0.0"
+  app-name: 'Ayphen Textile'
+  app-version: '1.0.0'

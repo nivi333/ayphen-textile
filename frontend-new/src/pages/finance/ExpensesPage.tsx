@@ -64,6 +64,7 @@ import {
   CreateExpenseRequest,
 } from '@/services/expenseService';
 import useAuth from '@/contexts/AuthContext';
+import { useSortableTable } from '@/hooks/useSortableTable';
 
 const expenseSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -235,6 +236,17 @@ const ExpensesPage = () => {
     }
   };
 
+  const {
+    sortedData: sortedExpenses,
+    sortColumn,
+    sortDirection,
+    handleSort,
+  } = useSortableTable({
+    data: expenses,
+    defaultSortColumn: 'expenseDate',
+    defaultSortDirection: 'desc',
+  });
+
   if (!currentCompany) {
     return (
       <PageContainer>
@@ -335,20 +347,32 @@ const ExpensesPage = () => {
         />
       ) : (
         <Card>
-          <DataTable>
+          <DataTable sortColumn={sortColumn} sortDirection={sortDirection} onSort={handleSort}>
             <TableHeader>
               <TableRow>
-                <TableHead>Expense ID</TableHead>
-                <TableHead>Title</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead className='text-right'>Amount</TableHead>
+                <TableHead sortable sortKey='expenseId'>
+                  Expense ID
+                </TableHead>
+                <TableHead sortable sortKey='title'>
+                  Title
+                </TableHead>
+                <TableHead sortable sortKey='category'>
+                  Category
+                </TableHead>
+                <TableHead sortable sortKey='status'>
+                  Status
+                </TableHead>
+                <TableHead sortable sortKey='expenseDate'>
+                  Date
+                </TableHead>
+                <TableHead className='text-right' sortable sortKey='amount'>
+                  Amount
+                </TableHead>
                 <TableHead className='w-[50px]'>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {expenses.map(expense => (
+              {sortedExpenses.map(expense => (
                 <TableRow key={expense.id}>
                   <TableCell>{expense.expenseId}</TableCell>
                   <TableCell>

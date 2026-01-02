@@ -66,6 +66,7 @@ import {
   CreateTransactionRequest,
 } from '@/services/pettyCashService';
 import useAuth from '@/contexts/AuthContext';
+import { useSortableTable } from '@/hooks/useSortableTable';
 
 const accountSchema = z.object({
   name: z.string().min(1, 'Account name is required'),
@@ -236,6 +237,28 @@ const PettyCashPage = () => {
     }
   };
 
+  const {
+    sortedData: sortedAccounts,
+    sortColumn: accountSortColumn,
+    sortDirection: accountSortDirection,
+    handleSort: handleAccountSort,
+  } = useSortableTable({
+    data: accounts,
+    defaultSortColumn: 'name',
+    defaultSortDirection: 'asc',
+  });
+
+  const {
+    sortedData: sortedTransactions,
+    sortColumn: transactionSortColumn,
+    sortDirection: transactionSortDirection,
+    handleSort: handleTransactionSort,
+  } = useSortableTable({
+    data: transactions,
+    defaultSortColumn: 'transactionDate',
+    defaultSortDirection: 'desc',
+  });
+
   if (!currentCompany) {
     return (
       <PageContainer>
@@ -323,20 +346,36 @@ const PettyCashPage = () => {
             />
           ) : (
             <Card>
-              <DataTable>
+              <DataTable
+                sortColumn={accountSortColumn}
+                sortDirection={accountSortDirection}
+                onSort={handleAccountSort}
+              >
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Account ID</TableHead>
-                    <TableHead>Account Name</TableHead>
-                    <TableHead>Location</TableHead>
-                    <TableHead className='text-right'>Current Balance</TableHead>
-                    <TableHead>Custodian</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead sortable sortKey='accountId'>
+                      Account ID
+                    </TableHead>
+                    <TableHead sortable sortKey='name'>
+                      Account Name
+                    </TableHead>
+                    <TableHead sortable sortKey='location.name'>
+                      Location
+                    </TableHead>
+                    <TableHead className='text-right' sortable sortKey='currentBalance'>
+                      Current Balance
+                    </TableHead>
+                    <TableHead sortable sortKey='custodianName'>
+                      Custodian
+                    </TableHead>
+                    <TableHead sortable sortKey='isActive'>
+                      Status
+                    </TableHead>
                     <TableHead className='w-[50px]'>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {accounts.map(account => (
+                  {sortedAccounts.map(account => (
                     <TableRow key={account.id}>
                       <TableCell>{account.accountId}</TableCell>
                       <TableCell>
@@ -425,21 +464,39 @@ const PettyCashPage = () => {
             />
           ) : (
             <Card>
-              <DataTable>
+              <DataTable
+                sortColumn={transactionSortColumn}
+                sortDirection={transactionSortDirection}
+                onSort={handleTransactionSort}
+              >
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Transaction ID</TableHead>
-                    <TableHead>Account</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead className='text-right'>Amount</TableHead>
-                    <TableHead className='text-right'>Balance After</TableHead>
-                    <TableHead>Date</TableHead>
+                    <TableHead sortable sortKey='transactionId'>
+                      Transaction ID
+                    </TableHead>
+                    <TableHead sortable sortKey='account.name'>
+                      Account
+                    </TableHead>
+                    <TableHead sortable sortKey='transactionType'>
+                      Type
+                    </TableHead>
+                    <TableHead className='text-right' sortable sortKey='amount'>
+                      Amount
+                    </TableHead>
+                    <TableHead className='text-right' sortable sortKey='balanceAfter'>
+                      Balance After
+                    </TableHead>
+                    <TableHead sortable sortKey='transactionDate'>
+                      Date
+                    </TableHead>
                     <TableHead>Description</TableHead>
-                    <TableHead>Recorded By</TableHead>
+                    <TableHead sortable sortKey='recordedBy'>
+                      Recorded By
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {transactions.map(transaction => (
+                  {sortedTransactions.map(transaction => (
                     <TableRow key={transaction.id}>
                       <TableCell>{transaction.transactionId}</TableCell>
                       <TableCell>{transaction.account?.name || '-'}</TableCell>

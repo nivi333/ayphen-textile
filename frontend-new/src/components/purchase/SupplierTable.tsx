@@ -30,6 +30,9 @@ interface SupplierTableProps {
   onCreatePO: (supplier: Supplier) => void;
   onViewPOs: (supplier: Supplier) => void;
   userRole?: string;
+  sortColumn?: string;
+  sortDirection?: 'asc' | 'desc';
+  onSort?: (column: string) => void;
 }
 
 export function SupplierTable({
@@ -40,6 +43,9 @@ export function SupplierTable({
   onCreatePO,
   onViewPOs,
   userRole,
+  sortColumn,
+  sortDirection,
+  onSort,
 }: SupplierTableProps) {
   const isEmployee = userRole === 'EMPLOYEE';
 
@@ -59,16 +65,30 @@ export function SupplierTable({
   }
 
   return (
-    <DataTable>
+    <DataTable sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort}>
       <TableHeader>
         <TableRow>
-          <TableHead>Code</TableHead>
-          <TableHead className='w-[250px]'>Supplier Name</TableHead>
-          <TableHead>Email</TableHead>
-          <TableHead>Phone</TableHead>
-          <TableHead>Type</TableHead>
-          <TableHead>Lead Time</TableHead>
-          <TableHead>Status</TableHead>
+          <TableHead sortable sortKey='code'>
+            Code
+          </TableHead>
+          <TableHead className='w-[250px]' sortable sortKey='name'>
+            Supplier Name
+          </TableHead>
+          <TableHead sortable sortKey='email'>
+            Email
+          </TableHead>
+          <TableHead sortable sortKey='phone'>
+            Phone
+          </TableHead>
+          <TableHead sortable sortKey='supplierType'>
+            Type
+          </TableHead>
+          <TableHead sortable sortKey='leadTimeDays'>
+            Lead Time
+          </TableHead>
+          <TableHead sortable sortKey='isActive'>
+            Status
+          </TableHead>
           <TableHead className='w-[80px]'></TableHead>
         </TableRow>
       </TableHeader>

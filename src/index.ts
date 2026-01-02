@@ -22,7 +22,7 @@ import {
   setupUnhandledRejectionHandler,
   setupUncaughtExceptionHandler,
 } from './middleware/enhancedErrorHandler';
- 
+
 import { setupSwagger } from './docs/swagger';
 import v1Routes from './routes/v1';
 
@@ -78,7 +78,7 @@ app.get('/health', (req, res) => {
 // API routes will be added here
 app.get('/', (req, res) => {
   res.json({
-    message: 'Lavoro AI Ferri - Textile Manufacturing ERP API',
+    message: 'Ayphen Textile - Textile Manufacturing ERP API',
     version: '1.0.0',
     environment: config.env,
   });

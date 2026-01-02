@@ -1,7 +1,7 @@
-# Lavoro AI Ferri - Frontend Migration Guide
+# Ayphen Textile - Frontend Migration Guide
 ## From Ant Design + SCSS to shadcn/ui + Tailwind CSS
 
-Complete documentation for migrating the Lavoro AI Ferri frontend from Ant Design to shadcn/ui while maintaining exact same UI/UX and all backend API integrations.
+Complete documentation for migrating the Ayphen Textile frontend from Ant Design to shadcn/ui while maintaining exact same UI/UX and all backend API integrations.
 
 ---
 

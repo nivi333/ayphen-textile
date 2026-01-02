@@ -36,6 +36,7 @@ import { Button } from '@/components/ui/button';
 import { qualityService } from '@/services/qualityService';
 import useAuth from '@/contexts/AuthContext';
 import { format } from 'date-fns';
+import { useSortableTable } from '@/hooks/useSortableTable';
 
 interface QualityDefect {
   id: string;
@@ -68,6 +69,16 @@ const STATUS_COLORS: Record<string, 'default' | 'success' | 'warning' | 'error' 
 const QualityDefectsListPage = () => {
   const { currentCompany } = useAuth();
   const [defects, setDefects] = useState<QualityDefect[]>([]);
+  const {
+    sortedData: sortedDefects,
+    sortColumn,
+    sortDirection,
+    handleSort,
+  } = useSortableTable({
+    data: defects,
+    defaultSortColumn: 'detectedDate',
+    defaultSortDirection: 'desc',
+  });
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [selectedSeverity, setSelectedSeverity] = useState<string>('');
@@ -209,21 +220,35 @@ const QualityDefectsListPage = () => {
         />
       ) : (
         <Card>
-          <DataTable>
+          <DataTable sortColumn={sortColumn} sortDirection={sortDirection} onSort={handleSort}>
             <TableHeader>
               <TableRow>
-                <TableHead className='w-[120px]'>Defect ID</TableHead>
-                <TableHead className='w-[150px]'>Category</TableHead>
-                <TableHead className='w-[120px]'>Severity</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead className='w-[100px] text-center'>Quantity</TableHead>
-                <TableHead className='w-[140px]'>Detected Date</TableHead>
-                <TableHead className='w-[120px]'>Status</TableHead>
+                <TableHead className='w-[120px]' sortable sortKey='defectId'>
+                  Defect ID
+                </TableHead>
+                <TableHead className='w-[150px]' sortable sortKey='defectCategory'>
+                  Category
+                </TableHead>
+                <TableHead className='w-[120px]' sortable sortKey='severity'>
+                  Severity
+                </TableHead>
+                <TableHead sortable sortKey='description'>
+                  Description
+                </TableHead>
+                <TableHead className='w-[100px] text-center' sortable sortKey='quantity'>
+                  Quantity
+                </TableHead>
+                <TableHead className='w-[140px]' sortable sortKey='detectedDate'>
+                  Detected Date
+                </TableHead>
+                <TableHead className='w-[120px]' sortable sortKey='status'>
+                  Status
+                </TableHead>
                 <TableHead className='w-[100px]'>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {defects.map(defect => (
+              {sortedDefects.map(defect => (
                 <TableRow key={defect.id}>
                   <TableCell>
                     <span className='font-semibold'>{defect.defectId}</span>

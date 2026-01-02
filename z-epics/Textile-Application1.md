@@ -1,5 +1,5 @@
 # 🏭 EPIC: Multi-Tenant Textile Manufacturing ERP System
-## Lavoro AI Ferri - Functional Specification Document
+## Ayphen Textile - Functional Specification Document
 
 ---
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # =========================================
-# LAVORO AI FERRI - LOCAL SERVER TEST SCRIPT
+# Ayphen Textile - LOCAL SERVER TEST SCRIPT
 # =========================================
 # Quick test script for localhost:3000
 # Tests all major APIs with minimal data

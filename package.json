@@ -48,7 +48,7 @@
     "express",
     "typescript"
   ],
-  "author": "Lavoro AI Ferri Team",
+  "author": "Ayphen Textile Team",
   "license": "MIT",
   "dependencies": {
     "@nestjs/swagger": "^11.2.1",

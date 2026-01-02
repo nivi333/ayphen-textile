@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # =========================================
-# LAVORO AI FERRI - LIVE SERVER TEST SCRIPT
+# Ayphen Textile - LIVE SERVER TEST SCRIPT
 # =========================================
 # Test script for https://lavoro-ai-ferri.onrender.com
 # Tests all major APIs with minimal data

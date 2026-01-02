@@ -92,6 +92,19 @@ class SupplierService {
       throw new Error('Company not found');
     }
 
+    // Check for duplicate name
+    const existingSupplier = await prisma.suppliers.findFirst({
+      where: {
+        company_id: companyId,
+        name: { equals: supplierData.name, mode: 'insensitive' },
+        is_active: true,
+      },
+    });
+
+    if (existingSupplier) {
+      throw new Error('Supplier with this name already exists');
+    }
+
     const code = await this.generateSupplierCode(companyId);
 
     return await prisma.suppliers.create({
@@ -240,6 +253,22 @@ class SupplierService {
 
     if (!existingSupplier) {
       throw new Error('Supplier not found');
+    }
+
+    // Check name uniqueness if updated
+    if (updateData.name && updateData.name !== existingSupplier.name) {
+      const duplicateName = await prisma.suppliers.findFirst({
+        where: {
+          company_id: companyId,
+          name: { equals: updateData.name, mode: 'insensitive' },
+          is_active: true,
+          id: { not: supplierId },
+        },
+      });
+
+      if (duplicateName) {
+        throw new Error('Supplier with this name already exists');
+      }
     }
 
     return await prisma.suppliers.update({

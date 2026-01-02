@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # =========================================
-# LAVORO AI FERRI - COMPREHENSIVE API TEST (FIXED)
+# Ayphen Textile - COMPREHENSIVE API TEST (FIXED)
 # =========================================
 # Tests ALL APIs with full CRUD operations
 # Goal: 100% Success Rate

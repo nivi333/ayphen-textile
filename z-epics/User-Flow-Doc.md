@@ -1,10 +1,10 @@
-# Lavoro AI Ferri - Complete User Flow Documentation
+# Ayphen Textile - Complete User Flow Documentation
 
 ## 🏭 Project Overview
 
-**Lavoro AI Ferri** is a comprehensive **textile manufacturing ERP (Enterprise Resource Planning) system** designed specifically for the textile and garment industry. The platform provides end-to-end business management solutions for textile manufacturers, traders, and processing units.
+**Ayphen Textile** is a comprehensive **textile manufacturing ERP (Enterprise Resource Planning) system** designed specifically for the textile and garment industry. The platform provides end-to-end business management solutions for textile manufacturers, traders, and processing units.
 
-### **What is Lavoro AI Ferri?**
+### **What is Ayphen Textile?**
 
 **Lavoro** (Italian for "work") **AI Ferri** (Italian for "tools/instruments") represents a modern, AI-powered toolkit for textile businesses to streamline their operations, from raw material procurement to finished product delivery.
 
@@ -124,7 +124,7 @@ This ERP system transforms traditional textile businesses into modern, data-driv
 
 ## 🎯 Overview
 
-This document provides a comprehensive guide to the complete user authentication, multi-tenant company management, location management, and user role system for the Lavoro AI Ferri textile manufacturing ERP system.
+This document provides a comprehensive guide to the complete user authentication, multi-tenant company management, location management, and user role system for the Ayphen Textile textile manufacturing ERP system.
 
 ## 🎨 Theme & Design System
 
@@ -639,7 +639,7 @@ const clearSession = (logout: () => void) => {
 - **Session fixation**: New session ID after login/company switch
 - **Concurrent sessions**: Track and limit active sessions per user
 
-This comprehensive documentation covers all essential screens, functionality, and architectural decisions for the Lavoro AI Ferri multi-tenant ERP system.
+This comprehensive documentation covers all essential screens, functionality, and architectural decisions for the Ayphen Textile multi-tenant ERP system.
 - Real-time validation for email/phone
 
 ### **Backend Response**:
@@ -1149,4 +1149,4 @@ This comprehensive documentation covers all essential screens, functionality, an
 
 ---
 
-This documentation provides a complete overview of the current implementation and planned features for the Lavoro AI Ferri textile manufacturing ERP system. All components follow the established design guidelines and maintain consistency across the application.
+This documentation provides a complete overview of the current implementation and planned features for the Ayphen Textile textile manufacturing ERP system. All components follow the established design guidelines and maintain consistency across the application.

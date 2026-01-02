@@ -95,6 +95,19 @@ export class LocationService {
         });
       }
 
+      // Check for duplicate name
+      const existingLocation = await this.prisma.company_locations.findFirst({
+        where: {
+          company_id: companyId,
+          name: { equals: data.name, mode: 'insensitive' },
+          is_active: true,
+        },
+      });
+
+      if (existingLocation) {
+        throw new Error('Location with this name already exists');
+      }
+
       const newLocation = await this.prisma.company_locations.create({
         data: {
           id: uuidv4(),
@@ -319,6 +332,22 @@ export class LocationService {
           },
           data: { is_default: false },
         });
+      }
+
+      // Check name uniqueness if updated
+      if (data.name && data.name !== existingLocation.name) {
+        const duplicateName = await this.prisma.company_locations.findFirst({
+          where: {
+            company_id: companyId,
+            name: { equals: data.name, mode: 'insensitive' },
+            is_active: true,
+            id: { not: locationId },
+          },
+        });
+
+        if (duplicateName) {
+          throw new Error('Location with this name already exists');
+        }
       }
 
       const updatedLocation = await this.prisma.company_locations.update({

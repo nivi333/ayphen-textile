@@ -21,7 +21,7 @@ const LegalPage: React.FC = () => {
             <Paragraph>Last updated: {new Date().toLocaleDateString()}</Paragraph>
             <Title level={3}>1. Introduction</Title>
             <Paragraph>
-              Welcome to Lavoro AI Ferri. We respect your privacy and are committed to protecting
+              Welcome to Ayphen Textile. We respect your privacy and are committed to protecting
               your personal data. This privacy policy will inform you as to how we look after your
               personal data when you visit our website and tell you about your privacy rights and
               how the law protects you.
@@ -95,7 +95,7 @@ const LegalPage: React.FC = () => {
           <Title level={3}>2. Use License</Title>
           <Paragraph>
             Permission is granted to temporarily download one copy of the materials (information or
-            software) on Lavoro AI Ferri's website for personal, non-commercial transitory viewing
+            software) on Ayphen Textile's website for personal, non-commercial transitory viewing
             only.
           </Paragraph>
         </>

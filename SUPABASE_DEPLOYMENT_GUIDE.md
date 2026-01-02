@@ -1,7 +1,7 @@
-# Supabase + Render Deployment Guide for Lavoro AI Ferri
+# Supabase + Render Deployment Guide for Ayphen Textile
 
 ## Overview
-This guide covers deploying the Lavoro AI Ferri backend to Render with Supabase as the PostgreSQL database provider.
+This guide covers deploying the Ayphen Textile backend to Render with Supabase as the PostgreSQL database provider.
 
 ## Prerequisites
 - Supabase account with a project created

@@ -31,13 +31,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
+  DataTable,
   TableHeader,
+  TableBody,
   TableRow,
-} from '@/components/ui/table';
+  TableHead,
+  TableCell,
+} from '@/components/globalComponents';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -58,6 +58,7 @@ import {
   PrimaryButton,
   EmptyState,
 } from '@/components/globalComponents';
+import { useSortableTable } from '@/hooks/useSortableTable';
 import { PurchaseOrderFormSheet } from '@/components/purchase';
 import {
   purchaseOrderService,
@@ -204,6 +205,17 @@ export default function PurchaseOrdersListPage() {
     }
   };
 
+  const {
+    sortedData: sortedPurchaseOrders,
+    sortColumn,
+    sortDirection,
+    handleSort,
+  } = useSortableTable({
+    data: purchaseOrders,
+    defaultSortColumn: 'poId',
+    defaultSortDirection: 'desc',
+  });
+
   const getLocationName = (locationId?: string) => {
     if (!locationId) return '—';
     const loc = locations.find(l => l.id === locationId);
@@ -256,16 +268,30 @@ export default function PurchaseOrdersListPage() {
       </ActionBar>
 
       <div className='rounded-md border bg-card'>
-        <Table>
+        <DataTable sortColumn={sortColumn} sortDirection={sortDirection} onSort={handleSort}>
           <TableHeader>
             <TableRow>
-              <TableHead>PO ID</TableHead>
-              <TableHead>Supplier</TableHead>
-              <TableHead>PO Date</TableHead>
-              <TableHead>Expected Delivery</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className='text-right'>Total</TableHead>
+              <TableHead sortable sortKey='poId'>
+                PO ID
+              </TableHead>
+              <TableHead sortable sortKey='supplierName'>
+                Supplier
+              </TableHead>
+              <TableHead sortable sortKey='poDate'>
+                PO Date
+              </TableHead>
+              <TableHead sortable sortKey='expectedDeliveryDate'>
+                Expected Delivery
+              </TableHead>
+              <TableHead sortable sortKey='locationName'>
+                Location
+              </TableHead>
+              <TableHead sortable sortKey='status'>
+                Status
+              </TableHead>
+              <TableHead className='text-right' sortable sortKey='totalAmount'>
+                Total
+              </TableHead>
               <TableHead className='w-[60px]'></TableHead>
             </TableRow>
           </TableHeader>
@@ -276,14 +302,14 @@ export default function PurchaseOrdersListPage() {
                   Loading purchase orders...
                 </TableCell>
               </TableRow>
-            ) : purchaseOrders.length === 0 ? (
+            ) : sortedPurchaseOrders.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={8} className='text-center py-10 text-muted-foreground'>
                   No purchase orders found
                 </TableCell>
               </TableRow>
             ) : (
-              purchaseOrders.map(po => {
+              sortedPurchaseOrders.map(po => {
                 const statusInfo = STATUS_CONFIG[po.status] || {
                   label: po.status,
                   variant: 'secondary',
@@ -356,7 +382,7 @@ export default function PurchaseOrdersListPage() {
               })
             )}
           </TableBody>
-        </Table>
+        </DataTable>
       </div>
 
       <PurchaseOrderFormSheet

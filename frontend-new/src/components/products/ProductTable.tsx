@@ -68,52 +68,26 @@ export function ProductTable({
   }
 
   return (
-    <DataTable>
+    <DataTable sortColumn={sortColumn} sortDirection={sortDirection || undefined} onSort={onSort}>
       <TableHeader>
         <TableRow>
-          <TableHead
-            sortable={!!onSort}
-            sortDirection={sortColumn === 'productCode' ? sortDirection : null}
-            onSort={() => onSort?.('productCode')}
-          >
+          <TableHead sortable sortKey='productCode'>
             Product Code
           </TableHead>
-          <TableHead
-            sortable={!!onSort}
-            sortDirection={sortColumn === 'name' ? sortDirection : null}
-            onSort={() => onSort?.('name')}
-          >
+          <TableHead sortable sortKey='name'>
             Product Name
           </TableHead>
           <TableHead>Barcode</TableHead>
-          <TableHead
-            sortable={!!onSort}
-            sortDirection={sortColumn === 'category' ? sortDirection : null}
-            onSort={() => onSort?.('category')}
-          >
+          <TableHead sortable sortKey='category'>
             Category
           </TableHead>
-          <TableHead
-            className='text-right'
-            sortable={!!onSort}
-            sortDirection={sortColumn === 'stockQuantity' ? sortDirection : null}
-            onSort={() => onSort?.('stockQuantity')}
-          >
+          <TableHead className='text-right' sortable sortKey='stockQuantity'>
             Stock
           </TableHead>
-          <TableHead
-            className='text-right'
-            sortable={!!onSort}
-            sortDirection={sortColumn === 'sellingPrice' ? sortDirection : null}
-            onSort={() => onSort?.('sellingPrice')}
-          >
+          <TableHead className='text-right' sortable sortKey='sellingPrice'>
             Price
           </TableHead>
-          <TableHead
-            sortable={!!onSort}
-            sortDirection={sortColumn === 'isActive' ? sortDirection : null}
-            onSort={() => onSort?.('isActive')}
-          >
+          <TableHead sortable sortKey='isActive'>
             Status
           </TableHead>
           <TableHead className='w-[80px]'></TableHead>

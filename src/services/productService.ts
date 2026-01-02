@@ -202,6 +202,19 @@ export class ProductService {
     const productCode = data.productCode || (await this.generateProductCode(companyId));
     const sku = data.sku || (await this.generateSKU(companyId, data.name));
 
+    // Check product name uniqueness within company
+    const existingName = await this.prisma.products.findFirst({
+      where: {
+        company_id: companyId,
+        name: { equals: data.name, mode: 'insensitive' },
+        is_active: true,
+      },
+    });
+
+    if (existingName) {
+      throw new Error('Product with this name already exists');
+    }
+
     // Check product code uniqueness within company
     const existingCode = await this.prisma.products.findFirst({
       where: { company_id: companyId, product_code: productCode },

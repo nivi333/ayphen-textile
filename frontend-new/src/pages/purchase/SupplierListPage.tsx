@@ -30,6 +30,9 @@ export default function SupplierListPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<SupplierFilters>({});
 
+  const [sortColumn, setSortColumn] = useState<string>('name');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
   const [isDeleting, setIsDeleting] = useState<Supplier | null>(null);
@@ -60,6 +63,28 @@ export default function SupplierListPage() {
   useEffect(() => {
     fetchSuppliers();
   }, [filters, searchQuery]);
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortDirection(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
+  const sortedSuppliers = [...suppliers].sort((a: any, b: any) => {
+    const aValue = a[sortColumn];
+    const bValue = b[sortColumn];
+
+    if (!aValue && !bValue) return 0;
+    if (!aValue) return 1;
+    if (!bValue) return -1;
+
+    if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+    if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+    return 0;
+  });
 
   const handleCreate = () => {
     setEditingSupplier(null);
@@ -205,12 +230,15 @@ export default function SupplierListPage() {
       </ActionBar>
 
       <SupplierTable
-        suppliers={suppliers}
+        suppliers={sortedSuppliers}
         loading={loading}
         onEdit={handleEdit}
         onDelete={handleDelete}
         onCreatePO={handleCreatePO}
         onViewPOs={handleViewPOs}
+        sortColumn={sortColumn}
+        sortDirection={sortDirection}
+        onSort={handleSort}
       />
 
       <SupplierFormSheet

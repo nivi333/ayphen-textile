@@ -25,6 +25,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { billService, BillSummary, BillStatus } from '@/services/billService';
 import useAuth from '@/contexts/AuthContext';
+import { useSortableTable } from '@/hooks/useSortableTable';
 
 const STATUS_COLORS: Record<BillStatus, 'default' | 'success' | 'warning' | 'error' | 'info'> = {
   DRAFT: 'default',
@@ -94,6 +95,17 @@ const AccountsPayablePage = () => {
   const handleRecordPayment = (bill: BillSummary) => {
     toast.info(`Record payment for bill ${bill.billId}`);
   };
+
+  const {
+    sortedData: sortedBills,
+    sortColumn,
+    sortDirection,
+    handleSort,
+  } = useSortableTable({
+    data: bills,
+    defaultSortColumn: 'billDate',
+    defaultSortDirection: 'desc',
+  });
 
   if (!currentCompany) {
     return (
@@ -180,21 +192,39 @@ const AccountsPayablePage = () => {
         <EmptyState message='No bills found' />
       ) : (
         <Card>
-          <DataTable>
+          <DataTable sortColumn={sortColumn} sortDirection={sortDirection} onSort={handleSort}>
             <TableHeader>
               <TableRow>
-                <TableHead>Bill ID</TableHead>
-                <TableHead>Supplier</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Bill Date</TableHead>
-                <TableHead>Due Date</TableHead>
-                <TableHead className='text-right'>Total Amount</TableHead>
-                <TableHead className='text-right'>Amount Due</TableHead>
+                <TableHead sortable sortKey='billId'>
+                  Bill ID
+                </TableHead>
+                <TableHead sortable sortKey='supplierName'>
+                  Supplier
+                </TableHead>
+                <TableHead sortable sortKey='status'>
+                  Status
+                </TableHead>
+                <TableHead sortable sortKey='billDate'>
+                  Bill Date
+                </TableHead>
+                <TableHead sortable sortKey='dueDate'>
+                  Due Date
+                </TableHead>
+                <TableHead className='text-right' sortable sortKey='totalAmount'>
+                  Total Amount
+                </TableHead>
+                <TableHead
+                  className='text-right'
+                  // Amount Due is calculated, might need custom sort logic or pre-calculation if we want to sort by it.
+                  // For now, let's skip sorting on calculated field unless we map it.
+                >
+                  Amount Due
+                </TableHead>
                 <TableHead className='w-[50px]'>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {bills.map(bill => {
+              {sortedBills.map(bill => {
                 const amountDue = bill.totalAmount - (bill.amountPaid || 0);
                 const isOverdue =
                   bill.dueDate && new Date(bill.dueDate) < new Date() && bill.status !== 'PAID';

@@ -1,6 +1,6 @@
 # CI/CD Pipeline Setup Guide
 
-This document provides comprehensive instructions for setting up and managing the CI/CD pipeline for the Lavoro AI Ferri textile manufacturing ERP system.
+This document provides comprehensive instructions for setting up and managing the CI/CD pipeline for the Ayphen Textile textile manufacturing ERP system.
 
 ## Table of Contents
 

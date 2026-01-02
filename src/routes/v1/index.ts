@@ -37,7 +37,7 @@ const router = Router();
 router.get('/', (req, res) => {
   res.json({
     version: 'v1',
-    name: 'Lavoro AI Ferri API',
+    name: 'Ayphen Textile API',
     description: 'Textile Manufacturing ERP API - Version 1',
     timestamp: new Date().toISOString(),
     endpoints: {

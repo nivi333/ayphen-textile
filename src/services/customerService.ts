@@ -104,6 +104,19 @@ class CustomerService {
       customerData.shippingPostalCode = customerData.billingPostalCode;
     }
 
+    // Check for duplicate name
+    const existingCustomer = await prisma.customers.findFirst({
+      where: {
+        company_id: companyId,
+        name: { equals: customerData.name, mode: 'insensitive' },
+        is_active: true,
+      },
+    });
+
+    if (existingCustomer) {
+      throw new Error('Customer with this name already exists');
+    }
+
     const code = await this.generateCustomerCode(companyId);
 
     return await prisma.customers.create({
@@ -271,6 +284,22 @@ class CustomerService {
       updateData.shippingCountry = updateData.billingCountry || existingCustomer.billing_country;
       updateData.shippingPostalCode =
         updateData.billingPostalCode || existingCustomer.billing_postal_code;
+    }
+
+    // Check name uniqueness if updated
+    if (updateData.name && updateData.name !== existingCustomer.name) {
+      const duplicateName = await prisma.customers.findFirst({
+        where: {
+          company_id: companyId,
+          name: { equals: updateData.name, mode: 'insensitive' },
+          is_active: true,
+          id: { not: customerId },
+        },
+      });
+
+      if (duplicateName) {
+        throw new Error('Customer with this name already exists');
+      }
     }
 
     return await prisma.customers.update({

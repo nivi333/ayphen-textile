@@ -36,6 +36,7 @@ import { Button } from '@/components/ui/button';
 import { qualityService } from '@/services/qualityService';
 import useAuth from '@/contexts/AuthContext';
 import { format } from 'date-fns';
+import { useSortableTable } from '@/hooks/useSortableTable';
 
 interface QualityCheckpoint {
   id: string;
@@ -61,6 +62,16 @@ const STATUS_COLORS: Record<string, 'default' | 'success' | 'warning' | 'error' 
 const QualityCheckpointsListPage = () => {
   const { currentCompany } = useAuth();
   const [checkpoints, setCheckpoints] = useState<QualityCheckpoint[]>([]);
+  const {
+    sortedData: sortedCheckpoints,
+    sortColumn,
+    sortDirection,
+    handleSort,
+  } = useSortableTable({
+    data: checkpoints,
+    defaultSortColumn: 'inspectionDate',
+    defaultSortDirection: 'desc',
+  });
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [selectedType, setSelectedType] = useState<string>('');
@@ -187,21 +198,35 @@ const QualityCheckpointsListPage = () => {
         />
       ) : (
         <Card>
-          <DataTable>
+          <DataTable sortColumn={sortColumn} sortDirection={sortDirection} onSort={handleSort}>
             <TableHeader>
               <TableRow>
-                <TableHead className='w-[140px]'>Checkpoint ID</TableHead>
-                <TableHead>Checkpoint Name</TableHead>
-                <TableHead className='w-[150px]'>Inspector</TableHead>
-                <TableHead className='w-[140px]'>Inspection Date</TableHead>
-                <TableHead className='w-[120px]'>Status</TableHead>
-                <TableHead className='w-[100px] text-center'>Score</TableHead>
-                <TableHead className='w-[100px] text-center'>Defects</TableHead>
+                <TableHead className='w-[140px]' sortable sortKey='checkpointId'>
+                  Checkpoint ID
+                </TableHead>
+                <TableHead sortable sortKey='checkpointName'>
+                  Checkpoint Name
+                </TableHead>
+                <TableHead className='w-[150px]' sortable sortKey='inspectorName'>
+                  Inspector
+                </TableHead>
+                <TableHead className='w-[140px]' sortable sortKey='inspectionDate'>
+                  Inspection Date
+                </TableHead>
+                <TableHead className='w-[120px]' sortable sortKey='status'>
+                  Status
+                </TableHead>
+                <TableHead className='w-[100px] text-center' sortable sortKey='overallScore'>
+                  Score
+                </TableHead>
+                <TableHead className='w-[100px] text-center' sortable sortKey='defectCount'>
+                  Defects
+                </TableHead>
                 <TableHead className='w-[100px]'>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {checkpoints.map(checkpoint => (
+              {sortedCheckpoints.map(checkpoint => (
                 <TableRow key={checkpoint.id}>
                   <TableCell>
                     <span className='font-semibold'>{checkpoint.checkpointId}</span>

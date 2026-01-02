@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Database Restore Script for Lavoro AI Ferri
+# Database Restore Script for Ayphen Textile
 # Supports restoration of global schema, tenant schemas, or full database
 
 set -euo pipefail

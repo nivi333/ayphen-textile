@@ -34,6 +34,9 @@ export default function InventoryListPage() {
   const [selectedLocation, setSelectedLocation] = useState<string>('all');
   const [selectedProduct, setSelectedProduct] = useState<string>('all');
 
+  const [sortColumn, setSortColumn] = useState<string>('productName');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
   // Sheet/Dialog states
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isMovementOpen, setIsMovementOpen] = useState(false);
@@ -48,6 +51,32 @@ export default function InventoryListPage() {
       fetchProducts();
     }
   }, [currentCompany?.id]);
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortDirection(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
+  const sortedInventory = [...inventory].sort((a: any, b: any) => {
+    let aValue = a[sortColumn];
+    let bValue = b[sortColumn];
+
+    // Handle nested or mapped fields if needed (e.g. productName is top level in LocationInventory?)
+    // Checking LocationInventory interface would be good, but assuming flat or handled here.
+    // If sortColumn is 'productName', it might be valid.
+
+    if (!aValue && !bValue) return 0;
+    if (!aValue) return 1;
+    if (!bValue) return -1;
+
+    if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+    if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+    return 0;
+  });
 
   useEffect(() => {
     if (currentCompany?.id) {
@@ -204,12 +233,15 @@ export default function InventoryListPage() {
 
       {/* Table */}
       <InventoryTable
-        data={inventory}
+        data={sortedInventory}
         loading={loading}
         onEdit={handleEdit}
         onRecordMovement={handleRecordMovement}
         onViewHistory={handleViewHistory}
         onRefresh={handleRefresh}
+        sortColumn={sortColumn}
+        sortDirection={sortDirection}
+        onSort={handleSort}
       />
 
       {/* Form Sheet */}

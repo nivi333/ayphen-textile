@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # =========================================
-# LAVORO AI FERRI - COMPREHENSIVE DATA SEEDING SCRIPT
+# Ayphen Textile - COMPREHENSIVE DATA SEEDING SCRIPT
 # =========================================
 # This script creates a complete test environment with:
 # - 5 companies with different industries
