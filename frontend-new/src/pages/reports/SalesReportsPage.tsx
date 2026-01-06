@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { DateRange } from 'react-day-picker';
 import { addDays } from 'date-fns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -29,10 +29,14 @@ const SalesReportsPage = () => {
 
   return (
     <PageContainer>
-      <PageHeader
-        title='Sales Reports'
-        description='Analyze sales performance, trends, top products, and customer history.'
-      />
+      <PageHeader>
+        <div className='flex flex-col gap-1'>
+          <h2 className='text-2xl font-bold tracking-tight'>Sales Reports</h2>
+          <p className='text-muted-foreground'>
+            Analyze sales performance, trends, top products, and customer history.
+          </p>
+        </div>
+      </PageHeader>
 
       <div className='mb-6'>
         <ReportFilters

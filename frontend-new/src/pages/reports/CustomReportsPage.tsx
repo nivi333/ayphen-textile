@@ -1,4 +1,3 @@
-import React from 'react';
 import { PageContainer, PageHeader, EmptyState } from '@/components/globalComponents';
 import { FileText } from 'lucide-react';
 

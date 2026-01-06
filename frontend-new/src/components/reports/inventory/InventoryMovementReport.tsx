@@ -15,6 +15,7 @@ import {
 import { TableCard } from '@/components/globalComponents';
 import { toast } from 'sonner';
 import ReportChart from '@/components/reports/shared/ReportChart';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 interface InventoryMovementReportProps {
   dateRange: DateRange | undefined;
@@ -98,14 +99,17 @@ const InventoryMovementReport: React.FC<InventoryMovementReportProps> = ({
 
       {data && (
         <>
-          <ReportChart
-            data={chartData || []}
-            title='Movement Trend'
-            bars={[
-              { key: 'In', color: '#16a34a' },
-              { key: 'Out', color: '#dc2626' },
-            ]}
-          />
+          <ReportChart title='Movement Trend' loading={loading}>
+            <BarChart data={chartData || []}>
+              <CartesianGrid strokeDasharray='3 3' />
+              <XAxis dataKey='name' />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey='In' fill='#16a34a' name='Incoming' />
+              <Bar dataKey='Out' fill='#dc2626' name='Outgoing' />
+            </BarChart>
+          </ReportChart>
 
           <TableCard title='Product Movements'>
             <Table>

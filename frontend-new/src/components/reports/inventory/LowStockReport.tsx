@@ -117,10 +117,9 @@ const LowStockReport: React.FC<LowStockReportProps> = ({
                     <TableCell className='text-right'>{item.reorderLevel}</TableCell>
                     <TableCell className='text-right text-red-600'>{shortage}</TableCell>
                     <TableCell>
-                      <StatusBadge
-                        status={item.status || 'WARNING'}
-                        variant={item.status === 'CRITICAL' ? 'rejected' : 'warning'}
-                      />
+                      <StatusBadge variant={item.status === 'CRITICAL' ? 'error' : 'warning'}>
+                        {item.status || 'WARNING'}
+                      </StatusBadge>
                     </TableCell>
                   </TableRow>
                 );

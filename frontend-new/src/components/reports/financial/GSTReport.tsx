@@ -26,7 +26,7 @@ const GSTReport: React.FC<GSTReportProps> = ({
   // We'll use a hardcoded period or derive from date for now as placeholder or assume API update.
   // The task list said `getGSTReport(period: string)`. Let's assume period="current" for now if date range isn't used directly,
   // OR map date range to a month string e.g. "2023-10".
-  searchText,
+  // searchText,
   triggerFetch,
   onLoadingChange,
 }) => {

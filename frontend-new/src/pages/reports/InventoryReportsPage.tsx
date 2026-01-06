@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { DateRange } from 'react-day-picker';
 import { addDays } from 'date-fns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -30,10 +30,11 @@ const InventoryReportsPage = () => {
 
   return (
     <PageContainer>
-      <PageHeader
-        title='Inventory Reports'
-        description='Track stock levels, valuation, movements, and aging inventory.'
-      />
+      <PageHeader>
+        <div className='flex flex-col gap-1'>
+          <h2 className='text-2xl font-bold tracking-tight'>Inventory Reports</h2>
+        </div>
+      </PageHeader>
 
       <div className='mb-6'>
         <ReportFilters

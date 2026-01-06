@@ -1080,70 +1080,72 @@ Create all input variants in `globalComponents.tsx`:
 > **Why Priority 14**: Textile-specific operations are industry-specific features.
 - [ ] **FabricProductionListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
+  - [x] **FabricProductionListPage.tsx**
+  - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`textileService`)
-  - [ ] **API Integration**: 
+  - [x] **API Integration**: 
     - GET `/api/v1/textile/fabric-production` - List fabric production records
     - DELETE `/api/v1/textile/fabric-production/{id}` - Delete record
 
-- [ ] **YarnManufacturingListPage.tsx**
+- [x] **YarnManufacturingListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`textileService`)
-  - [ ] **API Integration**: 
+  - [x] **API Integration**: 
     - GET `/api/v1/textile/yarn-manufacturing` - List yarn manufacturing records
     - DELETE `/api/v1/textile/yarn-manufacturing/{id}` - Delete record
 
-- [ ] **DyeingFinishingListPage.tsx**
+- [x] **DyeingFinishingListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`textileService`)
-  - [ ] **API Integration**: 
+  - [x] **API Integration**: 
     - GET `/api/v1/textile/dyeing-finishing` - List dyeing/finishing records
     - DELETE `/api/v1/textile/dyeing-finishing/{id}` - Delete record
 
-- [ ] **GarmentManufacturingListPage.tsx**
+- [x] **GarmentManufacturingListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`textileService`)
-  - [ ] **API Integration**: 
+  - [x] **API Integration**: 
     - GET `/api/v1/textile/garment-manufacturing` - List garment manufacturing records
     - DELETE `/api/v1/textile/garment-manufacturing/{id}` - Delete record
 
-- [ ] **DesignPatternsListPage.tsx**
+- [x] **DesignPatternsListPage.tsx**
   - Replace Ant Design components with shadcn/ui
-  - [ ] **API Integration**: 
+  - [x] **API Integration**: 
     - GET `/api/v1/textile/design-patterns` - List design patterns
     - DELETE `/api/v1/textile/design-patterns/{id}` - Delete pattern
 
-- [ ] **Components (`/src/components/textile/`)**
-  - [ ] `FabricProductionFormDrawer.tsx` → use Sheet
-    - [ ] **API Integration**: 
+- [x] **Components (`/src/components/textile/`)**
+  - [x] `FabricProductionFormDrawer.tsx` → use Sheet
+    - [x] **API Integration**: 
       - POST `/api/v1/textile/fabric-production` - Create record
       - PUT `/api/v1/textile/fabric-production/{id}` - Update record
-  - [ ] `YarnManufacturingFormDrawer.tsx` → use Sheet
-    - [ ] **API Integration**: 
+  - [x] `YarnManufacturingFormDrawer.tsx` → use Sheet
+    - [x] **API Integration**: 
       - POST `/api/v1/textile/yarn-manufacturing` - Create record
       - PUT `/api/v1/textile/yarn-manufacturing/{id}` - Update record
-  - [ ] `DyeingFinishingFormDrawer.tsx` → use Sheet
-    - [ ] **API Integration**: 
+  - [x] `DyeingFinishingFormDrawer.tsx` → use Sheet
+    - [x] **API Integration**: 
       - POST `/api/v1/textile/dyeing-finishing` - Create record
       - PUT `/api/v1/textile/dyeing-finishing/{id}` - Update record
-  - [ ] `GarmentManufacturingFormDrawer.tsx` → use Sheet
-    - [ ] **API Integration**: 
+  - [x] `GarmentManufacturingFormDrawer.tsx` → use Sheet
+    - [x] **API Integration**: 
       - POST `/api/v1/textile/garment-manufacturing` - Create record
       - PUT `/api/v1/textile/garment-manufacturing/{id}` - Update record
-  - [ ] `DesignPatternFormDrawer.tsx` → use Sheet
-    - [ ] **API Integration**: 
+  - [x] `DesignPatternFormDrawer.tsx` → use Sheet
+    - [x] **API Integration**: 
       - POST `/api/v1/textile/design-patterns` - Create pattern
       - PUT `/api/v1/textile/design-patterns/{id}` - Update pattern
-  - [ ] All table components → use shadcn/ui Table
-  - [ ] All chart components → use Recharts
+  - [x] All table components → use shadcn/ui Table
+  - [x] All chart components → use Recharts
 
-- [ ] **Routing & Navigation**
-  - [ ] Add route to `AppRouter.tsx` (`/textile`)
-  - [ ] Add sidebar link in `Sidebar.tsx`
-  - [ ] Verify navigation flow
+- [x] **Routing & Navigation**
+  - [x] Add route to `AppRouter.tsx` (`/textile/*`)
+  - [x] Add sidebar link in `Sidebar.tsx`
+  - [x] Verify navigation flow
 
 ### Priority 15: User Management (`/src/pages/users/`)
 
@@ -1182,7 +1184,7 @@ Create all input variants in `globalComponents.tsx`:
   - [ ] Add sidebar link in `Sidebar.tsx`
   - [ ] Verify navigation flow
 
-### Priority 16: Subscription Management (`/src/pages/subscription/`)
+### Priority 16: Subscription Management (`/src/pages/subscription/`) (***Omit this for now***)
 
 > [!NOTE]
 > **Why Priority 16**: Subscription management is for billing and plan management.

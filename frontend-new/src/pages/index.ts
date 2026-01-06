@@ -70,12 +70,12 @@ export { default as CustomReportsPage } from './reports/CustomReportsPage';
 // Subscription
 export const SubscriptionPlansPage = PlaceholderPage;
 
-// Textile Operations - TODO: Migrate these pages
-export const FabricProductionListPage = PlaceholderPage;
-export const YarnManufacturingListPage = PlaceholderPage;
-export const DyeingFinishingListPage = PlaceholderPage;
-export const GarmentManufacturingListPage = PlaceholderPage;
-export const DesignPatternsListPage = PlaceholderPage;
+// Textile Operations
+export { default as FabricProductionListPage } from './textile/FabricProductionListPage';
+export { default as YarnManufacturingListPage } from './textile/YarnManufacturingListPage';
+export { default as DyeingFinishingListPage } from './textile/DyeingFinishingListPage';
+export { default as GarmentManufacturingListPage } from './textile/GarmentManufacturingListPage';
+export { default as DesignPatternsListPage } from './textile/DesignPatternsListPage';
 
 // Legal - TODO: Migrate these pages
 export const LegalPage = PlaceholderPage;

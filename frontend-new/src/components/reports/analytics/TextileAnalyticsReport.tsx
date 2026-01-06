@@ -26,7 +26,7 @@ interface TextileAnalyticsReportProps {
 
 const TextileAnalyticsReport: React.FC<TextileAnalyticsReportProps> = ({
   dateRange,
-  searchText,
+  // searchText,
   triggerFetch,
   onLoadingChange,
 }) => {

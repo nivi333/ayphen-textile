@@ -24,7 +24,7 @@ interface CashFlowReportProps {
 
 const CashFlowReport: React.FC<CashFlowReportProps> = ({
   dateRange,
-  searchText,
+  // searchText,
   triggerFetch,
   onLoadingChange,
 }) => {

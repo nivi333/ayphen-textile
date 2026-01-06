@@ -7,6 +7,7 @@ import ReportSummaryCards from '@/components/reports/shared/ReportSummaryCards';
 import { TableCard } from '@/components/globalComponents';
 import { toast } from 'sonner';
 import ReportChart from '@/components/reports/shared/ReportChart';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import {
   Table,
   TableBody,
@@ -101,11 +102,16 @@ const SalesTrendReport: React.FC<SalesTrendReportProps> = ({
 
       {data && (
         <>
-          <ReportChart
-            data={chartData || []}
-            title='Revenue Trend'
-            bars={[{ key: 'Revenue', color: '#2563eb' }]}
-          />
+          <ReportChart title='Revenue Trend' loading={loading}>
+            <BarChart data={chartData || []}>
+              <CartesianGrid strokeDasharray='3 3' />
+              <XAxis dataKey='name' />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey='Revenue' fill='#2563eb' />
+            </BarChart>
+          </ReportChart>
 
           <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
             <TableCard title='Periodic Performance'>

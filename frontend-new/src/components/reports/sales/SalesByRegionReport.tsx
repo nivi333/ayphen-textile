@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
 import { reportService } from '@/services/reportService';
-import ReportSummaryCards from '@/components/reports/shared/ReportSummaryCards';
+
 import {
   Table,
   TableBody,
@@ -14,6 +14,7 @@ import {
 import { TableCard } from '@/components/globalComponents';
 import { toast } from 'sonner';
 import ReportChart from '@/components/reports/shared/ReportChart';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 interface SalesByRegionReportProps {
   dateRange: DateRange | undefined;
@@ -89,11 +90,16 @@ const SalesByRegionReport: React.FC<SalesByRegionReportProps> = ({
 
       {filteredData && filteredData.length > 0 && (
         <>
-          <ReportChart
-            data={chartData || []}
-            title='Revenue by Region'
-            bars={[{ key: 'Revenue', color: '#8884d8' }]}
-          />
+          <ReportChart title='Revenue by Region' loading={loading}>
+            <BarChart data={chartData || []}>
+              <CartesianGrid strokeDasharray='3 3' />
+              <XAxis dataKey='name' />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey='Revenue' fill='#8884d8' />
+            </BarChart>
+          </ReportChart>
 
           <TableCard title='Regional Performance'>
             <Table>

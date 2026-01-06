@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { DateRange } from 'react-day-picker';
 import { addDays } from 'date-fns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -38,10 +38,14 @@ const FinancialReportsPage = () => {
 
   return (
     <PageContainer>
-      <PageHeader
-        title='Financial Reports'
-        description='Generate and view financial statements, tax reports, and aging summaries.'
-      />
+      <PageHeader>
+        <div className='flex flex-col gap-1'>
+          <h2 className='text-2xl font-bold tracking-tight'>Financial Reports</h2>
+          <p className='text-muted-foreground'>
+            Generate and view financial statements, tax reports, and aging summaries.
+          </p>
+        </div>
+      </PageHeader>
 
       <div className='mb-6'>
         <ReportFilters

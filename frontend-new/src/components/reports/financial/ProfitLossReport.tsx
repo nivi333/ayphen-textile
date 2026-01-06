@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Card, CardContent, CardHeader, CardTitle, TableCard } from '@/components/globalComponents';
+import { TableCard } from '@/components/globalComponents';
 import { toast } from 'sonner';
 
 interface ProfitLossReportProps {
@@ -24,7 +24,7 @@ interface ProfitLossReportProps {
 
 const ProfitLossReport: React.FC<ProfitLossReportProps> = ({
   dateRange,
-  searchText,
+  // searchText,
   triggerFetch,
   onLoadingChange,
 }) => {
@@ -75,7 +75,7 @@ const ProfitLossReport: React.FC<ProfitLossReportProps> = ({
         },
         {
           title: 'Cost of Goods Sold',
-          value: formatCurrency(data.summary.totalCOGS),
+          value: formatCurrency(data.summary.costOfGoodsSold),
           color: '#dc2626', // red
         },
         {
@@ -85,7 +85,7 @@ const ProfitLossReport: React.FC<ProfitLossReportProps> = ({
         },
         {
           title: 'Total Expenses',
-          value: formatCurrency(data.summary.totalExpenses),
+          value: formatCurrency(data.summary.operatingExpenses),
           color: '#dc2626', // red
         },
         {
@@ -145,14 +145,14 @@ const ProfitLossReport: React.FC<ProfitLossReportProps> = ({
                     <TableRow>
                       <TableCell>Material Cost</TableCell>
                       <TableCell className='text-right'>
-                        {formatCurrency(data.summary.totalCOGS)}
+                        {formatCurrency(data.summary.costOfGoodsSold)}
                       </TableCell>
                     </TableRow>
                     {/* Add more COGS breakdown if available */}
                     <TableRow className='font-bold bg-muted/50'>
                       <TableCell>Total COGS</TableCell>
                       <TableCell className='text-right'>
-                        {formatCurrency(data.summary.totalCOGS)}
+                        {formatCurrency(data.summary.costOfGoodsSold)}
                       </TableCell>
                     </TableRow>
                   </TableBody>
@@ -172,7 +172,7 @@ const ProfitLossReport: React.FC<ProfitLossReportProps> = ({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {data.expenses.map((expense, index) => (
+                  {data.expenseBreakdown.map((expense, index) => (
                     <TableRow key={index}>
                       <TableCell>{expense.category}</TableCell>
                       <TableCell className='text-right'>{formatCurrency(expense.amount)}</TableCell>
@@ -181,7 +181,7 @@ const ProfitLossReport: React.FC<ProfitLossReportProps> = ({
                   <TableRow className='font-bold bg-muted/50'>
                     <TableCell>Total Expenses</TableCell>
                     <TableCell className='text-right'>
-                      {formatCurrency(data.summary.totalExpenses)}
+                      {formatCurrency(data.summary.operatingExpenses)}
                     </TableCell>
                   </TableRow>
                 </TableBody>

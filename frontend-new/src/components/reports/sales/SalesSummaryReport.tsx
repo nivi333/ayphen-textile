@@ -15,6 +15,7 @@ import {
 import { TableCard } from '@/components/globalComponents';
 import { toast } from 'sonner';
 import ReportChart from '@/components/reports/shared/ReportChart';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 interface SalesSummaryReportProps {
   dateRange: DateRange | undefined;
@@ -112,11 +113,16 @@ const SalesSummaryReport: React.FC<SalesSummaryReportProps> = ({
 
       {data && (
         <>
-          <ReportChart
-            data={chartData || []}
-            title='Sales Trend'
-            bars={[{ key: 'Revenue', color: '#16a34a' }]}
-          />
+          <ReportChart title='Sales Trend' loading={loading}>
+            <BarChart data={chartData || []}>
+              <CartesianGrid strokeDasharray='3 3' />
+              <XAxis dataKey='name' />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey='Revenue' fill='#16a34a' />
+            </BarChart>
+          </ReportChart>
 
           <TableCard title='Sales by Customer'>
             <Table>

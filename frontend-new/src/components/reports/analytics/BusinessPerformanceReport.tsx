@@ -26,7 +26,7 @@ interface BusinessPerformanceReportProps {
 
 const BusinessPerformanceReport: React.FC<BusinessPerformanceReportProps> = ({
   dateRange,
-  searchText,
+  // searchText,
   triggerFetch,
   onLoadingChange,
 }) => {
