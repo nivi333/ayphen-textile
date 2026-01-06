@@ -50,7 +50,7 @@ export { default as InspectionDetailsPage } from './quality/InspectionDetailsPag
 
 // Users
 export { default as UsersListPage } from './users/UsersListPage';
-export const UserProfilePage = PlaceholderPage; // TODO: Migrate this page
+export { default as UserProfilePage } from './users/UserProfilePage';
 
 // Finance
 export { default as FinanceOverviewPage } from './finance/FinanceOverviewPage';

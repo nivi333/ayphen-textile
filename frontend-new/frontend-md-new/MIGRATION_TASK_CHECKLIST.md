@@ -1154,35 +1154,35 @@ Create all input variants in `globalComponents.tsx`:
 - [x] **UsersListPage.tsx**
   - [x] Replace Ant Design Table with shadcn/ui Table
   - Keep same API integration (`userService`)
-  - [ ] **API Integration**: 
+  - [x] **API Integration**: 
     - GET `/api/v1/users` - List all users
     - GET `/api/v1/users/{id}` - Get user details
     - DELETE `/api/v1/users/{id}` - Delete user
     - PATCH `/api/v1/users/{id}/status` - Update user status
 
-- [ ] **UserProfilePage.tsx**
-  - Replace Ant Design Form with shadcn/ui Form
-  - Replace Tabs with shadcn/ui Tabs
-  - Keep same API integration (`userService`)
-  - [ ] **API Integration**: 
+- [x] **UserProfilePage.tsx**
+  - [x] Replace Ant Design Form with shadcn/ui Form
+  - [x] Replace Tabs with shadcn/ui Tabs
+  - [x] Keep same API integration (`userService`)
+  - [x] **API Integration**: 
     - GET `/api/v1/users/profile` - Get current user profile
     - PUT `/api/v1/users/profile` - Update profile
     - PUT `/api/v1/users/change-password` - Change password
 
-- [ ] **Components (`/src/components/users/`)**
-  - [ ] `UserFormDrawer.tsx` → use Sheet
-    - [ ] **API Integration**: 
+- [x] **Components (`/src/components/users/`)**
+  - [x] `UserFormDrawer.tsx` → use Sheet
+    - [x] **API Integration**: 
       - POST `/api/v1/users` - Create user
       - PUT `/api/v1/users/{id}` - Update user
-  - [ ] `UserActivityLog.tsx` → use Table
-    - [ ] **API Integration**: GET `/api/v1/users/{id}/activity` - Get activity log
-  - [ ] `UserDevicesList.tsx` → use Table
-    - [ ] **API Integration**: GET `/api/v1/users/{id}/devices` - Get user devices
+  - [x] `UserActivityLog.tsx` → use Table
+    - [x] **API Integration**: GET `/api/v1/users/{id}/activity` - Get activity log
+  - [x] `UserDevicesList.tsx` → use Table
+    - [x] **API Integration**: GET `/api/v1/users/{id}/devices` - Get user devices
 
-- [ ] **Routing & Navigation**
-  - [ ] Add route to `AppRouter.tsx` (`/users`)
-  - [ ] Add sidebar link in `Sidebar.tsx`
-  - [ ] Verify navigation flow
+- [x] **Routing & Navigation**
+  - [x] Add route to `AppRouter.tsx` (`/users`)
+  - [x] Add sidebar link in `Sidebar.tsx`
+  - [x] Verify navigation flow
 
 ### Priority 16: Subscription Management (`/src/pages/subscription/`) (***Omit this for now***)
 
