@@ -517,23 +517,7 @@ export default function AppRouter() {
 
             {/* Legal Pages */}
             <Route
-              path='/legal/terms'
-              element={
-                <ProtectedRoute>
-                  <LegalPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path='/legal/privacy'
-              element={
-                <ProtectedRoute>
-                  <LegalPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path='/legal/cookie-policy'
+              path='/legal'
               element={
                 <ProtectedRoute>
                   <LegalPage />

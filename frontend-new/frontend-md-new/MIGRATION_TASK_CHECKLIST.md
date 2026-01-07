@@ -1182,41 +1182,17 @@ Create all input variants in `globalComponents.tsx`:
   - [x] Add sidebar link in `Sidebar.tsx`
   - [x] Verify navigation flow
 
-### Priority 16: Subscription Management (`/src/pages/subscription/`) (***Omit this for now***)
-
+### Priority 16: Legal Pages (`/src/pages/legal/`)
 > [!NOTE]
-> **Why Priority 16**: Subscription management is for billing and plan management.
-- [ ] **SubscriptionPlansPage.tsx**
-  - Replace Ant Design Card with shadcn/ui Card
-  - Replace Modal with Dialog
-  - Keep same API integration (`subscriptionService`)
-  - [ ] **API Integration**: 
-    - GET `/api/v1/subscriptions/plans` - List subscription plans
-    - GET `/api/v1/subscriptions/current` - Get current subscription
-    - POST `/api/v1/subscriptions/subscribe` - Subscribe to plan
-    - POST `/api/v1/subscriptions/cancel` - Cancel subscription
-    - POST `/api/v1/subscriptions/upgrade` - Upgrade subscription
+> **Why Priority 16**: Legal pages are static content pages, lowest priority for migration.
+- [x] **LegalPage.tsx**
+  - [x] Replace Ant Design Tabs with shadcn/ui Tabs
+  - [x] Use Tailwind for content styling
 
-- [ ] **Components (`/src/components/subscription/`)**
-  - [ ] `SubscriptionPlanCard.tsx` → use Card
-
-- [ ] **Routing & Navigation**
-  - [ ] Add route to `AppRouter.tsx` (`/subscriptions`)
-  - [ ] Add sidebar link in `Sidebar.tsx`
-  - [ ] Verify navigation flow
-
-### Priority 17: Legal Pages (`/src/pages/legal/`)
-
-> [!NOTE]
-> **Why Priority 17**: Legal pages are static content pages, lowest priority for migration.
-- [ ] **LegalPage.tsx**
-  - Replace Ant Design Tabs with shadcn/ui Tabs
-  - Use Tailwind for content styling
-
-- [ ] **Routing & Navigation**
-  - [ ] Add route to `AppRouter.tsx` (`/legal`)
-  - [ ] Add sidebar link in `Sidebar.tsx`
-  - [ ] Verify navigation flow
+- [x] **Routing & Navigation**
+  - [x] Add route to `AppRouter.tsx` (`/legal`)
+  - [x] Add sidebar link in `Sidebar.tsx`
+  - [x] Verify navigation flow
 
 ---
 
