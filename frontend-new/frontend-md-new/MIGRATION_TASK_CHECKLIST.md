@@ -1078,9 +1078,7 @@ Create all input variants in `globalComponents.tsx`:
 
 > [!NOTE]
 > **Why Priority 14**: Textile-specific operations are industry-specific features.
-- [ ] **FabricProductionListPage.tsx**
-  - Replace Ant Design Table with shadcn/ui Table
-  - [x] **FabricProductionListPage.tsx**
+- [x] **FabricProductionListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`textileService`)
