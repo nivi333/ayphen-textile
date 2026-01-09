@@ -775,6 +775,313 @@ for company_idx in {1..3}; do
 done
 
 # =========================================
+# STEP 20: TEST REPORT APIs
+# =========================================
+print_section "STEP 20: Testing Report APIs"
+
+# Use Company 1 for report testing
+REPORT_TOKEN="${COMPANY_TOKENS[1]}"
+START_DATE="2024-12-01"
+END_DATE="2024-12-31"
+AS_OF_DATE="2024-12-31"
+
+print_info "Testing Financial Reports..."
+
+# Profit & Loss Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/profit-loss?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "Profit & Loss Report API"
+else
+    print_status 1 "Profit & Loss Report API"
+fi
+
+# Balance Sheet Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/balance-sheet?asOfDate=$AS_OF_DATE" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "Balance Sheet Report API"
+else
+    print_status 1 "Balance Sheet Report API"
+fi
+
+# Cash Flow Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/cash-flow?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "Cash Flow Report API"
+else
+    print_status 1 "Cash Flow Report API"
+fi
+
+# Trial Balance Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/trial-balance?asOfDate=$AS_OF_DATE" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "Trial Balance Report API"
+else
+    print_status 1 "Trial Balance Report API"
+fi
+
+# GST Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/gst?period=2024-12" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "GST Report API"
+else
+    print_status 1 "GST Report API"
+fi
+
+# AR Aging Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/ar-aging?asOfDate=$AS_OF_DATE" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "AR Aging Report API"
+else
+    print_status 1 "AR Aging Report API"
+fi
+
+# AP Aging Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/ap-aging?asOfDate=$AS_OF_DATE" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "AP Aging Report API"
+else
+    print_status 1 "AP Aging Report API"
+fi
+
+# Expense Summary Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/expense-summary?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "Expense Summary Report API"
+else
+    print_status 1 "Expense Summary Report API"
+fi
+
+print_info "Testing Sales Reports..."
+
+# Sales Summary Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/sales-summary?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "Sales Summary Report API"
+else
+    print_status 1 "Sales Summary Report API"
+fi
+
+# Sales Trends Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/sales-trends?startDate=$START_DATE&endDate=$END_DATE&groupBy=month" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "Sales Trends Report API"
+else
+    print_status 1 "Sales Trends Report API"
+fi
+
+# Top Selling Products Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/top-selling-products?startDate=$START_DATE&endDate=$END_DATE&limit=10" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "Top Selling Products Report API"
+else
+    print_status 1 "Top Selling Products Report API"
+fi
+
+# Customer Purchase History Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/customer-purchase-history?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "Customer Purchase History Report API"
+else
+    print_status 1 "Customer Purchase History Report API"
+fi
+
+# Sales by Region Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/sales-by-region?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "Sales by Region Report API"
+else
+    print_status 1 "Sales by Region Report API"
+fi
+
+print_info "Testing Operational Reports..."
+
+# Production Efficiency Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/production-efficiency?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "Production Efficiency Report API"
+else
+    print_status 1 "Production Efficiency Report API"
+fi
+
+# Machine Utilization Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/machine-utilization?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "Machine Utilization Report API"
+else
+    print_status 1 "Machine Utilization Report API"
+fi
+
+# Quality Metrics Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/quality-metrics?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "Quality Metrics Report API"
+else
+    print_status 1 "Quality Metrics Report API"
+fi
+
+# Production Planning Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/production-planning?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "Production Planning Report API"
+else
+    print_status 1 "Production Planning Report API"
+fi
+
+print_info "Testing Inventory Reports..."
+
+# Inventory Summary Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/inventory-summary" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "Inventory Summary Report API"
+else
+    print_status 1 "Inventory Summary Report API"
+fi
+
+# Low Stock Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/low-stock" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "Low Stock Report API"
+else
+    print_status 1 "Low Stock Report API"
+fi
+
+# Stock Valuation Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/stock-valuation?asOfDate=$AS_OF_DATE" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "Stock Valuation Report API"
+else
+    print_status 1 "Stock Valuation Report API"
+fi
+
+# Stock Aging Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/stock-aging?asOfDate=$AS_OF_DATE" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "Stock Aging Report API"
+else
+    print_status 1 "Stock Aging Report API"
+fi
+
+# Inventory Movement Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/inventory-movement?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "Inventory Movement Report API"
+else
+    print_status 1 "Inventory Movement Report API"
+fi
+
+print_info "Testing Analytics Reports..."
+
+# Business Performance Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/business-performance?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "Business Performance Report API"
+else
+    print_status 1 "Business Performance Report API"
+fi
+
+# Product Performance Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/product-performance?startDate=$START_DATE&endDate=$END_DATE&limit=10" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "Product Performance Report API"
+else
+    print_status 1 "Product Performance Report API"
+fi
+
+# Customer Insights Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/customer-insights?startDate=$START_DATE&endDate=$END_DATE" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "Customer Insights Report API"
+else
+    print_status 1 "Customer Insights Report API"
+fi
+
+# Textile Analytics Report
+REPORT_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/textile-analytics?startDate=$START_DATE&endDate=$END_DATE&category=all" \
+  -H "$CONTENT_TYPE" \
+  -H "Authorization: Bearer $REPORT_TOKEN")
+
+if [ "$(echo $REPORT_RESPONSE | jq -r '.success')" == "true" ]; then
+    print_status 0 "Textile Analytics Report API"
+else
+    print_status 1 "Textile Analytics Report API"
+fi
+
+# =========================================
 # FINAL SUMMARY
 # =========================================
 print_section "TEST SUMMARY"

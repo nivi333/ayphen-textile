@@ -23,7 +23,6 @@ interface ProfitLossReportProps {
 
 const ProfitLossReport: React.FC<ProfitLossReportProps> = ({
   dateRange,
-  // searchText,
   triggerFetch,
   onLoadingChange,
 }) => {
@@ -115,13 +114,23 @@ const ProfitLossReport: React.FC<ProfitLossReportProps> = ({
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    <TableRow>
-                      <TableCell>Sales Revenue</TableCell>
-                      <TableCell className='text-right'>
-                        {formatCurrency(data.summary.totalRevenue)}
-                      </TableCell>
-                    </TableRow>
-                    {/* Add more breakdown rows if available in API response */}
+                    {data.revenueBreakdown.length > 0 ? (
+                      data.revenueBreakdown.map((item, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{item.productName}</TableCell>
+                          <TableCell className='text-right'>
+                            {formatCurrency(item.revenue)}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell>Sales Revenue</TableCell>
+                        <TableCell className='text-right'>
+                          {formatCurrency(data.summary.totalRevenue)}
+                        </TableCell>
+                      </TableRow>
+                    )}
                     <TableRow className='font-bold bg-muted/50'>
                       <TableCell>Total Income</TableCell>
                       <TableCell className='text-right'>
@@ -145,7 +154,7 @@ const ProfitLossReport: React.FC<ProfitLossReportProps> = ({
                   </TableHeader>
                   <TableBody>
                     <TableRow>
-                      <TableCell>Material Cost</TableCell>
+                      <TableCell>Cost of Goods Sold</TableCell>
                       <TableCell className='text-right'>
                         {formatCurrency(data.summary.costOfGoodsSold)}
                       </TableCell>

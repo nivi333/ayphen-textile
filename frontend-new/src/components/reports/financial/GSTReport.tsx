@@ -20,15 +20,7 @@ interface GSTReportProps {
   onLoadingChange: (loading: boolean) => void;
 }
 
-const GSTReport: React.FC<GSTReportProps> = ({
-  dateRange, // Note: The API takes a 'period' string, we might need to adapt or just use date range if API supported it, but interface says 'period'.
-  // We'll use a hardcoded period or derive from date for now as placeholder or assume API update.
-  // The task list said `getGSTReport(period: string)`. Let's assume period="current" for now if date range isn't used directly,
-  // OR map date range to a month string e.g. "2023-10".
-  // searchText,
-  triggerFetch,
-  onLoadingChange,
-}) => {
+const GSTReport: React.FC<GSTReportProps> = ({ dateRange, triggerFetch, onLoadingChange }) => {
   const [data, setData] = useState<GSTData | null>(null);
   const [loading, setLoading] = useState(false);
 

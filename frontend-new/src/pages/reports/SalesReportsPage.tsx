@@ -8,7 +8,6 @@ import SalesSummaryReport from '@/components/reports/sales/SalesSummaryReport';
 import SalesTrendReport from '@/components/reports/sales/SalesTrendReport';
 import TopSellingProductsReport from '@/components/reports/sales/TopSellingProductsReport';
 import CustomerPurchaseHistoryReport from '@/components/reports/sales/CustomerPurchaseHistoryReport';
-import SalesByRegionReport from '@/components/reports/sales/SalesByRegionReport';
 
 const SalesReportsPage = () => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -64,7 +63,6 @@ const SalesReportsPage = () => {
           <TabsTrigger value='trends'>Sales Trends</TabsTrigger>
           <TabsTrigger value='top-selling'>Top Selling Products</TabsTrigger>
           <TabsTrigger value='customer-history'>Customer Purchase History</TabsTrigger>
-          <TabsTrigger value='region'>Sales by Region</TabsTrigger>
         </TabsList>
 
         <div className='mt-4'>
@@ -94,14 +92,6 @@ const SalesReportsPage = () => {
           </TabsContent>
           <TabsContent value='customer-history'>
             <CustomerPurchaseHistoryReport
-              dateRange={dateRange}
-              searchText={searchText}
-              triggerFetch={triggerFetch}
-              onLoadingChange={setLoading}
-            />
-          </TabsContent>
-          <TabsContent value='region'>
-            <SalesByRegionReport
               dateRange={dateRange}
               searchText={searchText}
               triggerFetch={triggerFetch}

@@ -22,7 +22,6 @@ interface BalanceSheetReportProps {
 
 const BalanceSheetReport: React.FC<BalanceSheetReportProps> = ({
   asOfDate,
-  // searchText,
   triggerFetch,
   onLoadingChange,
 }) => {

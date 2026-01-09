@@ -23,14 +23,12 @@ const InventorySummaryReport: React.FC<InventorySummaryReportProps> = ({
   onLoadingChange,
 }) => {
   const [data, setData] = useState<InventorySummaryData | null>(null);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
   }, [triggerFetch]);
 
   const fetchData = async () => {
-    setLoading(true);
     onLoadingChange(true);
     try {
       const result = await reportService.getInventorySummary();
@@ -39,7 +37,6 @@ const InventorySummaryReport: React.FC<InventorySummaryReportProps> = ({
       console.error('Error fetching Inventory Summary:', error);
       toast.error('Failed to load Inventory Summary report');
     } finally {
-      setLoading(false);
       onLoadingChange(false);
     }
   };
