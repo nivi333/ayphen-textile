@@ -211,7 +211,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw new Error(errorData.message || 'Registration failed. Please try again.');
       }
 
-      // No need to handle tokens or user here, just let the UI show success
+      // Success - set loading to false
+      dispatch({ type: 'SET_LOADING', payload: false });
     } catch (error: any) {
       dispatch({
         type: 'SET_ERROR',

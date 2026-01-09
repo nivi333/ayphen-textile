@@ -3,7 +3,7 @@
  * Features: Remember Me (email+password), Social Media Logos, Success/Failure Alerts
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '@/contexts/AuthContext';
 import {
@@ -44,6 +44,7 @@ export default function LoginPage() {
 
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const from = (location.state as any)?.from?.pathname || '/companies';
 
@@ -82,13 +83,14 @@ export default function LoginPage() {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
       return;
     }
 
+    setSubmitting(true);
     try {
       // Handle remember me functionality
       if (formData.rememberMe) {
@@ -117,8 +119,10 @@ export default function LoginPage() {
         description: err.message || 'Please check your credentials and try again.',
         duration: 4000,
       });
+    } finally {
+      setSubmitting(false);
     }
-  };
+  }, [formData, login, navigate, from]);
 
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
@@ -219,8 +223,8 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          <PrimaryButton type='submit' className='w-full' loading={isLoading} disabled={isLoading}>
-            {isLoading ? 'Signing in...' : 'Sign In'}
+          <PrimaryButton type='submit' className='w-full' loading={submitting || isLoading} disabled={submitting || isLoading}>
+            {(submitting || isLoading) ? 'Signing in...' : 'Sign In'}
           </PrimaryButton>
         </form>
 
