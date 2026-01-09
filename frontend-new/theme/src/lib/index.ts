@@ -1,4 +1,3 @@
-import { ThemeConfig } from 'antd';
 import { extraColorTokensLight, lightColorTokens } from './color-tokens/light';
 import { darkColorTokens, extraColorTokensDark } from './color-tokens/dark';
 
@@ -199,79 +198,6 @@ const styledComponentTokensLight = {
   ...extraColorTokensLight,
 };
 
-const antThemeConfigLight: ThemeConfig = {
-  token: antThemeTokenLight,
-  components: {
-    Dropdown: {
-      algorithm: true,
-    },
-    Layout: {
-      bodyBg: '#ffffff',
-      // lightSiderBg: '#ffffff',
-      siderBg: '#ffffff',
-      triggerBg: '#ffffff',
-      triggerColor: '#df005c',
-      headerHeight: 60,
-    },
-    Tabs: {
-      horizontalMargin: '0 0 4px 0',
-      lineType: undefined,
-    },
-    Table: {
-      headerBg: '#ffffff',
-    },
-    Select: {
-      selectorBg: '#f3f3f5',
-      activeBorderColor: '#00000040',
-      controlOutline: '#00000026',
-      colorPrimary: '#00000005',
-      colorPrimaryHover: '#00000005',
-      lineWidth: 1,
-      lineWidthFocus: 1,
-    },
-    Input: {
-      colorBgContainer: '#f3f3f5',
-      activeBorderColor: '#00000040',
-      controlOutline: '#00000026',
-      colorPrimary: '#00000005',
-      colorPrimaryHover: '#00000005',
-      lineWidth: 1,
-      lineWidthFocus: 1,
-    },
-    InputNumber: {
-      colorBgContainer: '#f3f3f5',
-      activeBorderColor: '#00000040',
-      controlOutline: '#00000026',
-      colorPrimary: '#00000005',
-      colorPrimaryHover: '#00000005',
-      lineWidth: 1,
-      lineWidthFocus: 1,
-    },
-    DatePicker: {
-      colorBgContainer: '#f3f3f5',
-      activeBorderColor: '#00000040',
-      controlOutline: '#00000026',
-      colorPrimary: '#00000005',
-      colorPrimaryHover: '#00000005',
-      lineWidth: 1,
-      lineWidthFocus: 1,
-    },
-    Drawer: {
-      paddingSM: 0,
-    },
-    Typography: {
-      titleMarginBottom: 0,
-      titleMarginTop: 0,
-    },
-    Checkbox: {
-      colorBorder: '#C4C4C4',
-    },
-    Notification: {
-      fontSizeLG: 14,
-    },
-  },
-};
-
 // For Styled Components
 const antThemeTokenDark = {
   wireframe: false,
@@ -300,86 +226,11 @@ const styledComponentsTokensDark = {
   ...extraColorTokensDark,
 };
 
-const antThemeConfigDark: ThemeConfig = {
-  token: antThemeTokenDark,
-  components: {
-    Dropdown: {
-      algorithm: true,
-    },
-    Layout: {
-      bodyBg: '#141414',
-      lightSiderBg: '#181818ff',
-      siderBg: '#181818ff',
-      triggerBg: '#181818ff',
-      triggerColor: '#ffffff',
-      headerHeight: 60,
-    },
-    Tabs: {
-      horizontalMargin: '0 0 4px 0',
-      lineType: undefined,
-    },
-    Table: {
-      headerBg: '#141414',
-    },
-    Select: {
-      selectorBg: '#1e1e1e',
-      activeBorderColor: '#595959',
-      controlOutline: '#434343',
-      colorPrimary: '#595959',
-      colorPrimaryHover: '#737373',
-      lineWidth: 1,
-      lineWidthFocus: 1,
-    },
-    Input: {
-      colorBgContainer: '#1e1e1e',
-      activeBorderColor: '#595959',
-      controlOutline: '#434343',
-      colorPrimary: '#595959',
-      colorPrimaryHover: '#737373',
-      lineWidth: 1,
-      lineWidthFocus: 1,
-    },
-    InputNumber: {
-      colorBgContainer: '#1e1e1e',
-      activeBorderColor: '#595959',
-      controlOutline: '#434343',
-      colorPrimary: '#595959',
-      colorPrimaryHover: '#737373',
-      lineWidth: 1,
-      lineWidthFocus: 1,
-    },
-    DatePicker: {
-      colorBgContainer: '#1e1e1e',
-      activeBorderColor: '#595959',
-      controlOutline: '#434343',
-      colorPrimary: '#595959',
-      colorPrimaryHover: '#737373',
-      lineWidth: 1,
-      lineWidthFocus: 1,
-    },
-    Drawer: {
-      paddingSM: 0,
-    },
-    Typography: {
-      titleMarginBottom: 0,
-      titleMarginTop: 0,
-    },
-    Checkbox: {
-      colorBorder: '#505050',
-    },
-    Notification: {
-      fontSizeLG: 14,
-    },
-  },
-};
-
 export type ThemeTokenType = typeof styledComponentTokensLight;
 
 export const themeTokens = {
-  antThemeConfigDark,
   antThemeTokenDark,
   antThemeTokenLight,
   styledComponentsTokensDark,
   styledComponentTokensLight,
-  antThemeConfigLight,
 };

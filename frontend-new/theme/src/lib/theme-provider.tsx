@@ -1,12 +1,10 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-import { ThemeConfig } from "antd";
 import { themeTokens, ThemeTokenType } from ".";
 
 interface ThemeContextType {
   isDarkMode: boolean;
   toggleTheme: () => void;
-  antTheme: ThemeConfig;
-  styledTheme: ThemeTokenType;
+  theme: ThemeTokenType;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -26,17 +24,13 @@ export function ThemeProvider(props: { children: ReactNode }) {
     });
   };
 
-  const antTheme = isDarkMode
-    ? themeTokens.antThemeConfigDark
-    : themeTokens.antThemeConfigLight;
-
-  const styledTheme = isDarkMode
+  const theme = isDarkMode
     ? themeTokens.styledComponentsTokensDark
     : themeTokens.styledComponentTokensLight;
 
   return (
     <ThemeContext.Provider
-      value={{ isDarkMode, toggleTheme, antTheme, styledTheme }}
+      value={{ isDarkMode, toggleTheme, theme }}
     >
       {props.children}
     </ThemeContext.Provider>
