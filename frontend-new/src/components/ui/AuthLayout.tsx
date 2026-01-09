@@ -5,6 +5,7 @@
 
 import { ReactNode } from 'react';
 import AnimatedBackground from './AnimatedBackground';
+import logoUrl from '../../assets/brand-logo.png';
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -28,7 +29,7 @@ export default function AuthLayout({
     >
       {/* Logo in top-left */}
       <div className='absolute top-6 left-6 z-10'>
-        <img src='/src/assets/brand-logo.png' alt='Ayphen' className='w-[70px] h-[60px]' />
+        <img src={logoUrl} alt='Ayphen' className='w-[70px] h-[60px]' />
       </div>
 
       {/* Background decoration */}
