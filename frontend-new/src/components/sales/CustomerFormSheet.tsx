@@ -78,7 +78,18 @@ const customerSchema = z.object({
   notes: z.string().optional(),
   tags: z.array(z.string()).optional(),
   isActive: z.boolean().optional(),
-});
+}).refine(
+  (data) => {
+    if (data.customerType === 'BUSINESS' && (!data.companyName || data.companyName.trim() === '')) {
+      return false;
+    }
+    return true;
+  },
+  {
+    message: 'Company Name is required for Business customers',
+    path: ['companyName'],
+  }
+);
 
 type CustomerFormValues = z.infer<typeof customerSchema>;
 
@@ -137,6 +148,11 @@ export function CustomerFormSheet({
   const sameAsBilling = useWatch({
     control: form.control,
     name: 'sameAsBillingAddress',
+  });
+
+  const customerType = useWatch({
+    control: form.control,
+    name: 'customerType',
   });
 
   const billingAddress = useWatch({
@@ -384,7 +400,9 @@ export function CustomerFormSheet({
                   name='companyName'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Company Name</FormLabel>
+                      <FormLabel>
+                        Company Name{customerType === 'BUSINESS' && <span className='text-destructive'> *</span>}
+                      </FormLabel>
                       <FormControl>
                         <Input placeholder='Enter company name' {...field} />
                       </FormControl>
