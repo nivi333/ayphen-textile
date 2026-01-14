@@ -3,8 +3,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Loader2 } from 'lucide-react';
-import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
 import {
@@ -27,10 +25,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
+import { DatePicker } from '@/components/ui/date-picker';
 import { ImageUpload } from '@/components/ui/image-upload';
-import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 import {
@@ -158,6 +154,7 @@ export function DyeingFinishingSheet({
             <Switch
               checked={form.watch('isActive') || false}
               onCheckedChange={checked => form.setValue('isActive', checked)}
+              disabled={!isEditing}
             />
           </div>
         </SheetHeader>
@@ -319,31 +316,15 @@ export function DyeingFinishingSheet({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel required>Process Date</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={'outline'}
-                              className={cn(
-                                'w-full pl-3 text-left font-normal',
-                                !field.value && 'text-muted-foreground'
-                              )}
-                            >
-                              {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
-                              <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className='w-auto p-0' align='start'>
-                          <Calendar
-                            mode='single'
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={date => date > new Date() || date < new Date('1900-01-01')}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
+                      <FormControl>
+                        <DatePicker
+                          date={field.value}
+                          setDate={field.onChange}
+                          placeholder='Select process date'
+                          disabled={date => date > new Date() || date < new Date('1900-01-01')}
+                          className='w-full'
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

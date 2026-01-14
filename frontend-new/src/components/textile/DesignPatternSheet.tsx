@@ -154,6 +154,7 @@ export function DesignPatternSheet({
             <Switch
               checked={form.watch('isActive')}
               onCheckedChange={checked => form.setValue('isActive', checked)}
+              disabled={!isEditing}
             />
           </div>
         </SheetHeader>

@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -42,11 +42,11 @@ const invoiceItemSchema = z.object({
   productId: z.string().optional(),
   itemCode: z.string().min(1, 'Item code is required'),
   description: z.string().optional(),
-  quantity: z.number().min(0.001, 'Quantity must be greater than 0'),
+  quantity: z.coerce.number().min(0.001, 'Quantity must be greater than 0'),
   unitOfMeasure: z.string().min(1, 'UOM is required'),
-  unitPrice: z.number().min(0, 'Unit price must be non-negative'),
-  discountPercent: z.number().min(0).max(100).optional(),
-  taxRate: z.number().min(0).max(100).optional(),
+  unitPrice: z.coerce.number().min(0, 'Unit price must be non-negative'),
+  discountPercent: z.coerce.number().min(0).max(100).optional(),
+  taxRate: z.coerce.number().min(0).max(100).optional(),
 });
 
 const invoiceSchema = z.object({
@@ -66,7 +66,7 @@ const invoiceSchema = z.object({
   }),
   paymentTerms: z.string().optional(),
   currency: z.string().max(10).optional(),
-  shippingCharges: z.number().min(0).optional(),
+  shippingCharges: z.coerce.number().min(0).optional(),
   notes: z.string().max(1000).optional(),
   termsConditions: z.string().max(2000).optional(),
   bankDetails: z.string().max(1000).optional(),
@@ -118,6 +118,9 @@ export function InvoiceFormSheet({ open, onClose, initialData }: InvoiceFormShee
   const [locations, setLocations] = useState<Location[]>([]);
   const [products, setProducts] = useState<ProductSummary[]>([]);
   const [orders, setOrders] = useState<OrderSummary[]>([]);
+  
+  // Ref to prevent duplicate API calls
+  const dataFetchedRef = React.useRef(false);
 
   const isEditing = !!initialData;
 
@@ -171,8 +174,12 @@ export function InvoiceFormSheet({ open, onClose, initialData }: InvoiceFormShee
   }, []);
 
   useEffect(() => {
-    if (open) {
+    if (open && !dataFetchedRef.current) {
+      dataFetchedRef.current = true;
       fetchData();
+    }
+    
+    if (open) {
       if (initialData) {
         // Populate form
         form.reset({
@@ -226,7 +233,12 @@ export function InvoiceFormSheet({ open, onClose, initialData }: InvoiceFormShee
         });
       }
     }
-  }, [open, initialData, form, fetchData, locations]);
+    
+    // Reset ref when sheet closes
+    if (!open) {
+      dataFetchedRef.current = false;
+    }
+  }, [open, initialData, locations]);
 
   const handleCustomerChange = (customerId: string) => {
     const customer = customers.find(c => c.id === customerId);
@@ -511,7 +523,7 @@ export function InvoiceFormSheet({ open, onClose, initialData }: InvoiceFormShee
                 />
               </div>
 
-              <div className='grid grid-cols-3 gap-4'>
+              <div className='grid grid-cols-3 gap-4 mt-2'>
                 <FormField
                   control={form.control}
                   name='invoiceDate'

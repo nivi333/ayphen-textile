@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Cog, Loader2, X } from 'lucide-react';
-import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
 import {
@@ -25,11 +24,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { cn } from '@/lib/utils';
-import { CalendarIcon } from 'lucide-react';
 import {
   machineService,
   CreateMachineRequest,
@@ -496,35 +492,15 @@ export function MachineFormSheet({
                     render={({ field }) => (
                       <FormItem className='flex flex-col'>
                         <FormLabel required>Purchase Date</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant='outline'
-                                className={cn(
-                                  'w-full pl-3 text-left font-normal',
-                                  !field.value && 'text-muted-foreground'
-                                )}
-                              >
-                                {field.value ? (
-                                  format(field.value, 'PPP')
-                                ) : (
-                                  <span>Pick a date</span>
-                                )}
-                                <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className='w-auto p-0' align='start'>
-                            <Calendar
-                              mode='single'
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              disabled={date => date > new Date() || date < new Date('1900-01-01')}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
+                        <FormControl>
+                          <DatePicker
+                            date={field.value}
+                            setDate={field.onChange}
+                            placeholder='Select purchase date'
+                            disabled={date => date > new Date() || date < new Date('1900-01-01')}
+                            className='w-full'
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -536,35 +512,15 @@ export function MachineFormSheet({
                     render={({ field }) => (
                       <FormItem className='flex flex-col'>
                         <FormLabel required>Warranty Expiry</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant='outline'
-                                className={cn(
-                                  'w-full pl-3 text-left font-normal',
-                                  !field.value && 'text-muted-foreground'
-                                )}
-                              >
-                                {field.value ? (
-                                  format(field.value, 'PPP')
-                                ) : (
-                                  <span>Pick a date</span>
-                                )}
-                                <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className='w-auto p-0' align='start'>
-                            <Calendar
-                              mode='single'
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              disabled={date => date < new Date('1900-01-01')}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
+                        <FormControl>
+                          <DatePicker
+                            date={field.value}
+                            setDate={field.onChange}
+                            placeholder='Select warranty expiry'
+                            disabled={date => date < new Date('1900-01-01')}
+                            className='w-full'
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}

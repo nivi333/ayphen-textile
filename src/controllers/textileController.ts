@@ -20,6 +20,7 @@ const createFabricSchema = Joi.object({
   qualityGrade: Joi.string().valid(...Object.values(QualityGrade)).required(),
   locationId: Joi.string().optional(),
   notes: Joi.string().max(1000).optional().allow('', null),
+  imageUrl: Joi.string().uri().optional().allow('', null),
   isActive: Joi.boolean().optional(),
 });
 
@@ -30,20 +31,20 @@ const createYarnSchema = Joi.object({
   yarnType: Joi.string().valid(...Object.values(YarnType)).required(),
   yarnCount: Joi.alternatives().try(Joi.string(), Joi.number()).required(),
   fiberContent: Joi.string().min(1).max(255).required(),
-  twistType: Joi.string().max(100).optional(),
+  twistType: Joi.string().max(100).optional().allow('', null),
   twistPerInch: Joi.number().positive().optional(),
   ply: Joi.number().integer().positive().optional(),
   color: Joi.string().min(1).max(100).required(),
-  dyeLot: Joi.string().max(100).optional(),
+  dyeLot: Joi.string().max(100).optional().allow('', null),
   quantityKg: Joi.number().positive().required(),
   productionDate: Joi.date().required(),
   batchNumber: Joi.string().min(1).max(100).required(),
-  processType: Joi.string().valid(...Object.values(YarnProcess)).optional(),
+  processType: Joi.string().valid(...Object.values(YarnProcess)).optional().allow('', null),
   qualityGrade: Joi.string().valid(...Object.values(QualityGrade)).required(),
   locationId: Joi.string().optional(),
-  notes: Joi.string().max(1000).optional(),
+  notes: Joi.string().max(1000).optional().allow('', null),
   isActive: Joi.boolean().optional(),
-  imageUrl: Joi.string().uri().optional().allow(''),
+  imageUrl: Joi.string().uri().optional().allow('', null),
 });
 
 const updateYarnSchema = createYarnSchema.fork(Object.keys(createYarnSchema.describe().keys), (schema) => schema.optional());
@@ -66,6 +67,7 @@ const createDyeingSchema = Joi.object({
   fabricId: Joi.string().optional().allow('', null),
   locationId: Joi.string().optional(),
   notes: Joi.string().max(1000).optional().allow('', null),
+  imageUrl: Joi.string().uri().optional().allow('', null),
   isActive: Joi.boolean().optional(),
 });
 
@@ -90,6 +92,7 @@ const createGarmentSchema = Joi.object({
   orderId: Joi.string().optional().allow('', null),
   locationId: Joi.string().optional(),
   notes: Joi.string().max(1000).optional().allow('', null),
+  imageUrl: Joi.string().uri().optional().allow('', null),
   isActive: Joi.boolean().optional(),
 });
 
@@ -129,8 +132,8 @@ export const createFabric = async (req: Request, res: Response) => {
     const tenantId = req.tenantId;
     if (!tenantId) return res.status(401).json({ message: 'Tenant ID not found' });
     
-    // Generate Code
-    const code = `FAB-${Date.now().toString().slice(-6)}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+    // Generate Sequential Code
+    const code = await textileService.generateFabricCode(tenantId);
     
     const fabric = await textileService.createFabric(tenantId, { ...value, code });
     res.status(201).json({ message: 'Fabric created successfully', data: fabric });
@@ -198,16 +201,10 @@ export const createYarn = async (req: Request, res: Response) => {
     const tenantId = req.tenantId;
     if (!tenantId) return res.status(401).json({ message: 'Tenant ID not found' });
     
-    // Generate Code
-    const code = `YRN-${Date.now().toString().slice(-6)}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+    // Generate Sequential Code
+    const code = await textileService.generateYarnCode(tenantId);
     
-    const yarnData = {
-      ...value,
-      yarnCount: String(value.yarnCount),
-      code
-    };
-    
-    const yarn = await textileService.createYarn(tenantId, yarnData);
+    const yarn = await textileService.createYarn(tenantId, { ...value, code });
     res.status(201).json({ message: 'Yarn created successfully', data: yarn });
   } catch (error: any) {
     logger.error('Error creating yarn:', error);
@@ -273,8 +270,8 @@ export const createDyeing = async (req: Request, res: Response) => {
     const tenantId = req.tenantId;
     if (!tenantId) return res.status(401).json({ message: 'Tenant ID not found' });
     
-    // Generate Code
-    const code = `DYE-${Date.now().toString().slice(-6)}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+    // Generate Sequential Code
+    const code = await textileService.generateDyeingCode(tenantId);
     
     const dyeing = await textileService.createDyeing(tenantId, { ...value, code });
     res.status(201).json({ message: 'Dyeing process created successfully', data: dyeing });
@@ -342,8 +339,8 @@ export const createGarment = async (req: Request, res: Response) => {
     const tenantId = req.tenantId;
     if (!tenantId) return res.status(401).json({ message: 'Tenant ID not found' });
     
-    // Generate Code
-    const code = `GAR-${Date.now().toString().slice(-6)}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+    // Generate Sequential Code
+    const code = await textileService.generateGarmentCode(tenantId);
     
     const garment = await textileService.createGarment(tenantId, { ...value, code });
     res.status(201).json({ message: 'Garment created successfully', data: garment });
@@ -425,8 +422,8 @@ export const createDesign = async (req: Request, res: Response) => {
     const tenantId = req.tenantId;
     if (!tenantId) return res.status(401).json({ message: 'Tenant ID not found' });
     
-    // Generate Code
-    const code = `DES-${Date.now().toString().slice(-6)}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+    // Generate Sequential Code
+    const code = await textileService.generateDesignCode(tenantId);
     
     const design = await textileService.createDesign(tenantId, { ...value, code });
     res.status(201).json({ message: 'Design created successfully', data: design });

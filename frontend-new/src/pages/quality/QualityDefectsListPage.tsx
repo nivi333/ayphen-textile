@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { toast } from 'sonner';
+import { QualityDefectFormSheet } from '@/components/quality/QualityDefectFormSheet';
 import { MoreVertical, Edit, Trash2, Plus } from 'lucide-react';
 import {
   PageContainer,
@@ -78,11 +79,13 @@ const QualityDefectsListPage = () => {
     defaultSortColumn: 'detectedDate',
     defaultSortDirection: 'desc',
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState('');
   const [selectedSeverity, setSelectedSeverity] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedStatus, setSelectedStatus] = useState<string>('');
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [selectedDefect, setSelectedDefect] = useState<QualityDefect | undefined>(undefined);
   const fetchInProgressRef = useRef(false);
 
   useEffect(() => {
@@ -116,7 +119,8 @@ const QualityDefectsListPage = () => {
   };
 
   const handleEditDefect = (defect: QualityDefect) => {
-    toast.info(`Edit defect ${defect.defectId}`);
+    setSelectedDefect(defect);
+    setSheetOpen(true);
   };
 
   const handleDeleteDefect = async (defect: QualityDefect) => {
@@ -131,7 +135,8 @@ const QualityDefectsListPage = () => {
   };
 
   const handleCreateDefect = () => {
-    toast.info('Create defect functionality');
+    setSelectedDefect(undefined);
+    setSheetOpen(true);
   };
 
   if (!currentCompany) {
@@ -307,6 +312,13 @@ const QualityDefectsListPage = () => {
           </DataTable>
         </div>
       )}
+
+      <QualityDefectFormSheet
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        onSuccess={fetchDefects}
+        defect={selectedDefect}
+      />
     </PageContainer>
   );
 };

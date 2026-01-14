@@ -35,61 +35,70 @@ import { Loader2, X } from 'lucide-react';
 import { Customer, customerService } from '@/services/customerService';
 import { toast } from 'sonner';
 
-const customerSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  code: z.string().optional(),
-  customerType: z.string().min(1, 'Customer Type is required'),
-  companyName: z.string().optional(),
-  customerCategory: z.string().optional(),
-  email: z.string().email('Invalid email address').min(1, 'Email is required'),
-  phone: z.string().optional(),
-  alternatePhone: z.string().optional(),
-  website: z.string().url('Invalid URL').optional().or(z.literal('')),
+const customerSchema = z
+  .object({
+    name: z.string().min(1, 'Name is required'),
+    code: z.string().optional(),
+    customerType: z.string().min(1, 'Customer Type is required'),
+    companyName: z.string().optional(),
+    customerCategory: z.string().optional(),
+    email: z.string().email('Invalid email address').optional().or(z.literal('')),
+    phone: z.string().optional(),
+    alternatePhone: z.string().optional(),
+    website: z.string().url('Invalid URL').optional().or(z.literal('')),
 
-  // Billing Address
-  billingAddressLine1: z.string().optional(),
-  billingAddressLine2: z.string().optional(),
-  billingCity: z.string().optional(),
-  billingState: z.string().optional(),
-  billingCountry: z.string().optional(),
-  billingPostalCode: z.string().optional(),
+    // Billing Address
+    billingAddressLine1: z.string().optional(),
+    billingAddressLine2: z.string().optional(),
+    billingCity: z.string().optional(),
+    billingState: z.string().optional(),
+    billingCountry: z.string().optional(),
+    billingPostalCode: z.string().optional(),
 
-  // Shipping Address
-  shippingAddressLine1: z.string().optional(),
-  shippingAddressLine2: z.string().optional(),
-  shippingCity: z.string().optional(),
-  shippingState: z.string().optional(),
-  shippingCountry: z.string().optional(),
-  shippingPostalCode: z.string().optional(),
-  sameAsBillingAddress: z.boolean().default(false),
+    // Shipping Address
+    shippingAddressLine1: z.string().optional(),
+    shippingAddressLine2: z.string().optional(),
+    shippingCity: z.string().optional(),
+    shippingState: z.string().optional(),
+    shippingCountry: z.string().optional(),
+    shippingPostalCode: z.string().optional(),
+    sameAsBillingAddress: z.boolean().default(false),
 
-  // Financial
-  paymentTerms: z.string().optional(),
-  creditLimit: z.preprocess(
-    val => (val === '' ? undefined : Number(val)),
-    z.number().min(0).optional()
-  ),
-  currency: z.string().optional(),
-  taxId: z.string().optional(),
-  panNumber: z.string().optional(),
+    // Financial
+    paymentTerms: z.string().optional(),
+    creditLimit: z.preprocess(
+      val => {
+        if (val === '' || val === null || val === undefined) return undefined;
+        const num = Number(val);
+        return isNaN(num) ? undefined : num;
+      },
+      z.number().min(0).optional()
+    ),
+    currency: z.string().optional(),
+    taxId: z.string().optional(),
+    panNumber: z.string().optional(),
 
-  // Additional
-  assignedSalesRep: z.string().optional(),
-  notes: z.string().optional(),
-  tags: z.array(z.string()).optional(),
-  isActive: z.boolean().optional(),
-}).refine(
-  (data) => {
-    if (data.customerType === 'BUSINESS' && (!data.companyName || data.companyName.trim() === '')) {
-      return false;
+    // Additional
+    assignedSalesRep: z.string().optional(),
+    notes: z.string().optional(),
+    tags: z.array(z.string()).optional(),
+    isActive: z.boolean().optional(),
+  })
+  .refine(
+    data => {
+      if (
+        data.customerType === 'BUSINESS' &&
+        (!data.companyName || data.companyName.trim() === '')
+      ) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'Company Name is required for Business customers',
+      path: ['companyName'],
     }
-    return true;
-  },
-  {
-    message: 'Company Name is required for Business customers',
-    path: ['companyName'],
-  }
-);
+  );
 
 type CustomerFormValues = z.infer<typeof customerSchema>;
 
@@ -363,6 +372,8 @@ export function CustomerFormSheet({
                     </FormItem>
                   )}
                 />
+              </div>
+              <div className='grid grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}
                   name='customerType'
@@ -393,15 +404,16 @@ export function CustomerFormSheet({
                     </FormItem>
                   )}
                 />
-              </div>
-              <div className='grid grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}
                   name='companyName'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
-                        Company Name{customerType === 'BUSINESS' && <span className='text-destructive'> *</span>}
+                        Company Name
+                        {customerType === 'BUSINESS' && (
+                          <span className='text-destructive'> *</span>
+                        )}
                       </FormLabel>
                       <FormControl>
                         <Input placeholder='Enter company name' {...field} />
@@ -410,6 +422,8 @@ export function CustomerFormSheet({
                     </FormItem>
                   )}
                 />
+              </div>
+              <div className='grid grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}
                   name='customerCategory'
@@ -437,8 +451,6 @@ export function CustomerFormSheet({
                     </FormItem>
                   )}
                 />
-              </div>
-              <div className='grid grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}
                   name='email'
@@ -454,6 +466,8 @@ export function CustomerFormSheet({
                     </FormItem>
                   )}
                 />
+              </div>
+              <div className='grid grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}
                   name='phone'
@@ -467,8 +481,6 @@ export function CustomerFormSheet({
                     </FormItem>
                   )}
                 />
-              </div>
-              <div className='grid grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}
                   name='website'
@@ -742,7 +754,16 @@ export function CustomerFormSheet({
                     <FormItem>
                       <FormLabel>Credit Limit</FormLabel>
                       <FormControl>
-                        <Input type='number' placeholder='0.00' {...field} />
+                        <Input
+                          type='number'
+                          placeholder='0.00'
+                          {...field}
+                          value={field.value ?? ''}
+                          onChange={e => {
+                            const value = e.target.value;
+                            field.onChange(value === '' ? undefined : value);
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

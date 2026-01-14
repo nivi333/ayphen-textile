@@ -9,17 +9,18 @@ const createCustomerSchema = Joi.object({
   customerType: Joi.string()
     .valid('INDIVIDUAL', 'BUSINESS', 'DISTRIBUTOR', 'RETAILER', 'WHOLESALER')
     .optional()
-    .allow(null),
+    .allow('', null),
   companyName: Joi.when('customerType', {
     is: Joi.string().valid('BUSINESS'),
     then: Joi.string().min(2).max(100).required(),
     otherwise: Joi.string().max(100).optional().allow('', null),
   }),
-  customerCategory: Joi.string().valid('VIP', 'REGULAR', 'NEW', 'INACTIVE').optional().allow(null),
-  email: Joi.string().email().required(),
+  customerCategory: Joi.string().valid('VIP', 'REGULAR', 'NEW', 'INACTIVE').optional().allow('', null),
+  email: Joi.string().email().optional().allow('', null),
   phone: Joi.string()
     .pattern(/^[+]?[1-9][\d]{0,15}$/)
-    .required()
+    .optional()
+    .allow('', null)
     .messages({
       'string.pattern.base': 'Please enter a valid phone number with country code',
     }),
@@ -48,11 +49,11 @@ const createCustomerSchema = Joi.object({
   sameAsBillingAddress: Joi.boolean().default(true),
   // Financial Information
   paymentTerms: Joi.string()
-    .valid('NET_30', 'NET_60', 'NET_90', 'ADVANCE', 'COD', 'CREDIT')
+    .valid('IMMEDIATE', 'NET_15', 'NET_30', 'NET_45', 'NET_60', 'NET_90', 'ADVANCE', 'COD', 'CREDIT', 'DUE_ON_RECEIPT')
     .optional()
-    .allow(null),
+    .allow('', null),
   creditLimit: Joi.number().min(0).precision(2).optional().allow(null),
-  currency: Joi.string().valid('INR', 'USD', 'EUR', 'GBP').default('INR'),
+  currency: Joi.string().valid('INR', 'USD', 'EUR', 'GBP').optional().allow('', null).default('INR'),
   taxId: Joi.string().max(50).optional().allow('', null),
   panNumber: Joi.string()
     .pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/)
@@ -74,13 +75,13 @@ const updateCustomerSchema = Joi.object({
   customerType: Joi.string()
     .valid('INDIVIDUAL', 'BUSINESS', 'DISTRIBUTOR', 'RETAILER', 'WHOLESALER')
     .optional()
-    .allow(null),
+    .allow('', null),
   companyName: Joi.when('customerType', {
     is: Joi.string().valid('BUSINESS'),
     then: Joi.string().min(2).max(100).required(),
     otherwise: Joi.string().max(100).optional().allow('', null),
   }),
-  customerCategory: Joi.string().valid('VIP', 'REGULAR', 'NEW', 'INACTIVE').optional().allow(null),
+  customerCategory: Joi.string().valid('VIP', 'REGULAR', 'NEW', 'INACTIVE').optional().allow('', null),
   email: Joi.string().email().optional().allow('', null),
   phone: Joi.string()
     .pattern(/^[+]?[1-9][\d]{0,15}$/)
@@ -114,11 +115,11 @@ const updateCustomerSchema = Joi.object({
   sameAsBillingAddress: Joi.boolean().optional(),
   // Financial Information
   paymentTerms: Joi.string()
-    .valid('NET_30', 'NET_60', 'NET_90', 'ADVANCE', 'COD', 'CREDIT')
+    .valid('IMMEDIATE', 'NET_15', 'NET_30', 'NET_45', 'NET_60', 'NET_90', 'ADVANCE', 'COD', 'CREDIT', 'DUE_ON_RECEIPT')
     .optional()
-    .allow(null),
+    .allow('', null),
   creditLimit: Joi.number().min(0).precision(2).optional().allow(null),
-  currency: Joi.string().valid('INR', 'USD', 'EUR', 'GBP').optional().allow(null),
+  currency: Joi.string().valid('INR', 'USD', 'EUR', 'GBP').optional().allow('', null),
   taxId: Joi.string().max(50).optional().allow('', null),
   panNumber: Joi.string()
     .pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/)

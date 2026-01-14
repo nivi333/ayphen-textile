@@ -12,10 +12,11 @@ const createSupplierSchema = Joi.object({
     .allow(null),
   companyRegNo: Joi.string().max(50).optional().allow('', null),
   // Contact Info
-  email: Joi.string().email().required(),
+  email: Joi.string().email().optional().allow('', null),
   phone: Joi.string()
     .pattern(/^[+]?[1-9][\d]{0,15}$/)
-    .required()
+    .optional()
+    .allow('', null)
     .messages({
       'string.pattern.base': 'Please enter a valid phone number with country code',
     }),
@@ -37,11 +38,11 @@ const createSupplierSchema = Joi.object({
   postalCode: Joi.string().max(20).optional().allow('', null),
   // Financial
   paymentTerms: Joi.string()
-    .valid('NET_30', 'NET_60', 'NET_90', 'ADVANCE', 'COD', 'CREDIT')
+    .valid('NET_15', 'NET_30', 'NET_45', 'NET_60', 'DUE_ON_RECEIPT', 'ADVANCE', 'COD', 'CREDIT')
     .optional()
-    .allow(null),
+    .allow('', null),
   creditPeriod: Joi.number().integer().min(0).optional().allow(null),
-  currency: Joi.string().valid('INR', 'USD', 'EUR', 'GBP').default('INR'),
+  currency: Joi.string().valid('INR', 'USD', 'EUR', 'GBP').optional().allow('', null).default('INR'),
   taxId: Joi.string().max(50).optional().allow('', null),
   panNumber: Joi.string()
     .pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/)
@@ -57,17 +58,17 @@ const createSupplierSchema = Joi.object({
   minOrderQty: Joi.number().integer().min(0).optional().allow(null),
   minOrderValue: Joi.number().min(0).precision(2).optional().allow(null),
   // Quality & Compliance
-  qualityRating: Joi.string().valid('EXCELLENT', 'GOOD', 'AVERAGE', 'POOR').optional().allow(null),
+  qualityRating: Joi.string().valid('EXCELLENT', 'GOOD', 'AVERAGE', 'POOR').optional().allow('', null),
   certifications: Joi.array().items(Joi.string().max(50)).optional().allow(null),
   complianceStatus: Joi.string()
     .valid('COMPLIANT', 'NON_COMPLIANT', 'PENDING_REVIEW')
     .optional()
-    .allow(null),
+    .allow('', null),
   // Additional
   supplierCategory: Joi.string()
     .valid('PREFERRED', 'APPROVED', 'TRIAL', 'BLACKLISTED')
     .optional()
-    .allow(null),
+    .allow('', null),
   assignedManager: Joi.string().uuid().optional().allow('', null),
   notes: Joi.string().max(500).optional().allow('', null),
   tags: Joi.array().items(Joi.string().max(50)).optional().allow(null),
@@ -109,11 +110,11 @@ const updateSupplierSchema = Joi.object({
   postalCode: Joi.string().max(20).optional().allow('', null),
   // Financial
   paymentTerms: Joi.string()
-    .valid('NET_30', 'NET_60', 'NET_90', 'ADVANCE', 'COD', 'CREDIT')
+    .valid('NET_15', 'NET_30', 'NET_45', 'NET_60', 'DUE_ON_RECEIPT', 'ADVANCE', 'COD', 'CREDIT')
     .optional()
-    .allow(null),
+    .allow('', null),
   creditPeriod: Joi.number().integer().min(0).optional().allow(null),
-  currency: Joi.string().valid('INR', 'USD', 'EUR', 'GBP').optional().allow(null),
+  currency: Joi.string().valid('INR', 'USD', 'EUR', 'GBP').optional().allow('', null),
   taxId: Joi.string().max(50).optional().allow('', null),
   panNumber: Joi.string()
     .pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/)
@@ -129,17 +130,17 @@ const updateSupplierSchema = Joi.object({
   minOrderQty: Joi.number().integer().min(0).optional().allow(null),
   minOrderValue: Joi.number().min(0).precision(2).optional().allow(null),
   // Quality & Compliance
-  qualityRating: Joi.string().valid('EXCELLENT', 'GOOD', 'AVERAGE', 'POOR').optional().allow(null),
+  qualityRating: Joi.string().valid('EXCELLENT', 'GOOD', 'AVERAGE', 'POOR').optional().allow('', null),
   certifications: Joi.array().items(Joi.string().max(50)).optional().allow(null),
   complianceStatus: Joi.string()
     .valid('COMPLIANT', 'NON_COMPLIANT', 'PENDING_REVIEW')
     .optional()
-    .allow(null),
+    .allow('', null),
   // Additional
   supplierCategory: Joi.string()
     .valid('PREFERRED', 'APPROVED', 'TRIAL', 'BLACKLISTED')
     .optional()
-    .allow(null),
+    .allow('', null),
   assignedManager: Joi.string().uuid().optional().allow('', null),
   notes: Joi.string().max(500).optional().allow('', null),
   tags: Joi.array().items(Joi.string().max(50)).optional().allow(null),

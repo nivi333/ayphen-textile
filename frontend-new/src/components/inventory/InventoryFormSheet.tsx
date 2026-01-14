@@ -48,9 +48,10 @@ interface InventoryFormSheetProps {
   open: boolean;
   onClose: () => void;
   onSaved: () => void;
+  initialData?: any;
 }
 
-export function InventoryFormSheet({ open, onClose, onSaved }: InventoryFormSheetProps) {
+export function InventoryFormSheet({ open, onClose, onSaved, initialData }: InventoryFormSheetProps) {
   const [loading, setLoading] = useState(false);
   const [locations, setLocations] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]); // Simple product list for now if selector isn't ready
@@ -67,16 +68,29 @@ export function InventoryFormSheet({ open, onClose, onSaved }: InventoryFormShee
   // Reset form when opening
   useEffect(() => {
     if (open) {
-      form.reset({
-        stockQuantity: 0,
-        reservedQuantity: 0,
-      });
+      if (initialData) {
+        form.reset({
+          inventoryCode: initialData.inventoryCode,
+          productId: initialData.productId,
+          locationId: initialData.locationId,
+          stockQuantity: initialData.stockQuantity || 0,
+          reservedQuantity: initialData.reservedQuantity || 0,
+          value: initialData.value || 0,
+          reorderLevel: initialData.reorderLevel || 0,
+          maxStockLevel: initialData.maxStockLevel || 0,
+        });
+      } else {
+        form.reset({
+          stockQuantity: 0,
+          reservedQuantity: 0,
+        });
+      }
       if (currentCompany?.id) {
         fetchLocations();
         fetchProducts();
       }
     }
-  }, [open, currentCompany?.id, form]);
+  }, [open, currentCompany?.id, initialData]);
 
   const fetchLocations = async () => {
     try {
@@ -90,15 +104,38 @@ export function InventoryFormSheet({ open, onClose, onSaved }: InventoryFormShee
 
   const fetchProducts = async () => {
     try {
-      // Assuming productService has getProducts. If not, we might need to verify.
-      // Based on previous tasks, productService exists.
       const response = await productService.getProducts();
       setProducts(response.data || []);
     } catch (error) {
       console.error('Error fetching products:', error);
-      // Fail silently for dropdown population or toast?
     }
   };
+
+  const handleProductChange = (productId: string) => {
+    const product = products.find(p => p.id === productId);
+    if (product) {
+      // Auto-fill value based on cost price * stock quantity
+      const stockQty = form.watch('stockQuantity') || 0;
+      const calculatedValue = product.costPrice * stockQty;
+      form.setValue('value', calculatedValue);
+    }
+  };
+
+  // Watch stock quantity changes to recalculate value
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === 'stockQuantity' || name === 'productId') {
+        const productId = value.productId;
+        const stockQty = value.stockQuantity || 0;
+        const product = products.find(p => p.id === productId);
+        if (product) {
+          const calculatedValue = product.costPrice * stockQty;
+          form.setValue('value', calculatedValue);
+        }
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form, products]);
 
   const onSubmit = async (values: InventoryFormValues) => {
     setLoading(true);
@@ -134,7 +171,7 @@ export function InventoryFormSheet({ open, onClose, onSaved }: InventoryFormShee
     <Sheet open={open} onOpenChange={handleSheetOpenChange}>
       <SheetContent className='w-[720px] sm:max-w-[720px] overflow-y-auto'>
         <SheetHeader className='pb-4'>
-          <SheetTitle>Add Inventory</SheetTitle>
+          <SheetTitle>{initialData ? 'Edit Inventory' : 'Add Inventory'}</SheetTitle>
         </SheetHeader>
 
         <Form {...form}>
@@ -163,8 +200,14 @@ export function InventoryFormSheet({ open, onClose, onSaved }: InventoryFormShee
                 name='productId'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel required>Product</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Product</FormLabel>
+                    <Select 
+                      onValueChange={(val) => {
+                        field.onChange(val);
+                        handleProductChange(val);
+                      }} 
+                      value={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder='Select product' />
@@ -188,8 +231,8 @@ export function InventoryFormSheet({ open, onClose, onSaved }: InventoryFormShee
                 name='locationId'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel required>Location</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Location</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder='Select location' />
@@ -223,7 +266,7 @@ export function InventoryFormSheet({ open, onClose, onSaved }: InventoryFormShee
                   name='stockQuantity'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel required>Stock Quantity</FormLabel>
+                      <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Stock Quantity</FormLabel>
                       <FormControl>
                         <Input
                           type='number'
@@ -271,12 +314,13 @@ export function InventoryFormSheet({ open, onClose, onSaved }: InventoryFormShee
                           type='number'
                           min='0'
                           step='0.01'
-                          placeholder='Enter inventory value'
+                          placeholder='Auto-calculated'
+                          disabled
                           {...field}
-                          onChange={e => field.onChange(parseFloat(e.target.value))}
+                          value={field.value || 0}
                         />
                       </FormControl>
-                      <FormDescription>Total value of inventory stock</FormDescription>
+                      <FormDescription>Auto-calculated: Cost Price × Stock Quantity</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -343,7 +387,7 @@ export function InventoryFormSheet({ open, onClose, onSaved }: InventoryFormShee
               </Button>
               <Button type='submit' disabled={loading}>
                 {loading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
-                Add Inventory
+                {initialData ? 'Update Inventory' : 'Add Inventory'}
               </Button>
             </SheetFooter>
           </form>

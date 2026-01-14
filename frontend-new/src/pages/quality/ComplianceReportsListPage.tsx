@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { toast } from 'sonner';
+import { ComplianceReportFormSheet } from '@/components/quality/ComplianceReportFormSheet';
 import { MoreVertical, Eye, Edit, Trash2, Plus } from 'lucide-react';
 import {
   PageContainer,
@@ -71,8 +72,10 @@ const ComplianceReportsListPage = () => {
     defaultSortColumn: 'reportDate',
     defaultSortDirection: 'desc',
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState('');
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [selectedReport, setSelectedReport] = useState<ComplianceReport | undefined>(undefined);
   const [selectedType, setSelectedType] = useState<string>('');
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const fetchInProgressRef = useRef(false);
@@ -111,7 +114,8 @@ const ComplianceReportsListPage = () => {
   };
 
   const handleEditReport = (report: ComplianceReport) => {
-    toast.info(`Edit report ${report.reportId}`);
+    setSelectedReport(report);
+    setSheetOpen(true);
   };
 
   const handleDeleteReport = async (report: ComplianceReport) => {
@@ -126,7 +130,8 @@ const ComplianceReportsListPage = () => {
   };
 
   const handleCreateReport = () => {
-    toast.info('Create compliance report functionality');
+    setSelectedReport(undefined);
+    setSheetOpen(true);
   };
 
   if (!currentCompany) {
@@ -284,6 +289,13 @@ const ComplianceReportsListPage = () => {
           </DataTable>
         </div>
       )}
+
+      <ComplianceReportFormSheet
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        onSuccess={fetchReports}
+        report={selectedReport}
+      />
     </PageContainer>
   );
 };

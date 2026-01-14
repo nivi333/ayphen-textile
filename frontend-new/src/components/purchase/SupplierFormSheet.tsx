@@ -59,7 +59,11 @@ const supplierSchema = z.object({
   // Financial
   paymentTerms: z.string().optional(),
   creditPeriod: z.preprocess(
-    val => (val === '' ? undefined : Number(val)),
+    val => {
+      if (val === '' || val === null || val === undefined) return undefined;
+      const num = Number(val);
+      return isNaN(num) ? undefined : num;
+    },
     z.number().min(0).optional()
   ),
   currency: z.string().optional(),
@@ -69,15 +73,27 @@ const supplierSchema = z.object({
 
   // Supply Info
   leadTimeDays: z.preprocess(
-    val => (val === '' ? undefined : Number(val)),
+    val => {
+      if (val === '' || val === null || val === undefined) return undefined;
+      const num = Number(val);
+      return isNaN(num) ? undefined : num;
+    },
     z.number().min(0).optional()
   ),
   minOrderQty: z.preprocess(
-    val => (val === '' ? undefined : Number(val)),
+    val => {
+      if (val === '' || val === null || val === undefined) return undefined;
+      const num = Number(val);
+      return isNaN(num) ? undefined : num;
+    },
     z.number().min(0).optional()
   ),
   minOrderValue: z.preprocess(
-    val => (val === '' ? undefined : Number(val)),
+    val => {
+      if (val === '' || val === null || val === undefined) return undefined;
+      const num = Number(val);
+      return isNaN(num) ? undefined : num;
+    },
     z.number().min(0).optional()
   ),
 
@@ -299,7 +315,7 @@ export function SupplierFormSheet({
                   name='name'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Supplier Name</FormLabel>
+                      <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Supplier Name</FormLabel>
                       <FormControl>
                         <div className='relative'>
                           <Input
@@ -330,7 +346,7 @@ export function SupplierFormSheet({
                   name='supplierType'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Supplier Type</FormLabel>
+                      <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Supplier Type</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
@@ -541,10 +557,10 @@ export function SupplierFormSheet({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value='NET15'>Net 15</SelectItem>
-                          <SelectItem value='NET30'>Net 30</SelectItem>
-                          <SelectItem value='NET45'>Net 45</SelectItem>
-                          <SelectItem value='NET60'>Net 60</SelectItem>
+                          <SelectItem value='NET_15'>Net 15</SelectItem>
+                          <SelectItem value='NET_30'>Net 30</SelectItem>
+                          <SelectItem value='NET_45'>Net 45</SelectItem>
+                          <SelectItem value='NET_60'>Net 60</SelectItem>
                           <SelectItem value='DUE_ON_RECEIPT'>Due on Receipt</SelectItem>
                           <SelectItem value='ADVANCE'>Advance</SelectItem>
                         </SelectContent>

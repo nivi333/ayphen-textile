@@ -130,6 +130,70 @@ export class TextileService {
   }
 
   // ============================================
+  // CODE GENERATION METHODS (PUBLIC)
+  // ============================================
+
+  async generateFabricCode(companyId: string): Promise<string> {
+    const lastFabric = await this.prisma.fabric_production.findFirst({
+      where: { company_id: companyId },
+      orderBy: { created_at: 'desc' },
+      select: { code: true },
+    });
+    if (!lastFabric || !lastFabric.code) return 'FAB-001';
+    const match = lastFabric.code.match(/FAB-(\d+)/);
+    const lastNumber = match ? parseInt(match[1]) : 0;
+    return `FAB-${(lastNumber + 1).toString().padStart(3, '0')}`;
+  }
+
+  async generateYarnCode(companyId: string): Promise<string> {
+    const lastYarn = await this.prisma.yarn_manufacturing.findFirst({
+      where: { company_id: companyId },
+      orderBy: { created_at: 'desc' },
+      select: { code: true },
+    });
+    if (!lastYarn || !lastYarn.code) return 'YARN-001';
+    const match = lastYarn.code.match(/YARN-(\d+)/);
+    const lastNumber = match ? parseInt(match[1]) : 0;
+    return `YARN-${(lastNumber + 1).toString().padStart(3, '0')}`;
+  }
+
+  async generateDyeingCode(companyId: string): Promise<string> {
+    const lastDyeing = await this.prisma.dyeing_finishing.findFirst({
+      where: { company_id: companyId },
+      orderBy: { created_at: 'desc' },
+      select: { code: true },
+    });
+    if (!lastDyeing || !lastDyeing.code) return 'DYE-001';
+    const match = lastDyeing.code.match(/DYE-(\d+)/);
+    const lastNumber = match ? parseInt(match[1]) : 0;
+    return `DYE-${(lastNumber + 1).toString().padStart(3, '0')}`;
+  }
+
+  async generateGarmentCode(companyId: string): Promise<string> {
+    const lastGarment = await this.prisma.garment_manufacturing.findFirst({
+      where: { company_id: companyId },
+      orderBy: { created_at: 'desc' },
+      select: { code: true },
+    });
+    if (!lastGarment || !lastGarment.code) return 'GAR-001';
+    const match = lastGarment.code.match(/GAR-(\d+)/);
+    const lastNumber = match ? parseInt(match[1]) : 0;
+    return `GAR-${(lastNumber + 1).toString().padStart(3, '0')}`;
+  }
+
+  async generateDesignCode(companyId: string): Promise<string> {
+    const lastDesign = await this.prisma.design_patterns.findFirst({
+      where: { company_id: companyId },
+      orderBy: { created_at: 'desc' },
+      select: { code: true },
+    });
+    if (!lastDesign || !lastDesign.code) return 'DES-001';
+    const match = lastDesign.code.match(/DES-(\d+)/);
+    const lastNumber = match ? parseInt(match[1]) : 0;
+    return `DES-${(lastNumber + 1).toString().padStart(3, '0')}`;
+  }
+
+  // ============================================
   // FABRIC PRODUCTION METHODS
   // ============================================
 

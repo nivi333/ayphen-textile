@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -112,6 +112,7 @@ export function BillFormSheet({ open, onClose, initialData }: BillFormSheetProps
   const [locations, setLocations] = useState<Location[]>([]);
   const [products, setProducts] = useState<ProductSummary[]>([]);
   const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrderSummary[]>([]);
+  const dataFetchedRef = useRef(false);
 
   const isEditing = !!initialData;
 
@@ -165,8 +166,18 @@ export function BillFormSheet({ open, onClose, initialData }: BillFormSheetProps
   }, []);
 
   useEffect(() => {
-    if (open) {
+    if (open && !dataFetchedRef.current) {
+      dataFetchedRef.current = true;
       fetchData();
+    }
+    
+    if (!open) {
+      dataFetchedRef.current = false;
+    }
+  }, [open, fetchData]);
+
+  useEffect(() => {
+    if (open && locations.length > 0) {
       if (initialData) {
         // Populate form
         form.reset({
@@ -219,7 +230,7 @@ export function BillFormSheet({ open, onClose, initialData }: BillFormSheetProps
         });
       }
     }
-  }, [open, initialData, form, fetchData, locations]);
+  }, [open, initialData, locations, form]);
 
   const handleSupplierChange = (supplierId: string) => {
     const supplier = suppliers.find(s => s.id === supplierId);

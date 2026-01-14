@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { toast } from 'sonner';
+import { QualityCheckpointFormSheet } from '@/components/quality/QualityCheckpointFormSheet';
 import { MoreVertical, Edit, Trash2, Plus } from 'lucide-react';
 import {
   PageContainer,
@@ -71,8 +72,10 @@ const QualityCheckpointsListPage = () => {
     defaultSortColumn: 'inspectionDate',
     defaultSortDirection: 'desc',
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState('');
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [selectedCheckpoint, setSelectedCheckpoint] = useState<QualityCheckpoint | undefined>(undefined);
   const [selectedType, setSelectedType] = useState<string>('');
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const fetchInProgressRef = useRef(false);
@@ -107,7 +110,8 @@ const QualityCheckpointsListPage = () => {
   };
 
   const handleEditCheckpoint = (checkpoint: QualityCheckpoint) => {
-    toast.info(`Edit checkpoint ${checkpoint.checkpointId}`);
+    setSelectedCheckpoint(checkpoint);
+    setSheetOpen(true);
   };
 
   const handleDeleteCheckpoint = async (checkpoint: QualityCheckpoint) => {
@@ -122,7 +126,8 @@ const QualityCheckpointsListPage = () => {
   };
 
   const handleCreateCheckpoint = () => {
-    toast.info('Create checkpoint functionality');
+    setSelectedCheckpoint(undefined);
+    setSheetOpen(true);
   };
 
   if (!currentCompany) {
@@ -293,6 +298,13 @@ const QualityCheckpointsListPage = () => {
           </DataTable>
         </div>
       )}
+
+      <QualityCheckpointFormSheet
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        onSuccess={fetchCheckpoints}
+        checkpoint={selectedCheckpoint}
+      />
     </PageContainer>
   );
 };

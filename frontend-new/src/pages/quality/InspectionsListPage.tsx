@@ -37,6 +37,7 @@ import { Button } from '@/components/ui/button';
 import { inspectionService, Inspection } from '@/services/inspectionService';
 import useAuth from '@/contexts/AuthContext';
 import { format } from 'date-fns';
+import { InspectionFormSheet } from '@/components/quality/InspectionFormSheet';
 
 type InspectionType = 'INCOMING_MATERIAL' | 'IN_PROCESS' | 'FINAL_PRODUCT' | 'RANDOM_CHECK';
 type InspectionStatus = 'PENDING' | 'IN_PROGRESS' | 'PASSED' | 'FAILED' | 'CONDITIONAL';
@@ -75,6 +76,8 @@ const InspectionsListPage = () => {
   const [selectedType, setSelectedType] = useState<string>('');
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [selectedReferenceType, setSelectedReferenceType] = useState<string>('');
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [selectedInspection, setSelectedInspection] = useState<Inspection | undefined>(undefined);
   const fetchInProgressRef = useRef(false);
 
   useEffect(() => {
@@ -112,22 +115,24 @@ const InspectionsListPage = () => {
   };
 
   const handleEditInspection = (inspection: Inspection) => {
-    toast.info(`Edit inspection ${inspection.inspectionNumber}`);
+    setSelectedInspection(inspection);
+    setSheetOpen(true);
   };
 
   const handleDeleteInspection = async (inspection: Inspection) => {
+    if (!confirm('Are you sure you want to delete this inspection?')) return;
     try {
       await inspectionService.deleteInspection(inspection.id);
       toast.success('Inspection deleted successfully');
       fetchInspections();
     } catch (error: any) {
-      console.error('Error deleting inspection:', error);
       toast.error(error.message || 'Failed to delete inspection');
     }
   };
 
   const handleCreateInspection = () => {
-    toast.info('Create inspection functionality');
+    setSelectedInspection(undefined);
+    setSheetOpen(true);
   };
 
   if (!currentCompany) {
@@ -317,6 +322,13 @@ const InspectionsListPage = () => {
           </DataTable>
         </div>
       )}
+
+      <InspectionFormSheet
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        onSuccess={fetchInspections}
+        inspection={selectedInspection}
+      />
     </PageContainer>
   );
 };
