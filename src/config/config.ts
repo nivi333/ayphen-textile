@@ -152,7 +152,7 @@ export const config: Config = {
     path: process.env.UPLOAD_PATH || 'uploads/',
   },
   security: {
-    bcryptRounds: parseInt(process.env.BCRYPT_ROUNDS || '12', 10),
+    bcryptRounds: parseInt(process.env.BCRYPT_ROUNDS || '10', 10),
     sessionSecret: process.env.SESSION_SECRET || 'fallback-session-secret',
   },
   multiTenant: {

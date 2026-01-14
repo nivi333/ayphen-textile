@@ -123,6 +123,9 @@ model sessions {
   created_at DateTime @default(now())
   updated_at DateTime
   users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([expires_at])
 }
 
 model user_companies {

@@ -150,42 +150,55 @@ export class AuthService {
       ipAddress: userData.ipAddress,
     });
 
-    // Record GDPR consents if provided
+    // Record GDPR consents asynchronously (non-blocking)
     if (
       userData.hasConsentedToTerms ||
       userData.hasConsentedToPrivacy ||
       userData.hasConsentedToCookies
     ) {
-      try {
-        await gdprService.recordConsent({
-          userId: user.id,
-          consentType: 'TERMS_AND_CONDITIONS',
-          hasConsented: userData.hasConsentedToTerms || false,
-          ipAddress: userData.ipAddress,
-          userAgent: userData.userAgent,
-        });
-
-        await gdprService.recordConsent({
-          userId: user.id,
-          consentType: 'PRIVACY_POLICY',
-          hasConsented: userData.hasConsentedToPrivacy || false,
-          ipAddress: userData.ipAddress,
-          userAgent: userData.userAgent,
-        });
-
-        if (userData.hasConsentedToCookies) {
-          await gdprService.recordConsent({
+      // Fire and forget - don't block registration response
+      const consentPromises = [];
+      
+      if (userData.hasConsentedToTerms) {
+        consentPromises.push(
+          gdprService.recordConsent({
+            userId: user.id,
+            consentType: 'TERMS_AND_CONDITIONS',
+            hasConsented: true,
+            ipAddress: userData.ipAddress,
+            userAgent: userData.userAgent,
+          })
+        );
+      }
+      
+      if (userData.hasConsentedToPrivacy) {
+        consentPromises.push(
+          gdprService.recordConsent({
+            userId: user.id,
+            consentType: 'PRIVACY_POLICY',
+            hasConsented: true,
+            ipAddress: userData.ipAddress,
+            userAgent: userData.userAgent,
+          })
+        );
+      }
+      
+      if (userData.hasConsentedToCookies) {
+        consentPromises.push(
+          gdprService.recordConsent({
             userId: user.id,
             consentType: 'COOKIE_POLICY',
             hasConsented: true,
             ipAddress: userData.ipAddress,
             userAgent: userData.userAgent,
-          });
-        }
-      } catch (gdprError) {
-        logger.error('Failed to record GDPR consent during registration:', gdprError);
-        // Continue registration even if consent recording fails (non-blocking)
+          })
+        );
       }
+      
+      // Execute in background without blocking
+      Promise.allSettled(consentPromises).catch(gdprError => {
+        logger.error('Failed to record GDPR consent during registration:', gdprError);
+      });
     }
 
     logger.info(`User registered: ${user.id}`);
@@ -266,8 +279,11 @@ export class AuthService {
       },
     });
 
+    // Cache in Redis asynchronously (non-blocking)
     const refreshExpSec = Math.floor(refreshExpMs / 1000);
-    await redisClient.setex(`refresh_token:${sessionId}`, refreshExpSec, refreshToken);
+    redisClient.setex(`refresh_token:${sessionId}`, refreshExpSec, refreshToken).catch(err => {
+      logger.error('Failed to cache refresh token in Redis:', err);
+    });
 
     return {
       accessToken,
