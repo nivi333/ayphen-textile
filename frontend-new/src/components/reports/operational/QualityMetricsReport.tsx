@@ -32,7 +32,7 @@ const QualityMetricsReport: React.FC<QualityMetricsReportProps> = ({
 
   useEffect(() => {
     fetchData();
-  }, [triggerFetch]);
+  }, [triggerFetch, dateRange]);
 
   const fetchData = async () => {
     if (!dateRange?.from || !dateRange?.to) {
@@ -62,6 +62,13 @@ const QualityMetricsReport: React.FC<QualityMetricsReportProps> = ({
 
   return (
     <div className='space-y-6'>
+      {loading && (
+        <div className='text-center py-12'>
+          <div className='inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]' />
+          <p className='mt-4 text-muted-foreground'>Loading quality metrics...</p>
+        </div>
+      )}
+
       {!data && !loading && (
         <div className='text-center py-12 text-muted-foreground'>
           <p>No quality metrics data available for the selected date range.</p>

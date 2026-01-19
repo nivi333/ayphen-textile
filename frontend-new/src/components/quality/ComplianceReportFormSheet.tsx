@@ -130,6 +130,15 @@ export function ComplianceReportFormSheet({ open, onOpenChange, onSuccess, repor
             <div className='space-y-4'>
               <h3 className='text-sm font-medium text-muted-foreground'>Report Information</h3>
               
+              {isEditing && report?.reportCode && (
+                <FormItem>
+                  <FormLabel>Code</FormLabel>
+                  <FormControl>
+                    <Input value={report.reportCode} disabled className='bg-muted' />
+                  </FormControl>
+                </FormItem>
+              )}
+
               <div className='grid grid-cols-2 gap-4'>
                 <FormField control={form.control} name='reportType' render={({ field }) => (
                   <FormItem>

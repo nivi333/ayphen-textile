@@ -178,6 +178,15 @@ export function InspectionFormSheet({
             <div className='space-y-4'>
               <h3 className='text-sm font-medium text-muted-foreground'>Basic Information</h3>
 
+              {isEditing && inspection?.inspectionNumber && (
+                <FormItem>
+                  <FormLabel>Code</FormLabel>
+                  <FormControl>
+                    <Input value={inspection.inspectionNumber} disabled className='bg-muted' />
+                  </FormControl>
+                </FormItem>
+              )}
+
               <div className='grid grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}

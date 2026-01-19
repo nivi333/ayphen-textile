@@ -112,6 +112,15 @@ export function QualityDefectFormSheet({ open, onOpenChange, onSuccess, defect }
             <div className='space-y-4'>
               <h3 className='text-sm font-medium text-muted-foreground'>Defect Information</h3>
               
+              {isEditing && defect?.defectId && (
+                <FormItem>
+                  <FormLabel>Code</FormLabel>
+                  <FormControl>
+                    <Input value={defect.defectId} disabled className='bg-muted' />
+                  </FormControl>
+                </FormItem>
+              )}
+
               <FormField control={form.control} name='checkpointId' render={({ field }) => (
                 <FormItem>
                   <FormLabel>Checkpoint ID (Optional)</FormLabel>

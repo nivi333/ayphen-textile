@@ -179,6 +179,15 @@ export function DyeingFinishingSheet({
                 )}
               />
 
+              {isEditing && process?.code && (
+                <FormItem>
+                  <FormLabel>Code</FormLabel>
+                  <FormControl>
+                    <Input value={process.code} disabled className='bg-muted' />
+                  </FormControl>
+                </FormItem>
+              )}
+
               <div className='grid grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}

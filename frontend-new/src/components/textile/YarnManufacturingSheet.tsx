@@ -186,6 +186,15 @@ export function YarnManufacturingSheet({
                 )}
               />
 
+              {isEditing && yarn?.code && (
+                <FormItem>
+                  <FormLabel>Code</FormLabel>
+                  <FormControl>
+                    <Input value={yarn.code} disabled className='bg-muted' />
+                  </FormControl>
+                </FormItem>
+              )}
+
               <div className='grid grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}

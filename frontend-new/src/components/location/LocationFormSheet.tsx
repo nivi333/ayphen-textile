@@ -249,20 +249,18 @@ export function LocationFormSheet({
   return (
     <Sheet open={visible} onOpenChange={isOpen => !isOpen && handleCancel()}>
       <SheetContent className='w-[680px] sm:max-w-[680px] overflow-y-auto'>
-        <SheetHeader>
-          <div className='flex items-center justify-between'>
-            <SheetTitle>{editingLocation ? 'Edit Location' : 'Add New Location'}</SheetTitle>
-            <div className='flex items-center gap-2'>
-              <span className='text-sm text-muted-foreground'>Active</span>
-              <Switch
-                checked={isActive}
-                onCheckedChange={checked => {
-                  setIsActive(checked);
-                  form.setValue('isActive', checked);
-                }}
-                disabled={!editingLocation}
-              />
-            </div>
+        <SheetHeader className='flex flex-row items-center justify-between space-y-0 pb-4'>
+          <SheetTitle>{editingLocation ? 'Edit Location' : 'Add New Location'}</SheetTitle>
+          <div className='flex items-center space-x-2 mr-6'>
+            <span className='text-sm text-muted-foreground'>Active</span>
+            <Switch
+              checked={isActive}
+              onCheckedChange={checked => {
+                setIsActive(checked);
+                form.setValue('isActive', checked);
+              }}
+              disabled={!editingLocation}
+            />
           </div>
         </SheetHeader>
 

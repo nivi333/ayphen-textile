@@ -191,6 +191,15 @@ export function GarmentManufacturingSheet({
                 )}
               />
 
+              {isEditing && garment?.code && (
+                <FormItem>
+                  <FormLabel>Code</FormLabel>
+                  <FormControl>
+                    <Input value={garment.code} disabled className='bg-muted' />
+                  </FormControl>
+                </FormItem>
+              )}
+
               <div className='grid grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}

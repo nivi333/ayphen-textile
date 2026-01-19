@@ -25,6 +25,7 @@ export interface FabricProduction {
   qualityGrade: string;
   imageUrl?: string;
   notes?: string;
+  code?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -78,6 +79,7 @@ export interface YarnManufacturing {
   qualityGrade: string;
   imageUrl?: string;
   notes?: string;
+  code?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -134,6 +136,7 @@ export interface DyeingFinishing {
   shrinkagePercent?: number;
   imageUrl?: string;
   notes?: string;
+  code?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -191,6 +194,7 @@ export interface GarmentManufacturing {
   defectCount: number;
   imageUrl?: string;
   notes?: string;
+  code?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -240,6 +244,7 @@ export interface DesignPattern {
   sampleImageUrl?: string;
   status: string;
   notes?: string;
+  code?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
