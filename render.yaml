@@ -10,36 +10,30 @@ services:
     ipAllowList: []
 
   - type: web
-    name: lavoro-backend
-    runtime: docker
-    plan: starter
+    name: ayphen-textile-backend
+    runtime: node
+    plan: free
     autoDeploy: true
-    healthCheckPath: /health
-    dockerContext: .
-    dockerfilePath: ./Dockerfile
-    preDeployCommand: "npx prisma migrate deploy"
+    healthCheckPath: /api/v1/health
+    buildCommand: "npm ci && npx prisma generate && npm run build"
+    startCommand: "npx prisma migrate deploy && npm start"
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 3000
+        value: 10000
       - key: HOST
         value: 0.0.0.0
-      # Supabase Database URLs - Set these in Render Dashboard
-      # DATABASE_URL: Use Transaction Pooler (port 6543)
-      # postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true&sslmode=require
       - key: DATABASE_URL
         sync: false
-      # DIRECT_URL: Use Direct Connection (port 5432) for migrations
-      # postgresql://postgres.[PROJECT-REF]:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres?sslmode=require
       - key: DIRECT_URL
         sync: false
       - key: DB_MAX_CONNECTIONS
-        value: 20
+        value: 10
       - key: DB_IDLE_TIMEOUT
         value: 30000
       - key: DB_CONNECTION_TIMEOUT
-        value: 5000
+        value: 10000
       - key: REDIS_URL
         fromService:
           name: lavoro-redis
@@ -49,13 +43,21 @@ services:
         generateValue: true
       - key: JWT_REFRESH_SECRET
         generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 24h
+      - key: JWT_REFRESH_EXPIRES_IN
+        value: 7d
       - key: SESSION_SECRET
         generateValue: true
       - key: CORS_ORIGIN
-        value: https://YOUR-NETLIFY-SUBDOMAIN.netlify.app
+        value: https://ayphentextile.netlify.app
       - key: API_VERSION
         value: v1
       - key: API_PREFIX
         value: /api
       - key: BCRYPT_ROUNDS
-        value: 12
+        value: 10
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 900000
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: 100
