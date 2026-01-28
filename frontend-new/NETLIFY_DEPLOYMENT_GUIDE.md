@@ -34,7 +34,7 @@ VITE_API_BASE_URL=https://your-render-backend.onrender.com/api/v1
 VITE_GOOGLE_CLIENT_ID=your_google_client_id_here
 
 # App Configuration
-VITE_APP_NAME=Lavoro AI Ferri
+VITE_APP_NAME=Ayphen Textile
 VITE_APP_VERSION=1.0.0
 ```
 
@@ -74,7 +74,7 @@ VITE_APP_VERSION=1.0.0
    |--------------|-------|
    | `VITE_API_BASE_URL` | `https://your-render-backend.onrender.com/api/v1` |
    | `VITE_GOOGLE_CLIENT_ID` | Your Google OAuth Client ID |
-   | `VITE_APP_NAME` | `Lavoro AI Ferri` |
+   | `VITE_APP_NAME` | `Ayphen Textile` |
    | `VITE_APP_VERSION` | `1.0.0` |
    | `NODE_VERSION` | `18` |
 

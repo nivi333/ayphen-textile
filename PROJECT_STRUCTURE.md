@@ -1,4 +1,4 @@
-# 📁 Lavoro AI Ferri - Project Structure
+# 📁 Ayphen Textile - Project Structure
 
 ## 🎯 Main Folders
 
