@@ -1,0 +1,52 @@
+# Codecov Configuration
+# Tracks code coverage over time and provides insights
+
+coverage:
+  precision: 2
+  round: down
+  range: "70...100"
+  
+  status:
+    project:
+      default:
+        target: 70%
+        threshold: 5%
+        base: auto
+    patch:
+      default:
+        target: 70%
+        threshold: 5%
+    changes:
+      default:
+        target: 70%
+
+comment:
+  layout: "reach,diff,flags,tree,footer"
+  behavior: default
+  require_changes: false
+  require_base: false
+  require_head: true
+
+flags:
+  backend:
+    paths:
+      - src/
+    carryforward: true
+  frontend:
+    paths:
+      - frontend-new/src/
+    carryforward: true
+
+ignore:
+  - "**/__tests__/**"
+  - "**/*.test.ts"
+  - "**/*.test.tsx"
+  - "**/*.spec.ts"
+  - "**/*.spec.tsx"
+  - "**/e2e/**"
+  - "**/dist/**"
+  - "**/coverage/**"
+  - "**/*.config.*"
+  - "**/node_modules/**"
+  - "prisma/migrations/**"
+  - "scripts/**"
