@@ -2,7 +2,7 @@
 
 [build]
   # Build command
-  command = "npm run build"
+  command = "npm ci --legacy-peer-deps && npm run build"
   
   # Directory with build output
   publish = "dist"
