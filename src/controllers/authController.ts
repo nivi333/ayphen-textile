@@ -75,7 +75,13 @@ export class AuthController {
       });
     } catch (error: any) {
       logger.error('Registration error:', error);
-      const status = error.message?.includes('already exists') ? 409 : 500;
+      const status = error.message?.includes('already exists')
+        ? 409
+        : error.message?.includes('Email or phone number is required')
+          ? 400
+          : error.message?.includes('Registration service temporarily unavailable')
+            ? 503
+            : 500;
       res.status(status).json({
         success: false,
         message: error.message || 'Registration failed',
@@ -108,9 +114,13 @@ export class AuthController {
       logger.error('Login error:', error);
       const status = error.message?.includes('Invalid credentials')
         ? 401
-        : error.message?.includes('User not registered')
+        : error.message?.includes('User not found')
           ? 404
-          : 500;
+          : error.message?.includes('Email/phone and password are required')
+            ? 400
+            : error.message?.includes('Authentication service temporarily unavailable')
+              ? 503
+              : 500;
       res.status(status).json({
         success: false,
         message: error.message || 'Login failed',

@@ -101,150 +101,214 @@ export class AuthService {
    * Register new user
    */
   static async register(userData: RegisterData): Promise<{ user: any; tokens: AuthTokens }> {
-    if (!userData.email && !userData.phone) {
-      throw new Error('Email or phone number is required');
-    }
-
-    const whereConditions = [
-      userData.email && { email: userData.email },
-      userData.phone && { phone: userData.phone },
-    ].filter(Boolean);
-
-    const existingUser = await globalPrisma.users.findFirst({
-      where: { OR: whereConditions },
-    });
-
-    if (existingUser) {
-      throw new Error('User already exists with this email or phone');
-    }
-
-    const hashedPassword = await this.hashPassword(userData.password);
-
-    const user = await globalPrisma.users.create({
-      data: {
-        id: uuidv4(),
-        first_name: userData.firstName,
-        last_name: userData.lastName,
-        email: userData.email,
-        phone: userData.phone,
-        password: hashedPassword,
-        updated_at: new Date(),
-      },
-      select: {
-        id: true,
-        first_name: true,
-        last_name: true,
-        email: true,
-        phone: true,
-        is_active: true,
-        created_at: true,
-      },
-    });
-
-    const sessionId = uuidv4();
-    const tokens = await this.createSession({
-      userId: user.id,
-      sessionId,
-      deviceInfo: userData.deviceInfo,
-      userAgent: userData.userAgent,
-      ipAddress: userData.ipAddress,
-    });
-
-    // Record GDPR consents asynchronously (non-blocking)
-    if (
-      userData.hasConsentedToTerms ||
-      userData.hasConsentedToPrivacy ||
-      userData.hasConsentedToCookies
-    ) {
-      // Fire and forget - don't block registration response
-      const consentPromises = [];
-      
-      if (userData.hasConsentedToTerms) {
-        consentPromises.push(
-          gdprService.recordConsent({
-            userId: user.id,
-            consentType: 'TERMS_AND_CONDITIONS',
-            hasConsented: true,
-            ipAddress: userData.ipAddress,
-            userAgent: userData.userAgent,
-          })
-        );
+    try {
+      if (!userData.email && !userData.phone) {
+        throw new Error('Email or phone number is required');
       }
-      
-      if (userData.hasConsentedToPrivacy) {
-        consentPromises.push(
-          gdprService.recordConsent({
-            userId: user.id,
-            consentType: 'PRIVACY_POLICY',
-            hasConsented: true,
-            ipAddress: userData.ipAddress,
-            userAgent: userData.userAgent,
-          })
-        );
+
+      const whereConditions = [
+        userData.email && { email: userData.email },
+        userData.phone && { phone: userData.phone },
+      ].filter(Boolean);
+
+      let existingUser;
+      try {
+        existingUser = await globalPrisma.users.findFirst({
+          where: { OR: whereConditions },
+        });
+      } catch (prismaError: any) {
+        logger.error('Database error during registration check:', prismaError);
+        throw new Error('Registration service temporarily unavailable');
       }
-      
-      if (userData.hasConsentedToCookies) {
-        consentPromises.push(
-          gdprService.recordConsent({
-            userId: user.id,
-            consentType: 'COOKIE_POLICY',
-            hasConsented: true,
-            ipAddress: userData.ipAddress,
-            userAgent: userData.userAgent,
-          })
-        );
+
+      if (existingUser) {
+        throw new Error('User already exists with this email or phone');
       }
-      
-      // Execute in background without blocking
-      Promise.allSettled(consentPromises).catch(gdprError => {
-        logger.error('Failed to record GDPR consent during registration:', gdprError);
+
+      const hashedPassword = await this.hashPassword(userData.password);
+
+      let user;
+      try {
+        user = await globalPrisma.users.create({
+          data: {
+            id: uuidv4(),
+            first_name: userData.firstName,
+            last_name: userData.lastName,
+            email: userData.email,
+            phone: userData.phone,
+            password: hashedPassword,
+            updated_at: new Date(),
+          },
+          select: {
+            id: true,
+            first_name: true,
+            last_name: true,
+            email: true,
+            phone: true,
+            is_active: true,
+            created_at: true,
+          },
+        });
+      } catch (prismaError: any) {
+        logger.error('Database error during user creation:', prismaError);
+        throw new Error('Registration failed. Please try again.');
+      }
+
+      const sessionId = uuidv4();
+      const tokens = await this.createSession({
+        userId: user.id,
+        sessionId,
+        deviceInfo: userData.deviceInfo,
+        userAgent: userData.userAgent,
+        ipAddress: userData.ipAddress,
       });
-    }
 
-    logger.info(`User registered: ${user.id}`);
-    return { user, tokens };
+      // Record GDPR consents asynchronously (non-blocking)
+      if (
+        userData.hasConsentedToTerms ||
+        userData.hasConsentedToPrivacy ||
+        userData.hasConsentedToCookies
+      ) {
+        // Fire and forget - don't block registration response
+        const consentPromises = [];
+        
+        if (userData.hasConsentedToTerms) {
+          consentPromises.push(
+            gdprService.recordConsent({
+              userId: user.id,
+              consentType: 'TERMS_AND_CONDITIONS',
+              hasConsented: true,
+              ipAddress: userData.ipAddress,
+              userAgent: userData.userAgent,
+            })
+          );
+        }
+        
+        if (userData.hasConsentedToPrivacy) {
+          consentPromises.push(
+            gdprService.recordConsent({
+              userId: user.id,
+              consentType: 'PRIVACY_POLICY',
+              hasConsented: true,
+              ipAddress: userData.ipAddress,
+              userAgent: userData.userAgent,
+            })
+          );
+        }
+        
+        if (userData.hasConsentedToCookies) {
+          consentPromises.push(
+            gdprService.recordConsent({
+              userId: user.id,
+              consentType: 'COOKIE_POLICY',
+              hasConsented: true,
+              ipAddress: userData.ipAddress,
+              userAgent: userData.userAgent,
+            })
+          );
+        }
+        
+        // Execute in background without blocking
+        Promise.allSettled(consentPromises).catch(gdprError => {
+          logger.error('Failed to record GDPR consent during registration:', gdprError);
+        });
+      }
+
+      logger.info(`User registered: ${user.id}`);
+      return { user, tokens };
+    } catch (error: any) {
+      // Ensure we don't expose internal errors
+      if (error.message.includes('Email or phone number is required') || 
+          error.message.includes('User already exists') ||
+          error.message.includes('Registration service temporarily unavailable') ||
+          error.message.includes('Registration failed. Please try again.')) {
+        throw error;
+      }
+      
+      // Log unexpected errors but don't expose them
+      logger.error('Unexpected registration error:', error);
+      throw new Error('Registration failed. Please try again.');
+    }
   }
 
   /**
    * Login user
    */
   static async login(credentials: LoginCredentials): Promise<{ user: any; tokens: AuthTokens }> {
-    const user = await globalPrisma.users.findFirst({
-      where: {
-        OR: [{ email: credentials.emailOrPhone }, { phone: credentials.emailOrPhone }],
-        is_active: true,
-      },
-    });
+    try {
+      // Validate input
+      if (!credentials.emailOrPhone || !credentials.password) {
+        throw new Error('Email/phone and password are required');
+      }
 
-    if (!user) {
-      throw new Error('User not registered');
+      // Find user with proper error handling
+      let user;
+      try {
+        user = await globalPrisma.users.findFirst({
+          where: {
+            OR: [
+              { email: credentials.emailOrPhone },
+              { phone: credentials.emailOrPhone }
+            ],
+            is_active: true,
+          },
+        });
+      } catch (prismaError: any) {
+        logger.error('Database error during login:', prismaError);
+        throw new Error('Authentication service temporarily unavailable');
+      }
+
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      // Verify password with error handling
+      let passwordValid = false;
+      try {
+        passwordValid = await this.verifyPassword(credentials.password, user.password);
+      } catch (bcryptError: any) {
+        logger.error('Password verification error:', bcryptError);
+        throw new Error('Invalid credentials');
+      }
+
+      if (!passwordValid) {
+        throw new Error('Invalid credentials');
+      }
+
+      const sessionId = uuidv4();
+      const tokens = await this.createSession({
+        userId: user.id,
+        sessionId,
+        deviceInfo: credentials.deviceInfo,
+        userAgent: credentials.userAgent,
+        ipAddress: credentials.ipAddress,
+      });
+
+      const userResponse = {
+        id: user.id,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        email: user.email,
+        phone: user.phone,
+        isActive: user.is_active,
+        createdAt: user.created_at,
+      };
+
+      logger.info(`User logged in: ${user.id}`);
+      return { user: userResponse, tokens };
+    } catch (error: any) {
+      // Ensure we don't expose internal errors
+      if (error.message.includes('User not found') || 
+          error.message.includes('Invalid credentials') ||
+          error.message.includes('Email/phone and password are required') ||
+          error.message.includes('Authentication service temporarily unavailable')) {
+        throw error;
+      }
+      
+      // Log unexpected errors but don't expose them
+      logger.error('Unexpected login error:', error);
+      throw new Error('Authentication failed');
     }
-
-    if (!(await this.verifyPassword(credentials.password, user.password))) {
-      throw new Error('Invalid credentials');
-    }
-
-    const sessionId = uuidv4();
-    const tokens = await this.createSession({
-      userId: user.id,
-      sessionId,
-      deviceInfo: credentials.deviceInfo,
-      userAgent: credentials.userAgent,
-      ipAddress: credentials.ipAddress,
-    });
-
-    const userResponse = {
-      id: user.id,
-      firstName: user.first_name,
-      lastName: user.last_name,
-      email: user.email,
-      phone: user.phone,
-      isActive: user.is_active,
-      createdAt: user.created_at,
-    };
-
-    logger.info(`User logged in: ${user.id}`);
-    return { user: userResponse, tokens };
   }
 
   /**

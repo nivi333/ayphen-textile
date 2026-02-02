@@ -1,0 +1,32 @@
+{
+  "name": "lavoro-ai-ferri-backend",
+  "description": "Multi-tenant textile manufacturing ERP system backend",
+  "image": "heroku/nodejs",
+  "stack": "heroku-22",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "addons": [
+    {
+      "plan": "heroku-postgresql:essential-0"
+    },
+    {
+      "plan": "heroku-redis:mini"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "NPM_CONFIG_PRODUCTION": "false"
+  },
+  "scripts": {
+    "postdeploy": "npm run db:migrate:deploy"
+  }
+}
