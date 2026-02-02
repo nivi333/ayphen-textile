@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useReducer, useEffect, useCallback, ReactNode } from 'react';
 import { AuthState, User, Company, AuthTokens, LoginCredentials } from '../types/auth';
 import { AuthStorage } from '../utils/storage';
 import { API_BASE_URL } from '../config/api';
@@ -388,10 +388,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  // Clear error state
-  const clearError = () => {
+  // Clear error state - memoized to prevent useEffect dependency loops
+  const clearError = useCallback(() => {
     dispatch({ type: 'SET_ERROR', payload: null });
-  };
+  }, []);
 
   const value: AuthContextType = {
     ...state,
