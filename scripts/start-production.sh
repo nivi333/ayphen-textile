@@ -1,17 +1,14 @@
 #!/bin/bash
-set -e
 
 echo "Starting production deployment..."
 
-# Run database migrations
+# Run database migrations (don't exit on failure)
 echo "Running database migrations..."
-if npx prisma migrate deploy; then
-  echo "✅ Migrations completed successfully"
-else
+npx prisma migrate deploy || {
   echo "⚠️  Migration failed, but continuing startup..."
   echo "Note: Migrations may have already been applied or database might not be accessible"
-fi
+}
 
 # Start the application
 echo "Starting application..."
-node dist/index.js
+exec node dist/index.js
