@@ -3,7 +3,7 @@
  * Features: emailOrPhone field (NOT separate email/phone), exact validation from existing frontend
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuth from '@/contexts/AuthContext';
 import {
@@ -20,7 +20,7 @@ import { User } from 'lucide-react';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const { register, isLoading, error } = useAuth();
+  const { register, isLoading, error, clearError } = useAuth();
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -33,6 +33,11 @@ export default function RegisterPage() {
 
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+
+  // Clear error on mount (when navigating from login page)
+  useEffect(() => {
+    clearError();
+  }, [clearError]);
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
@@ -87,41 +92,44 @@ export default function RegisterPage() {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
+      if (!validateForm()) {
+        return;
+      }
 
-    setSubmitting(true);
-    try {
-      // Determine if emailOrPhone is email or phone and structure data correctly
-      const registrationData = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        password: formData.password,
-        ...(isEmail(formData.emailOrPhone)
-          ? { email: formData.emailOrPhone }
-          : { phone: formData.emailOrPhone }),
-      };
+      setSubmitting(true);
+      try {
+        // Determine if emailOrPhone is email or phone and structure data correctly
+        const registrationData = {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          password: formData.password,
+          ...(isEmail(formData.emailOrPhone)
+            ? { email: formData.emailOrPhone }
+            : { phone: formData.emailOrPhone }),
+        };
 
-      await register(registrationData);
+        await register(registrationData);
 
-      toast.success('Registration successful!', {
-        description: 'Please check your email to verify your account.',
-        duration: 3000,
-      });
-      navigate('/login');
-    } catch (err: any) {
-      toast.error('Registration failed', {
-        description: err.message || 'Please try again.',
-        duration: 4000,
-      });
-    } finally {
-      setSubmitting(false);
-    }
-  }, [formData, register, navigate]);
+        toast.success('Registration successful!', {
+          description: 'Please check your email to verify your account.',
+          duration: 3000,
+        });
+        navigate('/login');
+      } catch (err: any) {
+        toast.error('Registration failed', {
+          description: err.message || 'Please try again.',
+          duration: 4000,
+        });
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [formData, register, navigate]
+  );
 
   return (
     <AuthLayout animated={true} animationVariant='register'>
@@ -271,8 +279,13 @@ export default function RegisterPage() {
             )}
           </div>
 
-          <PrimaryButton type='submit' className='w-full' loading={submitting || isLoading} disabled={submitting || isLoading}>
-            {(submitting || isLoading) ? 'Creating account...' : 'Create Account'}
+          <PrimaryButton
+            type='submit'
+            className='w-full'
+            loading={submitting || isLoading}
+            disabled={submitting || isLoading}
+          >
+            {submitting || isLoading ? 'Creating account...' : 'Create Account'}
           </PrimaryButton>
         </form>
 

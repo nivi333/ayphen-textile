@@ -103,6 +103,7 @@ interface AuthContextType extends AuthState {
   refreshToken: () => Promise<void>;
   refreshCompanies: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  clearError: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -387,6 +388,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  // Clear error state
+  const clearError = () => {
+    dispatch({ type: 'SET_ERROR', payload: null });
+  };
+
   const value: AuthContextType = {
     ...state,
     login,
@@ -397,6 +403,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     refreshToken,
     refreshCompanies,
     refreshUser,
+    clearError,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

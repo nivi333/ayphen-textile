@@ -34,7 +34,7 @@ const decryptPassword = (encrypted: string): string => {
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isLoading, error } = useAuth();
+  const { login, isLoading, error, clearError } = useAuth();
 
   const [formData, setFormData] = useState({
     emailOrPhone: '',
@@ -47,6 +47,11 @@ export default function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
 
   const from = (location.state as any)?.from?.pathname || '/companies';
+
+  // Clear error on mount (when navigating from register page)
+  useEffect(() => {
+    clearError();
+  }, [clearError]);
 
   // Load remembered credentials on mount
   useEffect(() => {
@@ -83,46 +88,49 @@ export default function LoginPage() {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      // Handle remember me functionality
-      if (formData.rememberMe) {
-        localStorage.setItem('rememberedUser', formData.emailOrPhone);
-        localStorage.setItem('rememberedPassword', encryptPassword(formData.password));
-      } else {
-        localStorage.removeItem('rememberedUser');
-        localStorage.removeItem('rememberedPassword');
+      if (!validateForm()) {
+        return;
       }
 
-      await login({
-        emailOrPhone: formData.emailOrPhone,
-        password: formData.password,
-      });
+      setSubmitting(true);
+      try {
+        // Handle remember me functionality
+        if (formData.rememberMe) {
+          localStorage.setItem('rememberedUser', formData.emailOrPhone);
+          localStorage.setItem('rememberedPassword', encryptPassword(formData.password));
+        } else {
+          localStorage.removeItem('rememberedUser');
+          localStorage.removeItem('rememberedPassword');
+        }
 
-      // Success alert with animation
-      toast.success('Login successful!', {
-        description: 'Redirecting to companies...',
-        duration: 2000,
-      });
+        await login({
+          emailOrPhone: formData.emailOrPhone,
+          password: formData.password,
+        });
 
-      navigate(from, { replace: true });
-    } catch (err: any) {
-      // Failure alert with animation
-      toast.error('Login failed', {
-        description: err.message || 'Please check your credentials and try again.',
-        duration: 4000,
-      });
-    } finally {
-      setSubmitting(false);
-    }
-  }, [formData, login, navigate, from]);
+        // Success alert with animation
+        toast.success('Login successful!', {
+          description: 'Redirecting to companies...',
+          duration: 2000,
+        });
+
+        navigate(from, { replace: true });
+      } catch (err: any) {
+        // Failure alert with animation
+        toast.error('Login failed', {
+          description: err.message || 'Please check your credentials and try again.',
+          duration: 4000,
+        });
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [formData, login, navigate, from]
+  );
 
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
@@ -223,8 +231,13 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          <PrimaryButton type='submit' className='w-full' loading={submitting || isLoading} disabled={submitting || isLoading}>
-            {(submitting || isLoading) ? 'Signing in...' : 'Sign In'}
+          <PrimaryButton
+            type='submit'
+            className='w-full'
+            loading={submitting || isLoading}
+            disabled={submitting || isLoading}
+          >
+            {submitting || isLoading ? 'Signing in...' : 'Sign In'}
           </PrimaryButton>
         </form>
 

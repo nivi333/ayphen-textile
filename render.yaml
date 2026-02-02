@@ -53,7 +53,7 @@ services:
       - key: API_PREFIX
         value: /api
       - key: BCRYPT_ROUNDS
-        value: 10
+        value: 8
       - key: RATE_LIMIT_WINDOW_MS
         value: 900000
       - key: RATE_LIMIT_MAX_REQUESTS
