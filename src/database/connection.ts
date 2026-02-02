@@ -10,8 +10,8 @@ function getGlobalPrisma(): PrismaClient {
   if (!globalPrismaInstance) {
     // Add connection_limit to DATABASE_URL for Prisma connection pooling
     const dbUrl = config.database.url.includes('?') 
-      ? `${config.database.url}&connection_limit=3&pool_timeout=10`
-      : `${config.database.url}?connection_limit=3&pool_timeout=10`;
+      ? `${config.database.url}&connection_limit=5&pool_timeout=20&connect_timeout=10`
+      : `${config.database.url}?connection_limit=5&pool_timeout=20&connect_timeout=10`;
 
     globalPrismaInstance = new PrismaClient({
       datasources: {
@@ -22,13 +22,31 @@ function getGlobalPrisma(): PrismaClient {
       log: config.env === 'development' ? ['error', 'warn'] : ['error'],
     });
 
-    // Connect once on initialization
-    globalPrismaInstance.$connect().catch(err => {
-      logger.error('Failed to connect to database:', err);
-      globalPrismaInstance = null;
-      process.exit(1);
-    });
+    // Connect with retry logic for Supabase restarts
+    const connectWithRetry = async (retries = 3) => {
+      for (let i = 0; i < retries; i++) {
+        try {
+          await globalPrismaInstance!.$connect();
+          logger.info('Global Prisma client connected successfully');
+          return;
+        } catch (err) {
+          logger.warn(`Database connection attempt ${i + 1} failed:`, err);
+          if (i === retries - 1) {
+            logger.error('Failed to connect to database after retries');
+            globalPrismaInstance = null;
+            // Don't exit in production, allow app to retry on next request
+            if (config.env !== 'production') {
+              process.exit(1);
+            }
+          } else {
+            // Wait before retry (exponential backoff)
+            await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, i)));
+          }
+        }
+      }
+    };
 
+    connectWithRetry();
     logger.info('Global Prisma client initialized with optimized connection pooling');
   }
   return globalPrismaInstance;

@@ -19,6 +19,13 @@ export const corsMiddleware = cors({
       ? configOrigin.split(',').map(o => o.trim())
       : Array.isArray(configOrigin) ? configOrigin : [configOrigin];
 
+    // Add common Netlify patterns
+    const netlifyPatterns = [
+      'https://ayphentextile.netlify.app',
+      'https://ayphen-textile.netlify.app',
+      /https:\/\/.*\.netlify\.app$/,
+    ];
+
     // Allow all origins in development
     if (config.env === 'development') {
       return callback(null, true);
@@ -27,6 +34,16 @@ export const corsMiddleware = cors({
     // Check if origin is allowed
     if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
       return callback(null, true);
+    }
+
+    // Check Netlify patterns
+    for (const pattern of netlifyPatterns) {
+      if (typeof pattern === 'string' && pattern === origin) {
+        return callback(null, true);
+      }
+      if (pattern instanceof RegExp && pattern.test(origin)) {
+        return callback(null, true);
+      }
     }
 
     logger.warn(`CORS: Origin ${origin} not allowed. Allowed: ${allowedOrigins.join(', ')}`);
