@@ -33,8 +33,8 @@ export const corsMiddleware = cors({
 
     const allPatterns = [...netlifyPatterns, ...vercelPatterns];
 
-    // Allow all origins in development
-    if (config.env === 'development') {
+    // Allow all origins in development OR any Vercel deployment
+    if (config.env === 'development' || (origin && origin.endsWith('.vercel.app'))) {
       return callback(null, true);
     }
 
