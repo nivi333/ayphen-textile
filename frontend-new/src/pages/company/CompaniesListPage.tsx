@@ -13,18 +13,25 @@ export default function CompaniesListPage() {
   const { companies, switchCompany, isLoading, logout, refreshCompanies } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [logoutLoading, setLogoutLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'owner' | 'roles'>('owner');
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [lazyLoading, setLazyLoading] = useState(true);
 
-  // Lazy loading effect
+  // Refresh companies on mount
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLazyLoading(false);
-    }, 2500);
-    return () => clearTimeout(timer);
-  }, []);
+    const init = async () => {
+      setRefreshing(true);
+      try {
+        await refreshCompanies();
+      } catch (error) {
+        console.error('Error refreshing companies:', error);
+      } finally {
+        setRefreshing(false);
+      }
+    };
+    init();
+  }, [refreshCompanies]);
 
   const handleSheetClose = () => setSheetOpen(false);
 
@@ -70,7 +77,7 @@ export default function CompaniesListPage() {
     }
   };
 
-  if (isLoading || lazyLoading) {
+  if (isLoading || refreshing) {
     return (
       <div className='flex items-center justify-center min-h-screen bg-background'>
         <div className='text-center'>

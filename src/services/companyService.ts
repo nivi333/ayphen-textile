@@ -1,9 +1,7 @@
-import { PrismaClient as GlobalPrismaClient } from '@prisma/client';
+import { globalPrisma } from '../database/connection';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateCompanyData } from '../types';
 import { industryToEnum, industryToDisplay } from '../utils/industryMapper';
-
-const globalPrisma = new GlobalPrismaClient();
 
 // Auto-generate Company ID (C001, C002, etc.)
 async function generateCompanyId(): Promise<string> {
@@ -479,8 +477,7 @@ class CompanyService {
       return [...confirmedCompanies, ...pendingCompanies];
     } catch (error) {
       console.error('Error fetching user companies:', error);
-      // Return empty array instead of throwing to prevent login issues
-      return [];
+      throw error;
     }
   }
 

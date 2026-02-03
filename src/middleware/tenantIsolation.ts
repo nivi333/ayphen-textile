@@ -55,7 +55,6 @@ export const tenantIsolationMiddleware = async (
         return;
       }
 
-      req.tenantPrisma = databaseManager.getTenantPrisma(decoded.tenantId);
       logger.debug(`Tenant context set: ${decoded.tenantId}`);
     }
 

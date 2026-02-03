@@ -76,49 +76,24 @@ class AnalyticsService {
       // Check cache first
       const cacheKey = `analytics:dashboard:${companyId}`;
       const cached = await redisClient.get(cacheKey).catch(() => null);
-      
+
       if (cached) {
         logger.info(`Cache hit for dashboard analytics: ${companyId}`);
         return JSON.parse(cached);
       }
-      
+
       logger.info(`Cache miss for dashboard analytics: ${companyId}`);
       // Run all queries in parallel for better performance
       const [
-        productsCount,
-        ordersCount,
-        teamMembersCount,
         invoicesData,
         billsData,
         purchaseOrdersData,
         inventoryData,
         inspectionsData,
         machinesData,
-        customersCount,
-        suppliersCount,
         textileData,
+        monthlyInvoices,
       ] = await Promise.all([
-        // Products count
-        globalPrisma.products.count({
-          where: { company_id: companyId, is_active: true },
-        }),
-
-        // Active orders count (not DELIVERED or CANCELLED)
-        globalPrisma.orders.count({
-          where: {
-            company_id: companyId,
-            is_active: true,
-            status: {
-              notIn: ['DELIVERED', 'CANCELLED'],
-            },
-          },
-        }),
-
-        // Team members count
-        globalPrisma.user_companies.count({
-          where: { company_id: companyId, is_active: true },
-        }),
-
         // Invoices data
         globalPrisma.invoices.aggregate({
           where: { company_id: companyId },
@@ -151,9 +126,7 @@ class AnalyticsService {
         // Inventory data
         globalPrisma.location_inventory.aggregate({
           where: {
-            product: {
-              company_id: companyId,
-            },
+            company_id: companyId,
           },
           _sum: {
             stock_quantity: true,
@@ -174,17 +147,7 @@ class AnalyticsService {
           _count: true,
         }),
 
-        // Customers count
-        globalPrisma.customers.count({
-          where: { company_id: companyId, is_active: true },
-        }),
-
-        // Suppliers count
-        globalPrisma.suppliers.count({
-          where: { company_id: companyId, is_active: true },
-        }),
-
-        // Textile operations data (wrapped in try-catch to handle connection pool issues)
+        // Textile operations data
         Promise.all([
           globalPrisma.fabric_production
             .count({
@@ -207,64 +170,45 @@ class AnalyticsService {
             })
             .catch(() => 0),
         ]),
+
+        // Monthly revenue
+        globalPrisma.invoices.aggregate({
+          where: {
+            company_id: companyId,
+            invoice_date: {
+              gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+            },
+          },
+          _sum: {
+            total_amount: true,
+          },
+        }),
       ]);
 
-      // Calculate monthly revenue (current month from invoices)
-      const currentMonth = new Date();
-      currentMonth.setDate(1);
-      currentMonth.setHours(0, 0, 0, 0);
+      // Group simple counts into a single query to reduce round-trips
+      const countsResult = await globalPrisma.$queryRaw<any[]>`
+        SELECT 
+          (SELECT COUNT(*)::int FROM products WHERE company_id = ${companyId} AND is_active = true) as products_count,
+          (SELECT COUNT(*)::int FROM orders WHERE company_id = ${companyId} AND is_active = true AND status NOT IN ('DELIVERED', 'CANCELLED')) as orders_count,
+          (SELECT COUNT(*)::int FROM user_companies WHERE company_id = ${companyId} AND is_active = true) as team_count,
+          (SELECT COUNT(*)::int FROM customers WHERE company_id = ${companyId} AND is_active = true) as customers_count,
+          (SELECT COUNT(*)::int FROM suppliers WHERE company_id = ${companyId} AND is_active = true) as suppliers_count,
+          (SELECT COUNT(*)::int FROM invoices WHERE company_id = ${companyId} AND status = 'OVERDUE') as overdue_invoices_count,
+          (SELECT COUNT(*)::int FROM location_inventory WHERE company_id = ${companyId} AND stock_quantity <= COALESCE(reorder_level, 10) AND stock_quantity > 0) as low_stock_count,
+          (SELECT COUNT(*)::int FROM location_inventory WHERE company_id = ${companyId} AND stock_quantity = 0) as out_of_stock_count,
+          (SELECT COUNT(*)::int FROM quality_defects WHERE company_id = ${companyId} AND resolution_status IN ('OPEN', 'IN_PROGRESS')) as active_defects_count
+      `;
 
-      const monthlyInvoices = await globalPrisma.invoices.aggregate({
-        where: {
-          company_id: companyId,
-          invoice_date: {
-            gte: currentMonth,
-          },
-        },
-        _sum: {
-          total_amount: true,
-        },
-      });
-
-      // Count overdue invoices
-      const overdueInvoicesCount = await globalPrisma.invoices.count({
-        where: {
-          company_id: companyId,
-          status: 'OVERDUE',
-        },
-      });
-
-      // Count low stock and out of stock products
-      const lowStockCount = await globalPrisma.location_inventory.count({
-        where: {
-          product: {
-            company_id: companyId,
-          },
-          stock_quantity: {
-            lte: globalPrisma.location_inventory.fields.reorder_level,
-            gt: 0,
-          },
-        },
-      });
-
-      const outOfStockCount = await globalPrisma.location_inventory.count({
-        where: {
-          product: {
-            company_id: companyId,
-          },
-          stock_quantity: 0,
-        },
-      });
-
-      // Count active defects
-      const activeDefectsCount = await globalPrisma.quality_defects.count({
-        where: {
-          company_id: companyId,
-          resolution_status: {
-            in: ['OPEN', 'IN_PROGRESS'],
-          },
-        },
-      });
+      const counts = countsResult[0] || {};
+      const productsCount = counts.products_count;
+      const ordersCount = counts.orders_count;
+      const teamMembersCount = counts.team_count;
+      const customersCount = counts.customers_count;
+      const suppliersCount = counts.suppliers_count;
+      const overdueInvoicesCount = counts.overdue_invoices_count;
+      const lowStockCount = counts.low_stock_count;
+      const outOfStockCount = counts.out_of_stock_count;
+      const activeDefectsCount = counts.active_defects_count;
 
       // Process inspections data
       const inspectionsMap = inspectionsData.reduce(
@@ -350,39 +294,23 @@ class AnalyticsService {
       startDate.setDate(1);
       startDate.setHours(0, 0, 0, 0);
 
-      const invoices = await globalPrisma.invoices.findMany({
-        where: {
-          company_id: companyId,
-          invoice_date: {
-            gte: startDate,
-          },
-        },
-        select: {
-          invoice_date: true,
-          total_amount: true,
-        },
-        orderBy: {
-          invoice_date: 'asc',
-        },
-      });
+      const trends = await globalPrisma.$queryRaw<any[]>`
+        SELECT 
+          TO_CHAR(invoice_date, 'YYYY-MM') as month,
+          COALESCE(SUM(total_amount), 0) as revenue,
+          COUNT(*)::integer as orders
+        FROM invoices
+        WHERE company_id = ${companyId} 
+          AND invoice_date >= ${startDate}
+          AND is_active = true
+        GROUP BY TO_CHAR(invoice_date, 'YYYY-MM')
+        ORDER BY month ASC
+      `;
 
-      // Group by month
-      const monthlyData: Record<string, { revenue: number; orders: number }> = {};
-
-      invoices.forEach(invoice => {
-        const monthKey = invoice.invoice_date.toISOString().substring(0, 7); // YYYY-MM
-        if (!monthlyData[monthKey]) {
-          monthlyData[monthKey] = { revenue: 0, orders: 0 };
-        }
-        monthlyData[monthKey].revenue += Number(invoice.total_amount);
-        monthlyData[monthKey].orders += 1;
-      });
-
-      // Convert to array and format
-      return Object.entries(monthlyData).map(([month, data]) => ({
-        month,
-        revenue: data.revenue,
-        orders: data.orders,
+      return trends.map(item => ({
+        month: item.month,
+        revenue: Number(item.revenue),
+        orders: item.orders,
       }));
     } catch (error: any) {
       console.error('Error fetching revenue trends:', error);

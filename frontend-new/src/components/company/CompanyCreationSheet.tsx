@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -87,6 +87,8 @@ export function CompanyCreationSheet({
   const [loading, setLoading] = useState(false);
   const [originalSlug, setOriginalSlug] = useState<string>('');
   const [originalName, setOriginalName] = useState<string>('');
+  const nameTimeoutRef = useRef<any>(null);
+  const slugTimeoutRef = useRef<any>(null);
 
   const isEditing = mode === 'edit' && !!editingCompanyId;
 
@@ -159,14 +161,24 @@ export function CompanyCreationSheet({
 
   // Auto-generate slug from name (only for create mode)
   const handleNameChange = (value: string) => {
-    checkNameUnique(value);
+    // Debounce name uniqueness check
+    if (nameTimeoutRef.current) clearTimeout(nameTimeoutRef.current);
+    nameTimeoutRef.current = setTimeout(() => {
+      checkNameUnique(value);
+    }, 500);
+
     if (!isEditing) {
       const slug = value
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '');
       form.setValue('slug', slug);
-      checkSlugUnique(slug);
+
+      // Debounce slug uniqueness check
+      if (slugTimeoutRef.current) clearTimeout(slugTimeoutRef.current);
+      slugTimeoutRef.current = setTimeout(() => {
+        checkSlugUnique(slug);
+      }, 500);
     }
   };
 
@@ -463,7 +475,11 @@ export function CompanyCreationSheet({
                                     .toLowerCase()
                                     .replace(/[^a-z0-9-]+/g, '');
                                   field.onChange(value);
-                                  checkSlugUnique(value);
+                                  // Debounce manual slug check
+                                  if (slugTimeoutRef.current) clearTimeout(slugTimeoutRef.current);
+                                  slugTimeoutRef.current = setTimeout(() => {
+                                    checkSlugUnique(value);
+                                  }, 500);
                                 }
                               }}
                             />

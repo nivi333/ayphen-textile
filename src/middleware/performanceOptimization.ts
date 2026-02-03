@@ -13,7 +13,7 @@ export const performanceOptimization = (req: Request, res: Response, next: NextF
   // Add response time tracking
   res.on('finish', () => {
     const duration = Date.now() - startTime;
-    
+
     // Log slow requests (> 1 second)
     if (duration > 1000) {
       logger.warn(`Slow request detected: ${req.method} ${req.path} took ${duration}ms`, {
@@ -28,9 +28,19 @@ export const performanceOptimization = (req: Request, res: Response, next: NextF
 
   // Set cache headers for GET requests
   if (req.method === 'GET') {
-    // Cache static data for 5 minutes
-    if (req.path.includes('/products') || req.path.includes('/locations') || req.path.includes('/customers')) {
-      res.setHeader('Cache-Control', 'private, max-age=300');
+    // API data endpoints should NOT be cached - they change frequently with user actions
+    // (e.g., creating a product should immediately show in the list)
+    if (
+      req.path.includes('/products') ||
+      req.path.includes('/locations') ||
+      req.path.includes('/customers') ||
+      req.path.includes('/suppliers') ||
+      req.path.includes('/orders') ||
+      req.path.includes('/inventory')
+    ) {
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
     }
   }
 
@@ -73,7 +83,7 @@ export const queryOptimizationHints = {
       image_url: true,
     },
   },
-  
+
   // Pagination defaults
   pagination: {
     defaultLimit: 20,

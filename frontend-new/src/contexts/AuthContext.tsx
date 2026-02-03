@@ -134,7 +134,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   // Login function (must call backend API)
-  const login = async (credentials: LoginCredentials) => {
+  const login = useCallback(async (credentials: LoginCredentials) => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
       dispatch({ type: 'SET_ERROR', payload: null });
@@ -186,10 +186,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       dispatch({ type: 'SET_ERROR', payload: error.message || 'Login failed. Please try again.' });
       throw error;
     }
-  };
+  }, []);
 
   // Register function (must call backend API)
-  const register = async (userData: any) => {
+  const register = useCallback(async (userData: any) => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
       dispatch({ type: 'SET_ERROR', payload: null });
@@ -216,10 +216,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       });
       throw error;
     }
-  };
+  }, []);
 
   // Forgot Password function (must call backend API)
-  const forgotPassword = async (email: string) => {
+  const forgotPassword = useCallback(async (email: string) => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
       dispatch({ type: 'SET_ERROR', payload: null });
@@ -246,14 +246,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
       });
       throw error;
     }
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     AuthStorage.clearAll();
     dispatch({ type: 'LOGOUT' });
-  };
+  }, []);
 
-  const switchCompany = async (company: Company) => {
+  const switchCompany = useCallback(async (company: Company) => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
 
@@ -297,18 +297,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false });
     }
-  };
+  }, []);
 
-  const refreshToken = async () => {
+  const refreshToken = useCallback(async () => {
     try {
       // TODO: Implement real refresh token API call here
       throw new Error('refreshToken API not implemented');
     } catch {
       logout();
     }
-  };
+  }, [logout]);
 
-  const refreshCompanies = async () => {
+  const refreshCompanies = useCallback(async () => {
     try {
       const tokens = AuthStorage.getTokens();
       if (!tokens?.accessToken) {
@@ -338,9 +338,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.error('Error refreshing companies:', error);
       throw error;
     }
-  };
+  }, []);
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     try {
       const tokens = AuthStorage.getTokens();
       const currentUser = AuthStorage.getUser();
@@ -386,7 +386,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.error('Error refreshing user:', error);
       // Don't throw, just log
     }
-  };
+  }, []);
 
   // Clear error state - memoized to prevent useEffect dependency loops
   const clearError = useCallback(() => {

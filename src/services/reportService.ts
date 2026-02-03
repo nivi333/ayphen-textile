@@ -32,7 +32,14 @@ export class ReportService {
           lte: endDate,
         },
       },
-      include: {
+      select: {
+        id: true,
+        total_amount: true,
+        balance_due: true,
+        status: true,
+        invoice_date: true,
+        customer_id: true,
+        customer_name: true,
         customer: {
           select: {
             id: true,
@@ -41,7 +48,12 @@ export class ReportService {
           },
         },
         invoice_items: {
-          include: {
+          select: {
+            product_id: true,
+            description: true,
+            quantity: true,
+            line_amount: true,
+            item_code: true,
             product: {
               select: {
                 id: true,
@@ -180,7 +192,12 @@ export class ReportService {
 
     const inventory = await this.prisma.location_inventory.findMany({
       where,
-      include: {
+      select: {
+        id: true,
+        product_id: true,
+        location_id: true,
+        stock_quantity: true,
+        reorder_level: true,
         product: {
           select: {
             id: true,
@@ -297,7 +314,12 @@ export class ReportService {
     // Get all inventory items where stock is at or below reorder level
     const inventory = await this.prisma.location_inventory.findMany({
       where,
-      include: {
+      select: {
+        id: true,
+        product_id: true,
+        location_id: true,
+        stock_quantity: true,
+        reorder_level: true,
         product: {
           select: {
             id: true,
@@ -1880,7 +1902,15 @@ export class ReportService {
     // Fetch all stock movements in date range
     const movements = await this.prisma.stock_movements.findMany({
       where,
-      include: {
+      select: {
+        id: true,
+        movement_type: true,
+        quantity: true,
+        total_cost: true,
+        product_id: true,
+        from_location_id: true,
+        to_location_id: true,
+        created_at: true,
         from_location: {
           select: {
             id: true,

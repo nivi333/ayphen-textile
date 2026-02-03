@@ -117,9 +117,10 @@ export class CompanyController {
           error.message.includes('Invalid `connection_1.globalPrisma'));
 
       if (prismaSessionError) {
-        res.status(401).json({
+        res.status(503).json({
           success: false,
-          message: 'Session timeout. Try login again!',
+          message:
+            'Database connection issue. The system is under high load, please try again in a few seconds.',
         });
         return;
       }

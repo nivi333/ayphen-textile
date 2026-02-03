@@ -1,7 +1,11 @@
 import dotenv from 'dotenv';
+import path from 'path';
 import { URL } from 'url';
 
-dotenv.config();
+// Load .env.local first (for local overrides), then .env (for defaults)
+// dotenv won't override existing variables, so .env.local takes precedence
+dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
 interface Config {
   env: string;

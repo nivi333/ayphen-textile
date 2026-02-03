@@ -8,10 +8,10 @@ let globalPrismaInstance: PrismaClient | null = null;
 
 function getGlobalPrisma(): PrismaClient {
   if (!globalPrismaInstance) {
-    // Add connection_limit to DATABASE_URL for Prisma connection pooling
+    const { maxConnections, connectionTimeout, idleTimeout } = config.database;
     const dbUrl = config.database.url.includes('?')
-      ? `${config.database.url}&connection_limit=5&pool_timeout=20&connect_timeout=10`
-      : `${config.database.url}?connection_limit=5&pool_timeout=20&connect_timeout=10`;
+      ? `${config.database.url}&connection_limit=${maxConnections}&pool_timeout=${connectionTimeout / 1000}&connect_timeout=15`
+      : `${config.database.url}?connection_limit=${maxConnections}&pool_timeout=${connectionTimeout / 1000}&connect_timeout=15`;
 
     globalPrismaInstance = new PrismaClient({
       datasources: {
@@ -69,6 +69,7 @@ export async function ensureDatabaseConnection(): Promise<boolean> {
 // Connection pool manager for tenant-specific databases
 class DatabaseManager {
   private tenantPools = new Map<string, Pool>();
+  // @deprecated Tenant-specific Prisma clients are no longer used in favor of globalPrisma with column isolation
   private tenantPrismaClients = new Map<string, PrismaClient>();
 
   /**
@@ -107,15 +108,17 @@ class DatabaseManager {
   }
 
   /**
-   * Get or create a Prisma client for a specific tenant with optimized pooling
+   * @deprecated Get or create a Prisma client for a specific tenant.
+   * Moved to globalPrisma with column-based isolation for better performance.
    */
   getTenantPrisma(tenantId: string): PrismaClient {
+    logger.warn(`getTenantPrisma called for tenant ${tenantId}. This is deprecated.`);
     if (!this.tenantPrismaClients.has(tenantId)) {
       const schemaName = this.getSchemaName(tenantId);
       // Create a connection URL with schema search_path and connection pooling
       const baseUrl = config.database.url;
       const separator = baseUrl.includes('?') ? '&' : '?';
-      const tenantUrl = `${baseUrl}${separator}options=-c%20search_path%3D${schemaName}%2Cpublic&connection_limit=2&pool_timeout=10`;
+      const tenantUrl = `${baseUrl}${separator}options=-c%20search_path%3D${schemaName}%2Cpublic&connection_limit=5&pool_timeout=15`;
 
       const prismaClient = new PrismaClient({
         datasources: {
@@ -131,7 +134,6 @@ class DatabaseManager {
       });
 
       this.tenantPrismaClients.set(tenantId, prismaClient);
-      logger.info(`Created Prisma client for tenant: ${tenantId} with schema: ${schemaName}`);
     }
 
     return this.tenantPrismaClients.get(tenantId)!;
