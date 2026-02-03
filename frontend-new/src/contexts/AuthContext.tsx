@@ -133,24 +133,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
     initializeAuth();
   }, []);
 
-  // Keep-alive ping to prevent backend from sleeping on Render Free Tier
+  // Warm up backend on app load (initial wake up)
   useEffect(() => {
-    const pingBackend = async () => {
+    const warmUpBackend = async () => {
       try {
         await fetch(`${API_BASE_URL}/health/ping`);
       } catch (error) {
-        // Silent error, ping failed but it's okay
-        console.warn('Keep-alive ping failed');
+        // Silent error
       }
     };
-
-    // Ping every 1 minutes (60,000 ms)
-    const interval = setInterval(pingBackend, 60000);
-
-    // Initial ping
-    pingBackend();
-
-    return () => clearInterval(interval);
+    warmUpBackend();
   }, []);
 
   // Login function (must call backend API)
