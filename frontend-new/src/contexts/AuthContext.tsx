@@ -144,8 +144,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
     };
 
-    // Ping every 5 minutes (300,000 ms)
-    const interval = setInterval(pingBackend, 300000);
+    // Ping every 1 minutes (60,000 ms)
+    const interval = setInterval(pingBackend, 60000);
 
     // Initial ping
     pingBackend();
