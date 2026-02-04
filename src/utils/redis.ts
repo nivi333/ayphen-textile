@@ -10,7 +10,12 @@ class RedisManager {
   constructor() {
     let clientConfig: any;
     if (process.env.REDIS_URL) {
-      clientConfig = { url: process.env.REDIS_URL };
+      const isTLS = process.env.REDIS_URL.startsWith('rediss://');
+      clientConfig = {
+        url: process.env.REDIS_URL,
+        socket: isTLS ? { tls: true, rejectUnauthorized: false } : undefined,
+      };
+      logger.info(`Initializing Redis with URL (TLS: ${isTLS})`);
     } else {
       clientConfig = {
         socket: {

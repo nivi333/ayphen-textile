@@ -32,7 +32,7 @@ services:
         fromService:
           name: lavoro-redis
           type: redis
-          property: connectionString
+          property: internalConnectionString
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_REFRESH_SECRET
