@@ -6,6 +6,7 @@ class RedisManager {
   private client: RedisClientType;
   private isConnected: boolean = false;
   private lastError: string | null = null;
+  private configSummary: any = {};
 
   constructor() {
     let clientConfig: any;
@@ -31,6 +32,11 @@ class RedisManager {
     }
 
     this.client = createClient(clientConfig);
+    this.configSummary = {
+      host: clientConfig.socket?.host || (clientConfig.url ? 'URL' : 'N/A'),
+      port: clientConfig.socket?.port || 'N/A',
+      hasPassword: !!clientConfig.password,
+    };
 
     this.setupEventHandlers();
   }
@@ -105,6 +111,10 @@ class RedisManager {
 
   getLastError(): string | null {
     return this.lastError;
+  }
+
+  getConfigSummary(): any {
+    return this.configSummary;
   }
 
   // Convenience methods for common operations

@@ -25,6 +25,7 @@ router.get('/', async (req, res) => {
         api: 'healthy',
         database: 'checking...',
         redis: 'checking...',
+        redisConfig: redisClient.getConfigSummary(),
       },
     };
 
