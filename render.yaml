@@ -10,7 +10,7 @@ services:
     ipAllowList: []
 
   - type: web
-    name: ayphen-textile-backend
+    name: ayphen-textile
     runtime: node
     plan: free
     autoDeploy: true
@@ -28,21 +28,11 @@ services:
         sync: false
       - key: DIRECT_URL
         sync: false
-      - key: REDIS_HOST
+      - key: REDIS_URL
         fromService:
           name: lavoro-redis
           type: redis
-          property: host
-      - key: REDIS_PORT
-        fromService:
-          name: lavoro-redis
-          type: redis
-          property: port
-      - key: REDIS_PASSWORD
-        fromService:
-          name: lavoro-redis
-          type: redis
-          property: password
+          property: internalConnectionString
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_REFRESH_SECRET
