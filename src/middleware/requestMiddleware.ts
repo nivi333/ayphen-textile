@@ -23,15 +23,13 @@ export const corsMiddleware = cors({
           : [configOrigin];
 
     // Add common Netlify and Vercel patterns
-    const netlifyPatterns = [
-      'https://ayphentextile.netlify.app',
-      'https://ayphen-textile.netlify.app',
-      /https:\/\/.*\.netlify\.app$/,
+    const vercelPatterns = [
+      'https://ayphen-textile.vercel.app',
+      'https://ayphen-textile-frontend.vercel.app',
+      /https:\/\/.*\.vercel\.app$/,
     ];
 
-    const vercelPatterns = ['https://ayphen-textile.vercel.app', /https:\/\/.*\.vercel\.app$/];
-
-    const allPatterns = [...netlifyPatterns, ...vercelPatterns];
+    const allPatterns = [...vercelPatterns];
 
     // Allow all origins in development OR any Vercel deployment
     if (config.env === 'development' || (origin && origin.endsWith('.vercel.app'))) {
