@@ -829,25 +829,26 @@ export class ReportService {
     // Calculate revenue
     const totalRevenue = invoices.reduce((sum, inv) => sum + Number(inv.total_amount), 0);
 
+    // Get expenses (direct expenses)
+    const expenses = await this.prisma.expenses.findMany({
+      where: {
+        company_id: companyId,
+        is_active: true,
+        status: 'APPROVED',
+        expense_date: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+    });
+
     // Calculate cost of goods sold (simplified)
-    const costOfGoodsSold = bills.reduce(
-      (sum, bill) =>
-        sum +
-        bill.bill_items
-          // Simplified: assume all items are products for now
-          .reduce((itemSum, item) => itemSum + Number(item.line_amount) * 0.7, 0), // 70% of bill amount as COGS
-      0
-    );
+    const totalBills = bills.reduce((sum, bill) => sum + Number(bill.total_amount), 0);
+    const costOfGoodsSold = totalBills; // Assuming Bills = Purchases/COGS for now
 
     // Calculate operating expenses
-    const operatingExpenses = bills.reduce(
-      (sum, bill) =>
-        sum +
-        bill.bill_items
-          // Simplified: assume 30% of bill amount is operating expenses
-          .reduce((itemSum, item) => itemSum + Number(item.line_amount) * 0.3, 0), // 30% of bill amount as expenses
-      0
-    );
+    const totalDirectExpenses = expenses.reduce((sum, exp) => sum + Number(exp.amount), 0);
+    const operatingExpenses = totalDirectExpenses;
 
     // Calculate gross profit and net profit
     const grossProfit = totalRevenue - costOfGoodsSold;
@@ -883,31 +884,33 @@ export class ReportService {
       item.percentage = totalRevenue > 0 ? (item.revenue / totalRevenue) * 100 : 0;
     });
 
-    // Expense breakdown by category (simplified)
-    const expenseCategories = ['Raw Materials', 'Labor', 'Utilities', 'Rent', 'Other'];
-    const expenseBreakdown = bills.reduce(
-      (acc, bill) => {
-        // Distribute bill amount across predefined categories
-        bill.bill_items.forEach(item => {
-          // Assign to a random category for demonstration
-          const categoryIndex = Math.floor(Math.random() * expenseCategories.length);
-          const category = expenseCategories[categoryIndex];
+    // Expense breakdown by category
+    const expenseBreakdown = expenses.reduce(
+      (acc, exp) => {
+        const category = exp.category || 'Uncategorized';
 
-          if (!acc[category]) {
-            acc[category] = {
-              category,
-              amount: 0,
-              percentage: 0,
-            };
-          }
+        if (!acc[category]) {
+          acc[category] = {
+            category,
+            amount: 0,
+            percentage: 0,
+          };
+        }
 
-          acc[category].amount += Number(item.line_amount);
-        });
-
+        acc[category].amount += Number(exp.amount);
         return acc;
       },
       {} as Record<string, any>
     );
+
+    // Add Bills sum to expense breakdown as "Material Purchases"
+    if (totalBills > 0) {
+      expenseBreakdown['Material Purchases (Bills)'] = {
+        category: 'Material Purchases',
+        amount: totalBills,
+        percentage: 0,
+      };
+    }
 
     // Calculate percentages for expense breakdown
     const totalExpenses = costOfGoodsSold + operatingExpenses;
@@ -937,8 +940,8 @@ export class ReportService {
           },
         });
 
-        // Get expenses for month
-        const monthExpenses = await this.prisma.bills.aggregate({
+        // Get bills for month
+        const monthBills = await this.prisma.bills.aggregate({
           where: {
             company_id: companyId,
             is_active: true,
@@ -952,13 +955,30 @@ export class ReportService {
           },
         });
 
+        // Get expenses for month
+        const monthDirectExpenses = await this.prisma.expenses.aggregate({
+          where: {
+            company_id: companyId,
+            is_active: true,
+            status: 'APPROVED',
+            expense_date: {
+              gte: monthStart,
+              lte: monthEnd,
+            },
+          },
+          _sum: {
+            amount: true,
+          },
+        });
+
+        const totalMonthCosts =
+          Number(monthBills._sum.total_amount || 0) + Number(monthDirectExpenses._sum.amount || 0);
+
         return {
           period: `${month.year}-${String(month.month + 1).padStart(2, '0')}`,
           revenue: Number(monthRevenue._sum.total_amount || 0),
-          expenses: Number(monthExpenses._sum.total_amount || 0),
-          profit:
-            Number(monthRevenue._sum.total_amount || 0) -
-            Number(monthExpenses._sum.total_amount || 0),
+          expenses: totalMonthCosts,
+          profit: Number(monthRevenue._sum.total_amount || 0) - totalMonthCosts,
         };
       })
     );
@@ -1033,27 +1053,32 @@ export class ReportService {
       },
     });
 
+    // Get Petty Cash Accounts for Cash
+    const pettyCashAccounts = await this.prisma.petty_cash_accounts.findMany({
+      where: {
+        company_id: companyId,
+        is_active: true,
+      },
+    });
+
     // Calculate current assets
     const accountsReceivable = invoices.reduce((sum, inv) => sum + Number(inv.balance_due), 0);
-
     const inventoryValue = inventory.reduce(
-      (sum, item) => sum + Number(item.stock_quantity) * Number(item.product?.cost_price || 0),
+      (sum, item) => sum + Number(item.stock_quantity) * Number(item.product?.selling_price || 0), // Valuation at selling price for now, preferably cost price
       0
     );
-
-    // Simplified cash calculation (would come from bank accounts in real system)
-    const cash = 100000; // Placeholder value
+    const cash = pettyCashAccounts.reduce((sum, acc) => sum + Number(acc.current_balance), 0);
 
     const currentAssets = [
-      { category: 'Cash', amount: cash },
+      { category: 'Cash & Equivalents', amount: cash },
       { category: 'Accounts Receivable', amount: accountsReceivable },
       { category: 'Inventory', amount: inventoryValue },
     ];
 
-    // Calculate fixed assets (simplified)
+    // Calculate fixed assets (TODO: Implement Fixed Asset Register)
     const fixedAssets = [
-      { category: 'Property & Equipment', amount: 500000 }, // Placeholder
-      { category: 'Accumulated Depreciation', amount: -50000 }, // Placeholder
+      { category: 'Property & Equipment', amount: 0 },
+      { category: 'Accumulated Depreciation', amount: 0 },
     ];
 
     // Calculate current liabilities
@@ -1061,15 +1086,13 @@ export class ReportService {
 
     const currentLiabilities = [
       { category: 'Accounts Payable', amount: accountsPayable },
-      { category: 'Accrued Expenses', amount: 25000 }, // Placeholder
+      { category: 'Accrued Expenses', amount: 0 }, // TODO: Implement Accruals
     ];
 
-    // Calculate long-term liabilities (simplified)
-    const longTermLiabilities = [
-      { category: 'Long-term Loans', amount: 200000 }, // Placeholder
-    ];
+    // Calculate long-term liabilities (TODO: Implement Loans)
+    const longTermLiabilities = [{ category: 'Long-term Loans', amount: 0 }];
 
-    // Calculate equity (simplified)
+    // Calculate equity
     const totalCurrentAssets = currentAssets.reduce((sum, asset) => sum + asset.amount, 0);
     const totalFixedAssets = fixedAssets.reduce((sum, asset) => sum + asset.amount, 0);
     const totalCurrentLiabilities = currentLiabilities.reduce(
@@ -1085,9 +1108,10 @@ export class ReportService {
     const totalLiabilities = totalCurrentLiabilities + totalLongTermLiabilities;
     const totalEquity = totalAssets - totalLiabilities;
 
+    // TODO: Implement proper Equity accounts (Capital, Drawings, etc.)
     const equity = [
-      { category: "Owner's Capital", amount: 100000 }, // Placeholder
-      { category: 'Retained Earnings', amount: totalEquity - 100000 }, // Calculated
+      { category: "Owner's Capital", amount: 0 },
+      { category: 'Retained Earnings', amount: totalEquity }, // Balancing figure
     ];
 
     return {
@@ -1156,37 +1180,27 @@ export class ReportService {
     const operatingCashFlow = cashFromCustomers - cashToSuppliers;
 
     // Simplified investing and financing activities
-    const investingCashFlow = -50000; // Placeholder for equipment purchases
-    const financingCashFlow = 100000; // Placeholder for loan proceeds
+    const investingCashFlow = 0; // TODO: Implement Asset Purchases
+    const financingCashFlow = 0; // TODO: Implement Loans/Equity Injections
 
     // Calculate net cash flow
     const netCashFlow = operatingCashFlow + investingCashFlow + financingCashFlow;
 
-    // Simplified beginning and ending cash balances
-    const beginningCashBalance = 75000; // Placeholder
+    // Simplified beginning and ending cash balances (TODO: Track daily cash balances)
+    const beginningCashBalance = 0;
     const endingCashBalance = beginningCashBalance + netCashFlow;
 
     // Detailed operating activities
     const operatingActivities = [
       { category: 'Cash from Customers', amount: cashFromCustomers },
       { category: 'Cash to Suppliers', amount: -cashToSuppliers },
-      { category: 'Wages and Salaries', amount: -30000 }, // Placeholder
-      { category: 'Interest Paid', amount: -5000 }, // Placeholder
-      { category: 'Taxes Paid', amount: -15000 }, // Placeholder
     ];
 
     // Detailed investing activities
-    const investingActivities = [
-      { category: 'Purchase of Equipment', amount: -50000 }, // Placeholder
-      { category: 'Sale of Assets', amount: 0 }, // Placeholder
-    ];
+    const investingActivities: any[] = [];
 
     // Detailed financing activities
-    const financingActivities = [
-      { category: 'Loan Proceeds', amount: 100000 }, // Placeholder
-      { category: 'Loan Repayments', amount: 0 }, // Placeholder
-      { category: 'Dividends Paid', amount: 0 }, // Placeholder
-    ];
+    const financingActivities: any[] = [];
 
     return {
       summary: {
@@ -1217,20 +1231,64 @@ export class ReportService {
     }
 
     // Simplified trial balance with placeholder accounts
+    // Get Petty Cash Accounts for Cash
+    const pettyCashAccounts = await this.prisma.petty_cash_accounts.findMany({
+      where: {
+        company_id: companyId,
+        is_active: true,
+      },
+    });
+    const cash = pettyCashAccounts.reduce((sum, acc) => sum + Number(acc.current_balance), 0);
+
+    // Get AR and AP
+    const invoices = await this.prisma.invoices.findMany({
+      where: {
+        company_id: companyId,
+        is_active: true,
+        status: { in: ['SENT', 'PARTIALLY_PAID', 'OVERDUE'] },
+      },
+    });
+    const bills = await this.prisma.bills.findMany({
+      where: {
+        company_id: companyId,
+        is_active: true,
+        status: { in: ['RECEIVED', 'PARTIALLY_PAID', 'OVERDUE'] },
+      },
+    });
+    const accountsReceivable = invoices.reduce((sum, inv) => sum + Number(inv.balance_due), 0);
+    const accountsPayable = bills.reduce((sum, bill) => sum + Number(bill.balance_due), 0);
+
+    // Get Inventory Value
+    const inventory = await this.prisma.location_inventory.findMany({
+      where: { company_id: companyId },
+      include: { product: true },
+    });
+    const inventoryValue = inventory.reduce(
+      (sum, item) => sum + Number(item.stock_quantity) * Number(item.product?.selling_price || 0),
+      0
+    );
+
+    // Get Sales Revenue (All time or YTD? Trial Balance usually snapshots. For simplicity, we'll placeholder income/expense as 0 for Balance Sheet focus, or we'd need a date range for P&L items. TB usually shows ending balances of all accounts.  )
+    // For now, implementing Real Real Accounts (Assets/Liabilities). Nominal accounts (Revenue/Expense) require a fiscal year context which we don't strictly have here.
+    // We will calculate Retained Earnings as the plug.
+
     const accounts = [
-      { accountCode: '1000', accountName: 'Cash', debit: 75000, credit: 0 },
-      { accountCode: '1100', accountName: 'Accounts Receivable', debit: 120000, credit: 0 },
-      { accountCode: '1200', accountName: 'Inventory', debit: 250000, credit: 0 },
-      { accountCode: '1500', accountName: 'Property & Equipment', debit: 500000, credit: 0 },
-      { accountCode: '1600', accountName: 'Accumulated Depreciation', debit: 0, credit: 50000 },
-      { accountCode: '2000', accountName: 'Accounts Payable', debit: 0, credit: 85000 },
-      { accountCode: '2100', accountName: 'Accrued Expenses', debit: 0, credit: 25000 },
-      { accountCode: '2500', accountName: 'Long-term Loans', debit: 0, credit: 200000 },
-      { accountCode: '3000', accountName: "Owner's Capital", debit: 0, credit: 100000 },
-      { accountCode: '3100', accountName: 'Retained Earnings', debit: 0, credit: 485000 },
-      { accountCode: '4000', accountName: 'Sales Revenue', debit: 0, credit: 750000 },
-      { accountCode: '5000', accountName: 'Cost of Goods Sold', debit: 450000, credit: 0 },
-      { accountCode: '6000', accountName: 'Operating Expenses', debit: 300000, credit: 0 },
+      { accountCode: '1000', accountName: 'Cash & Equivalents', debit: cash, credit: 0 },
+      {
+        accountCode: '1100',
+        accountName: 'Accounts Receivable',
+        debit: accountsReceivable,
+        credit: 0,
+      },
+      { accountCode: '1200', accountName: 'Inventory', debit: inventoryValue, credit: 0 },
+      { accountCode: '2000', accountName: 'Accounts Payable', debit: 0, credit: accountsPayable },
+      // Equity plug
+      {
+        accountCode: '3000',
+        accountName: 'Retained Earnings',
+        debit: 0,
+        credit: cash + accountsReceivable + inventoryValue - accountsPayable,
+      },
     ];
 
     // Calculate totals
@@ -1299,24 +1357,30 @@ export class ReportService {
       },
     });
 
-    // Calculate output tax (simplified as 18% of invoice amount)
+    // Calculate output tax (Using actual tax_amount from invoices)
     const outputTax = invoices.map(inv => ({
       invoiceId: inv.invoice_id,
       customerName: inv.customer?.name || inv.customer_name || 'Unknown',
       invoiceDate: inv.invoice_date.toISOString().split('T')[0],
-      taxableAmount: Number(inv.total_amount) / 1.18, // Remove tax component
-      taxAmount: Number(inv.total_amount) - Number(inv.total_amount) / 1.18,
-      taxRate: 18,
+      taxableAmount: Number(inv.total_amount) - Number(inv.tax_amount || 0),
+      taxAmount: Number(inv.tax_amount || 0),
+      taxRate:
+        Number(inv.tax_amount || 0) > 0
+          ? (Number(inv.tax_amount) / (Number(inv.total_amount) - Number(inv.tax_amount))) * 100
+          : 0,
     }));
 
-    // Calculate input tax (simplified as 18% of bill amount)
+    // Calculate input tax (Using actual tax_amount from bills)
     const inputTax = bills.map(bill => ({
       billId: bill.bill_id,
       supplierName: bill.supplier?.name || bill.supplier_name || 'Unknown',
       billDate: bill.bill_date.toISOString().split('T')[0],
-      taxableAmount: Number(bill.total_amount) / 1.18, // Remove tax component
-      taxAmount: Number(bill.total_amount) - Number(bill.total_amount) / 1.18,
-      taxRate: 18,
+      taxableAmount: Number(bill.total_amount) - Number(bill.tax_amount || 0),
+      taxAmount: Number(bill.tax_amount || 0),
+      taxRate:
+        Number(bill.tax_amount || 0) > 0
+          ? (Number(bill.tax_amount) / (Number(bill.total_amount) - Number(bill.tax_amount))) * 100
+          : 0,
     }));
 
     // Calculate summary

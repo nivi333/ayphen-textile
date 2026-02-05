@@ -19,6 +19,7 @@ interface ExpenseSummaryReportProps {
   searchText: string;
   triggerFetch: number;
   onLoadingChange: (loading: boolean) => void;
+  currency: string;
 }
 
 const ExpenseSummaryReport: React.FC<ExpenseSummaryReportProps> = ({
@@ -26,6 +27,7 @@ const ExpenseSummaryReport: React.FC<ExpenseSummaryReportProps> = ({
   searchText,
   triggerFetch,
   onLoadingChange,
+  currency,
 }) => {
   const [data, setData] = useState<ExpenseData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -59,7 +61,7 @@ const ExpenseSummaryReport: React.FC<ExpenseSummaryReportProps> = ({
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'INR',
+      currency: currency || 'INR',
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(amount);

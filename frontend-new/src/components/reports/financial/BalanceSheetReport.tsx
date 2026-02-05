@@ -18,12 +18,14 @@ interface BalanceSheetReportProps {
   searchText: string;
   triggerFetch: number;
   onLoadingChange: (loading: boolean) => void;
+  currency: string;
 }
 
 const BalanceSheetReport: React.FC<BalanceSheetReportProps> = ({
   asOfDate,
   triggerFetch,
   onLoadingChange,
+  currency,
 }) => {
   const [data, setData] = useState<BalanceSheetData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -51,7 +53,7 @@ const BalanceSheetReport: React.FC<BalanceSheetReportProps> = ({
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'INR',
+      currency: currency || 'INR', // Use passed currency
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(amount);

@@ -18,9 +18,15 @@ interface GSTReportProps {
   searchText: string;
   triggerFetch: number;
   onLoadingChange: (loading: boolean) => void;
+  currency: string;
 }
 
-const GSTReport: React.FC<GSTReportProps> = ({ dateRange, triggerFetch, onLoadingChange }) => {
+const GSTReport: React.FC<GSTReportProps> = ({
+  dateRange,
+  triggerFetch,
+  onLoadingChange,
+  currency,
+}) => {
   const [data, setData] = useState<GSTData | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -52,7 +58,7 @@ const GSTReport: React.FC<GSTReportProps> = ({ dateRange, triggerFetch, onLoadin
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'INR',
+      currency: currency || 'INR',
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(amount);

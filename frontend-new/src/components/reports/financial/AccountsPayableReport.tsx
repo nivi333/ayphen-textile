@@ -18,6 +18,7 @@ interface AccountsPayableReportProps {
   searchText: string;
   triggerFetch: number;
   onLoadingChange: (loading: boolean) => void;
+  currency: string;
 }
 
 const AccountsPayableReport: React.FC<AccountsPayableReportProps> = ({
@@ -25,6 +26,7 @@ const AccountsPayableReport: React.FC<AccountsPayableReportProps> = ({
   searchText,
   triggerFetch,
   onLoadingChange,
+  currency,
 }) => {
   const [data, setData] = useState<APAgingData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -52,7 +54,7 @@ const AccountsPayableReport: React.FC<AccountsPayableReportProps> = ({
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'INR',
+      currency: currency || 'INR',
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(amount);

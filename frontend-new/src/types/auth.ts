@@ -16,6 +16,7 @@ export interface Company {
   logoUrl?: string;
   role: CompanyRole;
   country?: string;
+  currency?: string;
   description?: string;
   status?: 'CONFIRMED' | 'PENDING';
   invitationId?: string;

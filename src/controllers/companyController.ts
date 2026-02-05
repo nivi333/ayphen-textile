@@ -16,6 +16,7 @@ const createCompanySchema = Joi.object({
     .optional(),
   industry: Joi.string().max(100).required(),
   country: Joi.string().max(100).required(),
+  currency: Joi.string().max(3).uppercase().required(),
   contactInfo: Joi.string().min(1).max(100).required(),
   establishedDate: Joi.date().required(),
   businessType: Joi.string().max(100).required(),
@@ -47,6 +48,7 @@ const updateCompanySchema = Joi.object({
   description: Joi.string().max(500).allow(null, '').optional(),
   logoUrl: Joi.string().max(3000000).optional(), // Allow up to ~3MB for base64 encoded 2MB images
   country: Joi.string().max(100).optional(),
+  currency: Joi.string().max(3).uppercase().optional(),
   defaultLocation: Joi.string().min(1).max(255).optional(),
   address1: Joi.string().min(1).max(255).optional(),
   address2: Joi.string().max(255).allow('').optional(),

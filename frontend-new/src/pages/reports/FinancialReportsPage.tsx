@@ -12,6 +12,7 @@ import GSTReport from '@/components/reports/financial/GSTReport';
 import AccountsReceivableReport from '@/components/reports/financial/AccountsReceivableReport';
 import AccountsPayableReport from '@/components/reports/financial/AccountsPayableReport';
 import ExpenseSummaryReport from '@/components/reports/financial/ExpenseSummaryReport';
+import { AuthStorage } from '@/utils/storage';
 
 const FinancialReportsPage = () => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -23,6 +24,12 @@ const FinancialReportsPage = () => {
   const [triggerFetch, setTriggerFetch] = useState(0);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('profit-loss');
+  const user = AuthStorage.getUser();
+  // Get currency from active company or default to INR
+  const company = AuthStorage.getCurrentCompany();
+  // We assume company object has currency field now (added to type)
+  // If not found in storage, default to INR
+  const currency = company?.currency || 'INR';
 
   const handleGenerate = () => {
     setTriggerFetch(prev => prev + 1);
@@ -86,6 +93,7 @@ const FinancialReportsPage = () => {
               searchText={searchText}
               triggerFetch={triggerFetch}
               onLoadingChange={setLoading}
+              currency={currency}
             />
           </TabsContent>
           <TabsContent value='balance-sheet'>
@@ -94,6 +102,7 @@ const FinancialReportsPage = () => {
               searchText={searchText}
               triggerFetch={triggerFetch}
               onLoadingChange={setLoading}
+              currency={currency}
             />
           </TabsContent>
           <TabsContent value='cash-flow'>
@@ -102,6 +111,7 @@ const FinancialReportsPage = () => {
               searchText={searchText}
               triggerFetch={triggerFetch}
               onLoadingChange={setLoading}
+              currency={currency}
             />
           </TabsContent>
           <TabsContent value='trial-balance'>
@@ -110,6 +120,7 @@ const FinancialReportsPage = () => {
               searchText={searchText}
               triggerFetch={triggerFetch}
               onLoadingChange={setLoading}
+              currency={currency}
             />
           </TabsContent>
           <TabsContent value='gst'>
@@ -118,6 +129,7 @@ const FinancialReportsPage = () => {
               searchText={searchText}
               triggerFetch={triggerFetch}
               onLoadingChange={setLoading}
+              currency={currency}
             />
           </TabsContent>
           <TabsContent value='ar-aging'>
@@ -126,6 +138,7 @@ const FinancialReportsPage = () => {
               searchText={searchText}
               triggerFetch={triggerFetch}
               onLoadingChange={setLoading}
+              currency={currency}
             />
           </TabsContent>
           <TabsContent value='ap-aging'>
@@ -134,6 +147,7 @@ const FinancialReportsPage = () => {
               searchText={searchText}
               triggerFetch={triggerFetch}
               onLoadingChange={setLoading}
+              currency={currency}
             />
           </TabsContent>
           <TabsContent value='expenses'>
@@ -142,6 +156,7 @@ const FinancialReportsPage = () => {
               searchText={searchText}
               triggerFetch={triggerFetch}
               onLoadingChange={setLoading}
+              currency={currency}
             />
           </TabsContent>
         </div>

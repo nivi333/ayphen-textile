@@ -18,6 +18,7 @@ interface TrialBalanceReportProps {
   searchText: string;
   triggerFetch: number;
   onLoadingChange: (loading: boolean) => void;
+  currency: string;
 }
 
 const TrialBalanceReport: React.FC<TrialBalanceReportProps> = ({
@@ -25,6 +26,7 @@ const TrialBalanceReport: React.FC<TrialBalanceReportProps> = ({
   searchText,
   triggerFetch,
   onLoadingChange,
+  currency,
 }) => {
   const [data, setData] = useState<TrialBalanceData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -52,7 +54,7 @@ const TrialBalanceReport: React.FC<TrialBalanceReportProps> = ({
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'INR',
+      currency: currency || 'INR',
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(amount);
