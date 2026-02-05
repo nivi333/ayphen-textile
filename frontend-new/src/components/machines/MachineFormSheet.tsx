@@ -497,7 +497,9 @@ export function MachineFormSheet({
                             date={field.value}
                             setDate={field.onChange}
                             placeholder='Select purchase date'
-                            disabled={date => date > new Date() || date < new Date('1900-01-01')}
+                            disabledDates={(date: Date) =>
+                              date > new Date() || date < new Date('1900-01-01')
+                            }
                             className='w-full'
                           />
                         </FormControl>
@@ -517,7 +519,7 @@ export function MachineFormSheet({
                             date={field.value}
                             setDate={field.onChange}
                             placeholder='Select warranty expiry'
-                            disabled={date => date < new Date('1900-01-01')}
+                            disabledDates={(date: Date) => date < new Date('1900-01-01')}
                             className='w-full'
                           />
                         </FormControl>

@@ -393,7 +393,9 @@ export function GarmentManufacturingSheet({
                           date={field.value}
                           setDate={field.onChange}
                           placeholder='Select cut date'
-                          disabled={date => date > new Date() || date < new Date('1900-01-01')}
+                          disabledDates={(date: Date) =>
+                            date > new Date() || date < new Date('1900-01-01')
+                          }
                           className='w-full'
                         />
                       </FormControl>
@@ -412,7 +414,9 @@ export function GarmentManufacturingSheet({
                           date={field.value}
                           setDate={field.onChange}
                           placeholder='Select sew date'
-                          disabled={date => date > new Date() || date < new Date('1900-01-01')}
+                          disabledDates={(date: Date) =>
+                            date > new Date() || date < new Date('1900-01-01')
+                          }
                           className='w-full'
                         />
                       </FormControl>
@@ -431,7 +435,9 @@ export function GarmentManufacturingSheet({
                           date={field.value}
                           setDate={field.onChange}
                           placeholder='Select finish date'
-                          disabled={date => date > new Date() || date < new Date('1900-01-01')}
+                          disabledDates={(date: Date) =>
+                            date > new Date() || date < new Date('1900-01-01')
+                          }
                           className='w-full'
                         />
                       </FormControl>
@@ -450,7 +456,9 @@ export function GarmentManufacturingSheet({
                           date={field.value}
                           setDate={field.onChange}
                           placeholder='Select pack date'
-                          disabled={date => date > new Date() || date < new Date('1900-01-01')}
+                          disabledDates={(date: Date) =>
+                            date > new Date() || date < new Date('1900-01-01')
+                          }
                           className='w-full'
                         />
                       </FormControl>

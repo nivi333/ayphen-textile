@@ -330,7 +330,9 @@ export function DyeingFinishingSheet({
                           date={field.value}
                           setDate={field.onChange}
                           placeholder='Select process date'
-                          disabled={date => date > new Date() || date < new Date('1900-01-01')}
+                          disabledDates={(date: Date) =>
+                            date > new Date() || date < new Date('1900-01-01')
+                          }
                           className='w-full'
                         />
                       </FormControl>
