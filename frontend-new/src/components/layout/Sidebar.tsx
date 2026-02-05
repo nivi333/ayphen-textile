@@ -107,11 +107,6 @@ const navItems: NavItem[] = [
         icon: <Shield className='h-4 w-4' />,
         path: '/quality/compliance',
       },
-      {
-        label: 'Quality Reports',
-        icon: <BarChart3 className='h-4 w-4' />,
-        path: '/quality/reports',
-      },
     ],
   },
   {
@@ -162,7 +157,6 @@ const navItems: NavItem[] = [
       { label: 'Sales Reports', icon: <ShoppingBag className='h-4 w-4' />, path: '/reports/sales' },
     ],
   },
-  { label: 'Legal', icon: <FileCheck className='h-5 w-5' />, path: '/legal' },
 ];
 
 export default function Sidebar({ collapsed, onToggle }: SidebarProps) {

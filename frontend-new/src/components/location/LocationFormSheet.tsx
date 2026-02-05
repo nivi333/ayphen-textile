@@ -101,6 +101,16 @@ export function LocationFormSheet({
         setNameUnique(true);
       } else {
         form.reset({
+          name: '',
+          email: '',
+          phone: '',
+          country: '',
+          addressLine1: '',
+          addressLine2: '',
+          city: '',
+          state: '',
+          pincode: '',
+          locationType: 'BRANCH',
           isActive: true,
           isDefault: false,
           isHeadquarters: false,

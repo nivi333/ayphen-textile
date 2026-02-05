@@ -99,6 +99,7 @@ export default function BillsListPage() {
   const [editingBill, setEditingBill] = useState<any | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [billToDelete, setBillToDelete] = useState<BillSummary | null>(null);
+  const [isDetailLoading, setIsDetailLoading] = useState(false);
 
   const { currentCompany } = useAuth();
 
@@ -157,15 +158,18 @@ export default function BillsListPage() {
   };
 
   const handleEdit = async (bill: BillSummary) => {
+    setEditingBill(null);
+    setIsDetailLoading(true);
+    setIsSheetOpen(true);
+
     try {
-      setLoading(true);
       const details = await billService.getBillById(bill.billId);
       setEditingBill(details);
-      setIsSheetOpen(true);
     } catch (error) {
       toast.error('Failed to load bill details');
+      setIsSheetOpen(false);
     } finally {
-      setLoading(false);
+      setIsDetailLoading(false);
     }
   };
 
@@ -194,11 +198,16 @@ export default function BillsListPage() {
   };
 
   const handleStatusChange = async (billId: string, newStatus: BillStatus) => {
+    // Optimistic update
+    const previousBills = [...bills];
+    setBills(prev => prev.map(b => (b.billId === billId ? { ...b, status: newStatus } : b)));
+    toast.success(`Bill status updated to ${STATUS_CONFIG[newStatus].label}`);
+
     try {
       await billService.updateBillStatus(billId, newStatus);
-      toast.success(`Bill status updated to ${STATUS_CONFIG[newStatus].label}`);
       fetchBills();
     } catch (error: any) {
+      setBills(previousBills);
       toast.error(error.message || 'Failed to update status');
     }
   };
@@ -294,7 +303,7 @@ export default function BillsListPage() {
                   new Date(bill.dueDate) < new Date();
 
                 return (
-                  <TableRow key={bill.billId}>
+                  <TableRow key={bill.billId} data-testid='bill-row'>
                     <TableCell className='font-medium'>
                       <div>{bill.billId}</div>
                       {bill.billNumber && (
@@ -340,7 +349,11 @@ export default function BillsListPage() {
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant='ghost' className='h-8 w-8 p-0'>
+                          <Button
+                            variant='ghost'
+                            className='h-8 w-8 p-0'
+                            data-testid='bill-actions'
+                          >
                             <span className='sr-only'>Open menu</span>
                             <MoreHorizontal className='h-4 w-4' />
                           </Button>
@@ -393,6 +406,7 @@ export default function BillsListPage() {
           setEditingBill(null);
         }}
         initialData={editingBill}
+        isLoading={isDetailLoading}
       />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

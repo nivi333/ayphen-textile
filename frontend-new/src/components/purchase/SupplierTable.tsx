@@ -94,7 +94,7 @@ export function SupplierTable({
       </TableHeader>
       <TableBody>
         {suppliers.map(supplier => (
-          <TableRow key={supplier.id}>
+          <TableRow key={supplier.id} data-testid='supplier-row'>
             <TableCell className='font-mono text-xs'>{supplier.code}</TableCell>
             <TableCell>
               <div className='flex items-center gap-3'>
@@ -141,7 +141,11 @@ export function SupplierTable({
             <TableCell>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <IconButton variant='ghost' className='h-8 w-8 p-0'>
+                  <IconButton
+                    variant='ghost'
+                    className='h-8 w-8 p-0'
+                    data-testid='supplier-actions'
+                  >
                     <MoreHorizontal className='h-4 w-4' />
                   </IconButton>
                 </DropdownMenuTrigger>

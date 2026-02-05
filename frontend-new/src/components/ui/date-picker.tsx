@@ -9,11 +9,11 @@ import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
-interface DatePickerProps extends React.HTMLAttributes<HTMLDivElement> {
+interface DatePickerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   date: Date | undefined;
   setDate: (date: Date | undefined) => void;
   placeholder?: string;
-  disabled?: (date: Date) => boolean;
+  disabledDates?: (date: Date) => boolean;
 }
 
 export function DatePicker({
@@ -21,7 +21,8 @@ export function DatePicker({
   setDate,
   placeholder = 'Pick a date',
   className,
-  disabled,
+  disabledDates,
+  ...props
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
 
@@ -42,6 +43,7 @@ export function DatePicker({
             'w-[240px] justify-start text-left font-normal data-[empty=true]:text-muted-foreground',
             className
           )}
+          {...props}
         >
           <CalendarIcon className='mr-2 h-4 w-4' />
           {date ? format(date, 'PPP') : <span>{placeholder}</span>}
@@ -52,7 +54,7 @@ export function DatePicker({
           mode='single'
           selected={date}
           onSelect={handleSelect}
-          disabled={disabled}
+          disabled={disabledDates}
           captionLayout='dropdown'
           fromYear={1800}
           toYear={2030}

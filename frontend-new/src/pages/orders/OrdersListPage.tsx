@@ -100,6 +100,7 @@ export default function OrdersListPage() {
   const [editingOrder, setEditingOrder] = useState<any | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState<string | null>(null);
+  const [isDetailLoading, setIsDetailLoading] = useState(false);
 
   const { currentCompany } = useAuth();
 
@@ -153,16 +154,20 @@ export default function OrdersListPage() {
   };
 
   const handleEdit = async (order: OrderSummary) => {
+    // Open sheet immediately to prevent delay
+    setEditingOrder(null);
+    setIsDetailLoading(true);
+    setIsSheetOpen(true);
+
     try {
-      setLoading(true);
-      // We need full details for editing, list view might be summary
+      // Fetch full details while sheet is open
       const details = await orderService.getOrderById(order.orderId);
       setEditingOrder(details);
-      setIsSheetOpen(true);
     } catch (error) {
       toast.error('Failed to load order details');
+      setIsSheetOpen(false);
     } finally {
-      setLoading(false);
+      setIsDetailLoading(false);
     }
   };
 
@@ -186,11 +191,18 @@ export default function OrdersListPage() {
   };
 
   const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
+    // Optimistic update
+    const previousOrders = [...orders];
+    setOrders(prev => prev.map(o => (o.orderId === orderId ? { ...o, status: newStatus } : o)));
+    toast.success(`Order status updated to ${STATUS_CONFIG[newStatus].label}`);
+
     try {
       await orderService.updateOrderStatus(orderId, newStatus);
-      toast.success(`Order status updated to ${STATUS_CONFIG[newStatus].label}`);
+      // Background refresh to ensure consistency
       fetchOrders();
     } catch (error: any) {
+      // Revert on failure
+      setOrders(previousOrders);
       toast.error(error.message || 'Failed to update status');
     }
   };
@@ -280,7 +292,7 @@ export default function OrdersListPage() {
                 };
 
                 return (
-                  <TableRow key={order.orderId}>
+                  <TableRow key={order.orderId} data-testid='order-row'>
                     <TableCell className='font-medium'>{order.orderId}</TableCell>
                     <TableCell>
                       <div className='font-medium'>{order.customerName}</div>
@@ -302,7 +314,11 @@ export default function OrdersListPage() {
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant='ghost' className='h-8 w-8 p-0'>
+                          <Button
+                            variant='ghost'
+                            className='h-8 w-8 p-0'
+                            data-testid='order-actions'
+                          >
                             <span className='sr-only'>Open menu</span>
                             <MoreHorizontal className='h-4 w-4' />
                           </Button>
@@ -352,6 +368,7 @@ export default function OrdersListPage() {
         }}
         onSaved={handleRefresh}
         initialData={editingOrder}
+        isLoading={isDetailLoading}
       />
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>

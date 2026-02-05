@@ -105,15 +105,21 @@ export function FabricProductionSheet({
         });
       } else {
         form.reset({
-          isActive: true,
-          quantityMeters: 0,
+          fabricName: '',
+          fabricType: '',
+          composition: '',
           weightGsm: 0,
           widthInches: 0,
-          productionDate: new Date(),
-          imageUrl: '',
+          color: '',
           pattern: '',
           finishType: '',
+          quantityMeters: 0,
+          productionDate: new Date(),
+          batchNumber: '',
+          qualityGrade: '',
+          imageUrl: '',
           notes: '',
+          isActive: true,
         });
       }
     }
@@ -250,7 +256,16 @@ export function FabricProductionSheet({
                     <FormItem>
                       <FormLabel required>Weight (GSM)</FormLabel>
                       <FormControl>
-                        <Input type='number' min='0' step='0.1' placeholder='0.0' {...field} />
+                        <Input
+                          type='number'
+                          min='0'
+                          step='0.1'
+                          placeholder='0.0'
+                          {...field}
+                          onChange={e =>
+                            field.onChange(e.target.value === '' ? 0 : Number(e.target.value))
+                          }
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -263,7 +278,16 @@ export function FabricProductionSheet({
                     <FormItem>
                       <FormLabel required>Width (Inches)</FormLabel>
                       <FormControl>
-                        <Input type='number' min='0' step='0.1' placeholder='0.0' {...field} />
+                        <Input
+                          type='number'
+                          min='0'
+                          step='0.1'
+                          placeholder='0.0'
+                          {...field}
+                          onChange={e =>
+                            field.onChange(e.target.value === '' ? 0 : Number(e.target.value))
+                          }
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -329,7 +353,16 @@ export function FabricProductionSheet({
                     <FormItem>
                       <FormLabel required>Quantity (Meters)</FormLabel>
                       <FormControl>
-                        <Input type='number' min='0' step='0.1' placeholder='0.0' {...field} />
+                        <Input
+                          type='number'
+                          min='0'
+                          step='0.1'
+                          placeholder='0.0'
+                          {...field}
+                          onChange={e =>
+                            field.onChange(e.target.value === '' ? 0 : Number(e.target.value))
+                          }
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

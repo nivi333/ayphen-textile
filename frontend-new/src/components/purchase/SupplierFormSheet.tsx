@@ -58,44 +58,32 @@ const supplierSchema = z.object({
 
   // Financial
   paymentTerms: z.string().optional(),
-  creditPeriod: z.preprocess(
-    val => {
-      if (val === '' || val === null || val === undefined) return undefined;
-      const num = Number(val);
-      return isNaN(num) ? undefined : num;
-    },
-    z.number().min(0).optional()
-  ),
+  creditPeriod: z.preprocess(val => {
+    if (val === '' || val === null || val === undefined) return undefined;
+    const num = Number(val);
+    return isNaN(num) ? undefined : num;
+  }, z.number().min(0).optional()),
   currency: z.string().optional(),
   taxId: z.string().optional(),
   panNumber: z.string().optional(),
   bankDetails: z.string().optional(),
 
   // Supply Info
-  leadTimeDays: z.preprocess(
-    val => {
-      if (val === '' || val === null || val === undefined) return undefined;
-      const num = Number(val);
-      return isNaN(num) ? undefined : num;
-    },
-    z.number().min(0).optional()
-  ),
-  minOrderQty: z.preprocess(
-    val => {
-      if (val === '' || val === null || val === undefined) return undefined;
-      const num = Number(val);
-      return isNaN(num) ? undefined : num;
-    },
-    z.number().min(0).optional()
-  ),
-  minOrderValue: z.preprocess(
-    val => {
-      if (val === '' || val === null || val === undefined) return undefined;
-      const num = Number(val);
-      return isNaN(num) ? undefined : num;
-    },
-    z.number().min(0).optional()
-  ),
+  leadTimeDays: z.preprocess(val => {
+    if (val === '' || val === null || val === undefined) return undefined;
+    const num = Number(val);
+    return isNaN(num) ? undefined : num;
+  }, z.number().min(0).optional()),
+  minOrderQty: z.preprocess(val => {
+    if (val === '' || val === null || val === undefined) return undefined;
+    const num = Number(val);
+    return isNaN(num) ? undefined : num;
+  }, z.number().min(0).optional()),
+  minOrderValue: z.preprocess(val => {
+    if (val === '' || val === null || val === undefined) return undefined;
+    const num = Number(val);
+    return isNaN(num) ? undefined : num;
+  }, z.number().min(0).optional()),
 
   // Quality & Compliance
   qualityRating: z.string().optional(),
@@ -233,6 +221,7 @@ export function SupplierFormSheet({
         supplierCategory: '',
         assignedManager: '',
         notes: '',
+        tags: [],
         isActive: true,
       });
       setOriginalName('');
@@ -250,8 +239,9 @@ export function SupplierFormSheet({
       setNameUnique(true);
       return;
     }
-    if (initialData && name.trim().toLowerCase() === originalName.toLowerCase()) {
+    if (initialData && name.trim().toLowerCase() === originalName.trim().toLowerCase()) {
       setNameUnique(true);
+      setNameChecking(false);
       return;
     }
     try {
@@ -265,13 +255,20 @@ export function SupplierFormSheet({
     }
   };
 
-  // Debounce name validation
   useEffect(() => {
     const nameValue = form.watch('name');
     if (!nameValue) return;
+
+    // Don't check if the name hasn't changed from original
+    if (initialData && nameValue.trim().toLowerCase() === originalName.trim().toLowerCase()) {
+      setNameUnique(true);
+      setNameChecking(false);
+      return;
+    }
+
     const timeoutId = setTimeout(() => checkNameUnique(nameValue), 500);
     return () => clearTimeout(timeoutId);
-  }, [form.watch('name')]);
+  }, [form.watch('name'), originalName, initialData]);
 
   const handleSubmit = async (data: SupplierFormValues) => {
     if (!nameUnique) {
@@ -315,7 +312,9 @@ export function SupplierFormSheet({
                   name='name'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Supplier Name</FormLabel>
+                      <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                        Supplier Name
+                      </FormLabel>
                       <FormControl>
                         <div className='relative'>
                           <Input
@@ -346,21 +345,29 @@ export function SupplierFormSheet({
                   name='supplierType'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Supplier Type</FormLabel>
+                      <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                        Supplier Type
+                      </FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                         value={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger data-testid='supplier-type-select'>
                             <SelectValue placeholder='Select type' />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value='MANUFACTURER'>Manufacturer</SelectItem>
-                          <SelectItem value='DISTRIBUTOR'>Distributor</SelectItem>
-                          <SelectItem value='WHOLESALER'>Wholesaler</SelectItem>
+                          <SelectItem value='MANUFACTURER' data-testid='type-manufacturer'>
+                            Manufacturer
+                          </SelectItem>
+                          <SelectItem value='DISTRIBUTOR' data-testid='type-distributor'>
+                            Distributor
+                          </SelectItem>
+                          <SelectItem value='WHOLESALER' data-testid='type-wholesaler'>
+                            Wholesaler
+                          </SelectItem>
                           <SelectItem value='IMPORTER'>Importer</SelectItem>
                           <SelectItem value='LOCAL_VENDOR'>Local Vendor</SelectItem>
                         </SelectContent>

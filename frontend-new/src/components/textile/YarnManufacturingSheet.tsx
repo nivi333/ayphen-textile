@@ -41,7 +41,7 @@ const yarnSchema = z.object({
   yarnName: z.string().min(1, 'Yarn name is required'),
   yarnType: z.string().min(1, 'Yarn type is required'),
   fiberContent: z.string().min(1, 'Fiber content is required'),
-  yarnCount: z.coerce.number().min(0, 'Yarn count must be positive'),
+  yarnCount: z.string().min(1, 'Yarn count is required'),
   twistType: z.string().min(1, 'Twist type is required'),
   twistPerInch: z.coerce.number().min(0).optional(),
   ply: z.coerce.number().min(0).optional(),
@@ -79,7 +79,7 @@ export function YarnManufacturingSheet({
     resolver: zodResolver(yarnSchema),
     defaultValues: {
       isActive: true,
-      yarnCount: 0,
+      yarnCount: '',
       quantityKg: 0,
       productionDate: new Date(),
     },
@@ -92,7 +92,7 @@ export function YarnManufacturingSheet({
           yarnName: yarn.yarnName,
           yarnType: yarn.yarnType,
           fiberContent: yarn.fiberContent,
-          yarnCount: Number(yarn.yarnCount) || 0, // Handling string/number mismatch if any
+          yarnCount: String(yarn.yarnCount) || '', // Handling string/number mismatch if any
           twistType: yarn.twistType || '',
           twistPerInch: yarn.twistPerInch || 0,
           ply: yarn.ply || 1,
@@ -109,16 +109,23 @@ export function YarnManufacturingSheet({
         });
       } else {
         form.reset({
-          isActive: true,
-          yarnCount: 0,
-          quantityKg: 0,
-          ply: 1,
-          productionDate: new Date(),
-          imageUrl: '',
+          yarnName: '',
+          yarnType: '',
+          fiberContent: '',
+          yarnCount: '',
           twistType: '',
+          twistPerInch: 0,
+          ply: 1,
+          color: '',
           dyeLot: '',
+          quantityKg: 0,
+          productionDate: new Date(),
+          batchNumber: '',
           processType: '',
+          qualityGrade: '',
+          imageUrl: '',
           notes: '',
+          isActive: true,
         });
       }
     }
@@ -257,7 +264,7 @@ export function YarnManufacturingSheet({
                     <FormItem>
                       <FormLabel required>Yarn Count</FormLabel>
                       <FormControl>
-                        <Input type='number' min='0' step='0.1' placeholder='0.0' {...field} />
+                        <Input placeholder='e.g., 40s or 20' {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -313,7 +320,7 @@ export function YarnManufacturingSheet({
                   name='twistType'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Twist Type</FormLabel>
+                      <FormLabel required>Twist Type</FormLabel>
                       <FormControl>
                         <Input placeholder='e.g., Z-Twist' {...field} />
                       </FormControl>
@@ -351,7 +358,16 @@ export function YarnManufacturingSheet({
                     <FormItem>
                       <FormLabel required>Quantity (Kg)</FormLabel>
                       <FormControl>
-                        <Input type='number' min='0' step='0.1' placeholder='0.0' {...field} />
+                        <Input
+                          type='number'
+                          min='0'
+                          step='0.1'
+                          placeholder='0.0'
+                          {...field}
+                          onChange={e =>
+                            field.onChange(e.target.value === '' ? 0 : Number(e.target.value))
+                          }
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

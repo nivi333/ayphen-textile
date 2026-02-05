@@ -66,14 +66,11 @@ const customerSchema = z
 
     // Financial
     paymentTerms: z.string().optional(),
-    creditLimit: z.preprocess(
-      val => {
-        if (val === '' || val === null || val === undefined) return undefined;
-        const num = Number(val);
-        return isNaN(num) ? undefined : num;
-      },
-      z.number().min(0).optional()
-    ),
+    creditLimit: z.preprocess(val => {
+      if (val === '' || val === null || val === undefined) return undefined;
+      const num = Number(val);
+      return isNaN(num) ? undefined : num;
+    }, z.number().min(0).optional()),
     currency: z.string().optional(),
     taxId: z.string().optional(),
     panNumber: z.string().optional(),
@@ -279,8 +276,9 @@ export function CustomerFormSheet({
       setNameUnique(true);
       return;
     }
-    if (initialData && name.trim().toLowerCase() === originalName.toLowerCase()) {
+    if (initialData && name.trim().toLowerCase() === originalName.trim().toLowerCase()) {
       setNameUnique(true);
+      setNameChecking(false);
       return;
     }
     try {
@@ -294,13 +292,20 @@ export function CustomerFormSheet({
     }
   };
 
-  // Debounce name validation
   useEffect(() => {
     const nameValue = form.watch('name');
     if (!nameValue) return;
+
+    // Don't check if the name hasn't changed from original
+    if (initialData && nameValue.trim().toLowerCase() === originalName.trim().toLowerCase()) {
+      setNameUnique(true);
+      setNameChecking(false);
+      return;
+    }
+
     const timeoutId = setTimeout(() => checkNameUnique(nameValue), 500);
     return () => clearTimeout(timeoutId);
-  }, [form.watch('name')]);
+  }, [form.watch('name'), originalName, initialData]);
 
   const handleSubmit = async (data: CustomerFormValues) => {
     if (!nameUnique) {
@@ -388,13 +393,17 @@ export function CustomerFormSheet({
                         value={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger data-testid='customer-type-select'>
                             <SelectValue placeholder='Select type' />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value='BUSINESS'>Business</SelectItem>
-                          <SelectItem value='INDIVIDUAL'>Individual</SelectItem>
+                          <SelectItem value='BUSINESS' data-testid='type-business'>
+                            Business
+                          </SelectItem>
+                          <SelectItem value='INDIVIDUAL' data-testid='type-individual'>
+                            Individual
+                          </SelectItem>
                           <SelectItem value='DISTRIBUTOR'>Distributor</SelectItem>
                           <SelectItem value='RETAILER'>Retailer</SelectItem>
                           <SelectItem value='WHOLESALER'>Wholesaler</SelectItem>
@@ -436,14 +445,20 @@ export function CustomerFormSheet({
                         value={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger data-testid='customer-category-select'>
                             <SelectValue placeholder='Select category' />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value='VIP'>VIP</SelectItem>
-                          <SelectItem value='REGULAR'>Regular</SelectItem>
-                          <SelectItem value='NEW'>New</SelectItem>
+                          <SelectItem value='VIP' data-testid='category-vip'>
+                            VIP
+                          </SelectItem>
+                          <SelectItem value='REGULAR' data-testid='category-regular'>
+                            Regular
+                          </SelectItem>
+                          <SelectItem value='NEW' data-testid='category-new'>
+                            New
+                          </SelectItem>
                           <SelectItem value='INACTIVE'>Inactive</SelectItem>
                         </SelectContent>
                       </Select>

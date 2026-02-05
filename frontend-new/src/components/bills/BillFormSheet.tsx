@@ -26,6 +26,7 @@ import { Separator } from '@/components/ui/separator';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/utils';
 
 import { billService, CreateBillRequest, BillDetail, PaymentTerms } from '@/services/billService';
 import { supplierService, Supplier } from '@/services/supplierService';
@@ -37,11 +38,11 @@ const billItemSchema = z.object({
   productId: z.string().optional(),
   itemCode: z.string().min(1, 'Item code is required'),
   description: z.string().optional(),
-  quantity: z.number().min(0.001, 'Quantity must be greater than 0'),
+  quantity: z.coerce.number().min(0.001, 'Quantity must be greater than 0'),
   unitOfMeasure: z.string().min(1, 'UOM is required'),
-  unitCost: z.number().min(0, 'Unit cost must be non-negative'),
-  discountPercent: z.number().min(0).max(100).optional(),
-  taxRate: z.number().min(0).max(100).optional(),
+  unitCost: z.coerce.number().min(0, 'Unit cost must be non-negative'),
+  discountPercent: z.coerce.number().min(0).max(100).optional(),
+  taxRate: z.coerce.number().min(0).max(100).optional(),
 });
 
 const billSchema = z.object({
@@ -61,7 +62,7 @@ const billSchema = z.object({
   }),
   paymentTerms: z.string().optional(),
   currency: z.string().max(10).optional(),
-  shippingCharges: z.number().min(0).optional(),
+  shippingCharges: z.coerce.number().min(0).optional(),
   notes: z.string().max(1000).optional(),
   supplierInvoiceNo: z.string().max(100).optional(),
   isActive: z.boolean().default(true),
@@ -101,9 +102,10 @@ interface BillFormSheetProps {
   open: boolean;
   onClose: () => void;
   initialData?: BillDetail | null;
+  isLoading?: boolean;
 }
 
-export function BillFormSheet({ open, onClose, initialData }: BillFormSheetProps) {
+export function BillFormSheet({ open, onClose, initialData, isLoading }: BillFormSheetProps) {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -114,7 +116,7 @@ export function BillFormSheet({ open, onClose, initialData }: BillFormSheetProps
   const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrderSummary[]>([]);
   const dataFetchedRef = useRef(false);
 
-  const isEditing = !!initialData;
+  const isEditing = !!initialData || !!isLoading;
 
   const form = useForm<BillFormValues>({
     resolver: zodResolver(billSchema) as any,
@@ -170,7 +172,7 @@ export function BillFormSheet({ open, onClose, initialData }: BillFormSheetProps
       dataFetchedRef.current = true;
       fetchData();
     }
-    
+
     if (!open) {
       dataFetchedRef.current = false;
     }
@@ -206,28 +208,55 @@ export function BillFormSheet({ open, onClose, initialData }: BillFormSheetProps
             taxRate: item.taxRate || 0,
           })),
         });
-      } else {
-        const defaultLocation = locations.find(l => l.isDefault && l.isHeadquarters);
-        form.reset({
-          currency: 'INR',
-          billDate: new Date(),
-          dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-          paymentTerms: 'NET_30',
-          isActive: true,
-          shippingCharges: 0,
-          locationId: defaultLocation?.id,
-          items: [
-            {
-              itemCode: '',
-              description: '',
-              quantity: 1,
-              unitOfMeasure: 'PCS',
-              unitCost: 0,
-              discountPercent: 0,
-              taxRate: 0,
-            },
-          ],
-        });
+        if (!initialData) {
+          const defaultLocation = locations.find(l => l.isDefault && l.isHeadquarters);
+          const currentLocationId = form.getValues('locationId');
+
+          if (!currentLocationId && defaultLocation) {
+            form.setValue('locationId', defaultLocation.id);
+          }
+
+          // Only reset if we haven't initialized yet (using a ref or check if form is dirty)
+          // But since we want to keep the reset for other fields but PRESERVE the location if already set:
+          // Actually, simply removing the full form.reset for new entries in this effect might be safer
+          // if we only want to set defaults.
+          // However, the original code used reset to set ALL defaults.
+          // Let's use reset options or check if values are effectively default.
+
+          // Better approach: Only reset if the form is not dirty, or just set specific defaults.
+          // The issue is likely that fetchData finishes, triggers this effect, and re-resets.
+
+          // If we are creating new (no initialData), and we haven't touched the form:
+          if (!form.formState.isDirty) {
+            form.reset({
+              supplierId: '',
+              supplierName: '',
+              supplierCode: '',
+              purchaseOrderId: '',
+              locationId: defaultLocation?.id || '',
+              billNumber: '',
+              billDate: new Date(),
+              dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+              paymentTerms: 'NET_30',
+              currency: 'INR',
+              shippingCharges: 0,
+              notes: '',
+              supplierInvoiceNo: '',
+              isActive: true,
+              items: [
+                {
+                  itemCode: '',
+                  description: '',
+                  quantity: 1,
+                  unitOfMeasure: 'PCS',
+                  unitCost: 0,
+                  discountPercent: 0,
+                  taxRate: 0,
+                },
+              ],
+            });
+          }
+        }
       }
     }
   }, [open, initialData, locations, form]);
@@ -357,7 +386,7 @@ export function BillFormSheet({ open, onClose, initialData }: BillFormSheetProps
       window.location.reload(); // Refresh to show updated data
     } catch (error: any) {
       console.error('Error saving bill:', error);
-      toast.error(error.message || 'Failed to save bill');
+      toast.error(getErrorMessage(error));
     } finally {
       setSubmitting(false);
     }
@@ -381,179 +410,70 @@ export function BillFormSheet({ open, onClose, initialData }: BillFormSheetProps
           </div>
         </SheetHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-3 mt-2'>
-            {/* Bill Info */}
-            <div>
-              <h3 className='text-sm font-medium'>Bill Info</h3>
+        {isLoading ? (
+          <div className='flex items-center justify-center p-8'>
+            <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
+          </div>
+        ) : (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-3 mt-2'>
+              {/* Bill Info */}
+              <div>
+                <h3 className='text-sm font-medium'>Bill Info</h3>
 
-              <div className='grid grid-cols-2 gap-4'>
-                <div className='no-form-context-needed space-y-2'>
-                  <label className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'>
-                    Bill Code
-                  </label>
-                  <Input disabled placeholder='Auto-generated' value={initialData?.billId || ''} />
+                <div className='grid grid-cols-2 gap-4'>
+                  <div className='no-form-context-needed space-y-2'>
+                    <label className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'>
+                      Bill Code
+                    </label>
+                    <Input
+                      disabled
+                      placeholder='Auto-generated'
+                      value={initialData?.billId || ''}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name='billNumber'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Bill Number</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            value={field.value || ''}
+                            placeholder='Custom number (optional)'
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
 
                 <FormField
                   control={form.control}
-                  name='billNumber'
+                  name='purchaseOrderId'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Bill Number</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value || ''}
-                          placeholder='Custom number (optional)'
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name='purchaseOrderId'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Purchase Order Reference</FormLabel>
-                    <Select
-                      onValueChange={val => {
-                        field.onChange(val);
-                        handlePurchaseOrderChange(val);
-                      }}
-                      value={field.value || ''}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder='Link to Purchase Order (optional)' />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {purchaseOrders.map(po => (
-                          <SelectItem key={po.poId} value={po.poId}>
-                            {po.poId} - {po.supplierName}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className='grid grid-cols-2 gap-4'>
-                <FormField
-                  control={form.control}
-                  name='supplierId'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
-                        Supplier
-                      </FormLabel>
+                      <FormLabel>Purchase Order Reference</FormLabel>
                       <Select
                         onValueChange={val => {
                           field.onChange(val);
-                          handleSupplierChange(val);
-                        }}
-                        value={field.value}
-                        disabled={loading}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder='Select supplier' />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {suppliers.map(supplier => (
-                            <SelectItem key={supplier.id} value={supplier.id}>
-                              {supplier.name} {supplier.code ? `(${supplier.code})` : ''}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name='locationId'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
-                        Location
-                      </FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder='Select receiving location' />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {locations.map(loc => (
-                            <SelectItem key={loc.id} value={loc.id}>
-                              {loc.name}
-                              {loc.isHeadquarters ? ' • HQ' : ''}
-                              {loc.isDefault ? ' • Default' : ''}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className='grid grid-cols-3 gap-4'>
-                <FormField
-                  control={form.control}
-                  name='billDate'
-                  render={({ field }) => (
-                    <FormItem className='flex flex-col'>
-                      <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
-                        Bill Date
-                      </FormLabel>
-                      <FormControl>
-                        <DatePicker
-                          date={field.value}
-                          setDate={field.onChange}
-                          placeholder='Pick a date'
-                          className='w-full'
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name='paymentTerms'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Payment Terms</FormLabel>
-                      <Select
-                        onValueChange={val => {
-                          field.onChange(val);
-                          handlePaymentTermsChange(val);
+                          handlePurchaseOrderChange(val);
                         }}
                         value={field.value || ''}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder='Select terms' />
+                            <SelectValue placeholder='Link to Purchase Order (optional)' />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {PAYMENT_TERMS_OPTIONS.map(opt => (
-                            <SelectItem key={opt.value} value={opt.value}>
-                              {opt.label}
+                          {purchaseOrders.map(po => (
+                            <SelectItem key={po.poId} value={po.poId}>
+                              {po.poId} - {po.supplierName}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -563,160 +483,32 @@ export function BillFormSheet({ open, onClose, initialData }: BillFormSheetProps
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name='dueDate'
-                  render={({ field }) => (
-                    <FormItem className='flex flex-col'>
-                      <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
-                        Due Date
-                      </FormLabel>
-                      <FormControl>
-                        <DatePicker
-                          date={field.value}
-                          setDate={field.onChange}
-                          placeholder='Pick a date'
-                          className='w-full'
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className='grid grid-cols-3 gap-4'>
-                <FormField
-                  control={form.control}
-                  name='currency'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Currency</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value || ''}
-                          placeholder='INR'
-                          maxLength={10}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name='shippingCharges'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Shipping Charges</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='number'
-                          step='0.01'
-                          min='0'
-                          {...field}
-                          value={field.value || 0}
-                          onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
-                          placeholder='0.00'
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name='supplierInvoiceNo'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Supplier Invoice No</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value || ''}
-                          placeholder='Supplier ref'
-                          maxLength={100}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Items */}
-            <div className='space-y-4'>
-              <div className='flex items-center justify-between'>
-                <h3 className='text-sm font-medium'>
-                  Bill Items
-                  {!form.watch('purchaseOrderId') && (
-                    <span className='text-xs text-destructive ml-2'>
-                      (Product required when not linked to PO)
-                    </span>
-                  )}
-                </h3>
-                <Button
-                  type='button'
-                  variant='outline'
-                  size='sm'
-                  onClick={() =>
-                    append({
-                      itemCode: '',
-                      description: '',
-                      quantity: 1,
-                      unitOfMeasure: 'PCS',
-                      unitCost: 0,
-                      discountPercent: 0,
-                      taxRate: 0,
-                    })
-                  }
-                >
-                  <Plus className='mr-2 h-4 w-4' /> Add Item
-                </Button>
-              </div>
-
-              {fields.map((field, index) => (
-                <div key={field.id} className='space-y-4 p-4 border rounded-md relative bg-muted/5'>
-                  {fields.length > 1 && (
-                    <Button
-                      type='button'
-                      variant='ghost'
-                      size='icon'
-                      className='absolute right-2 top-2 h-8 w-8 text-muted-foreground hover:text-destructive'
-                      onClick={() => remove(index)}
-                    >
-                      <Trash2 className='h-4 w-4' />
-                    </Button>
-                  )}
-
+                <div className='grid grid-cols-2 gap-4'>
                   <FormField
                     control={form.control}
-                    name={`items.${index}.productId`}
+                    name='supplierId'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Product</FormLabel>
+                        <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                          Supplier
+                        </FormLabel>
                         <Select
                           onValueChange={val => {
                             field.onChange(val);
-                            handleProductChange(val, index);
+                            handleSupplierChange(val);
                           }}
-                          value={field.value || ''}
+                          value={field.value}
+                          disabled={loading}
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder='Search and select product (optional)' />
+                              <SelectValue placeholder='Select supplier' />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {products.map(product => (
-                              <SelectItem key={product.id} value={product.id}>
-                                {product.name} ({product.productCode})
+                            {suppliers.map(supplier => (
+                              <SelectItem key={supplier.id} value={supplier.id}>
+                                {supplier.name} {supplier.code ? `(${supplier.code})` : ''}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -726,74 +518,248 @@ export function BillFormSheet({ open, onClose, initialData }: BillFormSheetProps
                     )}
                   />
 
-                  <div className='grid grid-cols-12 gap-3'>
-                    <FormField
-                      control={form.control}
-                      name={`items.${index}.itemCode`}
-                      render={({ field }) => (
-                        <FormItem className='col-span-3'>
-                          <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
-                            Item Code
-                          </FormLabel>
+                  <FormField
+                    control={form.control}
+                    name='locationId'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                          Location
+                        </FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
-                            <Input {...field} placeholder='Code' />
+                            <SelectTrigger>
+                              <SelectValue placeholder='Select receiving location' />
+                            </SelectTrigger>
                           </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`items.${index}.description`}
-                      render={({ field }) => (
-                        <FormItem className='col-span-4'>
-                          <FormLabel>Description</FormLabel>
+                          <SelectContent>
+                            {locations.map(loc => (
+                              <SelectItem key={loc.id} value={loc.id}>
+                                {loc.name}
+                                {loc.isHeadquarters ? ' • HQ' : ''}
+                                {loc.isDefault ? ' • Default' : ''}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className='grid grid-cols-3 gap-4 mt-2'>
+                  <FormField
+                    control={form.control}
+                    name='billDate'
+                    render={({ field }) => (
+                      <FormItem className='flex flex-col'>
+                        <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                          Bill Date
+                        </FormLabel>
+                        <FormControl>
+                          <DatePicker
+                            date={field.value}
+                            setDate={field.onChange}
+                            placeholder='Pick a date'
+                            className='w-full'
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='paymentTerms'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Payment Terms</FormLabel>
+                        <Select
+                          onValueChange={val => {
+                            field.onChange(val);
+                            handlePaymentTermsChange(val);
+                          }}
+                          value={field.value || ''}
+                        >
                           <FormControl>
-                            <Input {...field} value={field.value || ''} placeholder='Description' />
+                            <SelectTrigger>
+                              <SelectValue placeholder='Select terms' />
+                            </SelectTrigger>
                           </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                          <SelectContent>
+                            {PAYMENT_TERMS_OPTIONS.map(opt => (
+                              <SelectItem key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='dueDate'
+                    render={({ field }) => (
+                      <FormItem className='flex flex-col'>
+                        <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                          Due Date
+                        </FormLabel>
+                        <FormControl>
+                          <DatePicker
+                            date={field.value}
+                            setDate={field.onChange}
+                            placeholder='Pick a date'
+                            className='w-full'
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className='grid grid-cols-3 gap-4'>
+                  <FormField
+                    control={form.control}
+                    name='currency'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Currency</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            value={field.value || ''}
+                            placeholder='INR'
+                            maxLength={10}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='shippingCharges'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Shipping Charges</FormLabel>
+                        <FormControl>
+                          <Input
+                            type='number'
+                            step='0.01'
+                            min='0'
+                            {...field}
+                            value={field.value ?? 0}
+                            onChange={e =>
+                              field.onChange(e.target.value === '' ? 0 : Number(e.target.value))
+                            }
+                            placeholder='0.00'
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='supplierInvoiceNo'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Supplier Invoice No</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            value={field.value || ''}
+                            placeholder='Supplier ref'
+                            maxLength={100}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Items */}
+              <div className='space-y-4'>
+                <div className='flex items-center justify-between'>
+                  <h3 className='text-sm font-medium'>
+                    Bill Items
+                    {!form.watch('purchaseOrderId') && (
+                      <span className='text-xs text-destructive ml-2'>
+                        (Product required when not linked to PO)
+                      </span>
+                    )}
+                  </h3>
+                  <Button
+                    type='button'
+                    variant='outline'
+                    size='sm'
+                    onClick={() =>
+                      append({
+                        itemCode: '',
+                        description: '',
+                        quantity: 1,
+                        unitOfMeasure: 'PCS',
+                        unitCost: 0,
+                        discountPercent: 0,
+                        taxRate: 0,
+                      })
+                    }
+                  >
+                    <Plus className='mr-2 h-4 w-4' /> Add Item
+                  </Button>
+                </div>
+
+                {fields.map((field, index) => (
+                  <div
+                    key={field.id}
+                    className='space-y-4 p-4 border rounded-md relative bg-muted/5'
+                  >
+                    {fields.length > 1 && (
+                      <Button
+                        type='button'
+                        variant='ghost'
+                        size='icon'
+                        className='absolute right-2 top-2 h-8 w-8 text-muted-foreground hover:text-destructive'
+                        onClick={() => remove(index)}
+                      >
+                        <Trash2 className='h-4 w-4' />
+                      </Button>
+                    )}
+
                     <FormField
                       control={form.control}
-                      name={`items.${index}.quantity`}
+                      name={`items.${index}.productId`}
                       render={({ field }) => (
-                        <FormItem className='col-span-2'>
-                          <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
-                            Qty
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              type='number'
-                              step='1'
-                              min='0'
-                              {...field}
-                              onChange={e => field.onChange(parseFloat(e.target.value))}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`items.${index}.unitOfMeasure`}
-                      render={({ field }) => (
-                        <FormItem className='col-span-3'>
-                          <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
-                            UOM
-                          </FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
+                        <FormItem>
+                          <FormLabel>Product</FormLabel>
+                          <Select
+                            onValueChange={val => {
+                              field.onChange(val);
+                              handleProductChange(val, index);
+                            }}
+                            value={field.value || ''}
+                          >
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder='UOM' />
+                                <SelectValue placeholder='Search and select product (optional)' />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {UOM_OPTIONS.map(uom => (
-                                <SelectItem key={uom.value} value={uom.value}>
-                                  {uom.label}
+                              {products.map(product => (
+                                <SelectItem key={product.id} value={product.id}>
+                                  {product.name} ({product.productCode})
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -802,120 +768,214 @@ export function BillFormSheet({ open, onClose, initialData }: BillFormSheetProps
                         </FormItem>
                       )}
                     />
-                  </div>
-                  <div className='grid grid-cols-4 gap-4'>
-                    <FormField
-                      control={form.control}
-                      name={`items.${index}.unitCost`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
-                            Unit Cost
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              type='number'
-                              step='0.01'
-                              min='0'
-                              {...field}
-                              onChange={e => field.onChange(parseFloat(e.target.value))}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`items.${index}.discountPercent`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Discount %</FormLabel>
-                          <FormControl>
-                            <Input
-                              type='number'
-                              step='0.01'
-                              min='0'
-                              max='100'
-                              {...field}
-                              value={field.value || 0}
-                              onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`items.${index}.taxRate`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Tax %</FormLabel>
-                          <FormControl>
-                            <Input
-                              type='number'
-                              step='0.01'
-                              min='0'
-                              max='100'
-                              {...field}
-                              value={field.value || 0}
-                              onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
-              ))}
-              {form.formState.errors.items?.root && (
-                <p className='text-sm font-medium text-destructive'>
-                  {form.formState.errors.items.root.message}
-                </p>
-              )}
-            </div>
 
-            <Separator />
-
-            {/* Additional Details */}
-            <div className='space-y-4'>
-              <h3 className='text-sm font-medium'>Additional Details</h3>
-
-              <FormField
-                control={form.control}
-                name='notes'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Notes</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        value={field.value || ''}
-                        placeholder='Optional notes'
-                        maxLength={1000}
-                        className='resize-none'
-                        rows={3}
+                    <div className='grid grid-cols-12 gap-3'>
+                      <FormField
+                        control={form.control}
+                        name={`items.${index}.itemCode`}
+                        render={({ field }) => (
+                          <FormItem className='col-span-3'>
+                            <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                              Item Code
+                            </FormLabel>
+                            <FormControl>
+                              <Input {...field} placeholder='Code' />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                      <FormField
+                        control={form.control}
+                        name={`items.${index}.description`}
+                        render={({ field }) => (
+                          <FormItem className='col-span-4'>
+                            <FormLabel>Description</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                value={field.value || ''}
+                                placeholder='Description'
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`items.${index}.quantity`}
+                        render={({ field }) => (
+                          <FormItem className='col-span-2'>
+                            <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                              Qty
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type='number'
+                                step='1'
+                                min='0'
+                                {...field}
+                                onChange={e =>
+                                  field.onChange(
+                                    e.target.value === '' ? undefined : Number(e.target.value)
+                                  )
+                                }
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`items.${index}.unitOfMeasure`}
+                        render={({ field }) => (
+                          <FormItem className='col-span-3'>
+                            <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                              UOM
+                            </FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder='UOM' />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {UOM_OPTIONS.map(uom => (
+                                  <SelectItem key={uom.value} value={uom.value}>
+                                    {uom.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className='grid grid-cols-4 gap-4'>
+                      <FormField
+                        control={form.control}
+                        name={`items.${index}.unitCost`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                              Unit Cost
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type='number'
+                                step='0.01'
+                                min='0'
+                                {...field}
+                                onChange={e =>
+                                  field.onChange(
+                                    e.target.value === '' ? undefined : Number(e.target.value)
+                                  )
+                                }
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`items.${index}.discountPercent`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Discount %</FormLabel>
+                            <FormControl>
+                              <Input
+                                type='number'
+                                step='0.01'
+                                min='0'
+                                max='100'
+                                {...field}
+                                value={field.value ?? 0}
+                                onChange={e =>
+                                  field.onChange(e.target.value === '' ? 0 : Number(e.target.value))
+                                }
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`items.${index}.taxRate`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Tax %</FormLabel>
+                            <FormControl>
+                              <Input
+                                type='number'
+                                step='0.01'
+                                min='0'
+                                max='100'
+                                {...field}
+                                value={field.value ?? 0}
+                                onChange={e =>
+                                  field.onChange(e.target.value === '' ? 0 : Number(e.target.value))
+                                }
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+                ))}
+                {form.formState.errors.items?.root && (
+                  <p className='text-sm font-medium text-destructive'>
+                    {form.formState.errors.items.root.message}
+                  </p>
                 )}
-              />
-            </div>
+              </div>
 
-            <SheetFooter className='gap-2'>
-              <Button type='button' variant='outline' onClick={onClose} disabled={submitting}>
-                Cancel
-              </Button>
-              <Button type='submit' disabled={submitting}>
-                {submitting && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
-                {isEditing ? 'Update Bill' : 'Create Bill'}
-              </Button>
-            </SheetFooter>
-          </form>
-        </Form>
+              <Separator />
+
+              {/* Additional Details */}
+              <div className='space-y-4'>
+                <h3 className='text-sm font-medium'>Additional Details</h3>
+
+                <FormField
+                  control={form.control}
+                  name='notes'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Notes</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          {...field}
+                          value={field.value || ''}
+                          placeholder='Optional notes'
+                          maxLength={1000}
+                          className='resize-none'
+                          rows={3}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <SheetFooter className='gap-2'>
+                <Button type='button' variant='outline' onClick={onClose} disabled={submitting}>
+                  Cancel
+                </Button>
+                <Button type='submit' disabled={submitting}>
+                  {submitting && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
+                  {isEditing ? 'Update Bill' : 'Create Bill'}
+                </Button>
+              </SheetFooter>
+            </form>
+          </Form>
+        )}
       </SheetContent>
     </Sheet>
   );

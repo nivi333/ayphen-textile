@@ -12,7 +12,7 @@ import {
 import { CustomerTable } from '@/components/sales/CustomerTable';
 import { CustomerFormSheet } from '@/components/sales/CustomerFormSheet';
 import { customerService, Customer, CustomerFilters } from '@/services/customerService';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -41,8 +41,6 @@ export default function CustomerListPage() {
   const [isDeleting, setIsDeleting] = useState<Customer | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { toast } = useToast();
-
   const fetchCustomers = async () => {
     try {
       setLoading(true);
@@ -53,11 +51,7 @@ export default function CustomerListPage() {
       setCustomers(data);
     } catch (error) {
       console.error('Error fetching customers:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch customers. Please try again.',
-        variant: 'destructive',
-      });
+      toast.error('Failed to fetch customers. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -116,19 +110,11 @@ export default function CustomerListPage() {
 
     try {
       await customerService.deleteCustomer(isDeleting.id);
-      toast({
-        title: 'Success',
-        description: 'Customer deleted successfully',
-        variant: 'default',
-      });
+      toast.success('Customer deleted successfully');
       fetchCustomers();
     } catch (error) {
       console.error('Error deleting customer:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete customer',
-        variant: 'destructive',
-      });
+      toast.error('Failed to delete customer');
     } finally {
       setIsDeleting(null);
     }
@@ -139,26 +125,16 @@ export default function CustomerListPage() {
       setIsSubmitting(true);
       if (editingCustomer) {
         await customerService.updateCustomer(editingCustomer.id, data);
-        toast({
-          title: 'Success',
-          description: 'Customer updated successfully',
-        });
+        toast.success('Customer updated successfully');
       } else {
         await customerService.createCustomer(data);
-        toast({
-          title: 'Success',
-          description: 'Customer created successfully',
-        });
+        toast.success('Customer created successfully');
       }
       setIsSheetOpen(false);
       fetchCustomers();
     } catch (error) {
       console.error('Error saving customer:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to save customer',
-        variant: 'destructive',
-      });
+      toast.error('Failed to save customer');
     } finally {
       setIsSubmitting(false);
     }

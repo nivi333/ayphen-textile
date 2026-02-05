@@ -33,6 +33,7 @@ import {
 } from '@/services/companyService';
 import { AuthStorage } from '@/utils/storage';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/utils';
 
 const companySchema = z.object({
   name: z.string().min(1, 'Company name is required').max(48, 'Name too long'),
@@ -106,9 +107,11 @@ export function CompanyCreationSheet({
     setOriginalName('');
   }, [form]);
 
-  // Load company data for editing
+  // Load company data for editing or reset for creation
   useEffect(() => {
-    if (open && isEditing && editingCompanyId) {
+    if (!open) return;
+
+    if (isEditing && editingCompanyId) {
       setLoading(true);
       companyService
         .getCompany(editingCompanyId)
@@ -149,10 +152,13 @@ export function CompanyCreationSheet({
           toast.error('Failed to load company details');
         })
         .finally(() => setLoading(false));
-    } else if (open && !isEditing) {
+    } else {
+      // Small delay to ensure form is ready, or just call if confident
       resetFormState();
     }
-  }, [open, isEditing, editingCompanyId, form, resetFormState]);
+    // We only want to run this once when the sheet opens
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const handleDrawerClose = () => {
     resetFormState();
@@ -361,7 +367,7 @@ export function CompanyCreationSheet({
       handleDrawerClose();
       onCompanyCreated?.();
     } catch (error: any) {
-      toast.error(error.message || `Failed to ${isEditing ? 'update' : 'create'} company`);
+      toast.error(getErrorMessage(error));
     } finally {
       setUploading(false);
     }
@@ -509,12 +515,15 @@ export function CompanyCreationSheet({
                         <FormLabel required>Industry</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger data-testid='industry-select'>
                               <SelectValue placeholder='Select industry' />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value='TEXTILE_MANUFACTURING'>
+                            <SelectItem
+                              value='TEXTILE_MANUFACTURING'
+                              data-testid='industry-textile'
+                            >
                               Textile Manufacturing
                             </SelectItem>
                             <SelectItem value='GARMENT_PRODUCTION'>Garment Production</SelectItem>
@@ -563,12 +572,14 @@ export function CompanyCreationSheet({
                         <FormLabel required>Country</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger data-testid='country-select'>
                               <SelectValue placeholder='Select country' />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value='India'>India</SelectItem>
+                            <SelectItem value='India' data-testid='country-india'>
+                              India
+                            </SelectItem>
                             <SelectItem value='USA'>USA</SelectItem>
                             <SelectItem value='UK'>UK</SelectItem>
                             <SelectItem value='China'>China</SelectItem>
@@ -703,8 +714,11 @@ export function CompanyCreationSheet({
                             date={field.value}
                             setDate={field.onChange}
                             placeholder='Pick a date'
-                            disabled={date => date > new Date() || date < new Date('1900-01-01')}
+                            disabledDates={(date: Date) =>
+                              date > new Date() || date < new Date('1900-01-01')
+                            }
                             className='w-full'
+                            data-testid='established-date-picker'
                           />
                         </FormControl>
                         <FormMessage />
@@ -720,12 +734,14 @@ export function CompanyCreationSheet({
                         <FormLabel required>Business Type</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger data-testid='business-type-select'>
                               <SelectValue placeholder='Select type' />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value='Manufacturer'>Manufacturer</SelectItem>
+                            <SelectItem value='Manufacturer' data-testid='type-manufacturer'>
+                              Manufacturer
+                            </SelectItem>
                             <SelectItem value='Trader'>Trader</SelectItem>
                             <SelectItem value='Exporter'>Exporter</SelectItem>
                             <SelectItem value='Other'>Other</SelectItem>

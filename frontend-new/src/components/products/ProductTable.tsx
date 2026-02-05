@@ -97,7 +97,7 @@ export function ProductTable({
         {products.map(product => {
           const stockStatus = getStockStatus(product);
           return (
-            <TableRow key={product.id}>
+            <TableRow key={product.id} data-testid='product-row'>
               <TableCell className='font-medium'>{product.productCode || '—'}</TableCell>
               <TableCell>
                 <div className='flex items-center gap-3'>
@@ -141,7 +141,11 @@ export function ProductTable({
               <TableCell>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <IconButton variant='ghost' className='h-8 w-8 p-0'>
+                    <IconButton
+                      variant='ghost'
+                      className='h-8 w-8 p-0'
+                      data-testid='product-actions'
+                    >
                       <MoreHorizontal className='h-4 w-4' />
                     </IconButton>
                   </DropdownMenuTrigger>

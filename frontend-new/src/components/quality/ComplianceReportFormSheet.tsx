@@ -4,8 +4,21 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Loader2 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -62,7 +75,12 @@ interface ComplianceReportFormSheetProps {
   report?: any;
 }
 
-export function ComplianceReportFormSheet({ open, onOpenChange, onSuccess, report }: ComplianceReportFormSheetProps) {
+export function ComplianceReportFormSheet({
+  open,
+  onOpenChange,
+  onSuccess,
+  report,
+}: ComplianceReportFormSheetProps) {
   const [loading, setLoading] = useState(false);
   const isEditing = !!report;
 
@@ -97,7 +115,7 @@ export function ComplianceReportFormSheet({ open, onOpenChange, onSuccess, repor
         ...values,
         reportDate: values.reportDate.toISOString(),
       };
-      
+
       if (isEditing && report) {
         await qualityService.updateComplianceReport(report.id, payload);
         toast.success('Compliance report updated successfully');
@@ -121,7 +139,11 @@ export function ComplianceReportFormSheet({ open, onOpenChange, onSuccess, repor
           <SheetTitle>{isEditing ? 'Edit Compliance Report' : 'New Compliance Report'}</SheetTitle>
           <div className='flex items-center space-x-2 mr-6'>
             <span className='text-sm text-muted-foreground'>Active</span>
-            <Switch checked={form.watch('isActive')} onCheckedChange={checked => form.setValue('isActive', checked)} disabled={!isEditing} />
+            <Switch
+              checked={form.watch('isActive')}
+              onCheckedChange={checked => form.setValue('isActive', checked)}
+              disabled={!isEditing}
+            />
           </div>
         </SheetHeader>
 
@@ -129,7 +151,7 @@ export function ComplianceReportFormSheet({ open, onOpenChange, onSuccess, repor
           <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
             <div className='space-y-4'>
               <h3 className='text-sm font-medium text-muted-foreground'>Report Information</h3>
-              
+
               {isEditing && report?.reportCode && (
                 <FormItem>
                   <FormLabel>Code</FormLabel>
@@ -140,115 +162,188 @@ export function ComplianceReportFormSheet({ open, onOpenChange, onSuccess, repor
               )}
 
               <div className='grid grid-cols-2 gap-4'>
-                <FormField control={form.control} name='reportType' render={({ field }) => (
-                  <FormItem>
-                    <FormLabel required>Report Type</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                <FormField
+                  control={form.control}
+                  name='reportType'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel required>Report Type</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder='Select report type' />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {REPORT_TYPES.map(type => (
+                            <SelectItem key={type.value} value={type.value}>
+                              {type.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='reportDate'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel required>Report Date</FormLabel>
                       <FormControl>
-                        <SelectTrigger><SelectValue placeholder='Select report type' /></SelectTrigger>
+                        <DatePicker
+                          date={field.value}
+                          setDate={field.onChange}
+                          placeholder='Select date'
+                          className='w-full'
+                        />
                       </FormControl>
-                      <SelectContent>
-                        {REPORT_TYPES.map(type => (
-                          <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                
-                <FormField control={form.control} name='reportDate' render={({ field }) => (
-                  <FormItem className='flex flex-col'>
-                    <FormLabel required>Report Date</FormLabel>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className='grid grid-cols-2 gap-4'>
+                <FormField
+                  control={form.control}
+                  name='auditorName'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel required>Auditor Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder='Enter auditor name' {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='status'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel required>Status</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder='Select status' />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {STATUS_OPTIONS.map(opt => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className='grid grid-cols-2 gap-4'>
+                <FormField
+                  control={form.control}
+                  name='certification'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Certification</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder='Select certification' />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {CERTIFICATION_OPTIONS.map(opt => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='validityPeriod'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Validity Period</FormLabel>
+                      <FormControl>
+                        <Input placeholder='e.g., 12 months' {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name='findings'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Findings</FormLabel>
                     <FormControl>
-                      <DatePicker date={field.value} setDate={field.onChange} placeholder='Select date' className='w-full' />
+                      <Textarea
+                        placeholder='Enter audit findings'
+                        className='min-h-[80px]'
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
-                )} />
-              </div>
+                )}
+              />
 
-              <div className='grid grid-cols-2 gap-4'>
-                <FormField control={form.control} name='auditorName' render={({ field }) => (
+              <FormField
+                control={form.control}
+                name='recommendations'
+                render={({ field }) => (
                   <FormItem>
-                    <FormLabel required>Auditor Name</FormLabel>
-                    <FormControl><Input placeholder='Enter auditor name' {...field} /></FormControl>
+                    <FormLabel>Recommendations</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder='Enter recommendations'
+                        className='min-h-[80px]'
+                        {...field}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
-                )} />
-                
-                <FormField control={form.control} name='status' render={({ field }) => (
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='documentUrl'
+                render={({ field }) => (
                   <FormItem>
-                    <FormLabel required>Status</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger><SelectValue placeholder='Select status' /></SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {STATUS_OPTIONS.map(opt => (
-                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormLabel>Document URL</FormLabel>
+                    <FormControl>
+                      <Input placeholder='Enter document URL (optional)' {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
-                )} />
-              </div>
-
-              <div className='grid grid-cols-2 gap-4'>
-                <FormField control={form.control} name='certification' render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Certification</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger><SelectValue placeholder='Select certification' /></SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {CERTIFICATION_OPTIONS.map(opt => (
-                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                
-                <FormField control={form.control} name='validityPeriod' render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Validity Period</FormLabel>
-                    <FormControl><Input placeholder='e.g., 12 months' {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-              </div>
-
-              <FormField control={form.control} name='findings' render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Findings</FormLabel>
-                  <FormControl><Textarea placeholder='Enter audit findings' className='min-h-[80px]' {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-
-              <FormField control={form.control} name='recommendations' render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Recommendations</FormLabel>
-                  <FormControl><Textarea placeholder='Enter recommendations' className='min-h-[80px]' {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-
-              <FormField control={form.control} name='documentUrl' render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Document URL</FormLabel>
-                  <FormControl><Input placeholder='Enter document URL (optional)' {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
+                )}
+              />
             </div>
 
             <SheetFooter className='flex gap-2'>
-              <Button type='button' variant='outline' onClick={() => onOpenChange(false)}>Cancel</Button>
+              <Button type='button' variant='outline' onClick={() => onOpenChange(false)}>
+                Cancel
+              </Button>
               <Button type='submit' disabled={loading}>
                 {loading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
                 {isEditing ? 'Update' : 'Create'} Report

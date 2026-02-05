@@ -1,4 +1,5 @@
 import { createContext, useContext, useReducer, useEffect, useCallback, ReactNode } from 'react';
+import { toast } from 'sonner';
 import { AuthState, User, Company, AuthTokens, LoginCredentials } from '../types/auth';
 import { AuthStorage } from '../utils/storage';
 import { API_BASE_URL } from '../config/api';
@@ -136,10 +137,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Warm up backend on app load (initial wake up)
   useEffect(() => {
     const warmUpBackend = async () => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        toast.message('Waking up server...', {
+          description: 'This might take up to a minute for the initial load.',
+          duration: 10000, // Show for 10 seconds or until dismissed
+        });
+      }, 1500); // If ping takes more than 1.5s, assume cold start
+
       try {
-        await fetch(`${API_BASE_URL}/health/ping`);
+        await fetch(`${API_BASE_URL}/health/ping`, {
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+        // If we showed the toast (implied by time passing), we could dismiss it or show success,
+        // but typically the UI just becomes responsive.
+        // We can check if it took long, then show "Ready!"
       } catch (error) {
-        // Silent error
+        clearTimeout(timeoutId);
+        // Silent error, maybe offline or server down
       }
     };
     warmUpBackend();

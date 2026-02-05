@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Building2, Users, Loader2 } from 'lucide-react';
 import useAuth from '@/contexts/AuthContext';
@@ -8,6 +8,7 @@ import { CompanyCreationSheet } from '@/components/company/CompanyCreationSheet'
 import { companyService } from '@/services/companyService';
 import { Company } from '@/types/auth';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/utils';
 
 export default function CompaniesListPage() {
   const { companies, switchCompany, isLoading, logout, refreshCompanies } = useAuth();
@@ -17,9 +18,13 @@ export default function CompaniesListPage() {
   const [logoutLoading, setLogoutLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'owner' | 'roles'>('owner');
   const [sheetOpen, setSheetOpen] = useState(false);
+  const hasFetched = useRef(false);
 
-  // Refresh companies on mount
+  // Refresh companies on mount - only once
   useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
     const init = async () => {
       setRefreshing(true);
       try {
@@ -31,7 +36,8 @@ export default function CompaniesListPage() {
       }
     };
     init();
-  }, [refreshCompanies]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSheetClose = () => setSheetOpen(false);
 
@@ -53,7 +59,7 @@ export default function CompaniesListPage() {
       await refreshCompanies();
     } catch (error: any) {
       console.error('Error accepting invitation:', error);
-      toast.error(error.message || 'Failed to accept invitation');
+      toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -96,13 +102,10 @@ export default function CompaniesListPage() {
       await switchCompany(company);
       console.log('[CompaniesListPage] switchCompany completed successfully');
       toast.success('Company switched successfully');
-      console.log('[CompaniesListPage] Navigating to /dashboard...');
-      navigate('/dashboard');
       console.log('[CompaniesListPage] navigate() called');
     } catch (error: unknown) {
       console.error('[CompaniesListPage] Error in handleCompanySelect:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to switch company';
-      toast.error(errorMessage);
+      toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -185,6 +188,7 @@ export default function CompaniesListPage() {
                     {(activeTab === 'owner' ? ownerCompanies : roleCompanies).map(company => (
                       <li
                         key={company.id}
+                        data-testid='company-row'
                         className={`flex items-center justify-between p-2 border rounded-lg cursor-pointer transition-all hover:shadow-md hover:border-primary/50 bg-card ${
                           loading ? 'opacity-50 pointer-events-none' : ''
                         }`}

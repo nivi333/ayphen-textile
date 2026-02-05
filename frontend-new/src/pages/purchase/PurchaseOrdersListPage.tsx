@@ -104,6 +104,7 @@ export default function PurchaseOrdersListPage() {
   const [editingPO, setEditingPO] = useState<any | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [poToDelete, setPoToDelete] = useState<string | null>(null);
+  const [isDetailLoading, setIsDetailLoading] = useState(false);
 
   const { currentCompany } = useAuth();
 
@@ -164,15 +165,18 @@ export default function PurchaseOrdersListPage() {
   };
 
   const handleEdit = async (po: PurchaseOrderSummary) => {
+    setEditingPO(null);
+    setIsDetailLoading(true);
+    setIsSheetOpen(true);
+
     try {
-      setLoading(true);
       const details = await purchaseOrderService.getPurchaseOrderById(po.poId);
       setEditingPO(details);
-      setIsSheetOpen(true);
     } catch (error) {
       toast.error('Failed to load purchase order details');
+      setIsSheetOpen(false);
     } finally {
-      setLoading(false);
+      setIsDetailLoading(false);
     }
   };
 
@@ -196,11 +200,18 @@ export default function PurchaseOrdersListPage() {
   };
 
   const handleStatusChange = async (poId: string, newStatus: POStatus) => {
+    // Optimistic update
+    const previousPOs = [...purchaseOrders];
+    setPurchaseOrders(prev =>
+      prev.map(po => (po.poId === poId ? { ...po, status: newStatus } : po))
+    );
+    toast.success(`Purchase order status updated to ${STATUS_CONFIG[newStatus].label}`);
+
     try {
       await purchaseOrderService.updatePOStatus(poId, newStatus);
-      toast.success(`Purchase order status updated to ${STATUS_CONFIG[newStatus].label}`);
       fetchPurchaseOrders();
     } catch (error: any) {
+      setPurchaseOrders(previousPOs);
       toast.error(error.message || 'Failed to update status');
     }
   };
@@ -393,6 +404,7 @@ export default function PurchaseOrdersListPage() {
         }}
         onSaved={handleRefresh}
         initialData={editingPO}
+        isLoading={isDetailLoading}
       />
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>

@@ -17,6 +17,7 @@ import { EmailPhoneInput, validateEmailOrPhone } from '@/components/EmailPhoneIn
 import AuthLayout from '@/components/ui/AuthLayout';
 import { toast } from 'sonner';
 import { Facebook, Youtube, Instagram } from 'lucide-react';
+import { getErrorMessage } from '@/lib/utils';
 
 // Simple encryption/decryption for localStorage (base64)
 const encryptPassword = (password: string): string => {
@@ -122,7 +123,7 @@ export default function LoginPage() {
       } catch (err: any) {
         // Failure alert with animation
         toast.error('Login failed', {
-          description: err.message || 'Please check your credentials and try again.',
+          description: getErrorMessage(err),
           duration: 4000,
         });
       } finally {
@@ -149,7 +150,7 @@ export default function LoginPage() {
       });
     } catch (error: any) {
       toast.error('Google Sign-In failed', {
-        description: error.message || 'Please try again.',
+        description: getErrorMessage(error),
       });
     } finally {
       setGoogleLoading(false);

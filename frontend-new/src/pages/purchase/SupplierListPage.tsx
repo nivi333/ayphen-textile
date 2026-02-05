@@ -12,7 +12,7 @@ import {
 import { SupplierTable } from '@/components/purchase/SupplierTable';
 import { SupplierFormSheet } from '@/components/purchase/SupplierFormSheet';
 import { supplierService, Supplier, SupplierFilters } from '@/services/supplierService';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,8 +38,6 @@ export default function SupplierListPage() {
   const [isDeleting, setIsDeleting] = useState<Supplier | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { toast } = useToast();
-
   const fetchSuppliers = async () => {
     try {
       setLoading(true);
@@ -50,11 +48,7 @@ export default function SupplierListPage() {
       setSuppliers(data);
     } catch (error) {
       console.error('Error fetching suppliers:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch suppliers. Please try again.',
-        variant: 'destructive',
-      });
+      toast.error('Failed to fetch suppliers. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -105,19 +99,11 @@ export default function SupplierListPage() {
 
     try {
       await supplierService.deleteSupplier(isDeleting.id);
-      toast({
-        title: 'Success',
-        description: 'Supplier deleted successfully',
-        variant: 'default',
-      });
+      toast.success('Supplier deleted successfully');
       fetchSuppliers();
     } catch (error) {
       console.error('Error deleting supplier:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete supplier',
-        variant: 'destructive',
-      });
+      toast.error('Failed to delete supplier');
     } finally {
       setIsDeleting(null);
     }
@@ -128,43 +114,27 @@ export default function SupplierListPage() {
       setIsSubmitting(true);
       if (editingSupplier) {
         await supplierService.updateSupplier(editingSupplier.id, data);
-        toast({
-          title: 'Success',
-          description: 'Supplier updated successfully',
-        });
+        toast.success('Supplier updated successfully');
       } else {
         await supplierService.createSupplier(data);
-        toast({
-          title: 'Success',
-          description: 'Supplier created successfully',
-        });
+        toast.success('Supplier created successfully');
       }
       setIsSheetOpen(false);
       fetchSuppliers();
     } catch (error) {
       console.error('Error saving supplier:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to save supplier',
-        variant: 'destructive',
-      });
+      toast.error('Failed to save supplier');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleCreatePO = (_supplier: Supplier) => {
-    toast({
-      title: 'Coming Soon',
-      description: 'Create PO functionality is coming soon.',
-    });
+    toast.info('Create PO functionality is coming soon.');
   };
 
   const handleViewPOs = (_supplier: Supplier) => {
-    toast({
-      title: 'Coming Soon',
-      description: 'View POs functionality is coming soon.',
-    });
+    toast.info('View POs functionality is coming soon.');
   };
 
   return (

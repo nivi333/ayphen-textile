@@ -26,6 +26,7 @@ import { Separator } from '@/components/ui/separator';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/utils';
 
 import { orderService, CreateOrderRequest, OrderDetail } from '@/services/orderService';
 import { customerService, Customer } from '@/services/customerService';
@@ -36,9 +37,9 @@ const orderItemSchema = z.object({
   productId: z.string().optional(),
   itemCode: z.string().min(1, 'Item code is required'),
   description: z.string().optional(),
-  quantity: z.number().min(0.001, 'Quantity must be greater than 0'),
+  quantity: z.coerce.number().min(0.001, 'Quantity must be greater than 0'),
   unitOfMeasure: z.string().min(1, 'UOM is required'),
-  unitPrice: z.number().min(0, 'Unit price must be non-negative'),
+  unitPrice: z.coerce.number().min(0, 'Unit price must be non-negative'),
 });
 
 const orderSchema = z.object({
@@ -84,9 +85,16 @@ interface OrderFormSheetProps {
   onClose: () => void;
   onSaved: () => void;
   initialData?: OrderDetail | null;
+  isLoading?: boolean;
 }
 
-export function OrderFormSheet({ open, onClose, onSaved, initialData }: OrderFormSheetProps) {
+export function OrderFormSheet({
+  open,
+  onClose,
+  onSaved,
+  initialData,
+  isLoading,
+}: OrderFormSheetProps) {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -95,7 +103,7 @@ export function OrderFormSheet({ open, onClose, onSaved, initialData }: OrderFor
   const [locations, setLocations] = useState<Location[]>([]);
   const [products, setProducts] = useState<ProductSummary[]>([]);
 
-  const isEditing = !!initialData;
+  const isEditing = !!initialData || !!isLoading;
 
   const form = useForm<OrderFormValues>({
     resolver: zodResolver(orderSchema) as any,
@@ -173,20 +181,41 @@ export function OrderFormSheet({ open, onClose, onSaved, initialData }: OrderFor
           })),
         });
       } else {
-        form.reset({
-          currency: 'INR',
-          orderDate: new Date(),
-          isActive: true,
-          items: [
-            {
-              itemCode: '',
-              description: '',
-              quantity: 1,
-              unitOfMeasure: 'PCS',
-              unitPrice: 0,
-            },
-          ],
-        });
+        if (!initialData) {
+          const defaultLocation = locations.find(l => l.isDefault && l.isHeadquarters);
+          const currentLocationId = form.getValues('locationId');
+
+          if (!currentLocationId && defaultLocation) {
+            form.setValue('locationId', defaultLocation.id);
+          }
+
+          if (!form.formState.isDirty) {
+            form.reset({
+              customerId: '',
+              orderDate: new Date(),
+              deliveryDate: undefined,
+              currency: 'INR',
+              notes: '',
+              locationId: defaultLocation?.id || '',
+              shippingCarrier: '',
+              trackingNumber: '',
+              shippingMethod: '',
+              deliveryWindowStart: undefined,
+              deliveryWindowEnd: undefined,
+              isActive: true,
+              items: [
+                {
+                  itemCode: '',
+                  description: '',
+                  quantity: 1,
+                  unitOfMeasure: 'PCS',
+                  unitPrice: 0,
+                  productId: '',
+                },
+              ],
+            });
+          }
+        }
       }
     }
   }, [open, initialData, form, fetchData]);
@@ -238,7 +267,7 @@ export function OrderFormSheet({ open, onClose, onSaved, initialData }: OrderFor
       onClose();
     } catch (error: any) {
       console.error('Error saving order:', error);
-      toast.error(error.message || 'Failed to save order');
+      toast.error(getErrorMessage(error));
     } finally {
       setSubmitting(false);
     }
@@ -262,37 +291,141 @@ export function OrderFormSheet({ open, onClose, onSaved, initialData }: OrderFor
           </div>
         </SheetHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-3 mt-2'>
-            {/* Order Info */}
-            <div>
-              <h3 className='text-sm font-medium'>Order Info</h3>
-              <div className='grid grid-cols-2 gap-4'>
-                <div className='no-form-context-needed space-y-2'>
-                  <label className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'>
-                    Order Code
-                  </label>
-                  <Input disabled placeholder='Auto-generated' value={initialData?.orderId || ''} />
+        {isLoading ? (
+          <div className='flex items-center justify-center p-8'>
+            <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
+          </div>
+        ) : (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-3 mt-2'>
+              {/* Order Info */}
+              <div>
+                <h3 className='text-sm font-medium'>Order Info</h3>
+                <div className='grid grid-cols-2 gap-4'>
+                  <div className='no-form-context-needed space-y-2'>
+                    <label className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'>
+                      Order Code
+                    </label>
+                    <Input
+                      disabled
+                      placeholder='Auto-generated'
+                      value={initialData?.orderId || ''}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name='customerId'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                          Customer
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={loading}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder='Select customer' />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {customers.map(customer => (
+                              <SelectItem key={customer.id} value={customer.id}>
+                                {customer.name} {customer.code ? `(${customer.code})` : ''}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className='grid grid-cols-2 gap-4'>
+                  <FormField
+                    control={form.control}
+                    name='orderDate'
+                    render={({ field }) => (
+                      <FormItem className='flex flex-col'>
+                        <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                          Order Date
+                        </FormLabel>
+                        <FormControl>
+                          <DatePicker
+                            date={field.value}
+                            setDate={field.onChange}
+                            placeholder='Pick a date'
+                            className='w-full'
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='currency'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Currency</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder='INR'
+                            maxLength={10}
+                            value={field.value || ''}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
 
                 <FormField
                   control={form.control}
-                  name='customerId'
+                  name='notes'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
-                        Customer
-                      </FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value} disabled={loading}>
+                      <FormLabel>Notes</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          {...field}
+                          value={field.value || ''}
+                          placeholder='Optional notes'
+                          maxLength={1000}
+                          className='resize-none'
+                          rows={2}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='locationId'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Location</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value || ''}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder='Select customer' />
+                            <SelectValue placeholder='Select shipping location' />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {customers.map(customer => (
-                            <SelectItem key={customer.id} value={customer.id}>
-                              {customer.name} {customer.code ? `(${customer.code})` : ''}
+                          {locations.map(loc => (
+                            <SelectItem key={loc.id} value={loc.id}>
+                              {loc.name}
+                              {loc.isHeadquarters ? ' • HQ' : ''}
+                              {loc.isDefault ? ' • Default' : ''}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -303,234 +436,69 @@ export function OrderFormSheet({ open, onClose, onSaved, initialData }: OrderFor
                 />
               </div>
 
-              <div className='grid grid-cols-2 gap-4'>
-                <FormField
-                  control={form.control}
-                  name='orderDate'
-                  render={({ field }) => (
-                    <FormItem className='flex flex-col'>
-                      <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
-                        Order Date
-                      </FormLabel>
-                      <FormControl>
-                        <DatePicker
-                          date={field.value}
-                          setDate={field.onChange}
-                          placeholder='Pick a date'
-                          className='w-full'
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <Separator />
 
-                <FormField
-                  control={form.control}
-                  name='currency'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Currency</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          placeholder='INR'
-                          maxLength={10}
-                          value={field.value || ''}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              {/* Items */}
+              <div className='space-y-4'>
+                <div className='flex items-center justify-between'>
+                  <h3 className='text-sm font-medium'>Items</h3>
+                  <Button
+                    type='button'
+                    variant='outline'
+                    size='sm'
+                    onClick={() =>
+                      append({
+                        itemCode: '',
+                        description: '',
+                        quantity: 1,
+                        unitOfMeasure: 'PCS',
+                        unitPrice: 0,
+                      })
+                    }
+                  >
+                    <Plus className='mr-2 h-4 w-4' /> Add Item
+                  </Button>
+                </div>
 
-              <FormField
-                control={form.control}
-                name='notes'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Notes</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        value={field.value || ''}
-                        placeholder='Optional notes'
-                        maxLength={1000}
-                        className='resize-none'
-                        rows={2}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='locationId'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Location</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || ''}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder='Select shipping location' />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {locations.map(loc => (
-                          <SelectItem key={loc.id} value={loc.id}>
-                            {loc.name}
-                            {loc.isHeadquarters ? ' • HQ' : ''}
-                            {loc.isDefault ? ' • Default' : ''}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <Separator />
-
-            {/* Items */}
-            <div className='space-y-4'>
-              <div className='flex items-center justify-between'>
-                <h3 className='text-sm font-medium'>Items</h3>
-                <Button
-                  type='button'
-                  variant='outline'
-                  size='sm'
-                  onClick={() =>
-                    append({
-                      itemCode: '',
-                      description: '',
-                      quantity: 1,
-                      unitOfMeasure: 'PCS',
-                      unitPrice: 0,
-                    })
-                  }
-                >
-                  <Plus className='mr-2 h-4 w-4' /> Add Item
-                </Button>
-              </div>
-
-              {fields.map((field, index) => (
-                <div key={field.id} className='space-y-4 p-4 border rounded-md relative bg-muted/5'>
-                  {fields.length > 1 && (
-                    <Button
-                      type='button'
-                      variant='ghost'
-                      size='icon'
-                      className='absolute right-2 top-2 h-8 w-8 text-muted-foreground hover:text-destructive'
-                      onClick={() => remove(index)}
-                    >
-                      <Trash2 className='h-4 w-4' />
-                    </Button>
-                  )}
-
-                  <FormField
-                    control={form.control}
-                    name={`items.${index}.productId`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Product</FormLabel>
-                        <Select
-                          onValueChange={val => {
-                            field.onChange(val);
-                            handleProductChange(val, index);
-                          }}
-                          value={field.value || ''}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder='Search and select product (optional)' />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {products.map(product => (
-                              <SelectItem key={product.id} value={product.id}>
-                                {product.name} ({product.productCode})
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
+                {fields.map((field, index) => (
+                  <div
+                    key={field.id}
+                    className='space-y-4 p-4 border rounded-md relative bg-muted/5'
+                  >
+                    {fields.length > 1 && (
+                      <Button
+                        type='button'
+                        variant='ghost'
+                        size='icon'
+                        className='absolute right-2 top-2 h-8 w-8 text-muted-foreground hover:text-destructive'
+                        onClick={() => remove(index)}
+                      >
+                        <Trash2 className='h-4 w-4' />
+                      </Button>
                     )}
-                  />
 
-                  <div className='grid grid-cols-12 gap-3'>
                     <FormField
                       control={form.control}
-                      name={`items.${index}.itemCode`}
+                      name={`items.${index}.productId`}
                       render={({ field }) => (
-                        <FormItem className='col-span-3'>
-                          <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
-                            Item Code
-                          </FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder='Code' />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`items.${index}.description`}
-                      render={({ field }) => (
-                        <FormItem className='col-span-4'>
-                          <FormLabel>Description</FormLabel>
-                          <FormControl>
-                            <Input {...field} value={field.value || ''} placeholder='Description' />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`items.${index}.quantity`}
-                      render={({ field }) => (
-                        <FormItem className='col-span-2'>
-                          <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
-                            Qty
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              type='number'
-                              step='1'
-                              min='0'
-                              {...field}
-                              onChange={e => field.onChange(parseFloat(e.target.value))}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`items.${index}.unitOfMeasure`}
-                      render={({ field }) => (
-                        <FormItem className='col-span-3'>
-                          <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
-                            UOM
-                          </FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
+                        <FormItem>
+                          <FormLabel>Product</FormLabel>
+                          <Select
+                            onValueChange={val => {
+                              field.onChange(val);
+                              handleProductChange(val, index);
+                            }}
+                            value={field.value || ''}
+                          >
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder='UOM' />
+                                <SelectValue placeholder='Search and select product (optional)' />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {UOM_OPTIONS.map(uom => (
-                                <SelectItem key={uom.value} value={uom.value}>
-                                  {uom.label}
+                              {products.map(product => (
+                                <SelectItem key={product.id} value={product.id}>
+                                  {product.name} ({product.productCode})
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -539,169 +507,263 @@ export function OrderFormSheet({ open, onClose, onSaved, initialData }: OrderFor
                         </FormItem>
                       )}
                     />
+
+                    <div className='grid grid-cols-12 gap-3'>
+                      <FormField
+                        control={form.control}
+                        name={`items.${index}.itemCode`}
+                        render={({ field }) => (
+                          <FormItem className='col-span-3'>
+                            <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                              Item Code
+                            </FormLabel>
+                            <FormControl>
+                              <Input {...field} placeholder='Code' />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`items.${index}.description`}
+                        render={({ field }) => (
+                          <FormItem className='col-span-4'>
+                            <FormLabel>Description</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                value={field.value || ''}
+                                placeholder='Description'
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`items.${index}.quantity`}
+                        render={({ field }) => (
+                          <FormItem className='col-span-2'>
+                            <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                              Qty
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type='number'
+                                step='1'
+                                min='0'
+                                {...field}
+                                onChange={e =>
+                                  field.onChange(
+                                    e.target.value === '' ? undefined : Number(e.target.value)
+                                  )
+                                }
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`items.${index}.unitOfMeasure`}
+                        render={({ field }) => (
+                          <FormItem className='col-span-3'>
+                            <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                              UOM
+                            </FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder='UOM' />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {UOM_OPTIONS.map(uom => (
+                                  <SelectItem key={uom.value} value={uom.value}>
+                                    {uom.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className='grid grid-cols-2 gap-4'>
+                      <FormField
+                        control={form.control}
+                        name={`items.${index}.unitPrice`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                              Unit Price
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type='number'
+                                step='0.01'
+                                min='0'
+                                {...field}
+                                onChange={e =>
+                                  field.onChange(
+                                    e.target.value === '' ? undefined : Number(e.target.value)
+                                  )
+                                }
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   </div>
-                  <div className='grid grid-cols-2 gap-4'>
-                    <FormField
-                      control={form.control}
-                      name={`items.${index}.unitPrice`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
-                            Unit Price
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              type='number'
-                              step='0.01'
-                              min='0'
-                              {...field}
-                              onChange={e => field.onChange(parseFloat(e.target.value))}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                ))}
+                {form.formState.errors.items?.root && (
+                  <p className='text-sm font-medium text-destructive'>
+                    {form.formState.errors.items.root.message}
+                  </p>
+                )}
+              </div>
+
+              <Separator />
+
+              {/* Delivery Details */}
+              <div className='space-y-4'>
+                <h3 className='text-sm font-medium'>Delivery Details</h3>
+
+                <div className='grid grid-cols-2 gap-4'>
+                  <FormField
+                    control={form.control}
+                    name='deliveryDate'
+                    render={({ field }) => (
+                      <FormItem className='flex flex-col'>
+                        <FormLabel>Delivery Date</FormLabel>
+                        <FormControl>
+                          <DatePicker
+                            date={field.value}
+                            setDate={field.onChange}
+                            placeholder='Pick a date'
+                            className='w-full'
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='shippingMethod'
+                    render={({ field }) => (
+                      <FormItem className='flex flex-col'>
+                        <FormLabel>Shipping Method</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            value={field.value || ''}
+                            placeholder='e.g., Air, Sea, Road'
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
-              ))}
-              {form.formState.errors.items?.root && (
-                <p className='text-sm font-medium text-destructive'>
-                  {form.formState.errors.items.root.message}
-                </p>
-              )}
-            </div>
 
-            <Separator />
+                <div className='grid grid-cols-2 gap-4'>
+                  <FormField
+                    control={form.control}
+                    name='shippingCarrier'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Shipping Carrier</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            value={field.value || ''}
+                            placeholder='e.g., FedEx, DHL'
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-            {/* Delivery Details */}
-            <div className='space-y-4'>
-              <h3 className='text-sm font-medium'>Delivery Details</h3>
+                  <FormField
+                    control={form.control}
+                    name='trackingNumber'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tracking Number</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            value={field.value || ''}
+                            placeholder='Tracking number'
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-              <div className='grid grid-cols-2 gap-4'>
-                <FormField
-                  control={form.control}
-                  name='deliveryDate'
-                  render={({ field }) => (
-                    <FormItem className='flex flex-col'>
-                      <FormLabel>Delivery Date</FormLabel>
-                      <FormControl>
-                        <DatePicker
-                          date={field.value}
-                          setDate={field.onChange}
-                          placeholder='Pick a date'
-                          className='w-full'
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name='shippingMethod'
-                  render={({ field }) => (
-                    <FormItem className='flex flex-col'>
-                      <FormLabel>Shipping Method</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value || ''}
-                          placeholder='e.g., Air, Sea, Road'
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className='grid grid-cols-2 gap-4'>
+                  <FormField
+                    control={form.control}
+                    name='deliveryWindowStart'
+                    render={({ field }) => (
+                      <FormItem className='flex flex-col'>
+                        <FormLabel>Delivery Window Start</FormLabel>
+                        <FormControl>
+                          <DatePicker
+                            date={field.value}
+                            setDate={field.onChange}
+                            placeholder='Pick a date'
+                            className='w-full'
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='deliveryWindowEnd'
+                    render={({ field }) => (
+                      <FormItem className='flex flex-col'>
+                        <FormLabel>Delivery Window End</FormLabel>
+                        <FormControl>
+                          <DatePicker
+                            date={field.value}
+                            setDate={field.onChange}
+                            placeholder='Pick a date'
+                            className='w-full'
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
 
-              <div className='grid grid-cols-2 gap-4'>
-                <FormField
-                  control={form.control}
-                  name='shippingCarrier'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Shipping Carrier</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value || ''}
-                          placeholder='e.g., FedEx, DHL'
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name='trackingNumber'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tracking Number</FormLabel>
-                      <FormControl>
-                        <Input {...field} value={field.value || ''} placeholder='Tracking number' />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className='grid grid-cols-2 gap-4'>
-                <FormField
-                  control={form.control}
-                  name='deliveryWindowStart'
-                  render={({ field }) => (
-                    <FormItem className='flex flex-col'>
-                      <FormLabel>Delivery Window Start</FormLabel>
-                      <FormControl>
-                        <DatePicker
-                          date={field.value}
-                          setDate={field.onChange}
-                          placeholder='Pick a date'
-                          className='w-full'
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name='deliveryWindowEnd'
-                  render={({ field }) => (
-                    <FormItem className='flex flex-col'>
-                      <FormLabel>Delivery Window End</FormLabel>
-                      <FormControl>
-                        <DatePicker
-                          date={field.value}
-                          setDate={field.onChange}
-                          placeholder='Pick a date'
-                          className='w-full'
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-
-            <SheetFooter className='gap-2'>
-              <Button type='button' variant='outline' onClick={onClose} disabled={submitting}>
-                Cancel
-              </Button>
-              <Button type='submit' disabled={submitting}>
-                {submitting && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
-                {isEditing ? 'Update Sales Order' : 'Create Sales Order'}
-              </Button>
-            </SheetFooter>
-          </form>
-        </Form>
+              <SheetFooter className='gap-2'>
+                <Button type='button' variant='outline' onClick={onClose} disabled={submitting}>
+                  Cancel
+                </Button>
+                <Button type='submit' disabled={submitting}>
+                  {submitting && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
+                  {isEditing ? 'Update Sales Order' : 'Create Sales Order'}
+                </Button>
+              </SheetFooter>
+            </form>
+          </Form>
+        )}
       </SheetContent>
     </Sheet>
   );

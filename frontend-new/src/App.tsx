@@ -1,3 +1,4 @@
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Toaster } from 'sonner';
 import ThemeProvider from './contexts/ThemeContext';
 import AppRouter from './router/AppRouter';
@@ -10,6 +11,7 @@ function App() {
       <SidebarStylesInjector />
       <AppRouter />
       <Toaster position='top-right' richColors />
+      <SpeedInsights />
     </ThemeProvider>
   );
 }

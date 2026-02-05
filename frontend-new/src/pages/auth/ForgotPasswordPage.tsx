@@ -9,6 +9,7 @@ import useAuth from '@/contexts/AuthContext';
 import { TextInput, PrimaryButton, Label, Card } from '@/components/globalComponents';
 import AuthLayout from '@/components/ui/AuthLayout';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/utils';
 
 export default function ForgotPasswordPage() {
   const navigate = useNavigate();
@@ -53,7 +54,7 @@ export default function ForgotPasswordPage() {
       }, 2000);
     } catch (error: any) {
       toast.error('Failed to send reset email', {
-        description: error.message || 'Please try again.',
+        description: getErrorMessage(error),
         duration: 4000,
       });
     }

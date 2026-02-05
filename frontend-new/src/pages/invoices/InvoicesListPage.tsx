@@ -99,6 +99,7 @@ export default function InvoicesListPage() {
   const [editingInvoice, setEditingInvoice] = useState<any | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [invoiceToDelete, setInvoiceToDelete] = useState<InvoiceSummary | null>(null);
+  const [isDetailLoading, setIsDetailLoading] = useState(false);
 
   const { currentCompany } = useAuth();
 
@@ -157,15 +158,18 @@ export default function InvoicesListPage() {
   };
 
   const handleEdit = async (invoice: InvoiceSummary) => {
+    setEditingInvoice(null);
+    setIsDetailLoading(true);
+    setIsSheetOpen(true);
+
     try {
-      setLoading(true);
       const details = await invoiceService.getInvoiceById(invoice.invoiceId);
       setEditingInvoice(details);
-      setIsSheetOpen(true);
     } catch (error) {
       toast.error('Failed to load invoice details');
+      setIsSheetOpen(false);
     } finally {
-      setLoading(false);
+      setIsDetailLoading(false);
     }
   };
 
@@ -196,11 +200,18 @@ export default function InvoicesListPage() {
   };
 
   const handleStatusChange = async (invoiceId: string, newStatus: InvoiceStatus) => {
+    // Optimistic update
+    const previousInvoices = [...invoices];
+    setInvoices(prev =>
+      prev.map(inv => (inv.invoiceId === invoiceId ? { ...inv, status: newStatus } : inv))
+    );
+    toast.success(`Invoice status updated to ${STATUS_CONFIG[newStatus].label}`);
+
     try {
       await invoiceService.updateInvoiceStatus(invoiceId, newStatus);
-      toast.success(`Invoice status updated to ${STATUS_CONFIG[newStatus].label}`);
       fetchInvoices();
     } catch (error: any) {
+      setInvoices(previousInvoices);
       toast.error(error.message || 'Failed to update status');
     }
   };
@@ -397,6 +408,7 @@ export default function InvoicesListPage() {
           setEditingInvoice(null);
         }}
         initialData={editingInvoice}
+        isLoading={isDetailLoading}
       />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

@@ -51,7 +51,12 @@ interface InventoryFormSheetProps {
   initialData?: any;
 }
 
-export function InventoryFormSheet({ open, onClose, onSaved, initialData }: InventoryFormSheetProps) {
+export function InventoryFormSheet({
+  open,
+  onClose,
+  onSaved,
+  initialData,
+}: InventoryFormSheetProps) {
   const [loading, setLoading] = useState(false);
   const [locations, setLocations] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]); // Simple product list for now if selector isn't ready
@@ -81,8 +86,14 @@ export function InventoryFormSheet({ open, onClose, onSaved, initialData }: Inve
         });
       } else {
         form.reset({
+          inventoryCode: '',
+          productId: '',
+          locationId: '',
           stockQuantity: 0,
           reservedQuantity: 0,
+          value: 0,
+          reorderLevel: 0,
+          maxStockLevel: 0,
         });
       }
       if (currentCompany?.id) {
@@ -200,12 +211,14 @@ export function InventoryFormSheet({ open, onClose, onSaved, initialData }: Inve
                 name='productId'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Product</FormLabel>
-                    <Select 
-                      onValueChange={(val) => {
+                    <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                      Product
+                    </FormLabel>
+                    <Select
+                      onValueChange={val => {
                         field.onChange(val);
                         handleProductChange(val);
-                      }} 
+                      }}
                       value={field.value}
                     >
                       <FormControl>
@@ -231,7 +244,9 @@ export function InventoryFormSheet({ open, onClose, onSaved, initialData }: Inve
                 name='locationId'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Location</FormLabel>
+                    <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                      Location
+                    </FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -266,7 +281,9 @@ export function InventoryFormSheet({ open, onClose, onSaved, initialData }: Inve
                   name='stockQuantity'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Stock Quantity</FormLabel>
+                      <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                        Stock Quantity
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type='number'
@@ -320,7 +337,9 @@ export function InventoryFormSheet({ open, onClose, onSaved, initialData }: Inve
                           value={field.value || 0}
                         />
                       </FormControl>
-                      <FormDescription>Auto-calculated: Cost Price × Stock Quantity</FormDescription>
+                      <FormDescription>
+                        Auto-calculated: Cost Price × Stock Quantity
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}

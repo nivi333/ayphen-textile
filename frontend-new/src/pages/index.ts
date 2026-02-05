@@ -42,7 +42,6 @@ export { default as PurchaseOrdersListPage } from './purchase/PurchaseOrdersList
 // Quality Control
 export { default as QualityCheckpointsListPage } from './quality/QualityCheckpointsListPage';
 export { default as QualityDefectsListPage } from './quality/QualityDefectsListPage';
-export { default as QualityReportsPage } from './quality/QualityReportsPage';
 export { default as ReportsListPage } from './reports/ReportsListPage';
 export { default as ComplianceReportsListPage } from './quality/ComplianceReportsListPage';
 export { default as InspectionsListPage } from './quality/InspectionsListPage';

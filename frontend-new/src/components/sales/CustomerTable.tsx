@@ -76,7 +76,7 @@ export function CustomerTable({
       </TableHeader>
       <TableBody>
         {customers.map(customer => (
-          <TableRow key={customer.id}>
+          <TableRow key={customer.id} data-testid='customer-row'>
             <TableCell className='font-medium'>{customer.code}</TableCell>
             <TableCell className='font-medium'>{customer.name}</TableCell>
             <TableCell>{customer.phone || '—'}</TableCell>
@@ -98,7 +98,11 @@ export function CustomerTable({
             <TableCell>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <IconButton variant='ghost' className='h-8 w-8 p-0'>
+                  <IconButton
+                    variant='ghost'
+                    className='h-8 w-8 p-0'
+                    data-testid='customer-actions'
+                  >
                     <MoreHorizontal className='h-4 w-4' />
                   </IconButton>
                 </DropdownMenuTrigger>

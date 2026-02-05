@@ -17,6 +17,7 @@ import { EmailPhoneInput, validateEmailOrPhone, isEmail } from '@/components/Ema
 import AuthLayout from '@/components/ui/AuthLayout';
 import { toast } from 'sonner';
 import { User } from 'lucide-react';
+import { getErrorMessage } from '@/lib/utils';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -121,7 +122,7 @@ export default function RegisterPage() {
         navigate('/login');
       } catch (err: any) {
         toast.error('Registration failed', {
-          description: err.message || 'Please try again.',
+          description: getErrorMessage(err),
           duration: 4000,
         });
       } finally {

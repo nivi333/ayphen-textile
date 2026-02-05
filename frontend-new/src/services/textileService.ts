@@ -2,7 +2,6 @@ import { API_BASE_URL } from '../config/api';
 import { toast } from 'sonner';
 import { AuthStorage } from '../utils/storage';
 
-
 // ============================================
 // FABRIC PRODUCTION INTERFACES
 // ============================================
@@ -94,7 +93,7 @@ export interface CreateYarnManufacturingData {
   yarnName: string;
   fiberContent: string;
   yarnType: string;
-  yarnCount: number;
+  yarnCount: string;
   twistType?: string;
   twistPerInch?: number;
   ply?: number;

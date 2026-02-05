@@ -101,14 +101,21 @@ export function ProductFormSheet({
 
   const resetForm = useCallback(() => {
     form.reset({
-      isActive: true,
-      stockQuantity: 0,
-      unitOfMeasure: 'PCS',
+      name: '',
+      productCode: '',
+      barcode: '',
+      description: '',
       productType: 'OWN_MANUFACTURE',
+      material: '',
+      color: '',
+      size: '',
+      weight: 0,
+      unitOfMeasure: 'PCS',
       costPrice: 0,
       sellingPrice: 0,
-      weight: 0,
+      stockQuantity: 0,
       reorderLevel: 0,
+      isActive: true,
     });
     setImageFile(null);
     setOriginalName('');
@@ -379,13 +386,17 @@ export function ProductFormSheet({
                         value={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger data-testid='product-type-select'>
                             <SelectValue placeholder='Select type' />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value='OWN_MANUFACTURE'>Own Manufacture</SelectItem>
-                          <SelectItem value='VENDOR_SUPPLIED'>Vendor Supplied</SelectItem>
+                          <SelectItem value='OWN_MANUFACTURE' data-testid='type-own-manufacture'>
+                            Own Manufacture
+                          </SelectItem>
+                          <SelectItem value='VENDOR_SUPPLIED' data-testid='type-vendor-supplied'>
+                            Vendor Supplied
+                          </SelectItem>
                           <SelectItem value='OUTSOURCED'>Outsourced</SelectItem>
                           <SelectItem value='RAW_MATERIAL'>Raw Material</SelectItem>
                           <SelectItem value='FINISHED_GOODS'>Finished Goods</SelectItem>
@@ -529,14 +540,18 @@ export function ProductFormSheet({
                         value={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger data-testid='uom-select'>
                             <SelectValue placeholder='Select UOM' />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent className='max-h-[200px]'>
-                          {UOM_OPTIONS.map(uom => (
-                            <SelectItem key={uom.value} value={uom.value}>
-                              {uom.label}
+                          {UOM_OPTIONS.map(option => (
+                            <SelectItem
+                              key={option.value}
+                              value={option.value}
+                              data-testid={`uom-${option.value.toLowerCase()}`}
+                            >
+                              {option.label}
                             </SelectItem>
                           ))}
                         </SelectContent>

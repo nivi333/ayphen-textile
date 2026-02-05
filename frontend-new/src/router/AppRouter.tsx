@@ -28,7 +28,6 @@ const QualityCheckpointsListPage = lazy(
   () => import('../pages/quality/QualityCheckpointsListPage')
 );
 const QualityDefectsListPage = lazy(() => import('../pages/quality/QualityDefectsListPage'));
-const QualityReportsPage = lazy(() => import('../pages/quality/QualityReportsPage'));
 const ComplianceReportsListPage = lazy(() => import('../pages/quality/ComplianceReportsListPage'));
 const UsersListPage = lazy(() => import('../pages/users/UsersListPage'));
 const UserProfilePage = lazy(() => import('../pages/users/UserProfilePage'));
@@ -354,17 +353,6 @@ export default function AppRouter() {
                   <ProtectedRoute requireCompany={true}>
                     <MainLayout>
                       <InspectionDetailsPage />
-                    </MainLayout>
-                  </ProtectedRoute>
-                }
-              />
-
-              <Route
-                path='/quality/reports'
-                element={
-                  <ProtectedRoute requireCompany={true}>
-                    <MainLayout>
-                      <QualityReportsPage />
                     </MainLayout>
                   </ProtectedRoute>
                 }
