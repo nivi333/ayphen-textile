@@ -38,7 +38,7 @@ const createOrderSchema = Joi.object({
         discountPercent: Joi.number().min(0).max(100).optional().allow(null),
         taxRate: Joi.number().min(0).max(100).optional().allow(null),
         notes: Joi.string().max(500).allow('', null).optional(),
-      }),
+      })
     )
     .min(1)
     .required(),
@@ -47,21 +47,21 @@ const createOrderSchema = Joi.object({
 const updateOrderSchema = Joi.object({
   customerId: Joi.string().uuid().allow(null).optional(),
   customerName: Joi.string().min(1).max(255).optional(),
-  customerCode: Joi.string().max(100).allow(null).optional(),
+  customerCode: Joi.string().max(100).allow('', null).optional(),
   priority: Joi.string().valid('URGENT', 'HIGH', 'NORMAL', 'LOW').optional(),
   orderDate: Joi.date().optional(),
   deliveryDate: Joi.date().min(Joi.ref('orderDate')).allow(null).optional(),
   expectedDeliveryDate: Joi.date().min(Joi.ref('orderDate')).allow(null).optional(),
-  currency: Joi.string().max(10).optional(),
-  paymentTerms: Joi.string().max(100).allow(null).optional(),
-  referenceNumber: Joi.string().max(255).allow(null).optional(),
-  notes: Joi.string().max(1000).allow(null).optional(),
-  customerNotes: Joi.string().max(1000).allow(null).optional(),
-  locationId: Joi.string().allow(null).optional(),
-  shippingAddress: Joi.string().max(500).allow(null).optional(),
-  shippingCarrier: Joi.string().max(255).allow(null).optional(),
-  trackingNumber: Joi.string().max(255).allow(null).optional(),
-  shippingMethod: Joi.string().max(255).allow(null).optional(),
+  currency: Joi.string().max(10).allow('', null).optional(),
+  paymentTerms: Joi.string().max(100).allow('', null).optional(),
+  referenceNumber: Joi.string().max(255).allow('', null).optional(),
+  notes: Joi.string().max(1000).allow('', null).optional(),
+  customerNotes: Joi.string().max(1000).allow('', null).optional(),
+  locationId: Joi.string().allow('', null).optional(),
+  shippingAddress: Joi.string().max(500).allow('', null).optional(),
+  shippingCarrier: Joi.string().max(255).allow('', null).optional(),
+  trackingNumber: Joi.string().max(255).allow('', null).optional(),
+  shippingMethod: Joi.string().max(255).allow('', null).optional(),
   deliveryWindowStart: Joi.date().allow(null).optional(),
   deliveryWindowEnd: Joi.date().min(Joi.ref('deliveryWindowStart')).allow(null).optional(),
   shippingCharges: Joi.number().min(0).allow(null).optional(),
@@ -78,7 +78,7 @@ const updateOrderSchema = Joi.object({
         discountPercent: Joi.number().min(0).max(100).optional(),
         taxRate: Joi.number().min(0).max(100).optional(),
         notes: Joi.string().max(500).allow('', null).optional(),
-      }),
+      })
     )
     .min(1)
     .optional(),
@@ -86,7 +86,15 @@ const updateOrderSchema = Joi.object({
 
 const updateOrderStatusSchema = Joi.object({
   status: Joi.string()
-    .valid('DRAFT', 'CONFIRMED', 'IN_PRODUCTION', 'READY_TO_SHIP', 'SHIPPED', 'DELIVERED', 'CANCELLED')
+    .valid(
+      'DRAFT',
+      'CONFIRMED',
+      'IN_PRODUCTION',
+      'READY_TO_SHIP',
+      'SHIPPED',
+      'DELIVERED',
+      'CANCELLED'
+    )
     .required(),
   deliveryDate: Joi.date().optional(),
   shippingCarrier: Joi.string().max(255).optional(),

@@ -1,4 +1,16 @@
-import { PrismaClient, CheckpointType, QCStatus, DefectCategory, DefectSeverity, ResolutionStatus, ComplianceType, ComplianceStatus, InspectionType, InspectionStatus, EvaluationType } from '@prisma/client';
+import {
+  PrismaClient,
+  CheckpointType,
+  QCStatus,
+  DefectCategory,
+  DefectSeverity,
+  ResolutionStatus,
+  ComplianceType,
+  ComplianceStatus,
+  InspectionType,
+  InspectionStatus,
+  EvaluationType,
+} from '@prisma/client';
 import { globalPrisma } from '../database/connection';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -214,17 +226,20 @@ export class QualityService {
     };
   }
 
-  /* 
+  /*
    * Get Checkpoints - FILTERED BY COMPANY for multi-tenant isolation
    * FIX: Returns empty array if table doesn't exist (new company scenario)
    * This prevents 500 errors when quality tables haven't been migrated yet
    */
-  async getCheckpoints(companyId: string, filters?: {
-    checkpointType?: CheckpointType;
-    status?: QCStatus;
-    startDate?: Date;
-    endDate?: Date;
-  }) {
+  async getCheckpoints(
+    companyId: string,
+    filters?: {
+      checkpointType?: CheckpointType;
+      status?: QCStatus;
+      startDate?: Date;
+      endDate?: Date;
+    }
+  ) {
     try {
       const where: any = { company_id: companyId };
 
@@ -277,7 +292,9 @@ export class QualityService {
     } catch (error: any) {
       // If table doesn't exist, return empty array instead of throwing error
       if (error.code === 'P2021' || error.message?.includes('does not exist')) {
-        console.warn(`Quality checkpoints table not found for company ${companyId}. Returning empty array.`);
+        console.warn(
+          `Quality checkpoints table not found for company ${companyId}. Returning empty array.`
+        );
         return [];
       }
       throw error;
@@ -337,7 +354,11 @@ export class QualityService {
   }
 
   // Update Checkpoint
-  async updateCheckpoint(companyId: string, checkpointId: string, data: Partial<CreateCheckpointData> & { status?: QCStatus }) {
+  async updateCheckpoint(
+    companyId: string,
+    checkpointId: string,
+    data: Partial<CreateCheckpointData> & { status?: QCStatus }
+  ) {
     const updateData: any = { updated_at: new Date() };
 
     if (data.checkpointName) updateData.checkpoint_name = data.checkpointName;
@@ -365,12 +386,31 @@ export class QualityService {
     const defectId = await this.generateDefectId(companyId);
     const now = new Date();
 
+    let checkpointUuid = data.checkpointId;
+
+    // Check if checkpointId is a valid UUID, if not, try to look up by human-readable checkpoint_id
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(data.checkpointId)) {
+      const checkpoint = await this.prisma.quality_checkpoints.findFirst({
+        where: {
+          checkpoint_id: data.checkpointId,
+          company_id: companyId,
+        },
+        select: { id: true },
+      });
+
+      if (!checkpoint) {
+        throw new Error(`Checkpoint with ID ${data.checkpointId} not found`);
+      }
+      checkpointUuid = checkpoint.id;
+    }
+
     const defect = await this.prisma.quality_defects.create({
       data: {
         id: uuidv4(),
         defect_id: defectId,
         company_id: companyId,
-        checkpoint_id: data.checkpointId,
+        checkpoint_id: checkpointUuid,
         product_id: data.productId,
         defect_category: data.defectCategory,
         defect_type: data.defectType,
@@ -403,16 +443,19 @@ export class QualityService {
     };
   }
 
-  /* 
+  /*
    * Get Defects - FILTERED BY COMPANY for multi-tenant isolation
    * FIX: Returns empty array if table doesn't exist (new company scenario)
    * This prevents 500 errors when quality tables haven't been migrated yet
    */
-  async getDefects(companyId: string, filters?: {
-    defectCategory?: DefectCategory;
-    severity?: DefectSeverity;
-    resolutionStatus?: ResolutionStatus;
-  }) {
+  async getDefects(
+    companyId: string,
+    filters?: {
+      defectCategory?: DefectCategory;
+      severity?: DefectSeverity;
+      resolutionStatus?: ResolutionStatus;
+    }
+  ) {
     try {
       const where: any = { company_id: companyId };
 
@@ -461,7 +504,9 @@ export class QualityService {
     } catch (error: any) {
       // If table doesn't exist, return empty array instead of throwing error
       if (error.code === 'P2021' || error.message?.includes('does not exist')) {
-        console.warn(`Quality defects table not found for company ${companyId}. Returning empty array.`);
+        console.warn(
+          `Quality defects table not found for company ${companyId}. Returning empty array.`
+        );
         return [];
       }
       throw error;
@@ -469,7 +514,12 @@ export class QualityService {
   }
 
   // Resolve Defect
-  async resolveDefect(companyId: string, defectId: string, resolvedBy: string, resolutionNotes?: string) {
+  async resolveDefect(
+    companyId: string,
+    defectId: string,
+    resolvedBy: string,
+    resolutionNotes?: string
+  ) {
     const defect = await this.prisma.quality_defects.update({
       where: { id: defectId },
       data: {
@@ -600,15 +650,18 @@ export class QualityService {
     };
   }
 
-  /* 
+  /*
    * Get Compliance Reports - FILTERED BY COMPANY for multi-tenant isolation
    * FIX: Returns empty array if table doesn't exist (new company scenario)
    * This prevents 500 errors when quality tables haven't been migrated yet
    */
-  async getComplianceReports(companyId: string, filters?: {
-    reportType?: ComplianceType;
-    status?: ComplianceStatus;
-  }) {
+  async getComplianceReports(
+    companyId: string,
+    filters?: {
+      reportType?: ComplianceType;
+      status?: ComplianceStatus;
+    }
+  ) {
     try {
       const where: any = { company_id: companyId };
 
@@ -640,7 +693,9 @@ export class QualityService {
     } catch (error: any) {
       // If table doesn't exist, return empty array instead of throwing error
       if (error.code === 'P2021' || error.message?.includes('does not exist')) {
-        console.warn(`Compliance reports table not found for company ${companyId}. Returning empty array.`);
+        console.warn(
+          `Compliance reports table not found for company ${companyId}. Returning empty array.`
+        );
         return [];
       }
       throw error;
@@ -678,7 +733,11 @@ export class QualityService {
   }
 
   // Update Compliance Report
-  async updateComplianceReport(companyId: string, reportId: string, data: UpdateComplianceReportData) {
+  async updateComplianceReport(
+    companyId: string,
+    reportId: string,
+    data: UpdateComplianceReportData
+  ) {
     const now = new Date();
 
     const report = await this.prisma.compliance_reports.update({

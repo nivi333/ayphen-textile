@@ -121,10 +121,7 @@ export class BillService {
       const po = await this.prisma.purchase_orders.findFirst({
         where: {
           company_id: companyId,
-          OR: [
-            { po_id: data.purchaseOrderId },
-            { id: data.purchaseOrderId },
-          ],
+          OR: [{ po_id: data.purchaseOrderId }, { id: data.purchaseOrderId }],
         },
         select: { id: true },
       });
@@ -194,77 +191,73 @@ export class BillService {
     const totalAmount = subtotal - totalDiscount + totalTax + shippingCharges;
     const balanceDue = totalAmount; // Initially, balance due equals total
 
-    // Create bill with items in a transaction
-    const bill = await this.prisma.$transaction(async tx => {
-      const newBill = await tx.bills.create({
-        data: {
-          id: uuidv4(),
-          bill_id: billId,
-          company_id: companyId,
-          supplier_id: data.supplierId || null,
-          supplier_name: data.supplierName,
-          supplier_code: data.supplierCode || null,
-          purchase_order_id: purchaseOrderUuid,
-          location_id: data.locationId,
-          bill_number: data.billNumber || null,
-          bill_date: new Date(data.billDate),
-          due_date: new Date(data.dueDate),
-          status: 'DRAFT',
-          payment_terms: (data.paymentTerms as PaymentTerms) || 'NET_30',
-          currency: data.currency || 'INR',
-          subtotal: new Prisma.Decimal(subtotal),
-          discount_amount: new Prisma.Decimal(totalDiscount),
-          tax_amount: new Prisma.Decimal(totalTax),
-          shipping_charges: new Prisma.Decimal(shippingCharges),
-          total_amount: new Prisma.Decimal(totalAmount),
-          amount_paid: new Prisma.Decimal(0),
-          balance_due: new Prisma.Decimal(balanceDue),
-          notes: data.notes || null,
-          supplier_invoice_no: data.supplierInvoiceNo || null,
-          is_active: true,
-          updated_at: new Date(),
-          bill_items: {
-            create: itemsWithTotals,
-          },
+    // Create bill with items (atomic operation, no transaction wrapper needed)
+    const bill = await this.prisma.bills.create({
+      data: {
+        id: uuidv4(),
+        bill_id: billId,
+        company_id: companyId,
+        supplier_id: data.supplierId || null,
+        supplier_name: data.supplierName,
+        supplier_code: data.supplierCode || null,
+        purchase_order_id: purchaseOrderUuid,
+        location_id: data.locationId,
+        bill_number: data.billNumber || null,
+        bill_date: new Date(data.billDate),
+        due_date: new Date(data.dueDate),
+        status: 'DRAFT',
+        payment_terms: (data.paymentTerms as PaymentTerms) || 'NET_30',
+        currency: data.currency || 'INR',
+        subtotal: new Prisma.Decimal(subtotal),
+        discount_amount: new Prisma.Decimal(totalDiscount),
+        tax_amount: new Prisma.Decimal(totalTax),
+        shipping_charges: new Prisma.Decimal(shippingCharges),
+        total_amount: new Prisma.Decimal(totalAmount),
+        amount_paid: new Prisma.Decimal(0),
+        balance_due: new Prisma.Decimal(balanceDue),
+        notes: data.notes || null,
+        supplier_invoice_no: data.supplierInvoiceNo || null,
+        is_active: true,
+        updated_at: new Date(),
+        bill_items: {
+          create: itemsWithTotals,
         },
-        include: {
-          bill_items: {
-            include: {
-              product: {
-                select: {
-                  id: true,
-                  product_code: true,
-                  name: true,
-                  unit_of_measure: true,
-                },
+      },
+      include: {
+        bill_items: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                product_code: true,
+                name: true,
+                unit_of_measure: true,
               },
             },
           },
-          supplier: {
-            select: {
-              id: true,
-              name: true,
-              code: true,
-            },
-          },
-          location: {
-            select: {
-              id: true,
-              name: true,
-              location_id: true,
-            },
-          },
-          purchase_order: {
-            select: {
-              id: true,
-              po_id: true,
-              status: true,
-            },
+        },
+        supplier: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
           },
         },
-      });
-
-      return newBill;
+        location: {
+          select: {
+            id: true,
+            name: true,
+            location_id: true,
+          },
+        },
+        purchase_order: {
+          select: {
+            id: true,
+            po_id: true,
+            status: true,
+          },
+        },
+      },
     });
 
     return this.toDto(bill);

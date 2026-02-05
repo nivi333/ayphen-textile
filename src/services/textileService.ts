@@ -1,4 +1,15 @@
-import { PrismaClient, FabricType, QualityGrade, YarnType, YarnProcess, DyeingProcess, GarmentType, ProductionStage, DesignCategory, DesignStatus } from '@prisma/client';
+import {
+  PrismaClient,
+  FabricType,
+  QualityGrade,
+  YarnType,
+  YarnProcess,
+  DyeingProcess,
+  GarmentType,
+  ProductionStage,
+  DesignCategory,
+  DesignStatus,
+} from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
 import { globalPrisma } from '../database/connection';
@@ -278,10 +289,10 @@ export class TextileService {
   }
 
   async updateFabric(id: string, companyId: string, data: Partial<CreateFabricData>) {
-    // Find fabric by fabric_id first
+    // Find fabric by id (UUID) or fabric_id (human-readable)
     const existingFabric = await this.prisma.fabric_production.findFirst({
       where: {
-        fabric_id: id,
+        OR: [{ id: id }, { fabric_id: id }],
         company_id: companyId,
       },
     });
@@ -318,7 +329,10 @@ export class TextileService {
 
   async deleteFabric(id: string, companyId: string) {
     const fabric = await this.prisma.fabric_production.findFirst({
-      where: { fabric_id: id, company_id: companyId },
+      where: {
+        OR: [{ id: id }, { fabric_id: id }],
+        company_id: companyId,
+      },
     });
 
     if (!fabric) {
@@ -388,7 +402,7 @@ export class TextileService {
         company_id: companyId,
         location_id: data.locationId,
         yarn_type: data.yarnType,
-        yarn_count: data.yarnCount,
+        yarn_count: data.yarnCount.toString(),
         twist_per_inch: data.twistPerInch,
         ply: data.ply,
         color: data.color,
@@ -440,10 +454,10 @@ export class TextileService {
   }
 
   async updateYarn(id: string, companyId: string, data: Partial<CreateYarnData>) {
-    // Find yarn by yarn_id first
+    // Find yarn by id (UUID) or yarn_id (human-readable)
     const existingYarn = await this.prisma.yarn_manufacturing.findFirst({
       where: {
-        yarn_id: id,
+        OR: [{ id: id }, { yarn_id: id }],
         company_id: companyId,
       },
     });
@@ -458,7 +472,7 @@ export class TextileService {
         yarn_name: data.yarnName,
         fiber_content: data.fiberContent,
         yarn_type: data.yarnType,
-        yarn_count: data.yarnCount,
+        yarn_count: data.yarnCount ? data.yarnCount.toString() : undefined,
         twist_type: data.twistType || null,
         twist_per_inch: data.twistPerInch,
         ply: data.ply,
@@ -482,7 +496,10 @@ export class TextileService {
 
   async deleteYarn(id: string, companyId: string) {
     const yarn = await this.prisma.yarn_manufacturing.findFirst({
-      where: { yarn_id: id, company_id: companyId },
+      where: {
+        OR: [{ id: id }, { yarn_id: id }],
+        company_id: companyId,
+      },
     });
 
     if (!yarn) {

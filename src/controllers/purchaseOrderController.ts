@@ -35,7 +35,7 @@ const createPurchaseOrderSchema = Joi.object({
         taxRate: Joi.number().min(0).max(100).optional().allow(null),
         expectedDelivery: Joi.date().optional().allow(null),
         notes: Joi.string().max(500).allow('', null).optional(),
-      }),
+      })
     )
     .min(1)
     .required(),
@@ -44,19 +44,19 @@ const createPurchaseOrderSchema = Joi.object({
 const updatePurchaseOrderSchema = Joi.object({
   supplierId: Joi.string().uuid().allow(null).optional(),
   supplierName: Joi.string().min(1).max(255).optional(),
-  supplierCode: Joi.string().max(100).allow(null).optional(),
+  supplierCode: Joi.string().max(100).allow('', null).optional(),
   priority: Joi.string().valid('URGENT', 'HIGH', 'NORMAL', 'LOW').optional(),
   poDate: Joi.date().optional(),
   expectedDeliveryDate: Joi.date().min(Joi.ref('poDate')).allow(null).optional(),
-  currency: Joi.string().max(10).optional(),
-  paymentTerms: Joi.string().max(100).allow(null).optional(),
-  referenceNumber: Joi.string().max(255).allow(null).optional(),
-  notes: Joi.string().max(1000).allow(null).optional(),
-  termsConditions: Joi.string().max(2000).allow(null).optional(),
-  locationId: Joi.string().allow(null).optional(),
-  deliveryAddress: Joi.string().max(500).allow(null).optional(),
-  shippingMethod: Joi.string().max(255).allow(null).optional(),
-  incoterms: Joi.string().max(100).allow(null).optional(),
+  currency: Joi.string().max(10).allow('', null).optional(),
+  paymentTerms: Joi.string().max(100).allow('', null).optional(),
+  referenceNumber: Joi.string().max(255).allow('', null).optional(),
+  notes: Joi.string().max(1000).allow('', null).optional(),
+  termsConditions: Joi.string().max(2000).allow('', null).optional(),
+  locationId: Joi.string().allow('', null).optional(),
+  deliveryAddress: Joi.string().max(500).allow('', null).optional(),
+  shippingMethod: Joi.string().max(255).allow('', null).optional(),
+  incoterms: Joi.string().max(100).allow('', null).optional(),
   shippingCharges: Joi.number().min(0).allow(null).optional(),
   items: Joi.array()
     .items(
@@ -72,7 +72,7 @@ const updatePurchaseOrderSchema = Joi.object({
         taxRate: Joi.number().min(0).max(100).optional(),
         expectedDelivery: Joi.date().allow(null).optional(),
         notes: Joi.string().max(500).allow('', null).optional(),
-      }),
+      })
     )
     .min(1)
     .optional(),
