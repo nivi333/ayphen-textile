@@ -1,7 +1,6 @@
 import { API_BASE_URL } from '../config/api';
 import { AuthStorage } from '../utils/storage';
 
-
 export interface CreateCompanyRequest {
   name: string;
   slug?: string;
@@ -195,12 +194,15 @@ class CompanyService {
     }
   }
 
-  async inviteUser(companyId: string, inviteData: {
-    emailOrPhone: string;
-    role: 'ADMIN' | 'MANAGER' | 'EMPLOYEE';
-    companyId: string;
-    locationId?: string;
-  }): Promise<any> {
+  async inviteUser(
+    companyId: string,
+    inviteData: {
+      emailOrPhone: string;
+      role: 'ADMIN' | 'MANAGER' | 'EMPLOYEE';
+      companyId: string;
+      locationId?: string;
+    }
+  ): Promise<any> {
     try {
       const payload = {
         emailOrPhone: inviteData.emailOrPhone,
