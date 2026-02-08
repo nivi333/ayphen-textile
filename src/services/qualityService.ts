@@ -495,9 +495,12 @@ export class QualityService {
         quantity: d.quantity,
         description: d.description ?? undefined,
         imageUrl: d.image_url ?? undefined,
+        status: d.resolution_status,
         resolutionStatus: d.resolution_status,
         resolvedBy: d.resolved_by ?? undefined,
         resolvedAt: d.resolved_at ?? undefined,
+        resolvedDate: d.resolved_at ?? undefined,
+        detectedDate: d.created_at,
         createdAt: d.created_at,
         updatedAt: d.updated_at,
       }));

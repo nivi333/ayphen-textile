@@ -277,7 +277,11 @@ const QualityDefectsListPage = () => {
                     {defect.description || '-'}
                   </TableCell>
                   <TableCell className='text-center font-medium'>{defect.quantity}</TableCell>
-                  <TableCell>{format(new Date(defect.detectedDate), 'MMM dd, yyyy')}</TableCell>
+                  <TableCell>
+                    {defect.detectedDate && !isNaN(new Date(defect.detectedDate).getTime())
+                      ? format(new Date(defect.detectedDate), 'MMM dd, yyyy')
+                      : '-'}
+                  </TableCell>
                   <TableCell>
                     <StatusBadge variant={STATUS_COLORS[defect.status] || 'default'}>
                       {defect.status}
