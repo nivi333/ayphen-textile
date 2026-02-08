@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
 import { Loader2 } from 'lucide-react';
@@ -31,15 +31,22 @@ const CashFlowReport: React.FC<CashFlowReportProps> = ({
 }) => {
   const [data, setData] = useState<CashFlowData | null>(null);
   const [loading, setLoading] = useState(false);
+  const lastTriggerRef = useRef<number>(-1);
 
   useEffect(() => {
-    fetchData();
+    if (triggerFetch > 0 && triggerFetch !== lastTriggerRef.current) {
+      lastTriggerRef.current = triggerFetch;
+      fetchData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [triggerFetch]);
 
   const fetchData = async () => {
     if (!dateRange?.from || !dateRange?.to) {
       return;
     }
+
+    if (loading) return;
 
     setLoading(true);
     onLoadingChange(true);

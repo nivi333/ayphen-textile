@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
 import { Loader2 } from 'lucide-react';
@@ -30,15 +30,23 @@ const MachineUtilizationReport: React.FC<MachineUtilizationReportProps> = ({
 }) => {
   const [data, setData] = useState<UtilizationData | null>(null);
   const [loading, setLoading] = useState(false);
+  const lastTriggerRef = useRef<number>(-1);
 
   useEffect(() => {
-    fetchData();
+    // Only fetch if triggerFetch has actually changed (user clicked Generate)
+    if (triggerFetch > 0 && triggerFetch !== lastTriggerRef.current) {
+      lastTriggerRef.current = triggerFetch;
+      fetchData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [triggerFetch]);
 
   const fetchData = async () => {
     if (!dateRange?.from || !dateRange?.to) {
       return;
     }
+
+    if (loading) return; // Prevent duplicate calls
 
     setLoading(true);
     onLoadingChange(true);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { format } from 'date-fns';
 import { Loader2 } from 'lucide-react';
 import { reportService } from '@/services/reportService';
@@ -30,12 +30,19 @@ const BalanceSheetReport: React.FC<BalanceSheetReportProps> = ({
 }) => {
   const [data, setData] = useState<BalanceSheetData | null>(null);
   const [loading, setLoading] = useState(false);
+  const lastTriggerRef = useRef<number>(-1);
 
   useEffect(() => {
-    fetchData();
+    if (triggerFetch > 0 && triggerFetch !== lastTriggerRef.current) {
+      lastTriggerRef.current = triggerFetch;
+      fetchData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [triggerFetch]);
 
   const fetchData = async () => {
+    if (loading) return;
+
     setLoading(true);
     onLoadingChange(true);
     try {
