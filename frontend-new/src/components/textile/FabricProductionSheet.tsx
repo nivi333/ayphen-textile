@@ -185,12 +185,15 @@ export function FabricProductionSheet({
                 )}
               />
 
-              {isEditing && fabric?.code && (
-                <div className='space-y-2'>
-                  <label className='text-sm font-medium'>Code</label>
-                  <Input value={fabric.code} disabled className='bg-muted' />
-                </div>
-              )}
+              <div className='space-y-2'>
+                <label className='text-sm font-medium'>Code</label>
+                <Input 
+                  value={isEditing && fabric?.code ? fabric.code : ''} 
+                  placeholder='Auto generated' 
+                  disabled 
+                  className='bg-muted' 
+                />
+              </div>
 
               <div className='grid grid-cols-2 gap-4'>
                 <FormField

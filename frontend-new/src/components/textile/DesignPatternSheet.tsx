@@ -179,12 +179,15 @@ export function DesignPatternSheet({
                 )}
               />
 
-              {isEditing && design?.code && (
-                <div className='space-y-2'>
-                  <label className='text-sm font-medium'>Code</label>
-                  <Input value={design.code} disabled className='bg-muted' />
-                </div>
-              )}
+              <div className='space-y-2'>
+                <label className='text-sm font-medium'>Code</label>
+                <Input 
+                  value={isEditing && design?.code ? design.code : ''} 
+                  placeholder='Auto generated' 
+                  disabled 
+                  className='bg-muted' 
+                />
+              </div>
 
               <div className='grid grid-cols-2 gap-4'>
                 <FormField

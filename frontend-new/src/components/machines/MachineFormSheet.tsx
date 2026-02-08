@@ -312,12 +312,15 @@ export function MachineFormSheet({
                   </p>
                 </div>
 
-                {isEditing && machineCode && (
-                  <div className='space-y-2'>
-                    <label className='text-sm font-medium'>Machine Code</label>
-                    <Input value={machineCode} disabled className='bg-muted' />
-                  </div>
-                )}
+                <div className='space-y-2'>
+                  <label className='text-sm font-medium'>Machine Code</label>
+                  <Input 
+                    value={isEditing && machineCode ? machineCode : ''} 
+                    placeholder='Auto generated' 
+                    disabled 
+                    className='bg-muted' 
+                  />
+                </div>
 
                 <FormField
                   control={form.control}

@@ -154,14 +154,15 @@ export function QualityDefectFormSheet({
             <div className='space-y-4'>
               <h3 className='text-sm font-medium text-muted-foreground'>Defect Information</h3>
 
-              {isEditing && defect?.defectId && (
-                <FormItem>
-                  <FormLabel>Code</FormLabel>
-                  <FormControl>
-                    <Input value={defect.defectId} disabled className='bg-muted' />
-                  </FormControl>
-                </FormItem>
-              )}
+              <div className='space-y-2'>
+                <label className='text-sm font-medium'>Code</label>
+                <Input 
+                  value={isEditing && defect?.defectId ? defect.defectId : ''} 
+                  placeholder='Auto generated' 
+                  disabled 
+                  className='bg-muted' 
+                />
+              </div>
 
               <FormField
                 control={form.control}

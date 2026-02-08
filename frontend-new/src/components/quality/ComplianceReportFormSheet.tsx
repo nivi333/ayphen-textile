@@ -152,14 +152,15 @@ export function ComplianceReportFormSheet({
             <div className='space-y-4'>
               <h3 className='text-sm font-medium text-muted-foreground'>Report Information</h3>
 
-              {isEditing && report?.reportCode && (
-                <FormItem>
-                  <FormLabel>Code</FormLabel>
-                  <FormControl>
-                    <Input value={report.reportCode} disabled className='bg-muted' />
-                  </FormControl>
-                </FormItem>
-              )}
+              <div className='space-y-2'>
+                <label className='text-sm font-medium'>Code</label>
+                <Input 
+                  value={isEditing && report?.reportCode ? report.reportCode : ''} 
+                  placeholder='Auto generated' 
+                  disabled 
+                  className='bg-muted' 
+                />
+              </div>
 
               <div className='grid grid-cols-2 gap-4'>
                 <FormField
