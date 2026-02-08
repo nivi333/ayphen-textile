@@ -41,7 +41,6 @@ const GarmentManufacturingListPage = lazy(
   () => import('../pages/textile/GarmentManufacturingListPage')
 );
 const DesignPatternsListPage = lazy(() => import('../pages/textile/DesignPatternsListPage'));
-const FinanceOverviewPage = lazy(() => import('../pages/finance/FinanceOverviewPage'));
 const AccountsReceivablePage = lazy(() => import('../pages/finance/AccountsReceivablePage'));
 const AccountsPayablePage = lazy(() => import('../pages/finance/AccountsPayablePage'));
 const ExpensesPage = lazy(() => import('../pages/finance/ExpensesPage'));
@@ -385,17 +384,6 @@ export default function AppRouter() {
                   <ProtectedRoute requireCompany={true}>
                     <MainLayout>
                       <UserProfilePage />
-                    </MainLayout>
-                  </ProtectedRoute>
-                }
-              />
-
-              <Route
-                path='/finance'
-                element={
-                  <ProtectedRoute requireCompany={true}>
-                    <MainLayout>
-                      <FinanceOverviewPage />
                     </MainLayout>
                   </ProtectedRoute>
                 }

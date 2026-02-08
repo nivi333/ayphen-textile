@@ -180,12 +180,10 @@ export function DesignPatternSheet({
               />
 
               {isEditing && design?.code && (
-                <FormItem>
-                  <FormLabel>Code</FormLabel>
-                  <FormControl>
-                    <Input value={design.code} disabled className='bg-muted' />
-                  </FormControl>
-                </FormItem>
+                <div className='space-y-2'>
+                  <label className='text-sm font-medium'>Code</label>
+                  <Input value={design.code} disabled className='bg-muted' />
+                </div>
               )}
 
               <div className='grid grid-cols-2 gap-4'>
@@ -304,8 +302,8 @@ export function DesignPatternSheet({
                 />
               </div>
 
-              <FormItem>
-                <FormLabel>Color Palette</FormLabel>
+              <div className='space-y-2'>
+                <label className='text-sm font-medium'>Color Palette</label>
                 <div className='flex gap-2 mb-2'>
                   <Input
                     value={colorInput}
@@ -341,7 +339,7 @@ export function DesignPatternSheet({
                     <span className='text-sm text-muted-foreground'>No colors added</span>
                   )}
                 </div>
-              </FormItem>
+              </div>
             </div>
 
             <div className='h-px bg-border' />

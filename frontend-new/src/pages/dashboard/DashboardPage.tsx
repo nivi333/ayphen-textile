@@ -8,6 +8,8 @@ import {
   Plus,
   Users,
   Loader2,
+  FileText,
+  ArrowRight,
 } from 'lucide-react';
 import {
   AreaChart,
@@ -26,8 +28,10 @@ import useAuth from '@/contexts/AuthContext';
 import { PrimaryButton } from '@/components/globalComponents';
 import { Card } from '@/components/ui/card';
 import { analyticsService, DashboardAnalytics } from '@/services/analyticsService';
+import { invoiceService, InvoiceSummary } from '@/services/invoiceService';
 import { COMPANY_TEXT } from '@/constants/company';
 import UserInviteSheet from '@/components/users/UserInviteSheet';
+import { StatusBadge } from '@/components/globalComponents';
 
 const DashboardPage = () => {
   const { currentCompany } = useAuth();
@@ -37,6 +41,7 @@ const DashboardPage = () => {
   const [loading, setLoading] = useState(false);
   const [analytics, setAnalytics] = useState<DashboardAnalytics | null>(null);
   const [revenueTrends, setRevenueTrends] = useState<any[]>([]);
+  const [recentInvoices, setRecentInvoices] = useState<InvoiceSummary[]>([]);
   const userRole = currentCompany?.role;
 
   useEffect(() => {
@@ -58,10 +63,17 @@ const DashboardPage = () => {
 
     setLoading(true);
     try {
-      const [dashboardAnalytics, revenueTrendData] = await Promise.all([
+      const [dashboardAnalytics, revenueTrendData, invoicesData] = await Promise.all([
         analyticsService.getDashboardAnalytics(),
         analyticsService.getRevenueTrends(6),
+        invoiceService.getInvoices().catch(() => []),
       ]);
+
+      // Get last 5 invoices sorted by date
+      const sortedInvoices = invoicesData
+        .sort((a: InvoiceSummary, b: InvoiceSummary) => new Date(b.invoiceDate).getTime() - new Date(a.invoiceDate).getTime())
+        .slice(0, 5);
+      setRecentInvoices(sortedInvoices);
 
       setAnalytics(dashboardAnalytics);
 
@@ -311,13 +323,64 @@ const DashboardPage = () => {
           </div>
         </div>
 
-        {/* Stock Alerts Card - Placeholder */}
+        {/* Recent Financial Transactions */}
         <Card>
           <div className='p-6'>
-            <h3 className='text-lg font-semibold mb-4'>Stock Alerts</h3>
-            <p className='text-sm text-muted-foreground text-center py-8'>
-              Stock alerts will be displayed here once the inventory module is migrated.
-            </p>
+            <div className='flex items-center justify-between mb-4'>
+              <div className='flex items-center gap-2'>
+                <FileText className='h-5 w-5 text-primary' />
+                <h3 className='text-lg font-semibold'>Recent Invoices</h3>
+              </div>
+              <button
+                onClick={() => navigate('/invoices')}
+                className='text-sm text-primary hover:underline flex items-center gap-1'
+              >
+                View All <ArrowRight className='h-4 w-4' />
+              </button>
+            </div>
+            {recentInvoices.length === 0 ? (
+              <p className='text-sm text-muted-foreground text-center py-6'>
+                No recent invoices found
+              </p>
+            ) : (
+              <div className='space-y-3'>
+                {recentInvoices.map(invoice => (
+                  <div
+                    key={invoice.invoiceId}
+                    className='flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer'
+                    onClick={() => navigate(`/invoices/${invoice.invoiceId}`)}
+                  >
+                    <div className='flex items-center gap-3'>
+                      <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center'>
+                        <FileText className='h-5 w-5 text-primary' />
+                      </div>
+                      <div>
+                        <p className='font-medium text-sm'>{invoice.invoiceId}</p>
+                        <p className='text-xs text-muted-foreground'>{invoice.customerName}</p>
+                      </div>
+                    </div>
+                    <div className='text-right'>
+                      <p className='font-semibold text-sm'>
+                        {invoice.currency} {Number(invoice.totalAmount).toLocaleString()}
+                      </p>
+                      <StatusBadge
+                        variant={
+                          invoice.status === 'PAID'
+                            ? 'success'
+                            : invoice.status === 'OVERDUE'
+                              ? 'error'
+                              : invoice.status === 'PARTIALLY_PAID'
+                                ? 'warning'
+                                : 'default'
+                        }
+                      >
+                        {invoice.status.replace('_', ' ')}
+                      </StatusBadge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </Card>
       </div>

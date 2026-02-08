@@ -41,6 +41,7 @@ import { useSortableTable } from '@/hooks/useSortableTable';
 interface QualityDefect {
   id: string;
   defectId: string;
+  checkpointId?: string;
   defectCategory: string;
   defectType: string;
   severity: 'CRITICAL' | 'MAJOR' | 'MINOR' | 'COSMETIC';
@@ -235,6 +236,9 @@ const QualityDefectsListPage = () => {
                 <TableHead className='w-[120px]' sortable sortKey='defectId'>
                   Defect ID
                 </TableHead>
+                <TableHead className='w-[120px]' sortable sortKey='checkpointId'>
+                  Checkpoint ID
+                </TableHead>
                 <TableHead className='w-[150px]' sortable sortKey='defectCategory'>
                   Category
                 </TableHead>
@@ -261,6 +265,9 @@ const QualityDefectsListPage = () => {
                 <TableRow key={defect.id}>
                   <TableCell>
                     <span className='font-semibold'>{defect.defectId}</span>
+                  </TableCell>
+                  <TableCell>
+                    <span className='text-muted-foreground font-mono text-sm'>{defect.checkpointId || '-'}</span>
                   </TableCell>
                   <TableCell>
                     <div>

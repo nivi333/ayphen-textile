@@ -211,7 +211,9 @@ export const DesignPatternsListPage = () => {
             {data.map(row => (
               <TableRow key={row.id}>
                 <TableCell>
-                  <span className='font-mono text-xs'>{row.id.substring(0, 8)}</span>
+                  <span className='font-mono text-xs bg-muted px-2 py-1 rounded'>
+                    {row.code || row.designId || '-'}
+                  </span>
                 </TableCell>
                 <TableCell>
                   <div className='flex flex-col'>

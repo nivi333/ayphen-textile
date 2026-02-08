@@ -189,8 +189,8 @@ export const DyeingFinishingListPage = () => {
             {data.map(row => (
               <TableRow key={row.id}>
                 <TableCell>
-                  <span className='font-mono text-xs'>
-                    {row.batchNumber || row.id.substring(0, 8)}
+                  <span className='font-mono text-xs bg-muted px-2 py-1 rounded'>
+                    {row.code || row.processId || '-'}
                   </span>
                 </TableCell>
                 <TableCell>

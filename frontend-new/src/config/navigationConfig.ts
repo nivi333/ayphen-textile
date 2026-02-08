@@ -166,12 +166,6 @@ export const CORE_MODULES: MenuItem[] = [
     ],
   },
   {
-    key: 'finance',
-    label: 'Finance',
-    icon: DollarSign,
-    path: '/finance',
-  },
-  {
     key: 'reports',
     label: 'Reports',
     icon: FileText,
@@ -352,12 +346,12 @@ export const getNavigationByIndustry = (industry: IndustryType): MenuItem[] => {
   const specificModules = industryModules[industry] || TEXTILE_MODULES;
 
   // Combine core modules with industry-specific modules
-  // Insert industry modules before Finance
-  const financeIndex = CORE_MODULES.findIndex(m => m.key === 'finance');
-  const beforeFinance = CORE_MODULES.slice(0, financeIndex);
-  const afterFinance = CORE_MODULES.slice(financeIndex);
+  // Insert industry modules before Reports
+  const reportsIndex = CORE_MODULES.findIndex(m => m.key === 'reports');
+  const beforeReports = CORE_MODULES.slice(0, reportsIndex);
+  const afterReports = CORE_MODULES.slice(reportsIndex);
 
-  return [...beforeFinance, ...specificModules, ...afterFinance];
+  return [...beforeReports, ...specificModules, ...afterReports];
 };
 
 /**
