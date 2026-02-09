@@ -57,7 +57,7 @@ export interface CustomerFilters {
 }
 
 class CustomerService {
-  // Generate Customer Code (CUST-001, etc.)
+  // Generate Customer Code (C001, C002, etc.) - Company level
   private async generateCustomerCode(companyId: string): Promise<string> {
     const lastCustomer = await prisma.customers.findFirst({
       where: { company_id: companyId },
@@ -65,17 +65,15 @@ class CustomerService {
       select: { code: true },
     });
 
-    if (!lastCustomer) {
-      return 'CUST-001';
+    if (!lastCustomer || !lastCustomer.code) {
+      return 'C001';
     }
 
-    try {
-      const lastNumber = parseInt(lastCustomer.code.split('-')[1]);
-      const nextNumber = lastNumber + 1;
-      return `CUST-${nextNumber.toString().padStart(3, '0')}`;
-    } catch (error) {
-      return `CUST-${Date.now().toString().slice(-4)}`;
-    }
+    // Extract numeric part safely (handles both C001 and CUST-001 formats)
+    const numericPart = lastCustomer.code.replace(/[^0-9]/g, '');
+    const lastNumber = parseInt(numericPart, 10);
+    const next = Number.isNaN(lastNumber) ? 1 : lastNumber + 1;
+    return `C${next.toString().padStart(3, '0')}`;
   }
 
   async createCustomer(data: CreateCustomerData) {

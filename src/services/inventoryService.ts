@@ -95,12 +95,13 @@ class InventoryService {
         select: { inventory_code: true },
       });
 
-      if (!lastInventory) {
+      if (!lastInventory || !lastInventory.inventory_code) {
         return 'INV001';
       }
 
-      const numericPart = parseInt(lastInventory.inventory_code.substring(3), 10);
-      const next = Number.isNaN(numericPart) ? 1 : numericPart + 1;
+      const numericPart = lastInventory.inventory_code.replace(/[^0-9]/g, '');
+      const lastNumber = parseInt(numericPart, 10);
+      const next = Number.isNaN(lastNumber) ? 1 : lastNumber + 1;
       return `INV${next.toString().padStart(3, '0')}`;
     } catch (error) {
       console.error('Error generating inventory code:', error);
@@ -571,12 +572,13 @@ class InventoryService {
         select: { movement_id: true },
       });
 
-      if (!lastMovement) {
+      if (!lastMovement || !lastMovement.movement_id) {
         return 'MOV001';
       }
 
-      const numericPart = parseInt(lastMovement.movement_id.substring(3), 10);
-      const next = Number.isNaN(numericPart) ? 1 : numericPart + 1;
+      const numericPart = lastMovement.movement_id.replace(/[^0-9]/g, '');
+      const lastNumber = parseInt(numericPart, 10);
+      const next = Number.isNaN(lastNumber) ? 1 : lastNumber + 1;
       return `MOV${next.toString().padStart(3, '0')}`;
     } catch (error) {
       console.error('Error generating movement ID:', error);
@@ -592,12 +594,13 @@ class InventoryService {
         select: { reservation_id: true },
       });
 
-      if (!lastReservation) {
+      if (!lastReservation || !lastReservation.reservation_id) {
         return 'RES001';
       }
 
-      const numericPart = parseInt(lastReservation.reservation_id.substring(3), 10);
-      const next = Number.isNaN(numericPart) ? 1 : numericPart + 1;
+      const numericPart = lastReservation.reservation_id.replace(/[^0-9]/g, '');
+      const lastNumber = parseInt(numericPart, 10);
+      const next = Number.isNaN(lastNumber) ? 1 : lastNumber + 1;
       return `RES${next.toString().padStart(3, '0')}`;
     } catch (error) {
       console.error('Error generating reservation ID:', error);
@@ -613,12 +616,13 @@ class InventoryService {
         select: { alert_id: true },
       });
 
-      if (!lastAlert) {
+      if (!lastAlert || !lastAlert.alert_id) {
         return 'ALT001';
       }
 
-      const numericPart = parseInt(lastAlert.alert_id.substring(3), 10);
-      const next = Number.isNaN(numericPart) ? 1 : numericPart + 1;
+      const numericPart = lastAlert.alert_id.replace(/[^0-9]/g, '');
+      const lastNumber = parseInt(numericPart, 10);
+      const next = Number.isNaN(lastNumber) ? 1 : lastNumber + 1;
       return `ALT${next.toString().padStart(3, '0')}`;
     } catch (error) {
       console.error('Error generating alert ID:', error);

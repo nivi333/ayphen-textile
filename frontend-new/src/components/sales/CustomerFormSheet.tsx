@@ -199,7 +199,10 @@ export function CustomerFormSheet({
           if (key === 'isActive') resetData[key] = true;
           else if (key === 'sameAsBillingAddress') resetData[key] = false;
           else if (key === 'creditLimit') resetData[key] = undefined;
-          else resetData[key] = '';
+          // Preserve null/undefined for select fields - don't convert to empty string
+          else if (key === 'customerType' || key === 'customerCategory' || key === 'paymentTerms') {
+            resetData[key] = resetData[key] ?? '';
+          } else resetData[key] = '';
         }
       });
 

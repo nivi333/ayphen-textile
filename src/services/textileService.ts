@@ -145,63 +145,68 @@ export class TextileService {
   // ============================================
 
   async generateFabricCode(companyId: string): Promise<string> {
-    const lastFabric = await this.prisma.fabric_production.findFirst({
-      where: { company_id: companyId },
-      orderBy: { created_at: 'desc' },
-      select: { code: true },
-    });
-    if (!lastFabric || !lastFabric.code) return 'FAB-001';
-    const match = lastFabric.code.match(/FAB-(\d+)/);
-    const lastNumber = match ? parseInt(match[1]) : 0;
-    return `FAB-${(lastNumber + 1).toString().padStart(3, '0')}`;
+    const fabrics = await this.prisma.fabric_production.findMany({ select: { code: true } });
+    let max = 0;
+    for (const f of fabrics) {
+      const match = f.code.match(/FAB-(\d+)/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > max) max = num;
+      }
+    }
+    return `FAB-${(max + 1).toString().padStart(3, '0')}`;
   }
 
   async generateYarnCode(companyId: string): Promise<string> {
-    const lastYarn = await this.prisma.yarn_manufacturing.findFirst({
-      where: { company_id: companyId },
-      orderBy: { created_at: 'desc' },
-      select: { code: true },
-    });
-    if (!lastYarn || !lastYarn.code) return 'YARN-001';
-    const match = lastYarn.code.match(/YARN-(\d+)/);
-    const lastNumber = match ? parseInt(match[1]) : 0;
-    return `YARN-${(lastNumber + 1).toString().padStart(3, '0')}`;
+    const yarns = await this.prisma.yarn_manufacturing.findMany({ select: { code: true } });
+    let max = 0;
+    for (const y of yarns) {
+      const match = y.code.match(/YARN-(\d+)/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > max) max = num;
+      }
+    }
+    return `YARN-${(max + 1).toString().padStart(3, '0')}`;
   }
 
   async generateDyeingCode(companyId: string): Promise<string> {
-    const lastDyeing = await this.prisma.dyeing_finishing.findFirst({
-      where: { company_id: companyId },
-      orderBy: { created_at: 'desc' },
-      select: { code: true },
-    });
-    if (!lastDyeing || !lastDyeing.code) return 'DYE-001';
-    const match = lastDyeing.code.match(/DYE-(\d+)/);
-    const lastNumber = match ? parseInt(match[1]) : 0;
-    return `DYE-${(lastNumber + 1).toString().padStart(3, '0')}`;
+    const dyeings = await this.prisma.dyeing_finishing.findMany({ select: { code: true } });
+    let max = 0;
+    for (const d of dyeings) {
+      const match = d.code.match(/DYE-(\d+)/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > max) max = num;
+      }
+    }
+    return `DYE-${(max + 1).toString().padStart(3, '0')}`;
   }
 
   async generateGarmentCode(companyId: string): Promise<string> {
-    const lastGarment = await this.prisma.garment_manufacturing.findFirst({
-      where: { company_id: companyId },
-      orderBy: { created_at: 'desc' },
-      select: { code: true },
-    });
-    if (!lastGarment || !lastGarment.code) return 'GAR-001';
-    const match = lastGarment.code.match(/GAR-(\d+)/);
-    const lastNumber = match ? parseInt(match[1]) : 0;
-    return `GAR-${(lastNumber + 1).toString().padStart(3, '0')}`;
+    const garments = await this.prisma.garment_manufacturing.findMany({ select: { code: true } });
+    let max = 0;
+    for (const g of garments) {
+      const match = g.code.match(/GAR-(\d+)/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > max) max = num;
+      }
+    }
+    return `GAR-${(max + 1).toString().padStart(3, '0')}`;
   }
 
   async generateDesignCode(companyId: string): Promise<string> {
-    const lastDesign = await this.prisma.design_patterns.findFirst({
-      where: { company_id: companyId },
-      orderBy: { created_at: 'desc' },
-      select: { code: true },
-    });
-    if (!lastDesign || !lastDesign.code) return 'DES-001';
-    const match = lastDesign.code.match(/DES-(\d+)/);
-    const lastNumber = match ? parseInt(match[1]) : 0;
-    return `DES-${(lastNumber + 1).toString().padStart(3, '0')}`;
+    const designs = await this.prisma.design_patterns.findMany({ select: { code: true } });
+    let max = 0;
+    for (const d of designs) {
+      const match = d.code.match(/DES-(\d+)/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > max) max = num;
+      }
+    }
+    return `DES-${(max + 1).toString().padStart(3, '0')}`;
   }
 
   // ============================================
@@ -209,19 +214,16 @@ export class TextileService {
   // ============================================
 
   private async generateFabricId(companyId: string): Promise<string> {
-    const lastFabric = await this.prisma.fabric_production.findFirst({
-      where: { company_id: companyId },
-      orderBy: { created_at: 'desc' },
-      select: { fabric_id: true },
-    });
-
-    if (!lastFabric) {
-      return 'FAB001';
+    const fabrics = await this.prisma.fabric_production.findMany({ select: { fabric_id: true } });
+    let max = 0;
+    for (const f of fabrics) {
+      const match = f.fabric_id.match(/FAB(\d+)/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > max) max = num;
+      }
     }
-
-    const lastNumber = parseInt(lastFabric.fabric_id.substring(3));
-    const nextNumber = lastNumber + 1;
-    return `FAB${nextNumber.toString().padStart(3, '0')}`;
+    return `FAB${(max + 1).toString().padStart(3, '0')}`;
   }
 
   async createFabric(companyId: string, data: CreateFabricData) {
@@ -378,19 +380,16 @@ export class TextileService {
   // ============================================
 
   private async generateYarnId(companyId: string): Promise<string> {
-    const lastYarn = await this.prisma.yarn_manufacturing.findFirst({
-      where: { company_id: companyId },
-      orderBy: { created_at: 'desc' },
-      select: { yarn_id: true },
-    });
-
-    if (!lastYarn) {
-      return 'YARN001';
+    const yarns = await this.prisma.yarn_manufacturing.findMany({ select: { yarn_id: true } });
+    let max = 0;
+    for (const y of yarns) {
+      const match = y.yarn_id.match(/YARN(\d+)/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > max) max = num;
+      }
     }
-
-    const lastNumber = parseInt(lastYarn.yarn_id.substring(4));
-    const nextNumber = lastNumber + 1;
-    return `YARN${nextNumber.toString().padStart(3, '0')}`;
+    return `YARN${(max + 1).toString().padStart(3, '0')}`;
   }
 
   async createYarn(companyId: string, data: CreateYarnData) {
@@ -548,19 +547,16 @@ export class TextileService {
   // ============================================
 
   private async generateProcessId(companyId: string): Promise<string> {
-    const lastProcess = await this.prisma.dyeing_finishing.findFirst({
-      where: { company_id: companyId },
-      orderBy: { created_at: 'desc' },
-      select: { process_id: true },
-    });
-
-    if (!lastProcess) {
-      return 'DYE001';
+    const processes = await this.prisma.dyeing_finishing.findMany({ select: { process_id: true } });
+    let max = 0;
+    for (const p of processes) {
+      const match = p.process_id.match(/DYE(\d+)/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > max) max = num;
+      }
     }
-
-    const lastNumber = parseInt(lastProcess.process_id.substring(3));
-    const nextNumber = lastNumber + 1;
-    return `DYE${nextNumber.toString().padStart(3, '0')}`;
+    return `DYE${(max + 1).toString().padStart(3, '0')}`;
   }
 
   async createDyeing(companyId: string, data: CreateDyeingData) {
@@ -722,19 +718,18 @@ export class TextileService {
   // ============================================
 
   private async generateGarmentId(companyId: string): Promise<string> {
-    const lastGarment = await this.prisma.garment_manufacturing.findFirst({
-      where: { company_id: companyId },
-      orderBy: { created_at: 'desc' },
+    const garments = await this.prisma.garment_manufacturing.findMany({
       select: { garment_id: true },
     });
-
-    if (!lastGarment) {
-      return 'GARM001';
+    let max = 0;
+    for (const g of garments) {
+      const match = g.garment_id.match(/GARM(\d+)/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > max) max = num;
+      }
     }
-
-    const lastNumber = parseInt(lastGarment.garment_id.substring(4));
-    const nextNumber = lastNumber + 1;
-    return `GARM${nextNumber.toString().padStart(3, '0')}`;
+    return `GARM${(max + 1).toString().padStart(3, '0')}`;
   }
 
   async createGarment(companyId: string, data: CreateGarmentData) {

@@ -92,89 +92,74 @@ export class QualityService {
 
   // Generate checkpoint ID (QC001, QC002, etc.) - GLOBALLY UNIQUE but company-scoped
   private async generateCheckpointId(companyId: string): Promise<string> {
-    // Find the last checkpoint GLOBALLY to ensure unique IDs across all companies
-    // This prevents duplicate checkpoint_id violations in the database
-    const lastCheckpoint = await this.prisma.quality_checkpoints.findFirst({
-      orderBy: { created_at: 'desc' },
+    const checkpoints = await this.prisma.quality_checkpoints.findMany({
       select: { checkpoint_id: true },
     });
-
-    if (!lastCheckpoint) {
-      return 'QC001';
+    let max = 0;
+    for (const cp of checkpoints) {
+      const match = cp.checkpoint_id.match(/QC(\d+)/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > max) max = num;
+      }
     }
-
-    const lastNumber = parseInt(lastCheckpoint.checkpoint_id.substring(2));
-    const nextNumber = lastNumber + 1;
-    return `QC${nextNumber.toString().padStart(3, '0')}`;
+    return `QC${(max + 1).toString().padStart(3, '0')}`;
   }
 
   // Generate defect ID (DEF001, DEF002, etc.) - GLOBALLY UNIQUE
   private async generateDefectId(companyId: string): Promise<string> {
-    // Find the last defect globally since defect_id has @unique constraint
-    const lastDefect = await this.prisma.quality_defects.findFirst({
-      orderBy: { created_at: 'desc' },
-      select: { defect_id: true },
-    });
-
-    if (!lastDefect) {
-      return 'DEF001';
+    const defects = await this.prisma.quality_defects.findMany({ select: { defect_id: true } });
+    let max = 0;
+    for (const d of defects) {
+      const match = d.defect_id.match(/DEF(\d+)/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > max) max = num;
+      }
     }
-
-    const lastNumber = parseInt(lastDefect.defect_id.substring(3));
-    const nextNumber = lastNumber + 1;
-    return `DEF${nextNumber.toString().padStart(3, '0')}`;
+    return `DEF${(max + 1).toString().padStart(3, '0')}`;
   }
 
-  // Generate metric ID (QM001, QM002, etc.) - GLOBALLY UNIQUE
   private async generateMetricId(companyId: string): Promise<string> {
-    // Find the last metric globally since metric_id has @unique constraint
-    const lastMetric = await this.prisma.quality_metrics.findFirst({
-      orderBy: { created_at: 'desc' },
-      select: { metric_id: true },
-    });
-
-    if (!lastMetric) {
-      return 'QM001';
+    const metrics = await this.prisma.quality_metrics.findMany({ select: { metric_id: true } });
+    let max = 0;
+    for (const m of metrics) {
+      const match = m.metric_id.match(/QM(\d+)/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > max) max = num;
+      }
     }
-
-    const lastNumber = parseInt(lastMetric.metric_id.substring(2));
-    const nextNumber = lastNumber + 1;
-    return `QM${nextNumber.toString().padStart(3, '0')}`;
+    return `QM${(max + 1).toString().padStart(3, '0')}`;
   }
 
-  // Generate compliance report ID (CR001, CR002, etc.) - GLOBALLY UNIQUE
   private async generateReportId(companyId: string): Promise<string> {
-    // Find the last report globally since report_id has @unique constraint
-    const lastReport = await this.prisma.compliance_reports.findFirst({
-      orderBy: { created_at: 'desc' },
-      select: { report_id: true },
-    });
-
-    if (!lastReport) {
-      return 'CR001';
+    const reports = await this.prisma.compliance_reports.findMany({ select: { report_id: true } });
+    let max = 0;
+    for (const r of reports) {
+      const match = r.report_id.match(/CR(\d+)/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > max) max = num;
+      }
     }
-
-    const lastNumber = parseInt(lastReport.report_id.substring(2));
-    const nextNumber = lastNumber + 1;
-    return `CR${nextNumber.toString().padStart(3, '0')}`;
+    return `CR${(max + 1).toString().padStart(3, '0')}`;
   }
 
-  // Generate compliance report code (COMP001, COMP002, etc.) - GLOBALLY UNIQUE
   private async generateReportCode(companyId: string): Promise<string> {
-    // Find the last report globally since report_code has @unique constraint
-    const lastReport = await this.prisma.compliance_reports.findFirst({
-      where: { report_code: { not: null } },
-      orderBy: { created_at: 'desc' },
+    const reports = await this.prisma.compliance_reports.findMany({
       select: { report_code: true },
     });
-
-    if (!lastReport || !lastReport.report_code) {
-      return 'COMP001';
+    let max = 0;
+    for (const r of reports) {
+      if (!r.report_code) continue;
+      const match = r.report_code.match(/COMP(\d+)/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > max) max = num;
+      }
     }
-
-    const lastNumber = parseInt(lastReport.report_code.substring(4));
-    const nextNumber = lastNumber + 1;
-    return `COMP${nextNumber.toString().padStart(3, '0')}`;
+    return `COMP${(max + 1).toString().padStart(3, '0')}`;
   }
 
   // Create Quality Checkpoint

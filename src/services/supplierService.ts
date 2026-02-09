@@ -60,7 +60,7 @@ export interface SupplierFilters {
 }
 
 class SupplierService {
-  // Generate Supplier Code (SUPP-001, etc.)
+  // Generate Supplier Code (S001, S002, etc.) - Company level
   private async generateSupplierCode(companyId: string): Promise<string> {
     const lastSupplier = await prisma.suppliers.findFirst({
       where: { company_id: companyId },
@@ -68,17 +68,15 @@ class SupplierService {
       select: { code: true },
     });
 
-    if (!lastSupplier) {
-      return 'SUPP-001';
+    if (!lastSupplier || !lastSupplier.code) {
+      return 'S001';
     }
 
-    try {
-      const lastNumber = parseInt(lastSupplier.code.split('-')[1]);
-      const nextNumber = lastNumber + 1;
-      return `SUPP-${nextNumber.toString().padStart(3, '0')}`;
-    } catch (error) {
-      return `SUPP-${Date.now().toString().slice(-4)}`;
-    }
+    // Extract numeric part safely (handles both S001 and SUPP-001 formats)
+    const numericPart = lastSupplier.code.replace(/[^0-9]/g, '');
+    const lastNumber = parseInt(numericPart, 10);
+    const next = Number.isNaN(lastNumber) ? 1 : lastNumber + 1;
+    return `S${next.toString().padStart(3, '0')}`;
   }
 
   async createSupplier(data: CreateSupplierData) {

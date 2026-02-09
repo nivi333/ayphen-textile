@@ -4,22 +4,32 @@ import { CreateCompanyData } from '../types';
 import { industryToEnum, industryToDisplay } from '../utils/industryMapper';
 
 // Auto-generate Company ID (C001, C002, etc.)
+// Auto-generate Company ID (C001, C002, etc.)
 async function generateCompanyId(): Promise<string> {
   try {
-    const lastCompany = await globalPrisma.companies.findFirst({
-      orderBy: { company_id: 'desc' },
+    const companies = await globalPrisma.companies.findMany({
       select: { company_id: true },
     });
 
-    if (!lastCompany) {
+    if (companies.length === 0) {
       return 'C001';
     }
 
-    const lastNumber = parseInt(lastCompany.company_id.replace('C', ''));
-    const nextNumber = lastNumber + 1;
-    return `C${nextNumber.toString().padStart(3, '0')}`;
+    let maxNumber = 0;
+    for (const comp of companies) {
+      const match = comp.company_id.match(/[A-Z]+(\d+)/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (!Number.isNaN(num) && num > maxNumber) {
+          maxNumber = num;
+        }
+      }
+    }
+
+    const next = maxNumber + 1;
+    return `C${next.toString().padStart(3, '0')}`;
   } catch (error) {
-    // Fallback to timestamp-based ID if there's an error
+    console.error('Error generating company ID:', error);
     return `C${Date.now().toString().slice(-3)}`;
   }
 }
@@ -32,12 +42,14 @@ async function generateLocationId(): Promise<string> {
       select: { location_id: true },
     });
 
-    if (!lastLocation) {
+    if (!lastLocation || !lastLocation.location_id) {
       return 'L001';
     }
 
-    const lastNumber = parseInt(lastLocation.location_id.replace('L', ''));
-    const nextNumber = lastNumber + 1;
+    // Extract numeric part safely using regex
+    const numericPart = lastLocation.location_id.replace(/[^0-9]/g, '');
+    const lastNumber = parseInt(numericPart, 10);
+    const nextNumber = Number.isNaN(lastNumber) ? 1 : lastNumber + 1;
     return `L${nextNumber.toString().padStart(3, '0')}`;
   } catch (error) {
     // Fallback to timestamp-based ID if there's an error

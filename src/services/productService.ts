@@ -72,7 +72,7 @@ export class ProductService {
   }
 
   /**
-   * Generate unique product ID for a company
+   * Generate unique product ID for a company (P001, P002, etc.) - Company level
    */
   private async generateProductId(companyId: string): Promise<string> {
     try {
@@ -82,21 +82,24 @@ export class ProductService {
         select: { product_id: true },
       });
 
-      if (!lastProduct) {
-        return 'PRD001';
+      if (!lastProduct || !lastProduct.product_id) {
+        return 'P001';
       }
 
-      const numericPart = parseInt(lastProduct.product_id.substring(3), 10);
-      const next = Number.isNaN(numericPart) ? 1 : numericPart + 1;
-      return `PRD${next.toString().padStart(3, '0')}`;
+      // Extract numeric part safely using regex
+      const numericPart = lastProduct.product_id.replace(/[^0-9]/g, '');
+      const lastNumber = parseInt(numericPart, 10);
+      const next = Number.isNaN(lastNumber) ? 1 : lastNumber + 1;
+      return `P${next.toString().padStart(3, '0')}`;
     } catch (error) {
       console.error('Error generating product ID:', error);
-      return `PRD${Date.now().toString().slice(-3)}`;
+      return `P${Date.now().toString().slice(-3)}`;
     }
   }
 
   /**
-   * Generate unique product code for a company
+   * Generate unique product code for a company (P001, P002, etc.) - Company level
+   * Product code and product ID use same prefix P for consistency
    */
   private async generateProductCode(companyId: string): Promise<string> {
     try {
@@ -106,16 +109,18 @@ export class ProductService {
         select: { product_code: true },
       });
 
-      if (!lastProduct) {
-        return 'PC0001';
+      if (!lastProduct || !lastProduct.product_code) {
+        return 'P001';
       }
 
-      const numericPart = parseInt(lastProduct.product_code.substring(2), 10);
-      const next = Number.isNaN(numericPart) ? 1 : numericPart + 1;
-      return `PC${next.toString().padStart(4, '0')}`;
+      // Extract numeric part safely using regex
+      const numericPart = lastProduct.product_code.replace(/[^0-9]/g, '');
+      const lastNumber = parseInt(numericPart, 10);
+      const next = Number.isNaN(lastNumber) ? 1 : lastNumber + 1;
+      return `P${next.toString().padStart(3, '0')}`;
     } catch (error) {
       console.error('Error generating product code:', error);
-      return `PC${Date.now().toString().slice(-4)}`;
+      return `P${Date.now().toString().slice(-3)}`;
     }
   }
 

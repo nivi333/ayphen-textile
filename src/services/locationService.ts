@@ -6,7 +6,7 @@ import { CreateLocationData, UpdateLocationData } from '../types';
 
 // Use shared global Prisma client
 
-// Generate unique location ID (L001, L002, etc.)
+// Generate unique location ID (L001, L002, etc.) - Company level
 export async function generateLocationId(companyId: string): Promise<string> {
   try {
     const lastLocation = await globalPrisma.company_locations.findFirst({
@@ -15,14 +15,15 @@ export async function generateLocationId(companyId: string): Promise<string> {
       select: { location_id: true },
     });
 
-    if (!lastLocation) {
+    if (!lastLocation || !lastLocation.location_id) {
       return 'L001';
     }
 
-    // Extract numeric part and increment
-    const lastNumber = parseInt(lastLocation.location_id.substring(1));
-    const nextNumber = lastNumber + 1;
-    return `L${nextNumber.toString().padStart(3, '0')}`;
+    // Extract numeric part safely using regex
+    const numericPart = lastLocation.location_id.replace(/[^0-9]/g, '');
+    const lastNumber = parseInt(numericPart, 10);
+    const next = Number.isNaN(lastNumber) ? 1 : lastNumber + 1;
+    return `L${next.toString().padStart(3, '0')}`;
   } catch (error) {
     console.error('Error generating location ID:', error);
     return `L${Date.now().toString().slice(-3)}`;
@@ -178,7 +179,7 @@ export class LocationService {
       const locations = await this.prisma.company_locations.findMany({
         where: {
           company_id: companyId,
-          is_active: true,
+          // Removed is_active filter to show all locations including inactive
         },
         orderBy: { created_at: 'asc' },
         select: {
@@ -311,6 +312,18 @@ export class LocationService {
       // Prevent deactivating headquarters location
       if (data.isActive === false && existingLocation.is_headquarters) {
         throw new Error('Cannot deactivate headquarters location');
+      }
+
+      // Prevent setting inactive location as headquarters or default
+      const isLocationInactive =
+        data.isActive === false || (data.isActive === undefined && !existingLocation.is_active);
+      if (isLocationInactive) {
+        if (data.isHeadquarters === true) {
+          throw new Error('Cannot set inactive location as headquarters');
+        }
+        if (data.isDefault === true) {
+          throw new Error('Cannot set inactive location as default');
+        }
       }
 
       // If updating to headquarters, ensure no other headquarters exists

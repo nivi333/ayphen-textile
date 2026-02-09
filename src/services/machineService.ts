@@ -1,4 +1,11 @@
-import { PrismaClient, MachineStatus, MaintenanceType, BreakdownSeverity, BreakdownStatus, BreakdownPriority } from '@prisma/client';
+import {
+  PrismaClient,
+  MachineStatus,
+  MaintenanceType,
+  BreakdownSeverity,
+  BreakdownStatus,
+  BreakdownPriority,
+} from '@prisma/client';
 import { globalPrisma } from '../database/connection';
 import { logger } from '../utils/logger';
 
@@ -82,47 +89,46 @@ export interface CreateMaintenanceRecordRequest {
 }
 
 class MachineService {
-  // Generate unique machine ID
+  // Generate unique machine ID (M001, M002, etc.) - Company level
   private async generateMachineId(companyId: string): Promise<string> {
     try {
-      const lastMachine = await prisma.machines.findFirst({
+      const machines = await prisma.machines.findMany({
         where: { company_id: companyId },
-        orderBy: { machine_id: 'desc' },
         select: { machine_id: true },
       });
-
-      if (!lastMachine) {
-        return 'MCH0001';
+      let max = 0;
+      for (const m of machines) {
+        const match = m.machine_id.match(/M(\d+)/);
+        if (match) {
+          const num = parseInt(match[1], 10);
+          if (num > max) max = num;
+        }
       }
-
-      const numericPart = parseInt(lastMachine.machine_id.substring(3), 10);
-      const next = Number.isNaN(numericPart) ? 1 : numericPart + 1;
-      return `MCH${next.toString().padStart(4, '0')}`;
+      return `M${(max + 1).toString().padStart(3, '0')}`;
     } catch (error) {
       logger.error('Error generating machine ID:', error);
-      return `MCH${Date.now().toString().slice(-4)}`;
+      return `M${Date.now().toString().slice(-3)}`;
     }
   }
 
-  // Generate unique machine code
   private async generateMachineCode(companyId: string): Promise<string> {
     try {
-      const lastMachine = await prisma.machines.findFirst({
+      const machines = await prisma.machines.findMany({
         where: { company_id: companyId },
-        orderBy: { machine_code: 'desc' },
         select: { machine_code: true },
       });
-
-      if (!lastMachine) {
-        return 'MC0001';
+      let max = 0;
+      for (const m of machines) {
+        const match = m.machine_code.match(/M(\d+)/);
+        if (match) {
+          const num = parseInt(match[1], 10);
+          if (num > max) max = num;
+        }
       }
-
-      const numericPart = parseInt(lastMachine.machine_code.substring(2), 10);
-      const next = Number.isNaN(numericPart) ? 1 : numericPart + 1;
-      return `MC${next.toString().padStart(4, '0')}`;
+      return `M${(max + 1).toString().padStart(3, '0')}`;
     } catch (error) {
       logger.error('Error generating machine code:', error);
-      return `MC${Date.now().toString().slice(-4)}`;
+      return `M${Date.now().toString().slice(-3)}`;
     }
   }
 
@@ -214,7 +220,7 @@ class MachineService {
           specifications: data.specifications || null,
           image_url: data.imageUrl || null,
           current_operator_id: data.currentOperatorId || null,
-          operational_status: data.operationalStatus as any || 'FREE',
+          operational_status: (data.operationalStatus as any) || 'FREE',
           is_active: data.isActive ?? true,
           updated_at: new Date(),
         },
@@ -376,19 +382,23 @@ class MachineService {
       const updateData: any = {
         updated_at: new Date(),
       };
-      
+
       if (data.name !== undefined) updateData.name = data.name;
       if (data.machineType !== undefined) updateData.machine_type = data.machineType || null;
       if (data.model !== undefined) updateData.model = data.model || null;
       if (data.manufacturer !== undefined) updateData.manufacturer = data.manufacturer || null;
       if (data.serialNumber !== undefined) updateData.serial_number = data.serialNumber || null;
       if (data.purchaseDate !== undefined) updateData.purchase_date = data.purchaseDate || null;
-      if (data.warrantyExpiry !== undefined) updateData.warranty_expiry = data.warrantyExpiry || null;
-      if (data.specifications !== undefined) updateData.specifications = data.specifications || null;
+      if (data.warrantyExpiry !== undefined)
+        updateData.warranty_expiry = data.warrantyExpiry || null;
+      if (data.specifications !== undefined)
+        updateData.specifications = data.specifications || null;
       if (data.imageUrl !== undefined) updateData.image_url = data.imageUrl || null;
       if (data.locationId !== undefined) updateData.location_id = data.locationId || null;
-      if (data.currentOperatorId !== undefined) updateData.current_operator_id = data.currentOperatorId || null;
-      if (data.operationalStatus !== undefined) updateData.operational_status = data.operationalStatus;
+      if (data.currentOperatorId !== undefined)
+        updateData.current_operator_id = data.currentOperatorId || null;
+      if (data.operationalStatus !== undefined)
+        updateData.operational_status = data.operationalStatus;
       if (data.status !== undefined) updateData.status = data.status;
       if (data.isActive !== undefined) updateData.is_active = data.isActive;
 
@@ -429,7 +439,13 @@ class MachineService {
   }
 
   // Update machine status
-  async updateMachineStatus(companyId: string, machineId: string, status: MachineStatus, reason?: string, changedBy?: string) {
+  async updateMachineStatus(
+    companyId: string,
+    machineId: string,
+    status: MachineStatus,
+    reason?: string,
+    changedBy?: string
+  ) {
     try {
       const existingMachine = await prisma.machines.findFirst({
         where: {
@@ -465,7 +481,9 @@ class MachineService {
         },
       });
 
-      logger.info(`Machine status updated: ${machine.machine_id} to ${status} for company ${companyId}`);
+      logger.info(
+        `Machine status updated: ${machine.machine_id} to ${status} for company ${companyId}`
+      );
       return machine;
     } catch (error) {
       logger.error('Error updating machine status:', error);
@@ -503,10 +521,17 @@ class MachineService {
 
       // Update machine status to UNDER_REPAIR if critical
       if (data.severity === 'CRITICAL') {
-        await this.updateMachineStatus(companyId, data.machineId, 'UNDER_REPAIR', 'Critical breakdown reported');
+        await this.updateMachineStatus(
+          companyId,
+          data.machineId,
+          'UNDER_REPAIR',
+          'Critical breakdown reported'
+        );
       }
 
-      logger.info(`Breakdown report created: ${breakdown.ticket_id} for machine ${breakdown.machine.machine_id}`);
+      logger.info(
+        `Breakdown report created: ${breakdown.ticket_id} for machine ${breakdown.machine.machine_id}`
+      );
       return breakdown;
     } catch (error) {
       logger.error('Error creating breakdown report:', error);
@@ -515,7 +540,10 @@ class MachineService {
   }
 
   // Get breakdown reports
-  async getBreakdownReports(companyId: string, filters: { machineId?: string; status?: BreakdownStatus; severity?: BreakdownSeverity } = {}) {
+  async getBreakdownReports(
+    companyId: string,
+    filters: { machineId?: string; status?: BreakdownStatus; severity?: BreakdownSeverity } = {}
+  ) {
     try {
       const where: any = {
         company_id: companyId,
@@ -553,7 +581,11 @@ class MachineService {
   }
 
   // Update breakdown report
-  async updateBreakdownReport(companyId: string, breakdownId: string, data: UpdateBreakdownRequest) {
+  async updateBreakdownReport(
+    companyId: string,
+    breakdownId: string,
+    data: UpdateBreakdownRequest
+  ) {
     try {
       const breakdown = await prisma.breakdown_reports.update({
         where: {
@@ -576,7 +608,12 @@ class MachineService {
 
       // Update machine status if breakdown is resolved
       if (data.status === 'RESOLVED') {
-        await this.updateMachineStatus(companyId, breakdown.machine_id, 'IDLE', 'Breakdown resolved');
+        await this.updateMachineStatus(
+          companyId,
+          breakdown.machine_id,
+          'IDLE',
+          'Breakdown resolved'
+        );
       }
 
       logger.info(`Breakdown report updated: ${breakdown.ticket_id}`);
@@ -617,7 +654,9 @@ class MachineService {
         },
       });
 
-      logger.info(`Maintenance schedule created: ${schedule.schedule_id} for machine ${schedule.machine.machine_id}`);
+      logger.info(
+        `Maintenance schedule created: ${schedule.schedule_id} for machine ${schedule.machine.machine_id}`
+      );
       return schedule;
     } catch (error) {
       logger.error('Error creating maintenance schedule:', error);
@@ -626,7 +665,10 @@ class MachineService {
   }
 
   // Get maintenance schedules
-  async getMaintenanceSchedules(companyId: string, filters: { machineId?: string; dueWithinDays?: number } = {}) {
+  async getMaintenanceSchedules(
+    companyId: string,
+    filters: { machineId?: string; dueWithinDays?: number } = {}
+  ) {
     try {
       const where: any = {
         company_id: companyId,
@@ -707,7 +749,9 @@ class MachineService {
         });
       }
 
-      logger.info(`Maintenance record created: ${record.record_id} for machine ${record.machine.machine_id}`);
+      logger.info(
+        `Maintenance record created: ${record.record_id} for machine ${record.machine.machine_id}`
+      );
       return record;
     } catch (error) {
       logger.error('Error creating maintenance record:', error);
@@ -757,10 +801,13 @@ class MachineService {
 
       return {
         totalMachines,
-        machinesByStatus: machinesByStatus.reduce((acc, item) => {
-          acc[item.status] = item._count;
-          return acc;
-        }, {} as Record<string, number>),
+        machinesByStatus: machinesByStatus.reduce(
+          (acc, item) => {
+            acc[item.status] = item._count;
+            return acc;
+          },
+          {} as Record<string, number>
+        ),
         activeBreakdowns,
         dueMaintenance,
         overdueMaintenance,
@@ -794,7 +841,9 @@ class MachineService {
       });
 
       if (activeBreakdowns > 0) {
-        throw new Error('Cannot delete machine with active breakdown reports. Please resolve all breakdowns first.');
+        throw new Error(
+          'Cannot delete machine with active breakdown reports. Please resolve all breakdowns first.'
+        );
       }
 
       // Soft delete by setting is_active to false

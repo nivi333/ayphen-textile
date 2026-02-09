@@ -20,12 +20,13 @@ export class PurchaseOrderService {
         select: { po_id: true },
       });
 
-      if (!lastPO) {
+      if (!lastPO || !lastPO.po_id) {
         return 'PO001';
       }
 
-      const numericPart = parseInt(lastPO.po_id.substring(2), 10);
-      const next = Number.isNaN(numericPart) ? 1 : numericPart + 1;
+      const numericPart = lastPO.po_id.replace(/[^0-9]/g, '');
+      const lastNumber = parseInt(numericPart, 10);
+      const next = Number.isNaN(lastNumber) ? 1 : lastNumber + 1;
       return `PO${next.toString().padStart(3, '0')}`;
     } catch (error) {
       console.error('Error generating PO ID:', error);
@@ -428,7 +429,11 @@ export class PurchaseOrderService {
     };
   }
 
-  async updatePurchaseOrder(companyId: string, poId: string, data: Partial<CreatePurchaseOrderData>) {
+  async updatePurchaseOrder(
+    companyId: string,
+    poId: string,
+    data: Partial<CreatePurchaseOrderData>
+  ) {
     if (!companyId || !companyId.trim()) {
       throw new Error('Missing required field: companyId');
     }
@@ -500,14 +505,14 @@ export class PurchaseOrderService {
       if (data.referenceNumber !== undefined)
         updateData.reference_number = data.referenceNumber ?? null;
       if (data.notes !== undefined) updateData.notes = data.notes ?? null;
-      if (data.termsConditions !== undefined) updateData.terms_conditions = data.termsConditions ?? null;
+      if (data.termsConditions !== undefined)
+        updateData.terms_conditions = data.termsConditions ?? null;
       if (data.locationId !== undefined) updateData.location_id = data.locationId ?? null;
       if (data.deliveryAddress !== undefined)
         updateData.delivery_address = data.deliveryAddress ?? null;
       if (data.shippingMethod !== undefined)
         updateData.shipping_method = data.shippingMethod ?? null;
-      if (data.incoterms !== undefined)
-        updateData.incoterms = data.incoterms ?? null;
+      if (data.incoterms !== undefined) updateData.incoterms = data.incoterms ?? null;
 
       // Recompute items and totals if items were provided
       if (data.items && data.items.length > 0) {
@@ -672,7 +677,7 @@ export class PurchaseOrderService {
     data?: {
       expectedDeliveryDate?: Date;
       shippingMethod?: string;
-    },
+    }
   ) {
     if (!companyId || !companyId.trim()) {
       throw new Error('Missing required field: companyId');
