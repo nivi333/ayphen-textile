@@ -86,7 +86,7 @@ export class LocationService {
 
       const isDefault = existingLocations.length === 0;
 
-      // If marking as headquarters, ensure no other headquarters exists
+      // If marking as headquarters, ensure no other headquarters exists (only one HQ allowed)
       if (data.isHeadquarters) {
         await this.prisma.company_locations.updateMany({
           where: {
@@ -94,6 +94,17 @@ export class LocationService {
             is_headquarters: true,
           },
           data: { is_headquarters: false },
+        });
+      }
+
+      // If marking as default, ensure no other default exists (only one default allowed)
+      if (data.isDefault === true) {
+        await this.prisma.company_locations.updateMany({
+          where: {
+            company_id: companyId,
+            is_default: true,
+          },
+          data: { is_default: false },
         });
       }
 

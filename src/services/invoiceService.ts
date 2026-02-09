@@ -1,7 +1,12 @@
 import { PrismaClient, InvoiceStatus, PaymentMethod, PaymentTerms } from '@prisma/client';
 import { globalPrisma } from '../database/connection';
 import { v4 as uuidv4 } from 'uuid';
-import { CreateInvoiceData, UpdateInvoiceData, ListInvoiceFilters, InvoiceItemInput } from '../types';
+import {
+  CreateInvoiceData,
+  UpdateInvoiceData,
+  ListInvoiceFilters,
+  InvoiceItemInput,
+} from '../types';
 
 const prisma = globalPrisma;
 
@@ -36,12 +41,26 @@ export class InvoiceService {
         }
       }
 
-      const next = maxNumber + 1;
-      return `INV${next.toString().padStart(3, '0')}`;
+      // Generate next ID and verify uniqueness
+      let next = maxNumber + 1;
+      let candidateId = `INV${next.toString().padStart(3, '0')}`;
+
+      // Check if the candidate already exists (in case of data inconsistency)
+      const existing = await this.prisma.invoices.findFirst({
+        where: { company_id: companyId, invoice_id: candidateId },
+        select: { id: true },
+      });
+
+      if (existing) {
+        // Use timestamp-based fallback to guarantee uniqueness
+        candidateId = `INV${Date.now().toString().slice(-8)}`;
+      }
+
+      return candidateId;
     } catch (error) {
       console.error('Error generating invoice ID:', error);
       // Use timestamp-based fallback to avoid collisions
-      return `INV${Date.now().toString().slice(-6)}`;
+      return `INV${Date.now().toString().slice(-8)}`;
     }
   }
 
@@ -141,8 +160,8 @@ export class InvoiceService {
       let orderPk: string | null = null;
       if (data.orderId) {
         const order = await tx.orders.findFirst({
-          where: { 
-            company_id: companyId, 
+          where: {
+            company_id: companyId,
             order_id: data.orderId,
             is_active: true,
           },
@@ -165,7 +184,9 @@ export class InvoiceService {
         for (let index = 0; index < data.items.length; index++) {
           const item = data.items[index];
           if (!item.productId) {
-            throw new Error(`Product is required for item at index ${index} when not linked to a Sales Order`);
+            throw new Error(
+              `Product is required for item at index ${index} when not linked to a Sales Order`
+            );
           }
         }
       }
@@ -278,7 +299,11 @@ export class InvoiceService {
     return result;
   }
 
-  async createInvoiceFromOrder(companyId: string, orderId: string, data: Partial<CreateInvoiceData>) {
+  async createInvoiceFromOrder(
+    companyId: string,
+    orderId: string,
+    data: Partial<CreateInvoiceData>
+  ) {
     if (!companyId || !companyId.trim()) {
       throw new Error('Missing required field: companyId');
     }
@@ -558,7 +583,9 @@ export class InvoiceService {
     if (existing.status !== InvoiceStatus.DRAFT && existing.status !== InvoiceStatus.SENT) {
       // For other statuses, only allow payment updates
       if (data.items || data.customerName || data.locationId) {
-        throw new Error('Cannot modify invoice details after it has been partially paid or paid. Only payment information can be updated.');
+        throw new Error(
+          'Cannot modify invoice details after it has been partially paid or paid. Only payment information can be updated.'
+        );
       }
     }
 
@@ -600,10 +627,12 @@ export class InvoiceService {
       if (data.invoiceNumber !== undefined) updateData.invoice_number = data.invoiceNumber ?? null;
       if (data.invoiceDate !== undefined) updateData.invoice_date = data.invoiceDate;
       if (data.dueDate !== undefined) updateData.due_date = data.dueDate;
-      if (data.paymentTerms !== undefined) updateData.payment_terms = data.paymentTerms as PaymentTerms;
+      if (data.paymentTerms !== undefined)
+        updateData.payment_terms = data.paymentTerms as PaymentTerms;
       if (data.currency !== undefined) updateData.currency = data.currency || 'INR';
       if (data.notes !== undefined) updateData.notes = data.notes ?? null;
-      if (data.termsConditions !== undefined) updateData.terms_conditions = data.termsConditions ?? null;
+      if (data.termsConditions !== undefined)
+        updateData.terms_conditions = data.termsConditions ?? null;
       if (data.bankDetails !== undefined) updateData.bank_details = data.bankDetails ?? null;
 
       // Update payment information
@@ -621,9 +650,11 @@ export class InvoiceService {
         }
       }
 
-      if (data.paymentMethod !== undefined) updateData.payment_method = data.paymentMethod as PaymentMethod;
+      if (data.paymentMethod !== undefined)
+        updateData.payment_method = data.paymentMethod as PaymentMethod;
       if (data.paymentDate !== undefined) updateData.payment_date = data.paymentDate ?? null;
-      if (data.transactionRef !== undefined) updateData.transaction_ref = data.transactionRef ?? null;
+      if (data.transactionRef !== undefined)
+        updateData.transaction_ref = data.transactionRef ?? null;
 
       // Recompute items and totals if items were provided
       if (data.items && data.items.length > 0) {
@@ -632,7 +663,9 @@ export class InvoiceService {
           for (let index = 0; index < data.items.length; index++) {
             const item = data.items[index];
             if (!item.productId) {
-              throw new Error(`Product is required for item at index ${index} when not linked to a Sales Order`);
+              throw new Error(
+                `Product is required for item at index ${index} when not linked to a Sales Order`
+              );
             }
           }
         }
@@ -777,7 +810,12 @@ export class InvoiceService {
       case InvoiceStatus.DRAFT:
         return [InvoiceStatus.SENT, InvoiceStatus.CANCELLED];
       case InvoiceStatus.SENT:
-        return [InvoiceStatus.PARTIALLY_PAID, InvoiceStatus.PAID, InvoiceStatus.OVERDUE, InvoiceStatus.CANCELLED];
+        return [
+          InvoiceStatus.PARTIALLY_PAID,
+          InvoiceStatus.PAID,
+          InvoiceStatus.OVERDUE,
+          InvoiceStatus.CANCELLED,
+        ];
       case InvoiceStatus.PARTIALLY_PAID:
         return [InvoiceStatus.PAID, InvoiceStatus.OVERDUE];
       case InvoiceStatus.OVERDUE:
@@ -938,11 +976,13 @@ export class InvoiceService {
       updatedAt: invoice.updated_at,
       customer: invoice.customer,
       location: invoice.location,
-      order: invoice.order ? {
-        id: invoice.order.id,
-        orderId: invoice.order.order_id,
-        status: invoice.order.status,
-      } : undefined,
+      order: invoice.order
+        ? {
+            id: invoice.order.id,
+            orderId: invoice.order.order_id,
+            status: invoice.order.status,
+          }
+        : undefined,
       items: invoice.invoice_items.map((i: any) => ({
         id: i.id,
         lineNumber: i.line_number,

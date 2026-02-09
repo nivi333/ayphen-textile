@@ -24,6 +24,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -52,6 +53,7 @@ const machineSchema = z.object({
   status: z.enum(['NEW', 'IN_USE', 'UNDER_MAINTENANCE', 'UNDER_REPAIR', 'IDLE', 'DECOMMISSIONED']),
   specifications: z.string().optional(),
   imageUrl: z.string().url().optional().or(z.literal('')),
+  isActive: z.boolean(),
 });
 
 type MachineFormValues = z.infer<typeof machineSchema>;
@@ -100,6 +102,7 @@ export function MachineFormSheet({
     defaultValues: {
       operationalStatus: 'FREE',
       status: 'NEW',
+      isActive: true,
     },
   });
 
@@ -127,6 +130,7 @@ export function MachineFormSheet({
               status: machine.status,
               specifications: machine.specifications || '',
               imageUrl: machine.imageUrl || '',
+              isActive: machine.isActive ?? true,
             });
 
             if (machine.imageUrl) {
@@ -146,6 +150,7 @@ export function MachineFormSheet({
       form.reset({
         operationalStatus: 'FREE',
         status: 'NEW',
+        isActive: true,
       });
       setImageFile(null);
     }
@@ -206,6 +211,7 @@ export function MachineFormSheet({
           status: values.status,
           specifications: values.specifications,
           imageUrl: imageFile?.url,
+          isActive: values.isActive,
         };
 
         const response = await machineService.updateMachine(editingMachineId, updateData);
@@ -252,8 +258,17 @@ export function MachineFormSheet({
   return (
     <Sheet open={open} onOpenChange={isOpen => !isOpen && onClose()}>
       <SheetContent className='w-[720px] sm:max-w-[720px] overflow-y-auto'>
-        <SheetHeader>
+        <SheetHeader className='flex flex-row items-center justify-between space-y-0 pb-4'>
           <SheetTitle>{isEditing ? 'Edit Machine' : 'Create Machine'}</SheetTitle>
+          {/* Active Switch in Header - disabled when creating, enabled only when editing */}
+          <div className='flex items-center space-x-2 mr-6'>
+            <span className='text-sm text-muted-foreground'>Active</span>
+            <Switch
+              checked={form.watch('isActive')}
+              onCheckedChange={checked => form.setValue('isActive', checked)}
+              disabled={!isEditing}
+            />
+          </div>
         </SheetHeader>
 
         {loading ? (
@@ -314,11 +329,11 @@ export function MachineFormSheet({
 
                 <div className='space-y-2'>
                   <label className='text-sm font-medium'>Machine Code</label>
-                  <Input 
-                    value={isEditing && machineCode ? machineCode : ''} 
-                    placeholder='Auto generated' 
-                    disabled 
-                    className='bg-muted' 
+                  <Input
+                    value={isEditing && machineCode ? machineCode : ''}
+                    placeholder='Auto generated'
+                    disabled
+                    className='bg-muted'
                   />
                 </div>
 

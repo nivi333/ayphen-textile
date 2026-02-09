@@ -553,7 +553,7 @@ export function InvoiceFormSheet({ open, onClose, initialData, isLoading }: Invo
                     control={form.control}
                     name='invoiceDate'
                     render={({ field }) => (
-                      <FormItem className='flex flex-col'>
+                      <FormItem>
                         <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
                           Invoice Date
                         </FormLabel>
@@ -605,7 +605,7 @@ export function InvoiceFormSheet({ open, onClose, initialData, isLoading }: Invo
                     control={form.control}
                     name='dueDate'
                     render={({ field }) => (
-                      <FormItem className='flex flex-col'>
+                      <FormItem>
                         <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
                           Due Date
                         </FormLabel>

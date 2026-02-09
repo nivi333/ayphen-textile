@@ -119,9 +119,18 @@ export class InvoiceController {
         res.status(400).json({ success: false, message: error.message });
         return;
       }
+      // Handle database constraint errors with user-friendly messages
+      if (error.message?.includes('Unique constraint') || error.code === 'P2002') {
+        res.status(400).json({
+          success: false,
+          message: 'Unable to process request. Please try again or contact support.',
+        });
+        return;
+      }
+      // Generic server error - don't expose internal details
       res.status(500).json({
         success: false,
-        message: error?.message || 'Failed to create invoice',
+        message: 'Unable to process request. Please try again or contact support.',
       });
     }
   }
