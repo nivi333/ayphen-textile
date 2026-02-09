@@ -306,10 +306,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const data = await response.json();
       const newTokens = data.data.tokens;
 
-      // Update localStorage with new tokens
+      // Update localStorage FIRST (synchronous, immediate)
       AuthStorage.setTokens(newTokens);
       AuthStorage.setCurrentCompany(company);
 
+      // Dispatch state updates
       dispatch({
         type: 'SET_CURRENT_COMPANY',
         payload: company,
@@ -319,11 +320,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
         type: 'REFRESH_TOKEN_SUCCESS',
         payload: newTokens,
       });
+
+      dispatch({ type: 'SET_LOADING', payload: false });
+
+      // Return a promise that resolves after a microtask to ensure state updates propagate
+      // This allows the caller to await the full state update before navigating
+      await new Promise(resolve => setTimeout(resolve, 50));
     } catch (error: any) {
       console.error('Error switching company:', error);
-      throw error;
-    } finally {
       dispatch({ type: 'SET_LOADING', payload: false });
+      throw error;
     }
   }, []);
 
@@ -348,7 +354,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const newTokens: AuthTokens = {
         accessToken: data.tokens.accessToken,
         refreshToken: data.tokens.refreshToken,
-        expiresAt: Date.now() + (data.tokens.expiresIn * 1000),
+        expiresAt: Date.now() + data.tokens.expiresIn * 1000,
       };
 
       AuthStorage.setTokens(newTokens);

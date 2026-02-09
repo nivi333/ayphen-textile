@@ -171,7 +171,7 @@ export class AuthService {
       ) {
         // Fire and forget - don't block registration response
         const consentPromises = [];
-        
+
         if (userData.hasConsentedToTerms) {
           consentPromises.push(
             gdprService.recordConsent({
@@ -183,7 +183,7 @@ export class AuthService {
             })
           );
         }
-        
+
         if (userData.hasConsentedToPrivacy) {
           consentPromises.push(
             gdprService.recordConsent({
@@ -195,7 +195,7 @@ export class AuthService {
             })
           );
         }
-        
+
         if (userData.hasConsentedToCookies) {
           consentPromises.push(
             gdprService.recordConsent({
@@ -207,7 +207,7 @@ export class AuthService {
             })
           );
         }
-        
+
         // Execute in background without blocking
         Promise.allSettled(consentPromises).catch(gdprError => {
           logger.error('Failed to record GDPR consent during registration:', gdprError);
@@ -218,13 +218,15 @@ export class AuthService {
       return { user, tokens };
     } catch (error: any) {
       // Ensure we don't expose internal errors
-      if (error.message.includes('Email or phone number is required') || 
-          error.message.includes('User already exists') ||
-          error.message.includes('Registration service temporarily unavailable') ||
-          error.message.includes('Registration failed. Please try again.')) {
+      if (
+        error.message.includes('Email or phone number is required') ||
+        error.message.includes('User already exists') ||
+        error.message.includes('Registration service temporarily unavailable') ||
+        error.message.includes('Registration failed. Please try again.')
+      ) {
         throw error;
       }
-      
+
       // Log unexpected errors but don't expose them
       logger.error('Unexpected registration error:', error);
       throw new Error('Registration failed. Please try again.');
@@ -246,10 +248,7 @@ export class AuthService {
       try {
         user = await globalPrisma.users.findFirst({
           where: {
-            OR: [
-              { email: credentials.emailOrPhone },
-              { phone: credentials.emailOrPhone }
-            ],
+            OR: [{ email: credentials.emailOrPhone }, { phone: credentials.emailOrPhone }],
             is_active: true,
           },
         });
@@ -298,13 +297,15 @@ export class AuthService {
       return { user: userResponse, tokens };
     } catch (error: any) {
       // Ensure we don't expose internal errors
-      if (error.message.includes('User not found') || 
-          error.message.includes('Invalid credentials') ||
-          error.message.includes('Email/phone and password are required') ||
-          error.message.includes('Authentication service temporarily unavailable')) {
+      if (
+        error.message.includes('User not found') ||
+        error.message.includes('Invalid credentials') ||
+        error.message.includes('Email/phone and password are required') ||
+        error.message.includes('Authentication service temporarily unavailable')
+      ) {
         throw error;
       }
-      
+
       // Log unexpected errors but don't expose them
       logger.error('Unexpected login error:', error);
       throw new Error('Authentication failed');
@@ -389,7 +390,7 @@ export class AuthService {
     try {
       // Verify the refresh token
       const decoded = this.verifyToken(refreshToken, 'refresh');
-      
+
       // Check if session exists in database
       const session = await globalPrisma.sessions.findFirst({
         where: {
@@ -445,9 +446,11 @@ export class AuthService {
       // Update Redis cache
       const refreshExpSec = Math.floor(refreshExpMs / 1000);
       await redisClient.del(`refresh_token:${decoded.sessionId}`).catch(() => {});
-      redisClient.setex(`refresh_token:${newSessionId}`, refreshExpSec, newRefreshToken).catch(err => {
-        logger.error('Failed to cache new refresh token in Redis:', err);
-      });
+      redisClient
+        .setex(`refresh_token:${newSessionId}`, refreshExpSec, newRefreshToken)
+        .catch(err => {
+          logger.error('Failed to cache new refresh token in Redis:', err);
+        });
 
       logger.info(`Token refreshed for user: ${decoded.userId}`);
       return {
@@ -457,7 +460,11 @@ export class AuthService {
       };
     } catch (error: any) {
       logger.error('Token refresh error:', error);
-      if (error.message.includes('Invalid') || error.message.includes('expired') || error.message.includes('User not found')) {
+      if (
+        error.message.includes('Invalid') ||
+        error.message.includes('expired') ||
+        error.message.includes('User not found')
+      ) {
         throw error;
       }
       throw new Error('Token refresh failed');

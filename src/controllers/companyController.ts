@@ -415,7 +415,8 @@ export class CompanyController {
         return;
       }
 
-      const nameExists = await companyService.checkNameExists(name);
+      const userId = req.userId!;
+      const nameExists = await companyService.checkNameExistsForUser(userId, name);
 
       res.json({
         success: true,

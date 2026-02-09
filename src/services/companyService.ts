@@ -58,18 +58,35 @@ async function generateLocationId(): Promise<string> {
 }
 
 class CompanyService {
-  // Check if company name already exists (case-insensitive)
-  async checkNameExists(name: string, excludeCompanyId?: string): Promise<boolean> {
+  // Check if company name already exists for a specific user (case-insensitive)
+  async checkNameExistsForUser(
+    userId: string,
+    name: string,
+    excludeCompanyId?: string
+  ): Promise<boolean> {
     try {
       const trimmedName = name.trim();
 
-      // Use raw query for case-insensitive comparison
+      // Get all company IDs that this user owns or has access to
+      const userCompanies = await globalPrisma.user_companies.findMany({
+        where: { user_id: userId, is_active: true },
+        select: { company_id: true },
+      });
+      const companyIds = userCompanies.map(uc => uc.company_id);
+
+      // If user has no companies, name doesn't exist for them
+      if (companyIds.length === 0) {
+        return false;
+      }
+
+      // Check if name exists within user's companies only
       const existing = await globalPrisma.companies.findFirst({
         where: {
           name: {
             equals: trimmedName,
             mode: 'insensitive',
           },
+          id: { in: companyIds },
           ...(excludeCompanyId && { id: { not: excludeCompanyId } }),
         },
       });
@@ -118,8 +135,8 @@ class CompanyService {
       throw new Error('Company name must be between 2 and 100 characters');
     }
 
-    // CRITICAL: Check company name uniqueness (case-insensitive)
-    const nameExists = await this.checkNameExists(companyData.name);
+    // CRITICAL: Check company name uniqueness per user (case-insensitive)
+    const nameExists = await this.checkNameExistsForUser(userId, companyData.name);
     if (nameExists) {
       throw new Error('Company name already exists. Please choose a different name.');
     }
@@ -562,9 +579,9 @@ class CompanyService {
         throw new Error('Access denied. Only OWNER or ADMIN can update company.');
       }
 
-      // CRITICAL: Check company name uniqueness if name is being updated
+      // CRITICAL: Check company name uniqueness per user if name is being updated
       if (updateData.name !== undefined) {
-        const nameExists = await this.checkNameExists(updateData.name, companyId);
+        const nameExists = await this.checkNameExistsForUser(userId, updateData.name, companyId);
         if (nameExists) {
           throw new Error('Company name already exists. Please choose a different name.');
         }

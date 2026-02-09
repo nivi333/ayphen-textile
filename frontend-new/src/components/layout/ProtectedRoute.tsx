@@ -6,6 +6,7 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import useAuth from '@/contexts/AuthContext';
 import { LoadingSpinner } from '../globalComponents';
+import { AuthStorage } from '@/utils/storage';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -29,9 +30,13 @@ export default function ProtectedRoute({ children, requireCompany = false }: Pro
     return <Navigate to='/login' state={{ from: location }} replace />;
   }
 
+  // Check both React state AND localStorage for company
+  // This handles the race condition where localStorage is updated before React state
+  const hasCompany = currentCompany || AuthStorage.getCurrentCompany();
+
   // Only redirect to company selection if company is required and not selected
   // Don't redirect if we're already on the companies page
-  if (requireCompany && !currentCompany && location.pathname !== '/companies') {
+  if (requireCompany && !hasCompany && location.pathname !== '/companies') {
     return <Navigate to='/companies' replace />;
   }
 
