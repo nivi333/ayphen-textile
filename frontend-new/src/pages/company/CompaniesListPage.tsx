@@ -20,9 +20,14 @@ export default function CompaniesListPage() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const hasFetched = useRef(false);
 
-  // Refresh companies on mount - only once
+  // Refresh companies on mount - only if not already loaded from login
   useEffect(() => {
+    // Skip if already fetched or if companies are already loaded from login
     if (hasFetched.current) return;
+    if (companies && companies.length > 0) {
+      // Companies already loaded from login, no need to refetch
+      return;
+    }
     hasFetched.current = true;
 
     const init = async () => {
@@ -37,7 +42,7 @@ export default function CompaniesListPage() {
     };
     init();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [companies]);
 
   const handleSheetClose = () => setSheetOpen(false);
 
