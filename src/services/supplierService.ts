@@ -62,21 +62,40 @@ export interface SupplierFilters {
 class SupplierService {
   // Generate Supplier Code (S001, S002, etc.) - Company level
   private async generateSupplierCode(companyId: string): Promise<string> {
-    const lastSupplier = await prisma.suppliers.findFirst({
-      where: { company_id: companyId },
-      orderBy: { code: 'desc' },
-      select: { code: true },
-    });
+    try {
+      const lastSupplier = await prisma.suppliers.findFirst({
+        where: { company_id: companyId },
+        orderBy: { code: 'desc' },
+        select: { code: true },
+      });
 
-    if (!lastSupplier || !lastSupplier.code) {
-      return 'S001';
+      let candidateCode: string;
+      if (!lastSupplier || !lastSupplier.code) {
+        candidateCode = 'S001';
+      } else {
+        // Extract numeric part safely (handles both S001 and SUPP-001 formats)
+        const numericPart = lastSupplier.code.replace(/[^0-9]/g, '');
+        const lastNumber = parseInt(numericPart, 10);
+        const next = Number.isNaN(lastNumber) ? 1 : lastNumber + 1;
+        candidateCode = `S${next.toString().padStart(3, '0')}`;
+      }
+
+      // Verify uniqueness to avoid collisions in concurrent requests
+      const existing = await prisma.suppliers.findFirst({
+        where: { company_id: companyId, code: candidateCode },
+        select: { id: true },
+      });
+
+      if (existing) {
+        // If collision, use timestamp-based fallback for guaranteed uniqueness
+        return `S${Date.now().toString().slice(-8)}`;
+      }
+
+      return candidateCode;
+    } catch (error) {
+      console.error('Error generating supplier code:', error);
+      return `S${Date.now().toString().slice(-8)}`;
     }
-
-    // Extract numeric part safely (handles both S001 and SUPP-001 formats)
-    const numericPart = lastSupplier.code.replace(/[^0-9]/g, '');
-    const lastNumber = parseInt(numericPart, 10);
-    const next = Number.isNaN(lastNumber) ? 1 : lastNumber + 1;
-    return `S${next.toString().padStart(3, '0')}`;
   }
 
   async createSupplier(data: CreateSupplierData) {

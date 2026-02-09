@@ -59,21 +59,40 @@ export interface CustomerFilters {
 class CustomerService {
   // Generate Customer Code (C001, C002, etc.) - Company level
   private async generateCustomerCode(companyId: string): Promise<string> {
-    const lastCustomer = await prisma.customers.findFirst({
-      where: { company_id: companyId },
-      orderBy: { code: 'desc' },
-      select: { code: true },
-    });
+    try {
+      const lastCustomer = await prisma.customers.findFirst({
+        where: { company_id: companyId },
+        orderBy: { code: 'desc' },
+        select: { code: true },
+      });
 
-    if (!lastCustomer || !lastCustomer.code) {
-      return 'C001';
+      let candidateCode: string;
+      if (!lastCustomer || !lastCustomer.code) {
+        candidateCode = 'C001';
+      } else {
+        // Extract numeric part safely (handles both C001 and CUST-001 formats)
+        const numericPart = lastCustomer.code.replace(/[^0-9]/g, '');
+        const lastNumber = parseInt(numericPart, 10);
+        const next = Number.isNaN(lastNumber) ? 1 : lastNumber + 1;
+        candidateCode = `C${next.toString().padStart(3, '0')}`;
+      }
+
+      // Verify uniqueness to avoid collisions in concurrent requests
+      const existing = await prisma.customers.findFirst({
+        where: { company_id: companyId, code: candidateCode },
+        select: { id: true },
+      });
+
+      if (existing) {
+        // If collision, use timestamp-based fallback for guaranteed uniqueness
+        return `C${Date.now().toString().slice(-8)}`;
+      }
+
+      return candidateCode;
+    } catch (error) {
+      console.error('Error generating customer code:', error);
+      return `C${Date.now().toString().slice(-8)}`;
     }
-
-    // Extract numeric part safely (handles both C001 and CUST-001 formats)
-    const numericPart = lastCustomer.code.replace(/[^0-9]/g, '');
-    const lastNumber = parseInt(numericPart, 10);
-    const next = Number.isNaN(lastNumber) ? 1 : lastNumber + 1;
-    return `C${next.toString().padStart(3, '0')}`;
   }
 
   async createCustomer(data: CreateCustomerData) {

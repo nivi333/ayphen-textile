@@ -30,7 +30,9 @@ async function request(method, endpoint, body = null, description = '') {
       results.passed.push(`✅ ${description}`);
       return { success: true, data: data.data || data, status: response.status };
     } else {
-      results.failed.push(`❌ ${description}: ${data.message || data.details || 'Unknown error'}`);
+      const errorMsg =
+        data.message || data.details || (data.errors ? data.errors.join(', ') : 'Unknown error');
+      results.failed.push(`❌ ${description}: ${errorMsg}`);
       return { success: false, error: data, status: response.status };
     }
   } catch (error) {
@@ -95,6 +97,11 @@ async function runTests() {
     {
       name: `TestLoc-${Date.now()}`,
       locationType: 'WAREHOUSE',
+      addressLine1: '123 Test Street',
+      city: 'Test City',
+      state: 'Test State',
+      country: 'India',
+      pincode: '123456',
     },
     'CREATE: New location'
   );
@@ -132,6 +139,8 @@ async function runTests() {
     `/companies/${testCompanyId}/customers`,
     {
       name: `TestCustomer-${Date.now()}`,
+      email: `cust${Date.now()}@test.com`,
+      customerType: 'INDIVIDUAL',
     },
     'CREATE: New customer'
   );
@@ -175,6 +184,7 @@ async function runTests() {
     {
       name: `TestSupp-${Date.now()}`,
       email: `supp${Date.now()}@test.com`,
+      supplierType: 'MANUFACTURER',
     },
     'CREATE: New supplier'
   );
