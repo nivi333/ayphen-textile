@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Plus, Search, Filter, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -45,6 +45,7 @@ export default function InventoryListPage() {
   const [selectedRecord, setSelectedRecord] = useState<LocationInventory | null>(null);
 
   const { currentCompany } = useAuth();
+  const isInitialMount = useRef(true);
 
   useEffect(() => {
     if (currentCompany?.id) {
@@ -80,10 +81,14 @@ export default function InventoryListPage() {
   });
 
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
     if (currentCompany?.id) {
       fetchInventory();
     }
-  }, [currentCompany?.id, searchText, selectedLocation, selectedProduct]);
+  }, [searchText, selectedLocation, selectedProduct]);
 
   const fetchLocations = async () => {
     try {
@@ -274,7 +279,7 @@ export default function InventoryListPage() {
         productName={selectedRecord?.product?.name}
         locationId={selectedRecord?.locationId}
         open={isHistoryOpen}
-        onOpenChange={(open) => {
+        onOpenChange={open => {
           setIsHistoryOpen(open);
           if (!open) setSelectedRecord(null);
         }}

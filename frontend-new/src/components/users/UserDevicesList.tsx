@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Table, TableBody, TableRow, TableHead } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
   DataTable,
-  TableCell as GlobalTableCell,
-  TableHeader as GlobalTableHeader,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
 } from '@/components/globalComponents';
 import { userService } from '@/services/userService';
 import { format } from 'date-fns';
@@ -19,7 +21,7 @@ interface Session {
   id: string;
   lastActive: string;
   createdAt: string;
-  deviceType?: string; // Assuming API might provide this, typically parsed from User-Agent
+  deviceType?: string;
 }
 
 export default function UserDevicesList({ userId }: UserDevicesListProps) {
@@ -61,39 +63,37 @@ export default function UserDevicesList({ userId }: UserDevicesListProps) {
       </CardHeader>
       <CardContent>
         <DataTable>
-          <Table>
-            <TableHead>
-              <TableRow className='flex'>
-                <GlobalTableHeader>Device</GlobalTableHeader>
-                <GlobalTableHeader>Last Active</GlobalTableHeader>
-                <GlobalTableHeader>Started At</GlobalTableHeader>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Device</TableHead>
+              <TableHead>Last Active</TableHead>
+              <TableHead>Started At</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {sessions.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={3} className='text-center text-muted-foreground h-24'>
+                  No active sessions found
+                </TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {sessions.length === 0 ? (
-                <TableRow>
-                  <GlobalTableCell colSpan={3} className='text-center text-muted-foreground h-24'>
-                    No active sessions found
-                  </GlobalTableCell>
-                </TableRow>
-              ) : (
-                sessions.map(session => (
-                  <TableRow key={session.id}>
-                    <GlobalTableCell className='flex items-center gap-2'>
+            ) : (
+              sessions.map(session => (
+                <TableRow key={session.id}>
+                  <TableCell>
+                    <div className='flex items-center gap-2'>
                       <Monitor className='h-4 w-4 text-muted-foreground' />
                       <span>Session {session.id.substring(0, 8)}...</span>
-                    </GlobalTableCell>
-                    <GlobalTableCell>
-                      {format(new Date(session.lastActive), 'MMM d, yyyy h:mm a')}
-                    </GlobalTableCell>
-                    <GlobalTableCell>
-                      {format(new Date(session.createdAt), 'MMM d, yyyy h:mm a')}
-                    </GlobalTableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {format(new Date(session.lastActive), 'MMM d, yyyy h:mm a')}
+                  </TableCell>
+                  <TableCell>{format(new Date(session.createdAt), 'MMM d, yyyy h:mm a')}</TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
         </DataTable>
       </CardContent>
     </Card>

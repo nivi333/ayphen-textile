@@ -10,10 +10,11 @@ import {
   Loader2,
   FileText,
   ArrowRight,
+  Receipt,
 } from 'lucide-react';
 import {
-  AreaChart,
-  Area,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -27,8 +28,10 @@ import useAuth from '@/contexts/AuthContext';
 
 import { PrimaryButton } from '@/components/globalComponents';
 import { Card } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { analyticsService, DashboardAnalytics } from '@/services/analyticsService';
 import { invoiceService, InvoiceSummary } from '@/services/invoiceService';
+import { billService, BillSummary } from '@/services/billService';
 import { COMPANY_TEXT } from '@/constants/company';
 import UserInviteSheet from '@/components/users/UserInviteSheet';
 import { StatusBadge } from '@/components/globalComponents';
@@ -42,6 +45,7 @@ const DashboardPage = () => {
   const [analytics, setAnalytics] = useState<DashboardAnalytics | null>(null);
   const [revenueTrends, setRevenueTrends] = useState<any[]>([]);
   const [recentInvoices, setRecentInvoices] = useState<InvoiceSummary[]>([]);
+  const [recentBills, setRecentBills] = useState<BillSummary[]>([]);
   const userRole = currentCompany?.role;
 
   useEffect(() => {
@@ -63,21 +67,34 @@ const DashboardPage = () => {
 
     setLoading(true);
     try {
-      const [dashboardAnalytics, revenueTrendData, invoicesData] = await Promise.all([
+      const [dashboardAnalytics, revenueTrendData, invoicesData, billsData] = await Promise.all([
         analyticsService.getDashboardAnalytics(),
         analyticsService.getRevenueTrends(6),
         invoiceService.getInvoices().catch(() => []),
+        billService.getBills().catch(() => []),
       ]);
 
-      // Get last 5 invoices sorted by date
+      // Get last 3 invoices sorted by date
       const sortedInvoices = invoicesData
-        .sort((a: InvoiceSummary, b: InvoiceSummary) => new Date(b.invoiceDate).getTime() - new Date(a.invoiceDate).getTime())
-        .slice(0, 5);
+        .sort(
+          (a: InvoiceSummary, b: InvoiceSummary) =>
+            new Date(b.invoiceDate).getTime() - new Date(a.invoiceDate).getTime()
+        )
+        .slice(0, 3);
       setRecentInvoices(sortedInvoices);
+
+      // Get last 3 bills sorted by date
+      const sortedBills = billsData
+        .sort(
+          (a: BillSummary, b: BillSummary) =>
+            new Date(b.billDate).getTime() - new Date(a.billDate).getTime()
+        )
+        .slice(0, 3);
+      setRecentBills(sortedBills);
 
       setAnalytics(dashboardAnalytics);
 
-      // Transform revenue trends for Recharts - using actual data only
+      // Transform revenue trends for Recharts
       const chartData = revenueTrendData.map((item: any) => ({
         month: item.month,
         Revenue: item.revenue,
@@ -131,6 +148,34 @@ const DashboardPage = () => {
   const totalRevenue = analytics?.monthlyRevenue || 0;
   const totalInventoryValue = analytics?.totalInventoryValue || 0;
   const pendingPayments = analytics?.pendingPayments || 0;
+
+  const getInvoiceStatusVariant = (status: string) => {
+    switch (status) {
+      case 'PAID':
+        return 'success' as const;
+      case 'OVERDUE':
+        return 'error' as const;
+      case 'PARTIALLY_PAID':
+        return 'warning' as const;
+      default:
+        return 'default' as const;
+    }
+  };
+
+  const getBillStatusVariant = (status: string) => {
+    switch (status) {
+      case 'PAID':
+        return 'success' as const;
+      case 'OVERDUE':
+        return 'error' as const;
+      case 'PARTIALLY_PAID':
+        return 'warning' as const;
+      case 'RECEIVED':
+        return 'info' as const;
+      default:
+        return 'default' as const;
+    }
+  };
 
   return (
     <div>
@@ -229,7 +274,7 @@ const DashboardPage = () => {
           </Card>
         </div>
 
-        {/* Revenue Trend Chart - Modern Area Chart */}
+        {/* Revenue Trend Chart - Smooth Curved Line Chart */}
         {revenueTrends.length > 0 && (
           <Card className='mb-6 overflow-hidden'>
             <div className='p-6'>
@@ -250,54 +295,47 @@ const DashboardPage = () => {
                 </div>
               </div>
               <ResponsiveContainer width='100%' height={280}>
-                <AreaChart data={revenueTrends}>
-                  <defs>
-                    <linearGradient id='revenueGradient' x1='0' y1='0' x2='0' y2='1'>
-                      <stop offset='5%' stopColor='#7b5fc9' stopOpacity={0.3} />
-                      <stop offset='95%' stopColor='#7b5fc9' stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id='profitGradient' x1='0' y1='0' x2='0' y2='1'>
-                      <stop offset='5%' stopColor='#10b981' stopOpacity={0.3} />
-                      <stop offset='95%' stopColor='#10b981' stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
+                <LineChart data={revenueTrends}>
                   <CartesianGrid strokeDasharray='3 3' stroke='#e5e7eb' vertical={false} />
-                  <XAxis 
-                    dataKey='month' 
-                    axisLine={false} 
+                  <XAxis
+                    dataKey='month'
+                    axisLine={false}
                     tickLine={false}
                     tick={{ fill: '#6b7280', fontSize: 12 }}
                   />
-                  <YAxis 
+                  <YAxis
                     tickFormatter={value => `₹${(value / 1000).toFixed(0)}K`}
                     axisLine={false}
                     tickLine={false}
                     tick={{ fill: '#6b7280', fontSize: 12 }}
                   />
-                  <Tooltip 
+                  <Tooltip
                     formatter={(value: number) => [`₹${value.toLocaleString()}`, '']}
                     contentStyle={{
                       backgroundColor: 'rgba(255, 255, 255, 0.95)',
                       border: 'none',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                      borderRadius: '12px',
+                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+                      padding: '12px 16px',
                     }}
                   />
-                  <Area
-                    type='monotone'
+                  <Line
+                    type='natural'
                     dataKey='Revenue'
                     stroke='#7b5fc9'
-                    strokeWidth={2}
-                    fill='url(#revenueGradient)'
+                    strokeWidth={3}
+                    dot={{ r: 4, fill: '#7b5fc9', stroke: '#fff', strokeWidth: 2 }}
+                    activeDot={{ r: 6, fill: '#7b5fc9', stroke: '#fff', strokeWidth: 2 }}
                   />
-                  <Area
-                    type='monotone'
+                  <Line
+                    type='natural'
                     dataKey='Orders'
                     stroke='#10b981'
-                    strokeWidth={2}
-                    fill='url(#profitGradient)'
+                    strokeWidth={3}
+                    dot={{ r: 4, fill: '#10b981', stroke: '#fff', strokeWidth: 2 }}
+                    activeDot={{ r: 6, fill: '#10b981', stroke: '#fff', strokeWidth: 2 }}
                   />
-                </AreaChart>
+                </LineChart>
               </ResponsiveContainer>
             </div>
           </Card>
@@ -323,64 +361,107 @@ const DashboardPage = () => {
           </div>
         </div>
 
-        {/* Recent Financial Transactions */}
+        {/* Recent Transactions - Tabbed Invoices & Bills */}
         <Card>
           <div className='p-6'>
             <div className='flex items-center justify-between mb-4'>
               <div className='flex items-center gap-2'>
                 <FileText className='h-5 w-5 text-primary' />
-                <h3 className='text-lg font-semibold'>Recent Invoices</h3>
+                <h3 className='text-lg font-semibold'>Recent Transactions</h3>
               </div>
-              <button
-                onClick={() => navigate('/invoices')}
-                className='text-sm text-primary hover:underline flex items-center gap-1'
-              >
-                View All <ArrowRight className='h-4 w-4' />
-              </button>
             </div>
-            {recentInvoices.length === 0 ? (
-              <p className='text-sm text-muted-foreground text-center py-6'>
-                No recent invoices found
-              </p>
-            ) : (
-              <div className='space-y-3'>
-                {recentInvoices.map(invoice => (
-                  <div
-                    key={invoice.invoiceId}
-                    className='flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer'
-                    onClick={() => navigate(`/invoices/${invoice.invoiceId}`)}
-                  >
-                    <div className='flex items-center gap-3'>
-                      <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center'>
-                        <FileText className='h-5 w-5 text-primary' />
-                      </div>
-                      <div>
-                        <p className='font-medium text-sm'>{invoice.invoiceId}</p>
-                        <p className='text-xs text-muted-foreground'>{invoice.customerName}</p>
-                      </div>
-                    </div>
-                    <div className='text-right'>
-                      <p className='font-semibold text-sm'>
-                        {invoice.currency} {Number(invoice.totalAmount).toLocaleString()}
-                      </p>
-                      <StatusBadge
-                        variant={
-                          invoice.status === 'PAID'
-                            ? 'success'
-                            : invoice.status === 'OVERDUE'
-                              ? 'error'
-                              : invoice.status === 'PARTIALLY_PAID'
-                                ? 'warning'
-                                : 'default'
-                        }
+            <Tabs defaultValue='invoices' className='w-full'>
+              <TabsList className='mb-4'>
+                <TabsTrigger value='invoices'>Invoices</TabsTrigger>
+                <TabsTrigger value='bills'>Bills</TabsTrigger>
+              </TabsList>
+
+              {/* Invoices Tab */}
+              <TabsContent value='invoices'>
+                {recentInvoices.length === 0 ? (
+                  <p className='text-sm text-muted-foreground text-center py-6'>
+                    No recent invoices found
+                  </p>
+                ) : (
+                  <div className='space-y-3'>
+                    {recentInvoices.map(invoice => (
+                      <div
+                        key={invoice.invoiceId}
+                        className='flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer'
+                        onClick={() => navigate(`/invoices/${invoice.invoiceId}`)}
                       >
-                        {invoice.status.replace('_', ' ')}
-                      </StatusBadge>
-                    </div>
+                        <div className='flex items-center gap-3'>
+                          <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center'>
+                            <FileText className='h-5 w-5 text-primary' />
+                          </div>
+                          <div>
+                            <p className='font-medium text-sm'>{invoice.invoiceId}</p>
+                            <p className='text-xs text-muted-foreground'>{invoice.customerName}</p>
+                          </div>
+                        </div>
+                        <div className='text-right'>
+                          <p className='font-semibold text-sm'>
+                            ₹{Number(invoice.totalAmount).toLocaleString()}
+                          </p>
+                          <StatusBadge variant={getInvoiceStatusVariant(invoice.status)}>
+                            {invoice.status.replace('_', ' ')}
+                          </StatusBadge>
+                        </div>
+                      </div>
+                    ))}
+                    <button
+                      onClick={() => navigate('/invoices')}
+                      className='w-full text-sm text-primary hover:underline flex items-center justify-center gap-1 pt-2'
+                    >
+                      View All Invoices <ArrowRight className='h-4 w-4' />
+                    </button>
                   </div>
-                ))}
-              </div>
-            )}
+                )}
+              </TabsContent>
+
+              {/* Bills Tab */}
+              <TabsContent value='bills'>
+                {recentBills.length === 0 ? (
+                  <p className='text-sm text-muted-foreground text-center py-6'>
+                    No recent bills found
+                  </p>
+                ) : (
+                  <div className='space-y-3'>
+                    {recentBills.map(bill => (
+                      <div
+                        key={bill.billId}
+                        className='flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer'
+                        onClick={() => navigate(`/bills/${bill.billId}`)}
+                      >
+                        <div className='flex items-center gap-3'>
+                          <div className='w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center'>
+                            <Receipt className='h-5 w-5 text-orange-500' />
+                          </div>
+                          <div>
+                            <p className='font-medium text-sm'>{bill.billNumber || bill.billId}</p>
+                            <p className='text-xs text-muted-foreground'>{bill.supplierName}</p>
+                          </div>
+                        </div>
+                        <div className='text-right'>
+                          <p className='font-semibold text-sm'>
+                            ₹{Number(bill.totalAmount).toLocaleString()}
+                          </p>
+                          <StatusBadge variant={getBillStatusVariant(bill.status)}>
+                            {bill.status.replace('_', ' ')}
+                          </StatusBadge>
+                        </div>
+                      </div>
+                    ))}
+                    <button
+                      onClick={() => navigate('/bills')}
+                      className='w-full text-sm text-primary hover:underline flex items-center justify-center gap-1 pt-2'
+                    >
+                      View All Bills <ArrowRight className='h-4 w-4' />
+                    </button>
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
           </div>
         </Card>
       </div>

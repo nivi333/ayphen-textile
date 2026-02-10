@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Plus,
   Filter,
@@ -103,6 +103,7 @@ export default function OrdersListPage() {
   const [isDetailLoading, setIsDetailLoading] = useState(false);
 
   const { currentCompany } = useAuth();
+  const isInitialMount = useRef(true);
 
   useEffect(() => {
     if (currentCompany?.id) {
@@ -112,6 +113,10 @@ export default function OrdersListPage() {
   }, [currentCompany?.id]);
 
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
     if (currentCompany?.id) {
       fetchOrders();
     }

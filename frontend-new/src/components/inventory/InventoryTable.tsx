@@ -102,7 +102,8 @@ export function InventoryTable({
         ) : (
           data.map(record => {
             const status = getStockStatus(record);
-            const value = record.stockQuantity * record.product.costPrice;
+            const value =
+              (Number(record.stockQuantity) || 0) * (Number(record.product.costPrice) || 0);
 
             return (
               <TableRow key={record.id}>

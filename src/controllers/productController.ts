@@ -73,8 +73,8 @@ const stockAdjustmentSchema = Joi.object({
     .valid('ADD', 'REMOVE', 'SET', 'SALE', 'PURCHASE', 'RETURN', 'DAMAGE', 'TRANSFER')
     .required(),
   quantity: Joi.number().greater(0).required(),
-  reason: Joi.string().max(255).optional(),
-  notes: Joi.string().max(1000).optional(),
+  reason: Joi.string().max(255).optional().allow('', null),
+  notes: Joi.string().max(1000).optional().allow('', null),
   adjustedBy: Joi.string().min(1).max(255).required(),
 });
 

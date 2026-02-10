@@ -119,8 +119,9 @@ export default function CompanyDetailPage() {
 
   const isActive = extendedCompany.isActive !== false;
 
-  // Parse contact info
-  const rawContactInfo = extendedCompany.contactInfo || '';
+  // Parse contact info - handle case where contactInfo might be an object or non-string
+  const rawContactInfo =
+    typeof extendedCompany.contactInfo === 'string' ? extendedCompany.contactInfo : '';
   const inferredEmail =
     rawContactInfo.includes('@') && !rawContactInfo.startsWith('{') ? rawContactInfo : undefined;
   const inferredPhone =

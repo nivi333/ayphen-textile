@@ -25,7 +25,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { DatePicker } from '@/components/ui/date-picker';
-import { format, parse } from 'date-fns';
+import { format } from 'date-fns';
 import {
   companyService,
   CreateCompanyRequest,
@@ -116,9 +116,9 @@ export function CompanyCreationSheet({
       companyService
         .getCompany(editingCompanyId)
         .then(company => {
-          const establishedDate = company.establishedDate
-            ? parse(company.establishedDate, 'yyyy-MM-dd', new Date())
-            : new Date();
+          const parsedDate = company.establishedDate ? new Date(company.establishedDate) : null;
+          const establishedDate =
+            parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate : new Date();
 
           form.reset({
             name: company.name,
@@ -135,7 +135,12 @@ export function CompanyCreationSheet({
             establishedDate,
             businessType: company.businessType || '',
             certifications: company.certifications || '',
-            contactInfo: company.contactInfo || '',
+            contactInfo:
+              typeof company.contactInfo === 'string'
+                ? company.contactInfo
+                : company.contactInfo
+                  ? JSON.stringify(company.contactInfo)
+                  : '',
             website: company.website || '',
             taxId: company.taxId || '',
           });
