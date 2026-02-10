@@ -13,13 +13,14 @@ import {
   Receipt,
 } from 'lucide-react';
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Legend,
 } from 'recharts';
 import { toast } from 'sonner';
 
@@ -283,59 +284,75 @@ const DashboardPage = () => {
                   <h3 className='text-lg font-semibold'>Revenue Overview</h3>
                   <p className='text-sm text-muted-foreground'>Monthly revenue and order trends</p>
                 </div>
-                <div className='flex items-center gap-4 text-sm'>
-                  <div className='flex items-center gap-2'>
-                    <div className='w-3 h-3 rounded-full bg-primary' />
-                    <span className='text-muted-foreground'>Revenue</span>
-                  </div>
-                  <div className='flex items-center gap-2'>
-                    <div className='w-3 h-3 rounded-full bg-emerald-500' />
-                    <span className='text-muted-foreground'>Orders</span>
-                  </div>
-                </div>
               </div>
-              <ResponsiveContainer width='100%' height={280}>
-                <LineChart data={revenueTrends}>
-                  <CartesianGrid strokeDasharray='3 3' stroke='#e5e7eb' vertical={false} />
+              <ResponsiveContainer width='100%' height={300}>
+                <AreaChart data={revenueTrends}>
+                  <defs>
+                    <linearGradient id='revenueGradient' x1='0' y1='0' x2='0' y2='1'>
+                      <stop offset='5%' stopColor='#7c3aed' stopOpacity={0.3} />
+                      <stop offset='95%' stopColor='#7c3aed' stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id='ordersGradient' x1='0' y1='0' x2='0' y2='1'>
+                      <stop offset='5%' stopColor='#10b981' stopOpacity={0.3} />
+                      <stop offset='95%' stopColor='#10b981' stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray='3 3' stroke='#f1f5f9' vertical={false} />
                   <XAxis
                     dataKey='month'
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: '#6b7280', fontSize: 12 }}
+                    tick={{ fill: '#94a3b8', fontSize: 12 }}
+                    dy={8}
                   />
                   <YAxis
                     tickFormatter={value => `₹${(value / 1000).toFixed(0)}K`}
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: '#6b7280', fontSize: 12 }}
+                    tick={{ fill: '#94a3b8', fontSize: 12 }}
+                    dx={-4}
                   />
                   <Tooltip
-                    formatter={(value: number) => [`₹${value.toLocaleString()}`, '']}
+                    formatter={(value: number, name: string) => [
+                      `₹${value.toLocaleString('en-IN')}`,
+                      name,
+                    ]}
                     contentStyle={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                      border: 'none',
+                      backgroundColor: 'white',
+                      border: '1px solid #e2e8f0',
                       borderRadius: '12px',
-                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+                      boxShadow: '0 10px 40px rgba(0, 0, 0, 0.08)',
                       padding: '12px 16px',
                     }}
+                    labelStyle={{ color: '#475569', fontWeight: 600, marginBottom: 4 }}
+                    itemStyle={{ padding: '2px 0' }}
                   />
-                  <Line
-                    type='natural'
+                  <Legend
+                    verticalAlign='top'
+                    align='right'
+                    iconType='circle'
+                    iconSize={10}
+                    wrapperStyle={{ paddingBottom: 16, fontSize: 13 }}
+                  />
+                  <Area
+                    type='monotone'
                     dataKey='Revenue'
-                    stroke='#7b5fc9'
-                    strokeWidth={3}
-                    dot={{ r: 4, fill: '#7b5fc9', stroke: '#fff', strokeWidth: 2 }}
-                    activeDot={{ r: 6, fill: '#7b5fc9', stroke: '#fff', strokeWidth: 2 }}
+                    stroke='#7c3aed'
+                    strokeWidth={2.5}
+                    fill='url(#revenueGradient)'
+                    dot={{ r: 4, fill: '#7c3aed', stroke: '#fff', strokeWidth: 2 }}
+                    activeDot={{ r: 6, fill: '#7c3aed', stroke: '#fff', strokeWidth: 3 }}
                   />
-                  <Line
-                    type='natural'
+                  <Area
+                    type='monotone'
                     dataKey='Orders'
                     stroke='#10b981'
-                    strokeWidth={3}
+                    strokeWidth={2.5}
+                    fill='url(#ordersGradient)'
                     dot={{ r: 4, fill: '#10b981', stroke: '#fff', strokeWidth: 2 }}
-                    activeDot={{ r: 6, fill: '#10b981', stroke: '#fff', strokeWidth: 2 }}
+                    activeDot={{ r: 6, fill: '#10b981', stroke: '#fff', strokeWidth: 3 }}
                   />
-                </LineChart>
+                </AreaChart>
               </ResponsiveContainer>
             </div>
           </Card>

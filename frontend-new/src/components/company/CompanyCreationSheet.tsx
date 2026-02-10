@@ -35,7 +35,28 @@ import { AuthStorage } from '@/utils/storage';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/lib/utils';
 
-const companySchema = z.object({
+// Maps API display names back to form Select values
+const INDUSTRY_DISPLAY_TO_ENUM: Record<string, string> = {
+  'Textile Manufacturing': 'TEXTILE_MANUFACTURING',
+  'Garment Production': 'GARMENT_PRODUCTION',
+  'Knitting & Weaving': 'KNITTING_WEAVING',
+  'Fabric Processing': 'FABRIC_PROCESSING',
+  'Apparel Design': 'APPAREL_DESIGN',
+  'Fashion Retail': 'FASHION_RETAIL',
+  'Yarn Production': 'YARN_PRODUCTION',
+  'Dyeing & Finishing': 'DYEING_FINISHING',
+  'Home Textiles': 'HOME_TEXTILES',
+  'Technical Textiles': 'TECHNICAL_TEXTILES',
+};
+
+const BUSINESS_TYPE_ENUM_TO_DISPLAY: Record<string, string> = {
+  MANUFACTURER: 'Manufacturer',
+  TRADER: 'Trader',
+  EXPORTER: 'Exporter',
+  OTHER: 'Other',
+};
+
+const baseSchema = z.object({
   name: z.string().min(1, 'Company name is required').max(48, 'Name too long'),
   slug: z
     .string()
@@ -45,7 +66,7 @@ const companySchema = z.object({
   industry: z.string().min(1, 'Industry is required'),
   description: z.string().max(80).optional(),
   country: z.string().min(1, 'Country is required'),
-  defaultLocation: z.string().min(1, 'Default location name is required').max(32),
+  defaultLocation: z.string().max(32).optional(),
   addressLine1: z.string().min(1, 'Address is required').max(64),
   addressLine2: z.string().max(64).optional(),
   city: z.string().min(1, 'City is required').max(32),
@@ -56,11 +77,17 @@ const companySchema = z.object({
     invalid_type_error: 'Please select a valid date',
   }),
   businessType: z.string().min(1, 'Business type is required'),
-  certifications: z.string().max(64).optional(),
+  certifications: z.string().max(200).optional(),
   contactInfo: z.string().min(1, 'Contact information is required'),
   website: z.string().max(48).optional(),
   taxId: z.string().max(24).optional(),
 });
+
+const createSchema = baseSchema.extend({
+  defaultLocation: z.string().min(1, 'Default location name is required').max(32),
+});
+
+const companySchema = baseSchema;
 
 type CompanyFormValues = z.infer<typeof companySchema>;
 
@@ -94,7 +121,7 @@ export function CompanyCreationSheet({
   const isEditing = mode === 'edit' && !!editingCompanyId;
 
   const form = useForm<CompanyFormValues>({
-    resolver: zodResolver(companySchema),
+    resolver: zodResolver(isEditing ? companySchema : createSchema),
   });
 
   const resetFormState = useCallback(() => {
@@ -123,7 +150,10 @@ export function CompanyCreationSheet({
           form.reset({
             name: company.name,
             slug: company.slug,
-            industry: company.industry || '',
+            industry:
+              (company.industry && INDUSTRY_DISPLAY_TO_ENUM[company.industry]) ||
+              company.industry ||
+              '',
             description: company.description || '',
             country: company.country || '',
             defaultLocation: company.defaultLocation || '',
@@ -133,8 +163,13 @@ export function CompanyCreationSheet({
             state: company.state || '',
             pincode: company.pincode || '',
             establishedDate,
-            businessType: company.businessType || '',
-            certifications: company.certifications || '',
+            businessType:
+              (company.businessType && BUSINESS_TYPE_ENUM_TO_DISPLAY[company.businessType]) ||
+              company.businessType ||
+              '',
+            certifications: Array.isArray(company.certifications)
+              ? company.certifications.join(', ')
+              : company.certifications || '',
             contactInfo:
               typeof company.contactInfo === 'string'
                 ? company.contactInfo
@@ -348,7 +383,7 @@ export function CompanyCreationSheet({
           slug: values.slug,
           industry: values.industry,
           country: values.country,
-          defaultLocation: values.defaultLocation,
+          defaultLocation: values.defaultLocation!,
           addressLine1: values.addressLine1,
           city: values.city,
           state: values.state,

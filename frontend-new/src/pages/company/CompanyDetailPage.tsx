@@ -119,15 +119,23 @@ export default function CompanyDetailPage() {
 
   const isActive = extendedCompany.isActive !== false;
 
-  // Parse contact info - handle case where contactInfo might be an object or non-string
-  const rawContactInfo =
-    typeof extendedCompany.contactInfo === 'string' ? extendedCompany.contactInfo : '';
-  const inferredEmail =
-    rawContactInfo.includes('@') && !rawContactInfo.startsWith('{') ? rawContactInfo : undefined;
-  const inferredPhone =
-    !rawContactInfo.includes('@') && !rawContactInfo.startsWith('{') && rawContactInfo
-      ? rawContactInfo
-      : undefined;
+  // Parse contact info - handle case where contactInfo is a JSON object or string
+  let inferredEmail: string | undefined;
+  let inferredPhone: string | undefined;
+  if (typeof extendedCompany.contactInfo === 'object' && extendedCompany.contactInfo !== null) {
+    const ci = extendedCompany.contactInfo as Record<string, string>;
+    inferredEmail = ci.email || undefined;
+    inferredPhone = ci.phone || undefined;
+  } else {
+    const rawContactInfo =
+      typeof extendedCompany.contactInfo === 'string' ? extendedCompany.contactInfo : '';
+    inferredEmail =
+      rawContactInfo.includes('@') && !rawContactInfo.startsWith('{') ? rawContactInfo : undefined;
+    inferredPhone =
+      !rawContactInfo.includes('@') && !rawContactInfo.startsWith('{') && rawContactInfo
+        ? rawContactInfo
+        : undefined;
+  }
   const website = extendedCompany.website;
   const websiteNode = website ? (
     <a
@@ -183,8 +191,13 @@ export default function CompanyDetailPage() {
       title: 'Address',
       items: [
         { label: 'Default Location', value: extendedCompany.defaultLocation },
-        { label: 'Address Line 1', value: extendedCompany.addressLine1 },
-        { label: 'Address Line 2', value: extendedCompany.addressLine2 },
+        {
+          label: 'Address',
+          value:
+            [extendedCompany.addressLine1, extendedCompany.addressLine2]
+              .filter(Boolean)
+              .join(', ') || undefined,
+        },
         { label: 'City', value: extendedCompany.city },
         { label: 'State', value: extendedCompany.state },
         { label: 'Pincode', value: extendedCompany.pincode },
